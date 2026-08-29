@@ -2,7 +2,9 @@
 
 Reusable hybrid flat-file CMS for PHP 8.5+. The same domain model will serve normalized JSON through a REST API and render complete HTML through developer-defined PHP blocks and layouts.
 
-Stages 0, 1 and 2 are complete in this revision: architecture/contracts, the executable HTTP foundation, and the safe filesystem/YAML layer.
+Stages 0–3 are complete in this revision: architecture/contracts, the executable
+HTTP foundation, safe filesystem/YAML access and the localized public content
+API.
 
 ## Current capabilities
 
@@ -10,7 +12,7 @@ Stages 0, 1 and 2 are complete in this revision: architecture/contracts, the exe
 - small shared-service container;
 - environment loading from process variables and `.env.local`;
 - immutable HTTP request and response objects;
-- exact and `{parameter}` routes with GET/HEAD support;
+- exact, `{parameter}` and final `{path*}` routes with GET/HEAD support;
 - separate website, API and admin route spaces;
 - central JSON/HTML exception rendering;
 - production-safe internal errors;
@@ -22,9 +24,15 @@ Stages 0, 1 and 2 are complete in this revision: architecture/contracts, the exe
 - exclusive file locking and atomic replacement;
 - SHA-256 revision conflict detection;
 - restrictive, bounded YAML parsing;
-- content-hash-invalidated parsed YAML cache.
+- content-hash-invalidated parsed YAML cache;
+- validated page, language, configuration and navigation repositories;
+- localized public route index with sibling-collision detection;
+- central SEO fallback resolution;
+- normalized page, navigation and public-configuration API responses;
+- ETag and Last-Modified conditional requests.
 
-Page-domain repositories, localized routes, rendering and the admin application intentionally begin in subsequent stages.
+Block schemas, server-side rendering and the admin application intentionally
+begin in subsequent stages.
 
 ## Requirements
 
@@ -50,12 +58,22 @@ planned session, authentication-throttling and mail settings. A production
 installation must refuse the `CHANGE_ME` secret and insecure development
 values.
 
-## HTTP routes in stage 1
+Configuration has one owner per concern: deployment/runtime values and secrets
+belong to `.env.local`; site URL, SEO, layouts and media behavior belong to
+`config/setup.yml`. See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for the
+complete boundary. `YAML_CACHE_ENABLED` controls only the infrastructure cache
+of parsed YAML and is intentionally not a site setting.
+
+## HTTP routes through stage 3
 
 | Method | Route | Purpose |
 |---|---|---|
 | GET, HEAD | `/` | application readiness page |
 | GET, HEAD | `/api/v1/health` | JSON operational health |
+| GET, HEAD | `/api/v1/pages?lang=pl` | localized homepage data |
+| GET, HEAD | `/api/v1/pages/{path*}?lang=pl` | localized page data resolved from public slugs |
+| GET, HEAD | `/api/v1/navigation?lang=pl` | localized navigation with resolved page links |
+| GET, HEAD | `/api/v1/config?lang=pl` | deliberate public configuration projection |
 | GET, HEAD | `/admin` | protected-panel availability notice until auth is implemented |
 
 Unknown API routes use the documented JSON error envelope. Unknown website routes receive an HTML error without local paths or a stack trace.
@@ -79,6 +97,7 @@ tests/              unit and feature tests
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for accepted decisions and [docs/CONTENT-CONTRACTS.md](docs/CONTENT-CONTRACTS.md) for the first on-disk contract.
 Filesystem guarantees and cache behavior are documented in [docs/FILESYSTEM-SAFETY.md](docs/FILESYSTEM-SAFETY.md).
+Configuration ownership is documented in [docs/CONFIGURATION.md](docs/CONFIGURATION.md).
 
 ## Web-server setup
 
@@ -120,7 +139,7 @@ test failures.
 - user-controlled paths are constrained to configured filesystem roots;
 - user and authentication state will be the only SQLite-backed domain in the completed CMS.
 
-## Stage 2 API
+## Filesystem and YAML API
 
 Application services receive `FilesystemRoot` and `RelativePath`, never an
 unchecked absolute path. YAML reads return a `YamlDocument` containing both the
@@ -128,8 +147,22 @@ normalized mapping and its `FileRevision`. Pass that revision back to `write()`
 to prevent a stale editor from overwriting newer content. New files use
 `FileRevision::missing()`.
 
+## Public content API
+
+The `lang` query parameter defaults to the configured default locale. Disabled
+pages return the same `PAGE_NOT_FOUND` response as missing pages. Public page
+paths use translated slugs, while the `id` in the response remains the stable
+technical directory identity. In multilingual mode generated website URLs are
+prefixed with the locale; single-language installations produce unprefixed
+URLs.
+
+Every successful public API response includes `ETag`, `Last-Modified` and
+`Cache-Control: public, max-age=0, must-revalidate`. Both `If-None-Match` and
+`If-Modified-Since` are supported. See [docs/API.md](docs/API.md) for response
+contracts and examples.
+
 ## Next stage
 
-Stage 3 implements page, configuration and navigation repositories, localized
-route indexing, SEO resolution and the public content API. See
-`docs/ROADMAP.md` for the full sequence.
+Stage 4 implements automatic block discovery, field-type registration,
+schema-aware localization, normalization and validation. See `docs/ROADMAP.md`
+for the full sequence.

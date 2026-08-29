@@ -1,1 +1,7 @@
-main: []
+main:
+  - label:
+      pl: Start
+    link:
+      type: page
+      page: homepage
+    target: _self

@@ -27,7 +27,7 @@
 - locks, atomic writes and revision conflicts;
 - parsed-file cache.
 
-## Stage 3 — pages, localization and public API
+## Stage 3 — pages, localization and public API (complete)
 
 - page/config/navigation repositories;
 - localized route index;

@@ -41,6 +41,20 @@ final class RouterTest extends TestCase
         self::assertSame('Michał', $response->body());
     }
 
+    public function testItCapturesAPathUsingFinalWildcardParameter(): void
+    {
+        $router = new Router();
+        $router->get(
+            '/pages/{path*}',
+            static fn(Request $request): Response => Response::html((string) $request->attribute('path')),
+            'pages.show',
+        );
+
+        $response = $router->dispatch(new Request('GET', '/pages/services/websites'));
+
+        self::assertSame('services/websites', $response->body());
+    }
+
     public function testItReturnsAHeadResponseWithoutBody(): void
     {
         $router = new Router();

@@ -1,6 +1,6 @@
 # FlatFile CMS — Architecture Decision Record
 
-Status: accepted for stages 0–1  
+Status: accepted for stages 0–3  
 Baseline: PHP 8.5+
 
 The project intentionally provides no compatibility layer for PHP 8.4 or older.
@@ -19,7 +19,9 @@ Neither adapter calls the other. Content, navigation, public configuration, SEO 
 
 - Administrator-controlled: `pages/`, editable values in `config/`, and page media.
 - Developer-controlled: `blocks/`, executable renderers, layouts, partials and frontend assets.
-- Secret-controlled: environment variables or an untracked `.env.local` file.
+- Runtime/secret-controlled: environment variables or an untracked `.env.local`
+  file. This includes server-specific behavior and credentials, never site
+  content.
 - Runtime-controlled: `storage/`.
 
 Block and template PHP is trusted developer code. `RenderContext` deliberately limits the supported API but is not a security sandbox for malicious PHP.
@@ -104,4 +106,8 @@ The application must support Apache, Nginx, Docker and shared PHP hosting. Produ
 
 ## 10. Stage boundaries
 
-Stage 0 freezes architecture and file contracts. Stage 1 supplies Composer, bootstrap, dependency wiring, HTTP request/response objects, routing, health endpoints, central exception handling and tests. YAML repositories, localized routing and rendering begin in stage 2 and later vertical slices.
+Stage 0 freezes architecture and file contracts. Stage 1 supplies Composer,
+bootstrap and HTTP transport. Stage 2 supplies safe filesystem and YAML access.
+Stage 3 supplies page/configuration/navigation repositories, localized route
+indexing, SEO resolution and the public content API. Block-schema validation and
+HTML rendering remain separate later slices and consume the same page model.

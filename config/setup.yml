@@ -1,11 +1,11 @@
 schemaVersion: 1
 site:
   name: FlatFile CMS
-  url: https://example.com
+  url: http://localhost
   defaultLayout: default
 seo:
   titleSuffix: FlatFile CMS
-  description: ''
+  description: ""
   ogImage: null
 media:
   transformations:
@@ -15,5 +15,3 @@ media:
   formats:
     - webp
     - avif
-cache:
-  enabled: true

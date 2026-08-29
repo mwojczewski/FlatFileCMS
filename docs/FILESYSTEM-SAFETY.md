@@ -64,5 +64,6 @@ stored source revision equals the SHA-256 revision of the current YAML bytes.
 This avoids stale data even when modification time and file size do not change.
 
 Cache files are runtime-only, contain no executable PHP and may be deleted at
-any time. Setting `CACHE_ENABLED=0` disables reads and writes without changing
-repository behavior.
+any time. Setting `YAML_CACHE_ENABLED=0` disables reads and writes without
+changing repository behavior. This variable does not control media variants;
+media transformation and media-cache behavior belongs to `config/setup.yml`.

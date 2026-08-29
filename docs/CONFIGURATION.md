@@ -1,0 +1,57 @@
+# Configuration ownership
+
+Every setting has one authoritative source. Environment variables do not
+override site YAML, and site YAML does not contain server credentials or
+secrets. This prevents configuration drift and makes a copied site tree behave
+predictably after its environment has been supplied.
+
+## `.env.local`
+
+`.env.local` is untracked and belongs to the deployment/runtime operator.
+
+| Concern | Variables |
+|---|---|
+| Runtime | `APP_ENV`, `APP_DEBUG`, `APP_SECRET`, `APP_TIMEZONE` |
+| Infrastructure cache | `YAML_CACHE_ENABLED` |
+| Reverse proxy | `TRUSTED_PROXIES` |
+| Session deployment | `SESSION_NAME`, `SESSION_LIFETIME`, `SESSION_COOKIE_SECURE`, `SESSION_COOKIE_SAME_SITE` |
+| Auth protection | `AUTH_LOGIN_*`, `AUTH_RESET_*`, `AUTH_PASSWORD_RESET_TTL` |
+| Mail transport | `MAIL_*` |
+
+`HttpOnly` is not configurable: administrator session cookies must always use
+it. Other non-negotiable security guarantees should likewise be enforced in
+code instead of exposed as switches.
+
+`YAML_CACHE_ENABLED` controls only parsed mappings stored under
+`storage/cache/yaml/`. It exists in the environment because the useful choice
+depends on the server and deployment mode and because reading `setup.yml`
+itself uses this cache.
+
+## `config/setup.yml`
+
+`setup.yml` is versioned, copied with the site and may later be managed through
+the admin application.
+
+| Concern | Keys |
+|---|---|
+| Site identity | `site.name`, `site.url` |
+| Rendering | `site.defaultLayout` |
+| SEO defaults | `seo.*` |
+| Media transforms | `media.transformations.enabled`, `media.formats` |
+| Generated media cache | `media.cache.enabled` |
+
+`site.url` is the sole canonical site URL. There is no `APP_URL` environment
+override. Media processing has no environment override either; copying the
+site preserves its declared media contract.
+
+## Other YAML files
+
+- `config/languages.yml` owns enabled languages and the default locale;
+- `config/navigation.yml` owns menus;
+- `pages/**/content.yml` owns page content, localized slugs, page SEO and
+  blocks;
+- `blocks/*/block.yml` is developer-owned schema, not administrator content.
+
+Secrets are forbidden in every YAML file. SMTP passwords, application secrets
+and future external-service credentials belong only to the environment or an
+equivalent secret manager exposed as environment variables.

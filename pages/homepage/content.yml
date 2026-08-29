@@ -1,0 +1,17 @@
+schemaVersion: 1
+enabled: true
+layout: default
+title:
+  pl: Strona główna
+seo:
+  title:
+    pl: Strona główna
+  description:
+    pl: Przykładowa strona główna FlatFile CMS.
+  robots:
+    index: true
+    follow: true
+  openGraph: { }
+  twitter: { }
+  jsonLd: { }
+blocks: []

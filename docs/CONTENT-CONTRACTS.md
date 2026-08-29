@@ -88,6 +88,33 @@ filters: []
 
 A directory containing `pagination.yml` and no `content.yml` is a collection. A directory cannot be both a normal page and a collection in contract version 1.
 
+## `config/setup.yml`
+
+```yaml
+schemaVersion: 1
+site:
+  name: Example
+  url: https://example.com
+  defaultLayout: default
+seo:
+  titleSuffix: Example
+  description: ''
+  ogImage: null
+media:
+  transformations:
+    enabled: true
+  cache:
+    enabled: true
+  formats:
+    - webp
+    - avif
+```
+
+`site.url` is the canonical public URL and is owned exclusively by this file.
+Media behavior is also site configuration. Runtime cache of parsed YAML is a
+separate infrastructure concern controlled exclusively through
+`YAML_CACHE_ENABLED` in `.env.local`.
+
 ## Internal links
 
 Internal page references use stable identities rather than localized URLs:

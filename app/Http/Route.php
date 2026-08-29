@@ -40,11 +40,11 @@ final readonly class Route
         $names = [];
         $quoted = preg_quote($this->pattern, '#');
         $expression = preg_replace_callback(
-            '/\\\\\{([A-Za-z_][A-Za-z0-9_]*)\\\\\}/',
+            '/\\\\\{([A-Za-z_][A-Za-z0-9_]*)(\\\\\*)?\\\\\}/',
             static function (array $match) use (&$names): string {
                 $names[] = $match[1];
 
-                return '([^/]+)';
+                return ($match[2] ?? '') === '\\*' ? '(.+)' : '([^/]+)';
             },
             $quoted,
         );
