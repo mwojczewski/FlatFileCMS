@@ -1,0 +1,19 @@
+schemaVersion: 1
+site:
+  name: FlatFile CMS
+  url: https://example.com
+  defaultLayout: default
+seo:
+  titleSuffix: FlatFile CMS
+  description: ''
+  ogImage: null
+media:
+  transformations:
+    enabled: true
+  cache:
+    enabled: true
+  formats:
+    - webp
+    - avif
+cache:
+  enabled: true

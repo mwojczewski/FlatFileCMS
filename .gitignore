@@ -1,0 +1,82 @@
+# Environment files and local secrets
+/.env
+/.env.*
+!/.env.example
+!/.env.*.example
+/config/*.local.yml
+/config/secrets/
+/.htpasswd
+/auth.json
+/composer-auth.json
+
+# Private keys, certificates and keystores
+*.key
+*.pem
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+
+# Dependencies
+/vendor/
+
+# Runtime databases and SQLite sidecar files
+/storage/database/*
+!/storage/database/.gitkeep
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+*.db-wal
+*.db-shm
+
+# Sessions, password-reset state and temporary files
+/storage/sessions/*
+!/storage/sessions/.gitkeep
+/storage/tmp/*
+!/storage/tmp/.gitkeep
+
+# Cache, generated media and published runtime assets
+/storage/cache/*
+!/storage/cache/.gitkeep
+/public/assets/generated/
+
+# Logs and audit data may contain user IDs, email addresses and IP addresses
+/storage/logs/*
+!/storage/logs/.gitkeep
+/storage/audit/*
+!/storage/audit/.gitkeep
+*.log
+
+# Database dumps and backups
+*.sql
+*.sql.gz
+*.dump
+*.bak
+
+# Test and analysis output
+/.phpunit.cache/
+/.phpunit.result.cache
+/.php-cs-fixer.cache
+/coverage/
+/build/
+
+# Local container overrides
+/compose.override.yml
+/compose.override.yaml
+/docker-compose.override.yml
+/docker-compose.override.yaml
+
+# IDE and operating-system files
+/.idea/
+/.vscode/
+/.fleet/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db

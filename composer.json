@@ -1,0 +1,50 @@
+{
+    "name": "wojczewski/flatfile-cms",
+    "description": "Hybrid headless and server-side flat-file CMS for PHP 8.5+.",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.5",
+        "ext-ctype": "*",
+        "ext-filter": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "ext-pdo": "*",
+        "ext-pdo_sqlite": "*",
+        "symfony/yaml": "^8.0"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^13.0",
+        "friendsofphp/php-cs-fixer": "^3.80"
+    },
+    "autoload": {
+        "psr-4": {
+            "FlatFileCms\\": "app/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "FlatFileCms\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "analyse": "phpstan analyse --memory-limit=512M",
+        "fix-style": "php-cs-fixer fix --diff",
+        "check-style": "php-cs-fixer check --diff",
+        "check": [
+            "@check-style",
+            "@analyse",
+            "@test"
+        ]
+    },
+    "config": {
+        "allow-plugins": {},
+        "optimize-autoloader": true,
+        "platform": {
+            "php": "8.5.0"
+        },
+        "sort-packages": true
+    }
+}

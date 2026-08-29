@@ -1,0 +1,5 @@
+default: pl
+languages:
+  pl:
+    name: Polski
+    enabled: true
