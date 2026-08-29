@@ -1,0 +1,18 @@
+schemaVersion: 1
+name:
+  pl: Tekst
+  en: Rich text
+description:
+  pl: Bezpieczna treść zapisywana jako Markdown.
+  en: Safe content stored as Markdown.
+icon: text
+fields:
+  content:
+    type: markdown
+    required: true
+    translatable: true
+    minLength: 1
+    maxLength: 50000
+    label:
+      pl: Treść
+      en: Content

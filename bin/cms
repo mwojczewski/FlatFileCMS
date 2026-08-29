@@ -1,0 +1,15 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use FlatFileCms\Cli\BlockScaffolder;
+use FlatFileCms\Cli\ConsoleApplication;
+
+$projectRoot = dirname(__DIR__);
+require $projectRoot . '/vendor/autoload.php';
+
+$console = new ConsoleApplication(new BlockScaffolder($projectRoot));
+
+/** @var list<string> $argv */
+exit($console->run($argv));

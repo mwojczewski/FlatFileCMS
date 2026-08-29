@@ -35,7 +35,7 @@
 - public page/navigation/config endpoints;
 - ETag and Last-Modified.
 
-## Stage 4 — block schema and validation
+## Stage 4 — block schema and validation (complete)
 
 - block discovery and registry;
 - field-type registry;

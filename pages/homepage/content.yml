@@ -14,4 +14,13 @@ seo:
   openGraph: { }
   twitter: { }
   jsonLd: { }
-blocks: []
+blocks:
+  - id: 01994d31-4fd1-7f32-9c2a-e89d624cda37
+    type: rich-text
+    enabled: true
+    data:
+      content:
+        pl: |
+          ## FlatFile CMS
+
+          Warstwa contentu i publiczne API działają poprawnie.

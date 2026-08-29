@@ -96,6 +96,7 @@ final readonly class PublicApiController
             $this->pageSerializer->serialize($page, $locale, $languages, $routes, $configuration),
             max(
                 $page->modifiedAt(),
+                $this->pageSerializer->blockDefinitionsModifiedAt($page),
                 $routes->modifiedAt(),
                 $languageDocument->modifiedAt(),
                 $configuration->modifiedAt(),

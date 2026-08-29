@@ -20,7 +20,7 @@ return static function (Router $router, ?Container $container = null): void {
     $router->get('/api/v1/health', static fn(Request $request): Response => Response::json([
         'status' => 'ok',
         'application' => 'FlatFile CMS',
-        'stage' => 3,
+        'stage' => 4,
     ]), 'api.health');
 
     if ($container !== null) {

@@ -6,8 +6,8 @@ use PhpCsFixer\Config;
 use PhpCsFixer\Finder;
 
 $finder = Finder::create()
-    ->in([__DIR__ . '/app', __DIR__ . '/bootstrap', __DIR__ . '/config', __DIR__ . '/public', __DIR__ . '/tests'])
-    ->name('*.php');
+    ->in([__DIR__ . '/app', __DIR__ . '/bin', __DIR__ . '/bootstrap', __DIR__ . '/config', __DIR__ . '/public', __DIR__ . '/tests'])
+    ->name(['*.php', 'cms']);
 
 return (new Config())
     ->setRiskyAllowed(true)

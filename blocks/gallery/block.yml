@@ -1,0 +1,34 @@
+schemaVersion: 1
+name:
+  pl: Galeria
+  en: Gallery
+description:
+  pl: Lista obrazów z ALT-em zależnym od miejsca użycia.
+  en: Image list with usage-specific alt text.
+icon: images
+fields:
+  images:
+    type: repeater
+    required: true
+    translatable: false
+    minItems: 1
+    maxItems: 50
+    label:
+      pl: Obrazy
+      en: Images
+    fields:
+      image:
+        type: image
+        required: true
+        translatable: false
+        label:
+          pl: Obraz
+          en: Image
+      caption:
+        type: text
+        required: false
+        translatable: true
+        maxLength: 300
+        label:
+          pl: Podpis
+          en: Caption

@@ -68,9 +68,15 @@ fields:
     type: text
     required: true
     translatable: true
+    minLength: 1
+    maxLength: 160
 ```
 
 `block.yml` and `render.php` are required. `style.css`, `script.js` and `preview.webp` are optional developer assets.
+Block data may contain only fields declared by the definition. Required
+translatable fields require a value for every enabled site language. Field
+definitions and supported validation rules are documented in
+[BLOCKS.md](BLOCKS.md).
 
 ## `pages/<identity>/pagination.yml`
 

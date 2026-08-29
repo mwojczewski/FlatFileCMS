@@ -5,6 +5,11 @@ declare(strict_types=1);
 use FlatFileCms\Api\ApiResponseFactory;
 use FlatFileCms\Api\PageSerializer;
 use FlatFileCms\Api\PublicApiController;
+use FlatFileCms\Blocks\BlockProcessor;
+use FlatFileCms\Blocks\BlockRegistry;
+use FlatFileCms\Blocks\BlockValidator;
+use FlatFileCms\Blocks\BuiltinFieldTypes;
+use FlatFileCms\Blocks\Field\FieldTypeRegistry;
 use FlatFileCms\Config\ConfigurationRepository;
 use FlatFileCms\Config\LanguageRepository;
 use FlatFileCms\Content\PageRepository;
@@ -90,6 +95,34 @@ $container->set(
 );
 $container->set(LocalizedDataResolver::class, static fn(): LocalizedDataResolver => new LocalizedDataResolver());
 $container->set(
+    FieldTypeRegistry::class,
+    static fn(Container $container): FieldTypeRegistry => BuiltinFieldTypes::create(
+        $container->get(SafePathResolver::class),
+    ),
+);
+$container->set(
+    BlockRegistry::class,
+    static fn(Container $container): BlockRegistry => new BlockRegistry(
+        $container->get(Environment::class)->projectRoot(),
+        $container->get(YamlParser::class),
+        $container->get(FieldTypeRegistry::class),
+        $container->get(YamlFileCache::class),
+    ),
+);
+$container->set(
+    BlockValidator::class,
+    static fn(Container $container): BlockValidator => new BlockValidator(
+        $container->get(FieldTypeRegistry::class),
+    ),
+);
+$container->set(
+    BlockProcessor::class,
+    static fn(Container $container): BlockProcessor => new BlockProcessor(
+        $container->get(BlockRegistry::class),
+        $container->get(BlockValidator::class),
+    ),
+);
+$container->set(
     NavigationRepository::class,
     static fn(Container $container): NavigationRepository => new NavigationRepository(
         $container->get(YamlFileRepository::class),
@@ -106,7 +139,7 @@ $container->set(
 $container->set(
     PageSerializer::class,
     static fn(Container $container): PageSerializer => new PageSerializer(
-        $container->get(LocalizedDataResolver::class),
+        $container->get(BlockProcessor::class),
         $container->get(SeoResolver::class),
     ),
 );

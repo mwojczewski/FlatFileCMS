@@ -2,9 +2,9 @@
 
 Reusable hybrid flat-file CMS for PHP 8.5+. The same domain model will serve normalized JSON through a REST API and render complete HTML through developer-defined PHP blocks and layouts.
 
-Stages 0–3 are complete in this revision: architecture/contracts, the executable
+Stages 0–4 are complete in this revision: architecture/contracts, the executable
 HTTP foundation, safe filesystem/YAML access and the localized public content
-API.
+API with schema-validated blocks.
 
 ## Current capabilities
 
@@ -29,10 +29,14 @@ API.
 - localized public route index with sibling-collision detection;
 - central SEO fallback resolution;
 - normalized page, navigation and public-configuration API responses;
-- ETag and Last-Modified conditional requests.
+- ETag and Last-Modified conditional requests;
+- automatic developer block discovery from `blocks/*/block.yml`;
+- extensible field-type registry with all standard CMS field types;
+- schema-aware block validation, normalization and localization;
+- UUID v7 uniqueness and page-local media-reference validation.
 
-Block schemas, server-side rendering and the admin application intentionally
-begin in subsequent stages.
+Server-side rendering and the admin application intentionally begin in
+subsequent stages.
 
 ## Requirements
 
@@ -52,6 +56,17 @@ php -S 127.0.0.1:8080 -t public public/index.php
 
 Open `http://127.0.0.1:8080/`. Operational status is available from `GET /api/v1/health`.
 
+Create a developer block package with:
+
+```bash
+php bin/cms block:create image-with-text
+php bin/cms block:create gallery-slider --with-assets
+```
+
+The first form creates the required block.yml and render.php. The optional
+flag also creates scoped style.css and script.js. Existing block directories
+are never overwritten.
+
 Do not commit `.env.local`. Generate a unique `APP_SECRET` before a real deployment.
 The included `.env.example` contains development-only values and documents the
 planned session, authentication-throttling and mail settings. A production
@@ -66,15 +81,15 @@ of parsed YAML and is intentionally not a site setting.
 
 ## HTTP routes through stage 3
 
-| Method | Route | Purpose |
-|---|---|---|
-| GET, HEAD | `/` | application readiness page |
-| GET, HEAD | `/api/v1/health` | JSON operational health |
-| GET, HEAD | `/api/v1/pages?lang=pl` | localized homepage data |
-| GET, HEAD | `/api/v1/pages/{path*}?lang=pl` | localized page data resolved from public slugs |
-| GET, HEAD | `/api/v1/navigation?lang=pl` | localized navigation with resolved page links |
-| GET, HEAD | `/api/v1/config?lang=pl` | deliberate public configuration projection |
-| GET, HEAD | `/admin` | protected-panel availability notice until auth is implemented |
+| Method    | Route                           | Purpose                                                       |
+| --------- | ------------------------------- | ------------------------------------------------------------- |
+| GET, HEAD | `/`                             | application readiness page                                    |
+| GET, HEAD | `/api/v1/health`                | JSON operational health                                       |
+| GET, HEAD | `/api/v1/pages?lang=pl`         | localized homepage data                                       |
+| GET, HEAD | `/api/v1/pages/{path*}?lang=pl` | localized page data resolved from public slugs                |
+| GET, HEAD | `/api/v1/navigation?lang=pl`    | localized navigation with resolved page links                 |
+| GET, HEAD | `/api/v1/config?lang=pl`        | deliberate public configuration projection                    |
+| GET, HEAD | `/admin`                        | protected-panel availability notice until auth is implemented |
 
 Unknown API routes use the documented JSON error envelope. Unknown website routes receive an HTML error without local paths or a stack trace.
 
@@ -98,6 +113,7 @@ tests/              unit and feature tests
 See [ARCHITECTURE.md](ARCHITECTURE.md) for accepted decisions and [docs/CONTENT-CONTRACTS.md](docs/CONTENT-CONTRACTS.md) for the first on-disk contract.
 Filesystem guarantees and cache behavior are documented in [docs/FILESYSTEM-SAFETY.md](docs/FILESYSTEM-SAFETY.md).
 Configuration ownership is documented in [docs/CONFIGURATION.md](docs/CONFIGURATION.md).
+Block packages, field rules and extension points are documented in [docs/BLOCKS.md](docs/BLOCKS.md).
 
 ## Web-server setup
 
@@ -163,6 +179,6 @@ contracts and examples.
 
 ## Next stage
 
-Stage 4 implements automatic block discovery, field-type registration,
-schema-aware localization, normalization and validation. See `docs/ROADMAP.md`
-for the full sequence.
+Stage 5 implements block/page/layout renderers, the safe render context,
+Markdown rendering, partials and fingerprinted per-page assets. See
+`docs/ROADMAP.md` for the full sequence.

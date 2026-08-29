@@ -7,6 +7,10 @@ namespace FlatFileCms\Tests\Support;
 use FlatFileCms\Api\ApiResponseFactory;
 use FlatFileCms\Api\PageSerializer;
 use FlatFileCms\Api\PublicApiController;
+use FlatFileCms\Blocks\BlockProcessor;
+use FlatFileCms\Blocks\BlockRegistry;
+use FlatFileCms\Blocks\BlockValidator;
+use FlatFileCms\Blocks\BuiltinFieldTypes;
 use FlatFileCms\Config\ConfigurationRepository;
 use FlatFileCms\Config\LanguageRepository;
 use FlatFileCms\Content\PageRepository;
@@ -47,6 +51,9 @@ final class TestContentFactory
         );
         $localization = new LocalizedDataResolver();
         $seo = new SeoResolver($localization);
+        $fieldTypes = BuiltinFieldTypes::create($paths);
+        $blockRegistry = new BlockRegistry($project->path(), new YamlParser(), $fieldTypes);
+        $blockProcessor = new BlockProcessor($blockRegistry, new BlockValidator($fieldTypes));
 
         return new PublicApiController(
             new LanguageRepository($yaml, $paths),
@@ -54,7 +61,7 @@ final class TestContentFactory
             new PageRepository($yaml, $paths),
             new NavigationRepository($yaml, $paths, $localization),
             $localization,
-            new PageSerializer($localization, $seo),
+            new PageSerializer($blockProcessor, $seo),
             new ApiResponseFactory(),
         );
     }

@@ -1,0 +1,45 @@
+schemaVersion: 1
+name:
+  pl: Hero
+  en: Hero
+description:
+  pl: Główna sekcja otwierająca stronę.
+  en: Main opening section of a page.
+icon: image
+fields:
+  title:
+    type: text
+    required: true
+    translatable: true
+    minLength: 1
+    maxLength: 160
+    label:
+      pl: Nagłówek
+      en: Heading
+  content:
+    type: markdown
+    required: false
+    translatable: true
+    maxLength: 5000
+    label:
+      pl: Treść
+      en: Content
+  image:
+    type: image
+    required: false
+    translatable: false
+    label:
+      pl: Obraz
+      en: Image
+  alignment:
+    type: select
+    required: true
+    translatable: false
+    options:
+      - value: left
+        label: { pl: Do lewej, en: Left }
+      - value: center
+        label: { pl: Wyśrodkowane, en: Center }
+    label:
+      pl: Wyrównanie
+      en: Alignment

@@ -6,6 +6,7 @@ namespace FlatFileCms\Tests\Unit\Api;
 
 use FlatFileCms\Api\ApiResponseFactory;
 use FlatFileCms\Api\PublicApiController;
+use FlatFileCms\Content\InvalidContentException;
 use FlatFileCms\Http\HttpException;
 use FlatFileCms\Http\Request;
 use FlatFileCms\Http\Response;
@@ -123,8 +124,48 @@ YAML);
         }
     }
 
+    public function testItRejectsDuplicateBlockIdentifiers(): void
+    {
+        $this->project->write('pages/services/content.yml', <<<'YAML'
+schemaVersion: 1
+enabled: true
+slug: { pl: oferta, en: services }
+title: { pl: Oferta, en: Services }
+blocks:
+  - id: 01994d31-4fd1-7f32-9c2a-e89d624cda37
+    type: hero
+    data:
+      heading: { pl: Pierwszy, en: First }
+  - id: 01994d31-4fd1-7f32-9c2a-e89d624cda37
+    type: hero
+    data:
+      heading: { pl: Drugi, en: Second }
+YAML);
+        $this->controller = TestContentFactory::publicApi($this->project);
+
+        $this->expectException(InvalidContentException::class);
+        $this->controller->page(new Request(
+            'GET',
+            '/api/v1/pages/services',
+            query: ['lang' => 'en'],
+            attributes: ['path' => 'services'],
+        ));
+    }
+
     private function writeFixtures(): void
     {
+        $this->project->write('blocks/hero/block.yml', <<<'YAML'
+schemaVersion: 1
+name: { pl: Hero, en: Hero }
+fields:
+  heading:
+    type: text
+    required: true
+    translatable: true
+    minLength: 1
+    maxLength: 160
+YAML);
+        $this->project->write('blocks/hero/render.php', "<?php\n\ndeclare(strict_types=1);\n");
         $this->project->write('config/languages.yml', <<<'YAML'
 default: pl
 languages:

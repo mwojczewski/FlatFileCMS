@@ -45,10 +45,10 @@ contract.
 }
 ```
 
-Disabled blocks are omitted from the public representation. Until block schemas
-are introduced in stage 4, nested mappings whose keys consist exclusively of
-enabled locale codes are resolved as localized values. Stage 4 adds schema-aware
-validation while preserving the public response shape.
+Disabled blocks are validated but omitted from the public representation. Block
+data is validated, normalized and localized according to the developer-owned
+`block.yml` definition. Unknown block types, unknown fields, invalid UUIDs and
+missing translations make the page invalid instead of leaking unchecked data.
 
 ## Conditional requests
 
