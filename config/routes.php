@@ -18,7 +18,7 @@ return static function (Router $router): void {
     $router->get('/api/v1/health', static fn(Request $request): Response => Response::json([
         'status' => 'ok',
         'application' => 'FlatFile CMS',
-        'stage' => 1,
+        'stage' => 2,
     ]), 'api.health');
 
     $router->get('/admin', static fn(Request $request): Response => Response::html(

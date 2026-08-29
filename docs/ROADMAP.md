@@ -19,7 +19,7 @@
 - health endpoint and regression tests;
 - Apache and Nginx routing examples.
 
-## Stage 2 — safe filesystem and YAML
+## Stage 2 — safe filesystem and YAML (complete)
 
 - safe root-bound path resolver;
 - slug and page-identity value objects;

@@ -7,6 +7,7 @@ namespace FlatFileCms\Tests\Unit\Core;
 use FlatFileCms\Core\Environment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 #[CoversClass(Environment::class)]
 final class EnvironmentTest extends TestCase
@@ -36,5 +37,14 @@ final class EnvironmentTest extends TestCase
 
         self::assertSame('testing', $environment->name());
         self::assertTrue($environment->debug());
+    }
+
+    public function testItRejectsInvalidBooleanValue(): void
+    {
+        file_put_contents($this->temporaryDirectory . '/.env.local', "CACHE_ENABLED=perhaps\n");
+        $environment = Environment::load($this->temporaryDirectory);
+
+        $this->expectException(RuntimeException::class);
+        $environment->boolean('CACHE_ENABLED', true);
     }
 }

@@ -41,11 +41,8 @@ final readonly class Environment
             }
         }
 
-        foreach (['APP_ENV', 'APP_DEBUG', 'APP_URL', 'APP_SECRET'] as $key) {
-            $systemValue = getenv($key);
-            if (is_string($systemValue) && $systemValue !== '') {
-                $values[$key] = $systemValue;
-            }
+        foreach (getenv() as $key => $systemValue) {
+            $values[$key] = $systemValue;
         }
 
         return new self(rtrim($projectRoot, DIRECTORY_SEPARATOR), $values);
@@ -63,7 +60,18 @@ final readonly class Environment
 
     public function debug(): bool
     {
-        return filter_var($this->get('APP_DEBUG', '0'), FILTER_VALIDATE_BOOL);
+        return $this->boolean('APP_DEBUG', false);
+    }
+
+    public function boolean(string $key, bool $default): bool
+    {
+        $value = $this->get($key, $default ? '1' : '0');
+        $parsed = filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+        if ($parsed === null) {
+            throw new RuntimeException(sprintf('Environment variable "%s" must be boolean.', $key));
+        }
+
+        return $parsed;
     }
 
     public function get(string $key, ?string $default = null): string

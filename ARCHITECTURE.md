@@ -83,7 +83,8 @@ Stage 1 implements the transport foundation. Content-aware errors will add stabl
 
 ## 8. Libraries
 
-- `symfony/yaml`: mature, safe YAML parsing without adopting Symfony Framework.
+- `symfony/yaml` 8.1+: mature YAML parsing with pre-expansion alias rejection,
+  without adopting Symfony Framework.
 - PHPUnit: executable regression tests.
 - PHPStan: maximum-level static analysis.
 - PHP-CS-Fixer: deterministic PER-CS 2.0 formatting.

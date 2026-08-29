@@ -2,7 +2,7 @@
 
 Reusable hybrid flat-file CMS for PHP 8.5+. The same domain model will serve normalized JSON through a REST API and render complete HTML through developer-defined PHP blocks and layouts.
 
-Stages 0 and 1 are complete in this revision: architecture/contracts and the executable HTTP foundation.
+Stages 0, 1 and 2 are complete in this revision: architecture/contracts, the executable HTTP foundation, and the safe filesystem/YAML layer.
 
 ## Current capabilities
 
@@ -16,9 +16,15 @@ Stages 0 and 1 are complete in this revision: architecture/contracts and the exe
 - production-safe internal errors;
 - health endpoint;
 - PHPUnit, PHPStan and PHP-CS-Fixer configuration;
-- Apache and Nginx front-controller configuration examples.
+- Apache and Nginx front-controller configuration examples;
+- portable relative-path and page-identity value objects;
+- root-bound filesystem resolution with symlink-escape protection;
+- exclusive file locking and atomic replacement;
+- SHA-256 revision conflict detection;
+- restrictive, bounded YAML parsing;
+- content-hash-invalidated parsed YAML cache.
 
-Content repositories, YAML parsing, localized routes, rendering and the admin application intentionally begin in subsequent stages.
+Page-domain repositories, localized routes, rendering and the admin application intentionally begin in subsequent stages.
 
 ## Requirements
 
@@ -59,6 +65,8 @@ Unknown API routes use the documented JSON error envelope. Unknown website route
 ```text
 app/Core/           application kernel, environment and dependency wiring
 app/Http/           transport request/response, router and error handling
+app/Domain/         transport-independent content value objects
+app/Infrastructure/ safe filesystem and YAML implementations
 blocks/             developer-defined block packages
 config/             editable non-secret YAML configuration and PHP routes
 docs/               contracts and delivery roadmap
@@ -70,6 +78,7 @@ tests/              unit and feature tests
 ```
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for accepted decisions and [docs/CONTENT-CONTRACTS.md](docs/CONTENT-CONTRACTS.md) for the first on-disk contract.
+Filesystem guarantees and cache behavior are documented in [docs/FILESYSTEM-SAFETY.md](docs/FILESYSTEM-SAFETY.md).
 
 ## Web-server setup
 
@@ -108,9 +117,19 @@ test failures.
 - secrets belong to environment variables, never YAML;
 - production errors hide stack traces and filesystem paths;
 - executable block/layout PHP is trusted developer code and will never be editable in the admin panel;
-- user content will be constrained to configured filesystem roots in stage 2;
+- user-controlled paths are constrained to configured filesystem roots;
 - user and authentication state will be the only SQLite-backed domain in the completed CMS.
+
+## Stage 2 API
+
+Application services receive `FilesystemRoot` and `RelativePath`, never an
+unchecked absolute path. YAML reads return a `YamlDocument` containing both the
+normalized mapping and its `FileRevision`. Pass that revision back to `write()`
+to prevent a stale editor from overwriting newer content. New files use
+`FileRevision::missing()`.
 
 ## Next stage
 
-Stage 2 implements root-bound filesystem access, strict YAML parsing, atomic writes, locking, revision conflict detection and parsed-file caching. See `docs/ROADMAP.md` for the full sequence.
+Stage 3 implements page, configuration and navigation repositories, localized
+route indexing, SEO resolution and the public content API. See
+`docs/ROADMAP.md` for the full sequence.
