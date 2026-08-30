@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Seo;
 
+use FlatFileCms\Collections\Collection;
 use FlatFileCms\Config\ConfigurationDocument;
 use FlatFileCms\Content\InvalidContentException;
 use FlatFileCms\Domain\Content\Page;
@@ -22,13 +23,53 @@ final readonly class SeoResolver
         LanguageConfig $languages,
         ConfigurationDocument $configuration,
     ): array {
+        return $this->resolveData(
+            $page->title($locale, $languages->default()),
+            $page->seo(),
+            $locale,
+            $publicUrl,
+            $languages,
+            $configuration,
+        );
+    }
+
+    /** @return array<string, mixed> */
+    public function resolveCollection(
+        Collection $collection,
+        string $locale,
+        string $publicUrl,
+        LanguageConfig $languages,
+        ConfigurationDocument $configuration,
+    ): array {
+        return $this->resolveData(
+            $collection->title($locale, $languages->default()),
+            $collection->seo(),
+            $locale,
+            $publicUrl,
+            $languages,
+            $configuration,
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $resourceSeo
+     * @return array<string, mixed>
+     */
+    private function resolveData(
+        string $resourceTitle,
+        array $resourceSeo,
+        string $locale,
+        string $publicUrl,
+        LanguageConfig $languages,
+        ConfigurationDocument $configuration,
+    ): array {
         $setup = $configuration->data();
         $global = $this->map($this->localization->resolve($setup['seo'] ?? [], $locale, $languages));
-        $pageSeo = $this->map($this->localization->resolve($page->seo(), $locale, $languages));
+        $pageSeo = $this->map($this->localization->resolve($resourceSeo, $locale, $languages));
         $site = $this->map($this->localization->resolve($setup['site'] ?? [], $locale, $languages));
 
         $title = $this->optionalString($pageSeo['title'] ?? null)
-            ?? $page->title($locale, $languages->default());
+            ?? $resourceTitle;
         $suffix = $this->optionalString($global['titleSuffix'] ?? null);
         $fullTitle = $suffix === null || str_ends_with($title, $suffix) ? $title : $title . ' — ' . $suffix;
         $description = $this->optionalString($pageSeo['description'] ?? null)

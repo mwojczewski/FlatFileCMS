@@ -34,7 +34,7 @@ final class ApplicationTest extends TestCase
         self::assertSame(200, $response->status());
         self::assertSame('application/json; charset=UTF-8', $response->headers()['Content-Type']);
         self::assertSame(
-            ['status' => 'ok', 'application' => 'FlatFile CMS', 'stage' => 5],
+            ['status' => 'ok', 'application' => 'FlatFile CMS', 'stage' => 6],
             json_decode($response->body(), true, flags: JSON_THROW_ON_ERROR),
         );
     }

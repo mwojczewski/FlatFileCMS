@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Navigation;
 
+use FlatFileCms\Collections\CollectionNotFoundException;
 use FlatFileCms\Content\InvalidContentException;
 use FlatFileCms\Content\PageNotFoundException;
 use FlatFileCms\Content\PageRouteIndex;
@@ -53,7 +54,7 @@ final readonly class NavigationRepository
             }
 
             return new NavigationDocument($menus, $document->revision(), $modifiedAt);
-        } catch (InvalidArgumentException|PageNotFoundException $exception) {
+        } catch (CollectionNotFoundException|InvalidArgumentException|PageNotFoundException $exception) {
             throw new InvalidContentException('Invalid navigation.yml configuration.', previous: $exception);
         }
     }
@@ -102,6 +103,10 @@ final readonly class NavigationRepository
             return match ($type) {
                 'page' => $routes->urlFor(
                     PageIdentity::fromString(ContentData::string($link['page'] ?? null, 'link.page')),
+                    $locale,
+                ),
+                'collection' => $routes->collectionUrlFor(
+                    PageIdentity::fromString(ContentData::string($link['collection'] ?? null, 'link.collection')),
                     $locale,
                 ),
                 'url' => $this->externalUrl($link['url'] ?? null),

@@ -2,9 +2,9 @@
 
 Reusable hybrid flat-file CMS for PHP 8.5+. The same domain model will serve normalized JSON through a REST API and render complete HTML through developer-defined PHP blocks and layouts.
 
-Stages 0–5 are complete in this revision: architecture/contracts, the executable
+Stages 0–6 are complete in this revision: architecture/contracts, the executable
 HTTP foundation, safe filesystem/YAML access and the localized public content
-API with schema-validated blocks and server-side HTML rendering.
+API with schema-validated blocks, server-side HTML rendering and collections.
 
 ## Current capabilities
 
@@ -38,7 +38,9 @@ API with schema-validated blocks and server-side HTML rendering.
 - safe Markdown, block, partial, layout and page renderers;
 - multilingual website routing with default-locale redirects;
 - per-page block asset discovery, deduplication and content fingerprinting;
-- cache validators for both JSON and HTML responses.
+- cache validators for both JSON and HTML responses;
+- `pagination.yml` collections with translated routes, sorting, filtering and pagination;
+- collection output through both REST API and server-rendered layouts.
 
 The admin application intentionally begins in a subsequent stage.
 
@@ -89,18 +91,19 @@ belong to `.env.local`; site URL, SEO, layouts and media behavior belong to
 complete boundary. `YAML_CACHE_ENABLED` controls only the infrastructure cache
 of parsed YAML and is intentionally not a site setting.
 
-## HTTP routes through stage 5
+## HTTP routes through stage 6
 
 | Method | Route | Purpose |
 |---|---|---|
-| GET, HEAD | `/` | application readiness page |
+| GET, HEAD | `/` | server-rendered homepage; redirects to the default locale in multilingual mode |
 | GET, HEAD | `/api/v1/health` | JSON operational health |
 | GET, HEAD | `/api/v1/pages?lang=pl` | localized homepage data |
 | GET, HEAD | `/api/v1/pages/{path*}?lang=pl` | localized page data resolved from public slugs |
 | GET, HEAD | `/api/v1/navigation?lang=pl` | localized navigation with resolved page links |
 | GET, HEAD | `/api/v1/config?lang=pl` | deliberate public configuration projection |
+| GET, HEAD | `/api/v1/collections/{path*}?lang=pl&page=1` | localized, filtered and paginated collection |
 | GET, HEAD | `/admin` | protected-panel availability notice until auth is implemented |
-| GET, HEAD | `/{path}` | server-rendered website page; locale-prefixed in multilingual mode |
+| GET, HEAD | `/{path*}` | server-rendered website page or collection; locale-prefixed in multilingual mode |
 
 Unknown API routes use the documented JSON error envelope. Unknown website routes receive an HTML error without local paths or a stack trace.
 
@@ -109,6 +112,7 @@ Unknown API routes use the documented JSON error envelope. Unknown website route
 ```text
 app/Core/           application kernel, environment and dependency wiring
 app/Http/           transport request/response, router and error handling
+app/Collections/    collection definitions, queries, filtering and pagination
 app/Domain/         transport-independent content value objects
 app/Infrastructure/ safe filesystem and YAML implementations
 blocks/             developer-defined block packages
@@ -126,6 +130,7 @@ Filesystem guarantees and cache behavior are documented in [docs/FILESYSTEM-SAFE
 Configuration ownership is documented in [docs/CONFIGURATION.md](docs/CONFIGURATION.md).
 Block packages, field rules and extension points are documented in [docs/BLOCKS.md](docs/BLOCKS.md).
 Server-side rendering and template boundaries are documented in [docs/RENDERING.md](docs/RENDERING.md).
+Collection contracts and queries are documented in [docs/COLLECTIONS.md](docs/COLLECTIONS.md).
 
 ## Web-server setup
 
@@ -191,5 +196,5 @@ contracts and examples.
 
 ## Next stage
 
-Stage 6 implements collection directories backed by `pagination.yml`, including
-sorting, filtering and pagination. See `docs/ROADMAP.md` for the full sequence.
+Stage 7 introduces SQLite users, the CLI installer and role-aware user
+management. See `docs/ROADMAP.md` for the full sequence.

@@ -73,6 +73,19 @@ final class SiteControllerTest extends TestCase
         self::assertSame('', $second->body());
     }
 
+    public function testItRendersACollectionAtItsLocalizedWebsiteRoute(): void
+    {
+        $response = $this->controller->page(new Request(
+            'GET',
+            '/en/blog',
+            attributes: ['path' => 'en/blog'],
+        ));
+
+        self::assertSame(200, $response->status());
+        self::assertStringContainsString('<h1>Blog</h1>', $response->body());
+        self::assertStringContainsString('href="/en/blog/post"', $response->body());
+    }
+
     private function writeFixtures(): void
     {
         $this->project->write('blocks/text/block.yml', <<<'YAML'
@@ -123,12 +136,37 @@ blocks:
         pl: '**bezpieczna** treść'
         en: '**safe** content <script>alert(1)</script>'
 YAML);
+        $this->project->write('pages/blog/pagination.yml', <<<'YAML'
+schemaVersion: 1
+type: collection
+slug: { pl: aktualnosci, en: blog }
+title: { pl: Aktualności, en: Blog }
+source: children
+sort: { field: date, direction: desc }
+pagination: { perPage: 10 }
+filters: []
+YAML);
+        $this->project->write('pages/blog/post/content.yml', <<<'YAML'
+schemaVersion: 1
+enabled: true
+slug: { pl: wpis, en: post }
+title: { pl: Wpis, en: Post }
+date: '2026-08-30'
+blocks: []
+YAML);
         $this->project->write('templates/layouts/default.php', <<<'PHP'
 <?php
 
 declare(strict_types=1);
 ?>
 <!doctype html><html lang="<?= $context->escape($page->locale()) ?>"><body><?= $content ?><?php foreach ($assets->styles() as $style): ?><link rel="stylesheet" href="<?= $context->asset($style) ?>"><?php endforeach; ?></body></html>
+PHP);
+        $this->project->write('templates/layouts/collection.php', <<<'PHP'
+<?php
+
+declare(strict_types=1);
+?>
+<!doctype html><html lang="<?= $context->escape($collection['locale']) ?>"><body><h1><?= $context->escape($collection['title']) ?></h1><?php foreach ($items as $item): ?><a href="<?= $context->escape($item['url']) ?>"><?= $context->escape($item['title']) ?></a><?php endforeach; ?></body></html>
 PHP);
     }
 }

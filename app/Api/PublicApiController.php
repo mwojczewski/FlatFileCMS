@@ -4,12 +4,17 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Api;
 
+use FlatFileCms\Collections\CollectionNotFoundException;
+use FlatFileCms\Collections\CollectionRepository;
+use FlatFileCms\Collections\CollectionService;
+use FlatFileCms\Collections\InvalidCollectionQueryException;
 use FlatFileCms\Config\ConfigurationRepository;
 use FlatFileCms\Config\LanguageDocument;
 use FlatFileCms\Config\LanguageRepository;
 use FlatFileCms\Content\PageNotFoundException;
 use FlatFileCms\Content\PageRepository;
 use FlatFileCms\Content\PageRouteIndex;
+use FlatFileCms\Domain\Content\Page;
 use FlatFileCms\Domain\Localization\LanguageConfig;
 use FlatFileCms\Domain\Localization\LocalizedDataResolver;
 use FlatFileCms\Http\HttpException;
@@ -23,9 +28,12 @@ final readonly class PublicApiController
         private LanguageRepository $languages,
         private ConfigurationRepository $configuration,
         private PageRepository $pages,
+        private CollectionRepository $collections,
+        private CollectionService $collectionService,
         private NavigationRepository $navigation,
         private LocalizedDataResolver $localization,
         private PageSerializer $pageSerializer,
+        private CollectionSerializer $collectionSerializer,
         private ApiResponseFactory $responses,
     ) {}
 
@@ -37,6 +45,40 @@ final readonly class PublicApiController
     public function page(Request $request): Response
     {
         return $this->pageResponse($request, (string) $request->attribute('path'));
+    }
+
+    public function collection(Request $request): Response
+    {
+        [$languageDocument, $routes, $pages] = $this->routeContext();
+        $languages = $languageDocument->config();
+        $locale = $this->locale($request, $languages);
+        $configuration = $this->configuration->get();
+
+        try {
+            $collection = $routes->resolveCollection((string) $request->attribute('path'), $locale);
+            $result = $this->collectionService->query(
+                $collection,
+                $pages,
+                $request->query(),
+                $locale,
+                $languages,
+            );
+        } catch (CollectionNotFoundException) {
+            throw new HttpException(404, 'COLLECTION_NOT_FOUND', 'Collection not found');
+        } catch (InvalidCollectionQueryException $exception) {
+            throw new HttpException(400, 'INVALID_COLLECTION_QUERY', $exception->getMessage());
+        }
+
+        return $this->responses->cacheable(
+            $request,
+            $this->collectionSerializer->serialize($result, $locale, $languages, $routes, $configuration),
+            max(
+                $result->modifiedAt(),
+                $routes->modifiedAt(),
+                $languageDocument->modifiedAt(),
+                $configuration->modifiedAt(),
+            ),
+        );
     }
 
     public function navigation(Request $request): Response
@@ -104,14 +146,15 @@ final readonly class PublicApiController
         );
     }
 
-    /** @return array{LanguageDocument, PageRouteIndex} */
+    /** @return array{LanguageDocument, PageRouteIndex, list<Page>} */
     private function routeContext(): array
     {
         $languageDocument = $this->languages->document();
         $pages = $this->pages->all($languageDocument->config());
-        $routes = PageRouteIndex::build($pages, $languageDocument->config());
+        $collections = $this->collections->all($languageDocument->config());
+        $routes = PageRouteIndex::build($pages, $languageDocument->config(), $collections);
 
-        return [$languageDocument, $routes];
+        return [$languageDocument, $routes, $pages];
     }
 
     private function locale(Request $request, LanguageConfig $languages): string

@@ -83,16 +83,30 @@ definitions and supported validation rules are documented in
 ```yaml
 schemaVersion: 1
 type: collection
+enabled: true
+layout: collection
+slug:
+  pl: aktualnosci
+  en: blog
+title:
+  pl: Aktualności
+  en: Blog
 source: children
 sort:
   field: date
   direction: desc
 pagination:
   perPage: 12
-filters: []
+filters:
+  - parameter: category
+    field: category
+    allowedValues: [news, guide]
 ```
 
 A directory containing `pagination.yml` and no `content.yml` is a collection. A directory cannot be both a normal page and a collection in contract version 1.
+The collection is also a valid ancestor for child pages. Sort and filter fields
+are read from additional top-level properties of each child `content.yml`, for
+example `date`, `category` or a localized `excerpt`.
 
 ## `config/setup.yml`
 
@@ -140,6 +154,14 @@ link:
 ```
 
 The URL generator resolves page references for the current locale. This rule also applies to navigation.
+
+Collections use their stable technical identity in the same way:
+
+```yaml
+link:
+  type: collection
+  collection: blog
+```
 
 ## Public configuration projection
 

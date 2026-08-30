@@ -1,6 +1,6 @@
 # FlatFile CMS — Architecture Decision Record
 
-Status: accepted for stages 0–5  
+Status: accepted for stages 0–6  
 Baseline: PHP 8.5+
 
 The project intentionally provides no compatibility layer for PHP 8.4 or older.
@@ -113,3 +113,5 @@ indexing, SEO resolution and the public content API. Block-schema validation and
 normalization are supplied by stage 4. Stage 5 supplies the independent HTML
 adapter, safe template context and fingerprinted per-page developer assets. JSON
 and HTML consume the same `PageViewModelFactory`; neither adapter calls the other.
+Stage 6 adds file-backed collections as route ancestors and exposes the same
+localized collection result through JSON and HTML adapters.

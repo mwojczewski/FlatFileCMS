@@ -14,7 +14,7 @@ return static function (Router $router, ?Container $container = null): void {
     $router->get('/api/v1/health', static fn(Request $request): Response => Response::json([
         'status' => 'ok',
         'application' => 'FlatFile CMS',
-        'stage' => 5,
+        'stage' => 6,
     ]), 'api.health');
 
     if ($container !== null) {
@@ -37,6 +37,11 @@ return static function (Router $router, ?Container $container = null): void {
             '/api/v1/config',
             static fn(Request $request): Response => $container->get(PublicApiController::class)->configuration($request),
             'api.config',
+        );
+        $router->get(
+            '/api/v1/collections/{path*}',
+            static fn(Request $request): Response => $container->get(PublicApiController::class)->collection($request),
+            'api.collections.show',
         );
         $router->get(
             '/api/v1/{path*}',

@@ -25,3 +25,15 @@ nav ul {
 footer {
     padding-block: 2rem;
 }
+
+.collection__items {
+    display: grid;
+    gap: 1rem;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: 2rem;
+}

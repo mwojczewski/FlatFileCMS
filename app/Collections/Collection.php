@@ -2,28 +2,31 @@
 
 declare(strict_types=1);
 
-namespace FlatFileCms\Domain\Content;
+namespace FlatFileCms\Collections;
 
+use FlatFileCms\Domain\Content\PageIdentity;
+use FlatFileCms\Domain\Content\Slug;
 use FlatFileCms\Infrastructure\Filesystem\FileRevision;
 
-final readonly class Page
+final readonly class Collection
 {
     /**
      * @param array<string, Slug> $slugs
      * @param array<string, string> $titles
      * @param array<string, mixed> $seo
-     * @param list<array<string, mixed>> $blocks
-     * @param array<string, mixed> $attributes
+     * @param list<CollectionFilter> $filters
      */
     public function __construct(
         private PageIdentity $identity,
         private bool $enabled,
-        private ?string $layout,
+        private string $layout,
         private array $slugs,
         private array $titles,
         private array $seo,
-        private array $blocks,
-        private array $attributes,
+        private string $sortField,
+        private string $sortDirection,
+        private int $perPage,
+        private array $filters,
         private FileRevision $revision,
         private int $modifiedAt,
     ) {}
@@ -38,7 +41,7 @@ final readonly class Page
         return $this->enabled;
     }
 
-    public function layout(): ?string
+    public function layout(): string
     {
         return $this->layout;
     }
@@ -59,16 +62,25 @@ final readonly class Page
         return $this->seo;
     }
 
-    /** @return list<array<string, mixed>> */
-    public function blocks(): array
+    public function sortField(): string
     {
-        return $this->blocks;
+        return $this->sortField;
     }
 
-    /** @return array<string, mixed> */
-    public function attributes(): array
+    public function sortDirection(): string
     {
-        return $this->attributes;
+        return $this->sortDirection;
+    }
+
+    public function perPage(): int
+    {
+        return $this->perPage;
+    }
+
+    /** @return list<CollectionFilter> */
+    public function filters(): array
+    {
+        return $this->filters;
     }
 
     public function revision(): FileRevision

@@ -11,6 +11,7 @@ enabled default language from `config/languages.yml`.
 | GET, HEAD | `/api/v1/health` | runtime status |
 | GET, HEAD | `/api/v1/pages?lang=pl` | homepage |
 | GET, HEAD | `/api/v1/pages/oferta?lang=pl` | page matched by localized public path |
+| GET, HEAD | `/api/v1/collections/blog?lang=pl&page=1` | collection matched by localized public path |
 | GET, HEAD | `/api/v1/navigation?lang=pl` | all localized menus |
 | GET, HEAD | `/api/v1/config?lang=pl` | public setup projection and language metadata |
 
@@ -50,6 +51,45 @@ data is validated, normalized and localized according to the developer-owned
 `block.yml` definition. Unknown block types, unknown fields, invalid UUIDs and
 missing translations make the page invalid instead of leaking unchecked data.
 
+## Collection response
+
+```json
+{
+  "collection": {
+    "id": "blog",
+    "locale": "pl",
+    "url": "/pl/aktualnosci",
+    "layout": "collection",
+    "title": "Aktualności",
+    "seo": {}
+  },
+  "items": [
+    {
+      "id": "blog/first-post",
+      "url": "/pl/aktualnosci/pierwszy-wpis",
+      "title": "Pierwszy wpis",
+      "attributes": {
+        "date": "2026-08-30",
+        "category": "news"
+      }
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "perPage": 12,
+    "totalItems": 1,
+    "totalPages": 1
+  },
+  "filters": {
+    "category": "news"
+  }
+}
+```
+
+`page` must be a positive integer. Only filter parameters declared by the
+collection are applied. A declared `allowedValues` list rejects unsupported
+values with `INVALID_COLLECTION_QUERY` rather than silently changing the result.
+
 ## Conditional requests
 
 Successful content responses include:
@@ -72,6 +112,7 @@ returns HTTP 304 with an empty body.
 }
 ```
 
-Relevant stable codes are `PAGE_NOT_FOUND`, `LANGUAGE_NOT_AVAILABLE`,
-`ROUTE_NOT_FOUND` and `METHOD_NOT_ALLOWED`. Invalid on-disk configuration is a
+Relevant stable codes are `PAGE_NOT_FOUND`, `COLLECTION_NOT_FOUND`,
+`INVALID_COLLECTION_QUERY`, `LANGUAGE_NOT_AVAILABLE`, `ROUTE_NOT_FOUND` and
+`METHOD_NOT_ALLOWED`. Invalid on-disk configuration is a
 server fault and is never returned with filesystem details in production.

@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Rendering;
 
+use FlatFileCms\Collections\CollectionNotFoundException;
+use FlatFileCms\Collections\CollectionRepository;
+use FlatFileCms\Collections\CollectionService;
+use FlatFileCms\Collections\InvalidCollectionQueryException;
 use FlatFileCms\Config\ConfigurationRepository;
 use FlatFileCms\Config\LanguageRepository;
 use FlatFileCms\Content\PageNotFoundException;
@@ -16,6 +20,7 @@ use FlatFileCms\Http\HttpException;
 use FlatFileCms\Http\Request;
 use FlatFileCms\Http\Response;
 use FlatFileCms\Navigation\NavigationRepository;
+use FlatFileCms\Presentation\CollectionViewModelFactory;
 use FlatFileCms\Presentation\PageViewModelFactory;
 use InvalidArgumentException;
 
@@ -25,9 +30,13 @@ final readonly class SiteController
         private LanguageRepository $languages,
         private ConfigurationRepository $configuration,
         private PageRepository $pages,
+        private CollectionRepository $collections,
+        private CollectionService $collectionService,
         private NavigationRepository $navigation,
         private PageViewModelFactory $pageViews,
+        private CollectionViewModelFactory $collectionViews,
         private PageRenderer $renderer,
+        private CollectionRenderer $collectionRenderer,
         private HtmlResponseFactory $responses,
     ) {}
 
@@ -50,15 +59,47 @@ final readonly class SiteController
             return Response::redirect($redirect);
         }
 
-        $routes = PageRouteIndex::build($this->pages->all($languages), $languages);
+        $pages = $this->pages->all($languages);
+        $collections = $this->collections->all($languages);
+        $routes = PageRouteIndex::build($pages, $languages, $collections);
+        $configuration = $this->configuration->get();
+        $navigation = $this->navigation->resolve($locale, $languages, $routes);
+
         try {
             $page = $routes->resolve($contentPath, $locale);
         } catch (PageNotFoundException) {
-            throw new HttpException(404, 'PAGE_NOT_FOUND', 'Page not found');
+            try {
+                $collection = $routes->resolveCollection($contentPath, $locale);
+                $result = $this->collectionService->query(
+                    $collection,
+                    $pages,
+                    $request->query(),
+                    $locale,
+                    $languages,
+                );
+            } catch (CollectionNotFoundException) {
+                throw new HttpException(404, 'PAGE_NOT_FOUND', 'Page not found');
+            } catch (InvalidCollectionQueryException $exception) {
+                throw new HttpException(400, 'INVALID_COLLECTION_QUERY', $exception->getMessage());
+            }
+
+            $view = $this->collectionViews->create($result, $locale, $languages, $routes, $configuration);
+            $rendered = $this->collectionRenderer->render($view, $navigation->menus());
+
+            return $this->responses->cacheable(
+                $request,
+                $rendered->html(),
+                max(
+                    $result->modifiedAt(),
+                    $rendered->assetsModifiedAt(),
+                    $routes->modifiedAt(),
+                    $languageDocument->modifiedAt(),
+                    $configuration->modifiedAt(),
+                    $navigation->modifiedAt(),
+                ),
+            );
         }
 
-        $configuration = $this->configuration->get();
-        $navigation = $this->navigation->resolve($locale, $languages, $routes);
         $view = $this->pageViews->create($page, $locale, $languages, $routes, $configuration);
         $rendered = $this->renderer->render($view, $navigation->menus());
 

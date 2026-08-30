@@ -48,6 +48,14 @@
 - partial registry;
 - asset collection, publication and fingerprinting.
 
-## Stages 6–12
+## Stage 6 — collections (complete)
 
-Collections; users/auth; page CRUD; dynamic page builder; media; navigation/config editors; CLI, hardening, complete documentation and production release.
+- `pagination.yml` repository and validation;
+- collection-aware localized route index;
+- direct-child source, sorting, equality filters and pagination;
+- REST API and server-side collection layouts.
+
+## Stages 7–12
+
+Users/auth; page CRUD; dynamic page builder; media; navigation/config editors;
+CLI, hardening, complete documentation and production release.

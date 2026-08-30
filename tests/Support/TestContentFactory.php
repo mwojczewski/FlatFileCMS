@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace FlatFileCms\Tests\Support;
 
 use FlatFileCms\Api\ApiResponseFactory;
+use FlatFileCms\Api\CollectionSerializer;
 use FlatFileCms\Api\PageSerializer;
 use FlatFileCms\Api\PublicApiController;
 use FlatFileCms\Blocks\BlockProcessor;
 use FlatFileCms\Blocks\BlockRegistry;
 use FlatFileCms\Blocks\BlockValidator;
 use FlatFileCms\Blocks\BuiltinFieldTypes;
+use FlatFileCms\Collections\CollectionRepository;
+use FlatFileCms\Collections\CollectionService;
 use FlatFileCms\Config\ConfigurationRepository;
 use FlatFileCms\Config\LanguageRepository;
 use FlatFileCms\Content\PageRepository;
@@ -23,10 +26,12 @@ use FlatFileCms\Infrastructure\Yaml\YamlFileCache;
 use FlatFileCms\Infrastructure\Yaml\YamlFileRepository;
 use FlatFileCms\Infrastructure\Yaml\YamlParser;
 use FlatFileCms\Navigation\NavigationRepository;
+use FlatFileCms\Presentation\CollectionViewModelFactory;
 use FlatFileCms\Presentation\PageViewModelFactory;
 use FlatFileCms\Rendering\AssetCollector;
 use FlatFileCms\Rendering\AssetPublisher;
 use FlatFileCms\Rendering\BlockRenderer;
+use FlatFileCms\Rendering\CollectionRenderer;
 use FlatFileCms\Rendering\LayoutRegistry;
 use FlatFileCms\Rendering\LayoutRenderer;
 use FlatFileCms\Rendering\MarkdownRenderer;
@@ -67,14 +72,18 @@ final class TestContentFactory
         $fieldTypes = BuiltinFieldTypes::create($paths);
         $blockRegistry = new BlockRegistry($project->path(), new YamlParser(), $fieldTypes);
         $blockProcessor = new BlockProcessor($blockRegistry, new BlockValidator($fieldTypes));
+        $collectionViews = new CollectionViewModelFactory($localization, $seo);
 
         return new PublicApiController(
             new LanguageRepository($yaml, $paths),
             new ConfigurationRepository($yaml, $paths),
             new PageRepository($yaml, $paths),
+            new CollectionRepository($yaml, $paths),
+            new CollectionService($localization),
             new NavigationRepository($yaml, $paths, $localization),
             $localization,
             new PageSerializer(new PageViewModelFactory($blockProcessor, $seo)),
+            new CollectionSerializer($collectionViews),
             new ApiResponseFactory(),
         );
     }
@@ -94,6 +103,7 @@ final class TestContentFactory
         $registry = new BlockRegistry($project->path(), new YamlParser(), $fieldTypes);
         $blocks = new BlockProcessor($registry, new BlockValidator($fieldTypes));
         $views = new PageViewModelFactory($blocks, new SeoResolver($localization));
+        $collectionViews = new CollectionViewModelFactory($localization, new SeoResolver($localization));
         $buffer = new OutputBuffer();
         $partials = new PartialRenderer(new PartialRegistry($project->path()), $buffer);
         $renderer = new PageRenderer(
@@ -108,9 +118,18 @@ final class TestContentFactory
             new LanguageRepository($yaml, $paths),
             new ConfigurationRepository($yaml, $paths),
             new PageRepository($yaml, $paths),
+            new CollectionRepository($yaml, $paths),
+            new CollectionService($localization),
             new NavigationRepository($yaml, $paths, $localization),
             $views,
+            $collectionViews,
             $renderer,
+            new CollectionRenderer(
+                new LayoutRegistry($project->path()),
+                $buffer,
+                new MarkdownRenderer(),
+                $partials,
+            ),
             new HtmlResponseFactory(),
         );
     }

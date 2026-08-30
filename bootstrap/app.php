@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use FlatFileCms\Api\ApiResponseFactory;
+use FlatFileCms\Api\CollectionSerializer;
 use FlatFileCms\Api\PageSerializer;
 use FlatFileCms\Api\PublicApiController;
 use FlatFileCms\Blocks\BlockProcessor;
@@ -10,6 +11,8 @@ use FlatFileCms\Blocks\BlockRegistry;
 use FlatFileCms\Blocks\BlockValidator;
 use FlatFileCms\Blocks\BuiltinFieldTypes;
 use FlatFileCms\Blocks\Field\FieldTypeRegistry;
+use FlatFileCms\Collections\CollectionRepository;
+use FlatFileCms\Collections\CollectionService;
 use FlatFileCms\Config\ConfigurationRepository;
 use FlatFileCms\Config\LanguageRepository;
 use FlatFileCms\Content\PageRepository;
@@ -27,10 +30,12 @@ use FlatFileCms\Infrastructure\Yaml\YamlFileCache;
 use FlatFileCms\Infrastructure\Yaml\YamlFileRepository;
 use FlatFileCms\Infrastructure\Yaml\YamlParser;
 use FlatFileCms\Navigation\NavigationRepository;
+use FlatFileCms\Presentation\CollectionViewModelFactory;
 use FlatFileCms\Presentation\PageViewModelFactory;
 use FlatFileCms\Rendering\AssetCollector;
 use FlatFileCms\Rendering\AssetPublisher;
 use FlatFileCms\Rendering\BlockRenderer;
+use FlatFileCms\Rendering\CollectionRenderer;
 use FlatFileCms\Rendering\LayoutRegistry;
 use FlatFileCms\Rendering\LayoutRenderer;
 use FlatFileCms\Rendering\MarkdownRenderer;
@@ -108,6 +113,19 @@ $container->set(
 );
 $container->set(LocalizedDataResolver::class, static fn(): LocalizedDataResolver => new LocalizedDataResolver());
 $container->set(
+    CollectionRepository::class,
+    static fn(Container $container): CollectionRepository => new CollectionRepository(
+        $container->get(YamlFileRepository::class),
+        $container->get(SafePathResolver::class),
+    ),
+);
+$container->set(
+    CollectionService::class,
+    static fn(Container $container): CollectionService => new CollectionService(
+        $container->get(LocalizedDataResolver::class),
+    ),
+);
+$container->set(
     FieldTypeRegistry::class,
     static fn(Container $container): FieldTypeRegistry => BuiltinFieldTypes::create(
         $container->get(SafePathResolver::class),
@@ -157,9 +175,22 @@ $container->set(
     ),
 );
 $container->set(
+    CollectionViewModelFactory::class,
+    static fn(Container $container): CollectionViewModelFactory => new CollectionViewModelFactory(
+        $container->get(LocalizedDataResolver::class),
+        $container->get(SeoResolver::class),
+    ),
+);
+$container->set(
     PageSerializer::class,
     static fn(Container $container): PageSerializer => new PageSerializer(
         $container->get(PageViewModelFactory::class),
+    ),
+);
+$container->set(
+    CollectionSerializer::class,
+    static fn(Container $container): CollectionSerializer => new CollectionSerializer(
+        $container->get(CollectionViewModelFactory::class),
     ),
 );
 $container->set(ApiResponseFactory::class, static fn(): ApiResponseFactory => new ApiResponseFactory());
@@ -169,9 +200,12 @@ $container->set(
         $container->get(LanguageRepository::class),
         $container->get(ConfigurationRepository::class),
         $container->get(PageRepository::class),
+        $container->get(CollectionRepository::class),
+        $container->get(CollectionService::class),
         $container->get(NavigationRepository::class),
         $container->get(LocalizedDataResolver::class),
         $container->get(PageSerializer::class),
+        $container->get(CollectionSerializer::class),
         $container->get(ApiResponseFactory::class),
     ),
 );
@@ -233,6 +267,15 @@ $container->set(
         $container->get(PartialRenderer::class),
     ),
 );
+$container->set(
+    CollectionRenderer::class,
+    static fn(Container $container): CollectionRenderer => new CollectionRenderer(
+        $container->get(LayoutRegistry::class),
+        $container->get(OutputBuffer::class),
+        $container->get(MarkdownRenderer::class),
+        $container->get(PartialRenderer::class),
+    ),
+);
 $container->set(HtmlResponseFactory::class, static fn(): HtmlResponseFactory => new HtmlResponseFactory());
 $container->set(
     SiteController::class,
@@ -240,9 +283,13 @@ $container->set(
         $container->get(LanguageRepository::class),
         $container->get(ConfigurationRepository::class),
         $container->get(PageRepository::class),
+        $container->get(CollectionRepository::class),
+        $container->get(CollectionService::class),
         $container->get(NavigationRepository::class),
         $container->get(PageViewModelFactory::class),
+        $container->get(CollectionViewModelFactory::class),
         $container->get(PageRenderer::class),
+        $container->get(CollectionRenderer::class),
         $container->get(HtmlResponseFactory::class),
     ),
 );

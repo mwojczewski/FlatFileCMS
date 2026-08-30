@@ -6,6 +6,9 @@ metadata, resolved SEO and validated, normalized blocks. `PageSerializer`
 projects that model to JSON while `PageRenderer` projects it to HTML. Neither
 adapter performs an HTTP request to the other.
 
+Collections follow the same boundary: `CollectionViewModelFactory` prepares one
+localized query result for `CollectionSerializer` and `CollectionRenderer`.
+
 ## Rendering pipeline
 
 ```text

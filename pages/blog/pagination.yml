@@ -1,0 +1,25 @@
+schemaVersion: 1
+type: collection
+enabled: true
+layout: collection
+slug:
+  pl: blog
+title:
+  pl: Blog
+seo:
+  title:
+    pl: Blog
+  description:
+    pl: Aktualności i artykuły.
+source: children
+sort:
+  field: date
+  direction: desc
+pagination:
+  perPage: 10
+filters:
+  - parameter: category
+    field: category
+    allowedValues:
+      - cms
+      - news

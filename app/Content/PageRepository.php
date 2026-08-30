@@ -85,6 +85,15 @@ final readonly class PageRepository
             $titles = $this->localizedStrings($data['title'] ?? null, 'title', $languages);
             $seo = isset($data['seo']) ? ContentData::map($data['seo'], 'seo') : [];
             $blocks = $this->blocks($data['blocks'] ?? []);
+            $attributes = array_diff_key($data, array_flip([
+                'schemaVersion',
+                'enabled',
+                'layout',
+                'slug',
+                'title',
+                'seo',
+                'blocks',
+            ]));
 
             return new Page(
                 $identity,
@@ -94,6 +103,7 @@ final readonly class PageRepository
                 $titles,
                 $seo,
                 $blocks,
+                $attributes,
                 $document->revision(),
                 $modifiedAt,
             );
