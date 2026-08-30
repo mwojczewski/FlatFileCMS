@@ -80,3 +80,7 @@ id_ed25519.*
 *~
 .DS_Store
 Thumbs.db
+
+# block assets
+/public/assets/blocks/*
+!/public/assets/blocks/.gitkeep

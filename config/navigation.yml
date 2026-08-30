@@ -5,3 +5,9 @@ main:
       type: page
       page: homepage
     target: _self
+  - label:
+      pl: Health
+    link:
+      type: url
+      url: /api/v1/health
+    target: _blank

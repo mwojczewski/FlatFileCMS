@@ -41,7 +41,7 @@
 - field-type registry;
 - normalization, localization and validation.
 
-## Stage 5 — server-side rendering
+## Stage 5 — server-side rendering (complete)
 
 - block, page and layout renderers;
 - safe render context and Markdown;

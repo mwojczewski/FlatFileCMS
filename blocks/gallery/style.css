@@ -1,0 +1,18 @@
+.gallery {
+    padding-block: clamp(2rem, 5vw, 5rem);
+}
+
+.gallery__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: 1rem;
+}
+
+.gallery__item {
+    margin: 0;
+}
+
+.gallery__item img {
+    width: 100%;
+    height: auto;
+}

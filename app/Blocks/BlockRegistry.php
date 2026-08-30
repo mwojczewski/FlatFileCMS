@@ -55,7 +55,7 @@ final class BlockRegistry
             try {
                 $type = Slug::fromString($item->getFilename())->value();
                 $definition = $this->load($type, $item->getPathname());
-            } catch (FieldValueException | InvalidArgumentException | InvalidYamlException $exception) {
+            } catch (FieldValueException|InvalidArgumentException|InvalidYamlException $exception) {
                 throw new InvalidBlockDefinitionException(
                     sprintf('Block directory "%s" contains an invalid definition.', $item->getFilename()),
                     previous: $exception,
@@ -111,6 +111,11 @@ final class BlockRegistry
         if ($modifiedAt === false) {
             throw new InvalidBlockDefinitionException(sprintf('Block "%s" modification time cannot be read.', $type));
         }
+        $rendererModifiedAt = filemtime($rendererPath);
+        if ($rendererModifiedAt === false) {
+            throw new InvalidBlockDefinitionException(sprintf('Block "%s" renderer time cannot be read.', $type));
+        }
+        $modifiedAt = max($modifiedAt, $rendererModifiedAt);
 
         $revision = FileRevision::fromContents($contents);
         $cacheKey = 'block-definition:' . $type;

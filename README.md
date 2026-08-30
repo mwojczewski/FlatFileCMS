@@ -2,9 +2,9 @@
 
 Reusable hybrid flat-file CMS for PHP 8.5+. The same domain model will serve normalized JSON through a REST API and render complete HTML through developer-defined PHP blocks and layouts.
 
-Stages 0–4 are complete in this revision: architecture/contracts, the executable
+Stages 0–5 are complete in this revision: architecture/contracts, the executable
 HTTP foundation, safe filesystem/YAML access and the localized public content
-API with schema-validated blocks.
+API with schema-validated blocks and server-side HTML rendering.
 
 ## Current capabilities
 
@@ -33,10 +33,14 @@ API with schema-validated blocks.
 - automatic developer block discovery from `blocks/*/block.yml`;
 - extensible field-type registry with all standard CMS field types;
 - schema-aware block validation, normalization and localization;
-- UUID v7 uniqueness and page-local media-reference validation.
+- UUID v7 uniqueness and page-local media-reference validation;
+- shared page view models for the JSON and HTML adapters;
+- safe Markdown, block, partial, layout and page renderers;
+- multilingual website routing with default-locale redirects;
+- per-page block asset discovery, deduplication and content fingerprinting;
+- cache validators for both JSON and HTML responses.
 
-Server-side rendering and the admin application intentionally begin in
-subsequent stages.
+The admin application intentionally begins in a subsequent stage.
 
 ## Requirements
 
@@ -44,6 +48,12 @@ subsequent stages.
 - Composer 2;
 - extensions: Ctype, Filter, JSON, Mbstring, PDO and PDO SQLite;
 - a web server whose document root can be set to `public/`, or equivalent rewrite protection on shared hosting.
+
+The production dependencies are deliberately narrow. `symfony/yaml` provides a
+mature restrictive YAML parser without pulling in Symfony Framework;
+`league/commonmark` provides standards-compliant Markdown rendering with raw
+HTML stripping and unsafe-link protection. Implementing either parser in the
+CMS core would increase security risk without adding product value.
 
 ## Installation for development
 
@@ -63,8 +73,8 @@ php bin/cms block:create image-with-text
 php bin/cms block:create gallery-slider --with-assets
 ```
 
-The first form creates the required block.yml and render.php. The optional
-flag also creates scoped style.css and script.js. Existing block directories
+The first form creates the required `block.yml` and `render.php`. The optional
+flag also creates scoped `style.css` and `script.js`. Existing block directories
 are never overwritten.
 
 Do not commit `.env.local`. Generate a unique `APP_SECRET` before a real deployment.
@@ -79,17 +89,18 @@ belong to `.env.local`; site URL, SEO, layouts and media behavior belong to
 complete boundary. `YAML_CACHE_ENABLED` controls only the infrastructure cache
 of parsed YAML and is intentionally not a site setting.
 
-## HTTP routes through stage 3
+## HTTP routes through stage 5
 
-| Method    | Route                           | Purpose                                                       |
-| --------- | ------------------------------- | ------------------------------------------------------------- |
-| GET, HEAD | `/`                             | application readiness page                                    |
-| GET, HEAD | `/api/v1/health`                | JSON operational health                                       |
-| GET, HEAD | `/api/v1/pages?lang=pl`         | localized homepage data                                       |
-| GET, HEAD | `/api/v1/pages/{path*}?lang=pl` | localized page data resolved from public slugs                |
-| GET, HEAD | `/api/v1/navigation?lang=pl`    | localized navigation with resolved page links                 |
-| GET, HEAD | `/api/v1/config?lang=pl`        | deliberate public configuration projection                    |
-| GET, HEAD | `/admin`                        | protected-panel availability notice until auth is implemented |
+| Method | Route | Purpose |
+|---|---|---|
+| GET, HEAD | `/` | application readiness page |
+| GET, HEAD | `/api/v1/health` | JSON operational health |
+| GET, HEAD | `/api/v1/pages?lang=pl` | localized homepage data |
+| GET, HEAD | `/api/v1/pages/{path*}?lang=pl` | localized page data resolved from public slugs |
+| GET, HEAD | `/api/v1/navigation?lang=pl` | localized navigation with resolved page links |
+| GET, HEAD | `/api/v1/config?lang=pl` | deliberate public configuration projection |
+| GET, HEAD | `/admin` | protected-panel availability notice until auth is implemented |
+| GET, HEAD | `/{path}` | server-rendered website page; locale-prefixed in multilingual mode |
 
 Unknown API routes use the documented JSON error envelope. Unknown website routes receive an HTML error without local paths or a stack trace.
 
@@ -114,6 +125,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for accepted decisions and [docs/CONTENT-
 Filesystem guarantees and cache behavior are documented in [docs/FILESYSTEM-SAFETY.md](docs/FILESYSTEM-SAFETY.md).
 Configuration ownership is documented in [docs/CONFIGURATION.md](docs/CONFIGURATION.md).
 Block packages, field rules and extension points are documented in [docs/BLOCKS.md](docs/BLOCKS.md).
+Server-side rendering and template boundaries are documented in [docs/RENDERING.md](docs/RENDERING.md).
 
 ## Web-server setup
 
@@ -179,6 +191,5 @@ contracts and examples.
 
 ## Next stage
 
-Stage 5 implements block/page/layout renderers, the safe render context,
-Markdown rendering, partials and fingerprinted per-page assets. See
-`docs/ROADMAP.md` for the full sequence.
+Stage 6 implements collection directories backed by `pagination.yml`, including
+sorting, filtering and pagination. See `docs/ROADMAP.md` for the full sequence.

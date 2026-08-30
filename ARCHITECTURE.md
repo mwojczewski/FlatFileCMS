@@ -1,6 +1,6 @@
 # FlatFile CMS — Architecture Decision Record
 
-Status: accepted for stages 0–4  
+Status: accepted for stages 0–5  
 Baseline: PHP 8.5+
 
 The project intentionally provides no compatibility layer for PHP 8.4 or older.
@@ -110,5 +110,6 @@ Stage 0 freezes architecture and file contracts. Stage 1 supplies Composer,
 bootstrap and HTTP transport. Stage 2 supplies safe filesystem and YAML access.
 Stage 3 supplies page/configuration/navigation repositories, localized route
 indexing, SEO resolution and the public content API. Block-schema validation and
-normalization are supplied by stage 4. HTML rendering remains a separate later
-slice and consumes the same validated block model.
+normalization are supplied by stage 4. Stage 5 supplies the independent HTML
+adapter, safe template context and fingerprinted per-page developer assets. JSON
+and HTML consume the same `PageViewModelFactory`; neither adapter calls the other.

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Http;
 
+use InvalidArgumentException;
 use JsonException;
 
 final readonly class Response
@@ -19,6 +20,16 @@ final readonly class Response
     public static function html(string $body, int $status = 200, array $headers = []): self
     {
         return new self($body, $status, ['Content-Type' => 'text/html; charset=UTF-8', ...$headers]);
+    }
+
+    /** @param array<string, string> $headers */
+    public static function redirect(string $location, int $status = 302, array $headers = []): self
+    {
+        if (!in_array($status, [301, 302, 303, 307, 308], true)) {
+            throw new InvalidArgumentException('Invalid redirect status.');
+        }
+
+        return new self('', $status, ['Location' => $location, ...$headers]);
     }
 
     /**

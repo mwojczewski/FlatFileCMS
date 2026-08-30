@@ -1,0 +1,7 @@
+.rich-text {
+    padding-block: clamp(2rem, 5vw, 5rem);
+}
+
+.rich-text .container {
+    max-width: 48rem;
+}

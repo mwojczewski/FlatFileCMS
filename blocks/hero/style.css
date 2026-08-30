@@ -1,0 +1,12 @@
+.hero {
+    padding-block: clamp(3rem, 8vw, 8rem);
+}
+
+.hero--center {
+    text-align: center;
+}
+
+.hero img {
+    max-width: 100%;
+    height: auto;
+}

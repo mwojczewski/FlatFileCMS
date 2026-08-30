@@ -1,0 +1,27 @@
+:root {
+    color-scheme: light dark;
+    font-family: system-ui, sans-serif;
+    line-height: 1.5;
+}
+
+body {
+    margin: 0;
+}
+
+.container,
+nav,
+footer {
+    width: min(100% - 2rem, 72rem);
+    margin-inline: auto;
+}
+
+nav ul {
+    display: flex;
+    gap: 1rem;
+    padding: 0;
+    list-style: none;
+}
+
+footer {
+    padding-block: 2rem;
+}

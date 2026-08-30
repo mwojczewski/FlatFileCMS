@@ -16,7 +16,16 @@ final readonly class TemporaryProject
     public static function create(): self
     {
         $path = sys_get_temp_dir() . '/flatfile-cms-' . bin2hex(random_bytes(8));
-        foreach (['blocks', 'pages', 'config', 'storage/tmp', 'storage/cache'] as $directory) {
+        foreach ([
+            'blocks',
+            'pages',
+            'config',
+            'public/assets/css',
+            'storage/tmp',
+            'storage/cache',
+            'templates/layouts',
+            'templates/partials',
+        ] as $directory) {
             $absolutePath = $path . '/' . $directory;
             if (!mkdir($absolutePath, 0o700, true) && !is_dir($absolutePath)) {
                 throw new RuntimeException('Unable to create temporary project directory.');

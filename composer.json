@@ -11,6 +11,7 @@
         "ext-mbstring": "*",
         "ext-pdo": "*",
         "ext-pdo_sqlite": "*",
+        "league/commonmark": "^2.7",
         "symfony/yaml": "^8.1"
     },
     "require-dev": {
