@@ -12,7 +12,7 @@ predictably after its environment has been supplied.
 | Concern | Variables |
 |---|---|
 | Runtime | `APP_ENV`, `APP_DEBUG`, `APP_SECRET`, `APP_TIMEZONE` |
-| Infrastructure cache | `YAML_CACHE_ENABLED` |
+| Infrastructure cache | `YAML_CACHE_JSON_ENABLED`, `YAML_CACHE_SERIALIZE_ENABLED` |
 | Reverse proxy | `TRUSTED_PROXIES` |
 | Session deployment | `SESSION_NAME`, `SESSION_LIFETIME`, `SESSION_COOKIE_SECURE`, `SESSION_COOKIE_SAME_SITE` |
 | Auth protection | `AUTH_LOGIN_*`, `AUTH_RESET_*`, `AUTH_PASSWORD_RESET_TTL` |
@@ -28,10 +28,14 @@ WebAuthn credentials are cryptographically bound to it, so changing this value
 makes previously registered keys unusable. `WEBAUTHN_RP_NAME` is only the label
 shown by the browser during registration.
 
-`YAML_CACHE_ENABLED` controls only parsed mappings stored under
-`storage/cache/yaml/`. It exists in the environment because the useful choice
+`YAML_CACHE_JSON_ENABLED` controls the JSON representation of parsed
+mappings under `storage/cache/yaml/`. `YAML_CACHE_SERIALIZE_ENABLED` controls an
+independent representation produced by PHP `serialize()`. Either cache may run
+alone. When both are enabled, every parsed or written YAML document updates
+both formats; serialized data is read first and JSON remains a revision-checked
+fallback. Both switches belong to the environment because the useful choice
 depends on the server and deployment mode and because reading `setup.yml`
-itself uses this cache.
+itself uses these caches.
 
 ## `config/setup.yml`
 

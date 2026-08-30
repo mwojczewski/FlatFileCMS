@@ -17,7 +17,7 @@ final readonly class Environment
     public static function load(string $projectRoot): self
     {
         $values = [];
-        $localFile = $projectRoot . '/.env.local';
+        $localFile = "{$projectRoot}/.env.local";
 
         if (is_file($localFile)) {
             $lines = file($localFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -68,7 +68,7 @@ final readonly class Environment
         $value = $this->get($key, $default ? '1' : '0');
         $parsed = filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
         if ($parsed === null) {
-            throw new RuntimeException(sprintf('Environment variable "%s" must be boolean.', $key));
+            throw new RuntimeException(\sprintf('Environment variable "%s" must be boolean.', $key));
         }
 
         return $parsed;
@@ -78,8 +78,8 @@ final readonly class Environment
     {
         $value = $this->get($key, (string) $default);
         $parsed = filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => $minimum]]);
-        if (!is_int($parsed)) {
-            throw new RuntimeException(sprintf('Environment variable "%s" must be an integer of at least %d.', $key, $minimum));
+        if (!\is_int($parsed)) {
+            throw new RuntimeException(\sprintf('Environment variable "%s" must be an integer of at least %d.', $key, $minimum));
         }
 
         return $parsed;
@@ -87,7 +87,7 @@ final readonly class Environment
 
     public function get(string $key, ?string $default = null): string
     {
-        if (array_key_exists($key, $this->values)) {
+        if (\array_key_exists($key, $this->values)) {
             return $this->values[$key];
         }
 
@@ -95,14 +95,14 @@ final readonly class Environment
             return $default;
         }
 
-        throw new RuntimeException(sprintf('Required environment variable "%s" is missing.', $key));
+        throw new RuntimeException(\sprintf('Required environment variable "%s" is missing.', $key));
     }
 
     private static function unquote(string $value): string
     {
-        if (strlen($value) >= 2) {
+        if (\strlen($value) >= 2) {
             $first = $value[0];
-            $last = $value[strlen($value) - 1];
+            $last = $value[\strlen($value) - 1];
             if (($first === '"' && $last === '"') || ($first === "'" && $last === "'")) {
                 return substr($value, 1, -1);
             }

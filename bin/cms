@@ -8,27 +8,34 @@ use FlatFileCms\Auth\PasswordPolicy;
 use FlatFileCms\Auth\UserRepository;
 use FlatFileCms\Auth\WebAuthnCredentialRepository;
 use FlatFileCms\Cli\BlockScaffolder;
+use FlatFileCms\Cli\CacheClearer;
 use FlatFileCms\Cli\ConsoleApplication;
 use FlatFileCms\Cli\PasswordReader;
 use FlatFileCms\Cli\UserCommandService;
 use FlatFileCms\Infrastructure\Database\Database;
 use FlatFileCms\Infrastructure\Database\SchemaInstaller;
+use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
 
 $projectRoot = dirname(__DIR__);
 require $projectRoot . '/vendor/autoload.php';
 
-$database = new Database($projectRoot . '/storage/database/cms.sqlite');
-$connection = $database->connection();
-$console = new ConsoleApplication(
-    new BlockScaffolder($projectRoot),
-    new UserCommandService(
+$users = static function () use ($projectRoot): UserCommandService {
+    $database = new Database($projectRoot . '/storage/database/cms.sqlite');
+    $connection = $database->connection();
+
+    return new UserCommandService(
         new SchemaInstaller($connection),
         new UserRepository($connection),
         new WebAuthnCredentialRepository($connection),
         new PasswordPolicy(),
         new PasswordHasher(),
-    ),
+    );
+};
+$console = new ConsoleApplication(
+    new BlockScaffolder($projectRoot),
+    $users,
     new PasswordReader(),
+    new CacheClearer(new SafePathResolver($projectRoot)),
 );
 
 /** @var list<string> $argv */

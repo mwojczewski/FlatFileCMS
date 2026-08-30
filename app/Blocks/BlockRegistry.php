@@ -57,7 +57,7 @@ final class BlockRegistry
                 $definition = $this->load($type, $item->getPathname());
             } catch (FieldValueException|InvalidArgumentException|InvalidYamlException $exception) {
                 throw new InvalidBlockDefinitionException(
-                    sprintf('Block directory "%s" contains an invalid definition.', $item->getFilename()),
+                    \sprintf('Block directory "%s" contains an invalid definition.', $item->getFilename()),
                     previous: $exception,
                 );
             }
@@ -80,7 +80,7 @@ final class BlockRegistry
         }
 
         return $this->all()[$type]
-            ?? throw new InvalidBlockDefinitionException(sprintf('Unknown block type "%s".', $type));
+            ?? throw new InvalidBlockDefinitionException(\sprintf('Unknown block type "%s".', $type));
     }
 
     private function load(string $type, string $directory): BlockDefinition
@@ -94,26 +94,26 @@ final class BlockRegistry
             || is_link($rendererPath)
         ) {
             throw new InvalidBlockDefinitionException(
-                sprintf('Block "%s" requires regular block.yml and render.php files.', $type),
+                \sprintf('Block "%s" requires regular block.yml and render.php files.', $type),
             );
         }
 
         $size = filesize($definitionPath);
         if ($size === false || $size > self::MAX_DEFINITION_BYTES) {
-            throw new InvalidBlockDefinitionException(sprintf('Block "%s" definition is too large.', $type));
+            throw new InvalidBlockDefinitionException(\sprintf('Block "%s" definition is too large.', $type));
         }
         $contents = file_get_contents($definitionPath);
         if ($contents === false) {
-            throw new InvalidBlockDefinitionException(sprintf('Block "%s" definition cannot be read.', $type));
+            throw new InvalidBlockDefinitionException(\sprintf('Block "%s" definition cannot be read.', $type));
         }
         clearstatcache(true, $definitionPath);
         $modifiedAt = filemtime($definitionPath);
         if ($modifiedAt === false) {
-            throw new InvalidBlockDefinitionException(sprintf('Block "%s" modification time cannot be read.', $type));
+            throw new InvalidBlockDefinitionException(\sprintf('Block "%s" modification time cannot be read.', $type));
         }
         $rendererModifiedAt = filemtime($rendererPath);
         if ($rendererModifiedAt === false) {
-            throw new InvalidBlockDefinitionException(sprintf('Block "%s" renderer time cannot be read.', $type));
+            throw new InvalidBlockDefinitionException(\sprintf('Block "%s" renderer time cannot be read.', $type));
         }
         $modifiedAt = max($modifiedAt, $rendererModifiedAt);
 
@@ -147,13 +147,13 @@ final class BlockRegistry
         $fields = [];
         foreach ($mapping as $name => $rawDefinition) {
             if (preg_match('/^[a-z][A-Za-z0-9_]*$/D', $name) !== 1) {
-                throw new InvalidArgumentException(sprintf('Field name "%s" is invalid.', $name));
+                throw new InvalidArgumentException(\sprintf('Field name "%s" is invalid.', $name));
             }
 
             $definition = ContentData::map($rawDefinition, $path . '.' . $name);
             $type = ContentData::string($definition['type'] ?? null, $path . '.' . $name . '.type');
             if (!$this->fieldTypes->has($type)) {
-                throw new InvalidArgumentException(sprintf('Field "%s" uses unknown type "%s".', $name, $type));
+                throw new InvalidArgumentException(\sprintf('Field "%s" uses unknown type "%s".', $name, $type));
             }
             $required = ContentData::boolean($definition['required'] ?? false, $path . '.' . $name . '.required');
             $translatable = ContentData::boolean(
@@ -164,10 +164,10 @@ final class BlockRegistry
                 ? $this->fields($definition['fields'], $path . '.' . $name . '.fields')
                 : [];
             if ($type === 'repeater' && $nested === []) {
-                throw new InvalidArgumentException(sprintf('Repeater field "%s" requires nested fields.', $name));
+                throw new InvalidArgumentException(\sprintf('Repeater field "%s" requires nested fields.', $name));
             }
             if ($type !== 'repeater' && $nested !== []) {
-                throw new InvalidArgumentException(sprintf('Only repeater field "%s" may define nested fields.', $name));
+                throw new InvalidArgumentException(\sprintf('Only repeater field "%s" may define nested fields.', $name));
             }
 
             $fieldDefinition = new FieldDefinition(
@@ -196,13 +196,13 @@ final class BlockRegistry
     {
         $mapping = ContentData::map($value, $field);
         if ($required && $mapping === []) {
-            throw new InvalidArgumentException(sprintf('Field "%s" cannot be empty.', $field));
+            throw new InvalidArgumentException(\sprintf('Field "%s" cannot be empty.', $field));
         }
 
         $localized = [];
         foreach ($mapping as $locale => $text) {
             if (preg_match('/^[a-z]{2,3}(?:-[A-Z]{2})?$/D', $locale) !== 1) {
-                throw new InvalidArgumentException(sprintf('Field "%s" contains an invalid locale.', $field));
+                throw new InvalidArgumentException(\sprintf('Field "%s" contains an invalid locale.', $field));
             }
 
             $localized[$locale] = ContentData::string($text, $field . '.' . $locale);

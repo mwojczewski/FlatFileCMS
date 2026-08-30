@@ -54,7 +54,7 @@ final readonly class NavigationRepository
             }
 
             return new NavigationDocument($menus, $document->revision(), $modifiedAt);
-        } catch (CollectionNotFoundException|InvalidArgumentException|PageNotFoundException $exception) {
+        } catch (CollectionNotFoundException | InvalidArgumentException | PageNotFoundException $exception) {
             throw new InvalidContentException('Invalid navigation.yml configuration.', previous: $exception);
         }
     }
@@ -72,7 +72,7 @@ final readonly class NavigationRepository
             $entry = ContentData::map($item, $field . '.' . $index);
             $label = $this->localization->resolve($entry['label'] ?? null, $locale, $languages);
             $target = isset($entry['target']) ? ContentData::string($entry['target'], 'target') : '_self';
-            if (!in_array($target, ['_self', '_blank'], true)) {
+            if (!\in_array($target, ['_self', '_blank'], true)) {
                 throw new InvalidArgumentException('Navigation target is invalid.');
             }
 
@@ -85,7 +85,7 @@ final readonly class NavigationRepository
                     $locale,
                     $languages,
                     $routes,
-                    $field . '.' . $index . '.children',
+                    "{$field}.{$index}.children",
                 ),
             ];
         }
@@ -125,10 +125,10 @@ final readonly class NavigationRepository
         }
 
         $scheme = parse_url($url, PHP_URL_SCHEME);
-        if (!is_string($scheme) || !in_array(strtolower($scheme), ['http', 'https', 'mailto', 'tel'], true)) {
+        if (!\is_string($scheme) || !\in_array(strtolower($scheme), ['http', 'https', 'mailto', 'tel'], true)) {
             throw new InvalidArgumentException('Navigation URL is invalid.');
         }
-        if (in_array(strtolower($scheme), ['http', 'https'], true) && filter_var($url, FILTER_VALIDATE_URL) === false) {
+        if (\in_array(strtolower($scheme), ['http', 'https'], true) && filter_var($url, FILTER_VALIDATE_URL) === false) {
             throw new InvalidArgumentException('Navigation URL is invalid.');
         }
 

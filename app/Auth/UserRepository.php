@@ -47,7 +47,7 @@ SQL);
         $statement = $this->database->prepare('SELECT * FROM users WHERE id = :id');
         $statement->execute(['id' => $id]);
         $row = $statement->fetch();
-        if (!is_array($row)) {
+        if (!\is_array($row)) {
             throw new UserNotFoundException('User not found.');
         }
 
@@ -60,7 +60,7 @@ SQL);
         $statement->execute(['email' => $this->normalizeEmail($email)]);
         $row = $statement->fetch();
 
-        return is_array($row) ? $this->hydrate($row) : null;
+        return \is_array($row) ? $this->hydrate($row) : null;
     }
 
     /** @return list<User> */
@@ -76,7 +76,7 @@ SQL);
         $rows = $statement->fetchAll();
         $users = [];
         foreach ($rows as $row) {
-            if (is_array($row)) {
+            if (\is_array($row)) {
                 $users[] = $this->hydrate($row);
             }
         }
@@ -112,8 +112,8 @@ SQL);
         $role = $row['role'] ?? null;
         $enabled = $row['enabled'] ?? null;
         $handle = $row['webauthn_user_handle'] ?? null;
-        if (!is_int($id) || !is_string($email) || !is_string($hash) || !is_string($role)
-            || !is_int($enabled) || !is_string($handle)) {
+        if (!\is_int($id) || !\is_string($email) || !\is_string($hash) || !\is_string($role)
+            || !\is_int($enabled) || !\is_string($handle)) {
             throw new AuthenticationException('Invalid user record.');
         }
 
@@ -123,7 +123,7 @@ SQL);
     private function normalizeEmail(string $email): string
     {
         $email = mb_strtolower(trim($email));
-        if (filter_var($email, FILTER_VALIDATE_EMAIL) === false || strlen($email) > 254) {
+        if (filter_var($email, FILTER_VALIDATE_EMAIL) === false || \strlen($email) > 254) {
             throw new AuthenticationException('Email address is invalid.');
         }
 

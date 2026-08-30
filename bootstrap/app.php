@@ -3,7 +3,10 @@
 declare(strict_types=1);
 
 use FlatFileCms\Admin\AdminAuthController;
+use FlatFileCms\Admin\AdminPageBuilderController;
 use FlatFileCms\Admin\AdminPageController;
+use FlatFileCms\Admin\BlockFormDataMapper;
+use FlatFileCms\Admin\BlockFormRenderer;
 use FlatFileCms\Api\ApiResponseFactory;
 use FlatFileCms\Api\CollectionSerializer;
 use FlatFileCms\Api\PageSerializer;
@@ -28,6 +31,7 @@ use FlatFileCms\Collections\CollectionRepository;
 use FlatFileCms\Collections\CollectionService;
 use FlatFileCms\Config\ConfigurationRepository;
 use FlatFileCms\Config\LanguageRepository;
+use FlatFileCms\Content\PageBlockManager;
 use FlatFileCms\Content\PageManager;
 use FlatFileCms\Content\PageRepository;
 use FlatFileCms\Core\Application;
@@ -64,7 +68,7 @@ use FlatFileCms\Seo\SeoResolver;
 
 $projectRoot = dirname(__DIR__);
 
-require $projectRoot . '/vendor/autoload.php';
+require "{$projectRoot}/vendor/autoload.php";
 
 $environment = Environment::load($projectRoot);
 $container = new Container();
@@ -173,9 +177,10 @@ $container->set(YamlParser::class, static fn(): YamlParser => new YamlParser());
 $container->set(
     YamlFileCache::class,
     static fn(Container $container): YamlFileCache => new YamlFileCache(
-        $container->get(Environment::class)->boolean('YAML_CACHE_ENABLED', true),
+        $container->get(Environment::class)->boolean('YAML_CACHE_JSON_ENABLED', true),
         $container->get(SafePathResolver::class),
         $container->get(AtomicFileWriter::class),
+        $container->get(Environment::class)->boolean('YAML_CACHE_SERIALIZE_ENABLED', false),
     ),
 );
 $container->set(
@@ -257,6 +262,19 @@ $container->set(
     ),
 );
 $container->set(
+    PageBlockManager::class,
+    static fn(Container $container): PageBlockManager => new PageBlockManager(
+        $container->get(YamlFileRepository::class),
+        $container->get(PageRepository::class),
+        $container->get(BlockRegistry::class),
+        $container->get(BlockValidator::class),
+        $container->get(BlockProcessor::class),
+        $container->get(FileLockManager::class),
+    ),
+);
+$container->set(BlockFormDataMapper::class, static fn(): BlockFormDataMapper => new BlockFormDataMapper());
+$container->set(BlockFormRenderer::class, static fn(): BlockFormRenderer => new BlockFormRenderer());
+$container->set(
     PageManager::class,
     static fn(Container $container): PageManager => new PageManager(
         $container->get(YamlFileRepository::class),
@@ -278,6 +296,18 @@ $container->set(
         $container->get(CollectionRepository::class),
         $container->get(PageManager::class),
         $container->get(LayoutRegistry::class),
+    ),
+);
+$container->set(
+    AdminPageBuilderController::class,
+    static fn(Container $container): AdminPageBuilderController => new AdminPageBuilderController(
+        $container->get(Authenticator::class),
+        $container->get(CsrfTokenManager::class),
+        $container->get(LanguageRepository::class),
+        $container->get(PageBlockManager::class),
+        $container->get(BlockRegistry::class),
+        $container->get(BlockFormDataMapper::class),
+        $container->get(BlockFormRenderer::class),
     ),
 );
 $container->set(
@@ -422,7 +452,7 @@ $container->set(
 );
 $container->set(Router::class, static function (Container $container) use ($projectRoot): Router {
     $router = new Router();
-    $registerRoutes = require $projectRoot . '/config/routes.php';
+    $registerRoutes = require "{$projectRoot}/config/routes.php";
     if (!is_callable($registerRoutes)) {
         throw new RuntimeException('Route configuration must return a callable.');
     }

@@ -2,12 +2,12 @@ schemaVersion: 1
 enabled: true
 layout: default
 title:
-  pl: Strona główna
+  pl: 'Strona główna'
 seo:
   title:
-    pl: Strona główna
+    pl: 'Strona główna'
   description:
-    pl: Przykładowa strona główna FlatFile CMS.
+    pl: 'Przykładowa strona główna FlatFile CMS.'
   robots:
     index: true
     follow: true
@@ -15,12 +15,27 @@ seo:
   twitter: {}
   jsonLd: {}
 blocks:
-  - id: 01994d31-4fd1-7f32-9c2a-e89d624cda37
+  -
+    id: 01a052ab-7261-7325-8134-8163b0458afb
+    type: hero
+    enabled: true
+    data:
+      title:
+        pl: 'Witaj we FlatFileCMS'
+      content:
+        pl: 'Zaawansowanym, Polskim headless, flatfile CMS!'
+      alignment: left
+  -
+    id: 01994d31-4fd1-7f32-9c2a-e89d624cda37
     type: rich-text
     enabled: true
     data:
       content:
-        pl: |
+        pl: |-
           ## FlatFile CMS
 
           Warstwa contentu i publiczne API działają poprawnie.
+
+          ### Nawigacja
+
+          Nawigacja powyżej kieruje na strony testowe

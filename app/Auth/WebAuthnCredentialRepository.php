@@ -19,7 +19,7 @@ final readonly class WebAuthnCredentialRepository
         $statement->execute(['user_id' => $userId]);
         $credentials = [];
         foreach ($statement->fetchAll() as $row) {
-            if (is_array($row)) {
+            if (\is_array($row)) {
                 $credentials[] = $this->hydrate($row);
             }
         }
@@ -34,7 +34,7 @@ final readonly class WebAuthnCredentialRepository
         $statement->execute();
         $row = $statement->fetch();
 
-        return is_array($row) ? $this->hydrate($row) : null;
+        return \is_array($row) ? $this->hydrate($row) : null;
     }
 
     /** @param list<string> $transports */
@@ -95,7 +95,7 @@ SQL);
     private function hydrate(array $row): WebAuthnCredential
     {
         $transportsJson = $row['transports'] ?? null;
-        if (!is_string($transportsJson)) {
+        if (!\is_string($transportsJson)) {
             throw new AuthenticationException('Invalid WebAuthn credential record.');
         }
         try {
@@ -103,12 +103,12 @@ SQL);
         } catch (JsonException) {
             throw new AuthenticationException('Invalid WebAuthn credential record.');
         }
-        if (!is_array($transports) || !array_is_list($transports)) {
+        if (!\is_array($transports) || !array_is_list($transports)) {
             throw new AuthenticationException('Invalid WebAuthn transports.');
         }
         $normalizedTransports = [];
         foreach ($transports as $transport) {
-            if (!is_string($transport)) {
+            if (!\is_string($transport)) {
                 throw new AuthenticationException('Invalid WebAuthn transport.');
             }
             $normalizedTransports[] = $transport;
@@ -129,12 +129,12 @@ SQL);
     private function integerColumn(array $row, string $column): int
     {
         $value = $row[$column] ?? null;
-        if (is_int($value)) {
+        if (\is_int($value)) {
             return $value;
         }
-        if (is_string($value)) {
+        if (\is_string($value)) {
             $parsed = filter_var($value, FILTER_VALIDATE_INT);
-            if (is_int($parsed)) {
+            if (\is_int($parsed)) {
                 return $parsed;
             }
         }
@@ -146,7 +146,7 @@ SQL);
     private function stringColumn(array $row, string $column): string
     {
         $value = $row[$column] ?? null;
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             throw new AuthenticationException('Invalid WebAuthn credential record.');
         }
 

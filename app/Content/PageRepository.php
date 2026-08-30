@@ -42,8 +42,8 @@ final readonly class PageRepository
                 continue;
             }
 
-            $directory = dirname($item->getPathname());
-            $relative = str_replace(DIRECTORY_SEPARATOR, '/', substr($directory, strlen($root) + 1));
+            $directory = \dirname($item->getPathname());
+            $relative = str_replace(DIRECTORY_SEPARATOR, '/', substr($directory, \strlen($root) + 1));
             $identities[] = PageIdentity::fromString($relative);
         }
 
@@ -74,7 +74,7 @@ final readonly class PageRepository
             return $this->fromData($identity, $document->data(), $languages, $document->revision(), $modifiedAt);
         } catch (InvalidArgumentException $exception) {
             throw new InvalidContentException(
-                sprintf('Page "%s" contains invalid content.', $identity->value()),
+                \sprintf('Page "%s" contains invalid content.', $identity->value()),
                 previous: $exception,
             );
         }
@@ -127,7 +127,7 @@ final readonly class PageRepository
             );
         } catch (InvalidArgumentException $exception) {
             throw new InvalidContentException(
-                sprintf('Page "%s" contains invalid content.', $identity->value()),
+                \sprintf('Page "%s" contains invalid content.', $identity->value()),
                 previous: $exception,
             );
         }
@@ -163,7 +163,7 @@ final readonly class PageRepository
     {
         $blocks = [];
         foreach (ContentData::list($value, 'blocks') as $index => $item) {
-            $blocks[] = ContentData::map($item, 'blocks.' . $index);
+            $blocks[] = ContentData::map($item, "blocks.{$index}");
         }
 
         return $blocks;

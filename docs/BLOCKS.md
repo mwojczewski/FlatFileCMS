@@ -24,12 +24,13 @@ php bin/cms block:create image-with-text
 php bin/cms block:create image-with-text --with-assets
 ```
 
-The command accepts the same lowercase ASCII slug as BlockRegistry. It creates
-block.yml and render.php with translatable title and content fields. The
-asset option additionally creates style.css and script.js. Generated files
+The command accepts the same lowercase ASCII slug as `BlockRegistry`. It creates
+`block.yml` and `render.php` with translatable `title` and `content` fields. The
+asset option additionally creates `style.css` and `script.js`. Generated files
 are written in a private temporary directory and the complete package is then
 published using a directory rename. Existing block directories are rejected and
 never deliberately overwritten.
+
 The generated PHP, YAML, CSS and JavaScript are ordinary source files. A
 developer can immediately modify them in an editor; the CMS does not provide a
 web editor for executable block code.
@@ -64,21 +65,21 @@ invalid rule or missing renderer rejects the package.
 
 ## Built-in field types
 
-| Type                           | Normalized value                       | Rules                                               |
-| ------------------------------ | -------------------------------------- | --------------------------------------------------- |
-| `text`, `textarea`, `markdown` | string with normalized line endings    | `minLength`/`maxLength`, aliases `min`/`max`        |
-| `number`                       | integer or finite float                | `min`, `max`, `integer`                             |
-| `boolean`                      | boolean                                | accepts booleans and standard form boolean strings  |
-| `select`                       | allowed string                         | `options` or `allowedValues`                        |
-| `multiselect`                  | unique list of allowed strings         | options plus `minItems`/`maxItems`                  |
-| `url`                          | absolute HTTP(S) or root-relative URL  | format validation                                   |
-| `email`                        | email string                           | format validation                                   |
-| `date`                         | `YYYY-MM-DD`                           | strict calendar validation                          |
-| `datetime`                     | HTML datetime-local or RFC 3339 string | strict format validation                            |
-| `color`                        | lowercase `#rrggbb` or `#rrggbbaa`     | format validation                                   |
-| `image`                        | `{src, alt?}`                          | safe page-local path, existing image extension/file |
-| `file`                         | `{src}`                                | safe page-local path and existing file              |
-| `repeater`                     | list of normalized mappings            | `fields`, `minItems`/`maxItems`                     |
+| Type | Normalized value | Rules |
+|---|---|---|
+| `text`, `textarea`, `markdown` | string with normalized line endings | `minLength`/`maxLength`, aliases `min`/`max` |
+| `number` | integer or finite float | `min`, `max`, `integer` |
+| `boolean` | boolean | accepts booleans and standard form boolean strings |
+| `select` | allowed string | `options` or `allowedValues` |
+| `multiselect` | unique list of allowed strings | options plus `minItems`/`maxItems` |
+| `url` | absolute HTTP(S) or root-relative URL | format validation |
+| `email` | email string | format validation |
+| `date` | `YYYY-MM-DD` | strict calendar validation |
+| `datetime` | HTML datetime-local or RFC 3339 string | strict format validation |
+| `color` | lowercase `#rrggbb` or `#rrggbbaa` | format validation |
+| `image` | `{src, alt?}` | safe page-local path, existing image extension/file |
+| `file` | `{src}` | safe page-local path and existing file |
+| `repeater` | list of normalized mappings | `fields`, `minItems`/`maxItems` |
 
 For choices, `options` may be a list of values or objects containing `value`
 and localized `label`.
@@ -124,7 +125,7 @@ Validation rejects:
 
 Disabled blocks are also validated, then omitted from public output. Validation
 errors retain stable field paths such as `data.items.0.caption.en`, which the
-future admin form layer can map directly to controls.
+dynamic admin form layer maps to schema-generated controls.
 
 ## Adding a custom field type
 
@@ -141,5 +142,6 @@ interface FieldType
 ```
 
 Register one shared instance in `FieldTypeRegistry` during bootstrap. No block,
-controller, API serializer or database change is needed. The future dynamic
-admin form registry will use the same stable type name.
+controller, API serializer or database change is needed. A custom field type
+that needs a control different from the generic text fallback can extend the
+admin form renderer in the same delivery as the new type.

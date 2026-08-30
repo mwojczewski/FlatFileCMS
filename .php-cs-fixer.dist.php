@@ -14,6 +14,12 @@ return (new Config())
     ->setRules([
         '@PER-CS2.0' => true,
         'declare_strict_types' => true,
+        'explicit_string_variable' => true,
+        'native_function_invocation' => [
+            'include' => ['@compiler_optimized'],
+            'scope' => 'namespaced',
+            'strict' => true,
+        ],
         'ordered_imports' => true,
     ])
     ->setFinder($finder);

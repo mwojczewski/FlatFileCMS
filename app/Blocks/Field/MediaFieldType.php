@@ -31,9 +31,9 @@ final readonly class MediaFieldType implements FieldType
     /** @return array<string, mixed> */
     public function normalize(mixed $value, FieldDefinition $definition, FieldContext $context): array
     {
-        $mapping = is_string($value) ? ['src' => $value] : $this->mapping($value);
+        $mapping = \is_string($value) ? ['src' => $value] : $this->mapping($value);
         $src = $mapping['src'] ?? null;
-        if (!is_string($src) || $src === '') {
+        if (!\is_string($src) || $src === '') {
             throw new FieldValueException('INVALID_MEDIA', 'Media reference requires a non-empty src.');
         }
 
@@ -47,7 +47,7 @@ final readonly class MediaFieldType implements FieldType
         }
         if ($this->name === 'image') {
             $extension = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-            if (!in_array($extension, self::IMAGE_EXTENSIONS, true)) {
+            if (!\in_array($extension, self::IMAGE_EXTENSIONS, true)) {
                 throw new FieldValueException('INVALID_IMAGE_EXTENSION', 'Image extension is not allowed.');
             }
         }
@@ -69,7 +69,7 @@ final readonly class MediaFieldType implements FieldType
         }
 
         $normalized = ['src' => $relative->value()];
-        if ($this->name === 'image' && array_key_exists('alt', $mapping)) {
+        if ($this->name === 'image' && \array_key_exists('alt', $mapping)) {
             $normalized['alt'] = $this->alt($mapping['alt'], $context);
         }
 
@@ -84,7 +84,7 @@ final readonly class MediaFieldType implements FieldType
     ): mixed {
         $mapping = $this->mapping($value);
         $alt = $mapping['alt'] ?? null;
-        if (is_array($alt)) {
+        if (\is_array($alt)) {
             $mapping['alt'] = $alt[$locale] ?? $alt[$context->languages()->default()] ?? '';
         }
 
@@ -94,13 +94,13 @@ final readonly class MediaFieldType implements FieldType
     /** @return array<string, mixed> */
     private function mapping(mixed $value): array
     {
-        if (!is_array($value) || ($value !== [] && array_is_list($value))) {
+        if (!\is_array($value) || ($value !== [] && array_is_list($value))) {
             throw new FieldValueException('INVALID_MEDIA', 'Media value must be a mapping.');
         }
 
         $mapping = [];
         foreach ($value as $key => $item) {
-            if (!is_string($key) || !in_array($key, ['src', 'alt'], true)) {
+            if (!\is_string($key) || !\in_array($key, ['src', 'alt'], true)) {
                 throw new FieldValueException('INVALID_MEDIA', 'Media value contains an unknown property.');
             }
 
@@ -113,13 +113,13 @@ final readonly class MediaFieldType implements FieldType
     /** @return array<string, string> */
     private function alt(mixed $value, FieldContext $context): array
     {
-        if (!is_array($value) || ($value !== [] && array_is_list($value))) {
+        if (!\is_array($value) || ($value !== [] && array_is_list($value))) {
             throw new FieldValueException('INVALID_ALT', 'Image alt must be a localized mapping.');
         }
 
         $alt = [];
         foreach ($value as $locale => $text) {
-            if (!is_string($locale) || !$context->languages()->has($locale) || !is_string($text)) {
+            if (!\is_string($locale) || !$context->languages()->has($locale) || !\is_string($text)) {
                 throw new FieldValueException('INVALID_ALT', 'Image alt contains an invalid locale or value.');
             }
 

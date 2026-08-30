@@ -71,7 +71,7 @@ SELECT attempts, window_started_at FROM auth_rate_limits WHERE action = :action 
 SQL);
         $statement->execute(['action' => $action, 'hash' => $hash]);
         $row = $statement->fetch();
-        if (!is_array($row)) {
+        if (!\is_array($row)) {
             return null;
         }
 
@@ -85,12 +85,12 @@ SQL);
     private function integerColumn(array $row, string $column): int
     {
         $value = $row[$column] ?? null;
-        if (is_int($value)) {
+        if (\is_int($value)) {
             return $value;
         }
-        if (is_string($value)) {
+        if (\is_string($value)) {
             $parsed = filter_var($value, FILTER_VALIDATE_INT);
-            if (is_int($parsed)) {
+            if (\is_int($parsed)) {
                 return $parsed;
             }
         }

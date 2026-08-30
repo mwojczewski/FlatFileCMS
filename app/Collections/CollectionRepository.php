@@ -41,8 +41,8 @@ final readonly class CollectionRepository
                 continue;
             }
 
-            $directory = dirname($item->getPathname());
-            $relative = str_replace(DIRECTORY_SEPARATOR, '/', substr($directory, strlen($root) + 1));
+            $directory = \dirname($item->getPathname());
+            $relative = str_replace(DIRECTORY_SEPARATOR, '/', substr($directory, \strlen($root) + 1));
             $identities[] = PageIdentity::fromString($relative);
         }
 
@@ -67,12 +67,12 @@ final readonly class CollectionRepository
 
         try {
             $document = $this->yaml->read(FilesystemRoot::Pages, $relativePath);
-            $directory = dirname($this->paths->resolve(FilesystemRoot::Pages, $relativePath, mustExist: true));
+            $directory = \dirname($this->paths->resolve(FilesystemRoot::Pages, $relativePath, mustExist: true));
             if (is_file($directory . '/content.yml') || is_link($directory . '/content.yml')) {
                 throw new InvalidArgumentException('A directory cannot be both a page and a collection.');
             }
 
-            $absolutePath = $directory . '/pagination.yml';
+            $absolutePath = "{$directory}/pagination.yml";
             clearstatcache(true, $absolutePath);
             $modifiedAt = filemtime($absolutePath);
             if ($modifiedAt === false) {
@@ -96,7 +96,7 @@ final readonly class CollectionRepository
                 throw new InvalidArgumentException('Collection sort field is invalid.');
             }
             $sortDirection = ContentData::string($sort['direction'] ?? null, 'sort.direction');
-            if (!in_array($sortDirection, ['asc', 'desc'], true)) {
+            if (!\in_array($sortDirection, ['asc', 'desc'], true)) {
                 throw new InvalidArgumentException('Collection sort direction is invalid.');
             }
 
@@ -126,7 +126,7 @@ final readonly class CollectionRepository
             );
         } catch (InvalidArgumentException $exception) {
             throw new InvalidContentException(
-                sprintf('Collection "%s" contains invalid configuration.', $identity->value()),
+                \sprintf('Collection "%s" contains invalid configuration.', $identity->value()),
                 previous: $exception,
             );
         }
@@ -169,7 +169,7 @@ final readonly class CollectionRepository
             if (preg_match('/^[a-z][a-z0-9_-]*$/D', $parameter) !== 1) {
                 throw new InvalidArgumentException('Collection filter parameter is invalid.');
             }
-            if (in_array($parameter, ['lang', 'page'], true)) {
+            if (\in_array($parameter, ['lang', 'page'], true)) {
                 throw new InvalidArgumentException('Collection filter parameter is reserved.');
             }
             if (preg_match('/^[a-z][A-Za-z0-9_]*(?:\.[a-z][A-Za-z0-9_]*)*$/D', $field) !== 1) {

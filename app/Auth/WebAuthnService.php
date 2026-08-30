@@ -62,7 +62,7 @@ final readonly class WebAuthnService
         $credentialId = $values['credentialId'] ?? null;
         $publicKey = $values['credentialPublicKey'] ?? null;
         $counter = $values['signatureCounter'] ?? 0;
-        if (!is_string($credentialId) || !is_string($publicKey) || !is_int($counter)) {
+        if (!\is_string($credentialId) || !\is_string($publicKey) || !\is_int($counter)) {
             throw new AuthenticationException('Security key returned invalid registration data.');
         }
         $transports = $this->transports($response['transports'] ?? []);
@@ -110,7 +110,7 @@ final readonly class WebAuthnService
             throw new AuthenticationException('Security key verification failed.', previous: $exception);
         }
         $counter = $server->getSignatureCounter();
-        $this->credentials->markUsed($credential, is_int($counter) ? $counter : $credential->signatureCounter());
+        $this->credentials->markUsed($credential, \is_int($counter) ? $counter : $credential->signatureCounter());
     }
 
     private function server(): WebAuthn
@@ -127,12 +127,12 @@ final readonly class WebAuthnService
         } catch (JsonException $exception) {
             throw new AuthenticationException('Unable to encode WebAuthn options.', previous: $exception);
         }
-        $publicKey = is_array($data) ? ($data['publicKey'] ?? null) : null;
-        if (!is_array($data) || !is_array($publicKey) || array_is_list($data)) {
+        $publicKey = \is_array($data) ? ($data['publicKey'] ?? null) : null;
+        if (!\is_array($data) || !\is_array($publicKey) || array_is_list($data)) {
             throw new AuthenticationException('WebAuthn options are invalid.');
         }
         $challenge = $publicKey['challenge'] ?? null;
-        if (!is_string($challenge)) {
+        if (!\is_string($challenge)) {
             throw new AuthenticationException('WebAuthn challenge is missing.');
         }
         $this->session->set(self::CHALLENGE_KEY, $challenge);
@@ -141,7 +141,7 @@ final readonly class WebAuthnService
 
         $normalized = [];
         foreach ($data as $key => $value) {
-            if (!is_string($key)) {
+            if (!\is_string($key)) {
                 throw new AuthenticationException('WebAuthn option keys are invalid.');
             }
             $normalized[$key] = $value;
@@ -158,7 +158,7 @@ final readonly class WebAuthnService
         $this->session->remove(self::CHALLENGE_KEY);
         $this->session->remove(self::PURPOSE_KEY);
         $this->session->remove(self::ISSUED_AT_KEY);
-        if (!is_string($challenge) || $storedPurpose !== $purpose || !is_int($issuedAt) || $issuedAt + 180 < time()) {
+        if (!\is_string($challenge) || $storedPurpose !== $purpose || !\is_int($issuedAt) || $issuedAt + 180 < time()) {
             throw new AuthenticationException('WebAuthn challenge is missing or expired.');
         }
 
@@ -169,8 +169,8 @@ final readonly class WebAuthnService
     private function binary(array $response, string $field): string
     {
         $value = $response[$field] ?? null;
-        if (!is_string($value) || $value === '') {
-            throw new AuthenticationException(sprintf('WebAuthn field "%s" is missing.', $field));
+        if (!\is_string($value) || $value === '') {
+            throw new AuthenticationException(\sprintf('WebAuthn field "%s" is missing.', $field));
         }
 
         return $this->base64UrlDecode($value);
@@ -181,9 +181,9 @@ final readonly class WebAuthnService
         if (preg_match('/^[A-Za-z0-9_-]+$/D', $value) !== 1) {
             throw new AuthenticationException('WebAuthn data is not valid base64url.');
         }
-        $padding = (4 - strlen($value) % 4) % 4;
+        $padding = (4 - \strlen($value) % 4) % 4;
         $decoded = base64_decode(strtr($value . str_repeat('=', $padding), '-_', '+/'), true);
-        if (!is_string($decoded)) {
+        if (!\is_string($decoded)) {
             throw new AuthenticationException('Unable to decode WebAuthn data.');
         }
 
@@ -193,13 +193,13 @@ final readonly class WebAuthnService
     /** @return list<string> */
     private function transports(mixed $value): array
     {
-        if (!is_array($value) || !array_is_list($value)) {
+        if (!\is_array($value) || !array_is_list($value)) {
             return [];
         }
         $allowed = ['usb', 'nfc', 'ble'];
         $result = [];
         foreach ($value as $transport) {
-            if (is_string($transport) && in_array($transport, $allowed, true)) {
+            if (\is_string($transport) && \in_array($transport, $allowed, true)) {
                 $result[] = $transport;
             }
         }

@@ -47,21 +47,21 @@ final readonly class CollectionViewModel
     {
         $locale = $this->collection['locale'] ?? '';
 
-        return is_string($locale) ? $locale : '';
+        return \is_string($locale) ? $locale : '';
     }
 
     public function url(): string
     {
         $url = $this->collection['url'] ?? '';
 
-        return is_string($url) ? $url : '';
+        return \is_string($url) ? $url : '';
     }
 
     public function layout(): string
     {
         $layout = $this->collection['layout'] ?? '';
 
-        return is_string($layout) ? $layout : '';
+        return \is_string($layout) ? $layout : '';
     }
 
     /** @return array<string, mixed> */

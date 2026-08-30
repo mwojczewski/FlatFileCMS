@@ -50,7 +50,7 @@ final readonly class TemporaryProject
     public function write(string $relativePath, string $contents): void
     {
         $path = $this->path($relativePath);
-        $directory = dirname($path);
+        $directory = \dirname($path);
         if (!is_dir($directory) && !mkdir($directory, 0o700, true) && !is_dir($directory)) {
             throw new RuntimeException('Unable to create temporary file parent.');
         }

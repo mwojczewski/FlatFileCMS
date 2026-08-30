@@ -58,12 +58,26 @@ to `AtomicFileWriter`. Invalid data therefore cannot replace the current file.
 
 ## Parsed YAML cache
 
-Parsed mappings are stored as JSON below `storage/cache/yaml/`. Cache filenames
-are hashes of internal resource keys. A cache entry is accepted only when its
-stored source revision equals the SHA-256 revision of the current YAML bytes.
-This avoids stale data even when modification time and file size do not change.
+Parsed mappings may be stored in two independent representations below
+`storage/cache/yaml/`: JSON (`*.json`) and PHP serialized arrays
+(`*.serialized`). Cache filenames are hashes of internal resource keys. A cache
+entry is accepted only when its stored source revision equals the SHA-256
+revision of the current YAML bytes. This avoids stale data even when
+modification time and file size do not change.
 
 Cache files are runtime-only, contain no executable PHP and may be deleted at
-any time. Setting `YAML_CACHE_ENABLED=0` disables reads and writes without
-changing repository behavior. This variable does not control media variants;
-media transformation and media-cache behavior belongs to `config/setup.yml`.
+any time. `YAML_CACHE_JSON_ENABLED` controls JSON while
+`YAML_CACHE_SERIALIZE_ENABLED` controls `serialize()`. The switches are
+parallel rather than mutually exclusive. With both enabled, writes update both
+files and serialized data is preferred during reads, with JSON as fallback.
+
+Serialized entries use `unserialize(..., ['allowed_classes' => false])` and are
+recursively restricted to arrays and YAML-safe scalar values. Corrupt or
+object-bearing entries are discarded. Neither variable controls media
+variants; media transformation and media-cache behavior belongs to
+`config/setup.yml`.
+
+`php bin/cms cache:clear` removes every generated entry below
+`storage/cache/`, regardless of the cache mechanism that created it. The fixed
+cache root and its root `.gitkeep` file are preserved; the command accepts no
+path argument and never follows symbolic links.

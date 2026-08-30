@@ -46,7 +46,7 @@ final readonly class PageRouteIndex
         foreach ($pages as $page) {
             $identity = $page->identity()->value();
             if (isset($pagesByIdentity[$identity])) {
-                throw new InvalidContentException(sprintf('Duplicate page identity "%s".', $identity));
+                throw new InvalidContentException(\sprintf('Duplicate page identity "%s".', $identity));
             }
             $pagesByIdentity[$identity] = $page;
             $modifiedAt = max($modifiedAt, $page->modifiedAt());
@@ -54,7 +54,7 @@ final readonly class PageRouteIndex
         foreach ($collections as $collection) {
             $identity = $collection->identity()->value();
             if (isset($collectionsByIdentity[$identity]) || isset($pagesByIdentity[$identity])) {
-                throw new InvalidContentException(sprintf('Duplicate content identity "%s".', $identity));
+                throw new InvalidContentException(\sprintf('Duplicate content identity "%s".', $identity));
             }
             $collectionsByIdentity[$identity] = $collection;
             $modifiedAt = max($modifiedAt, $collection->modifiedAt());
@@ -221,7 +221,7 @@ final readonly class PageRouteIndex
             $ancestor = $pages[$ancestorIdentity] ?? $collections[$ancestorIdentity] ?? null;
             $slug = $ancestor?->slug($locale);
             if ($slug === null) {
-                throw new InvalidContentException(sprintf(
+                throw new InvalidContentException(\sprintf(
                     'Content "%s" requires an ancestor with a localized slug for "%s".',
                     $identity->value(),
                     $locale,
@@ -246,7 +246,7 @@ final readonly class PageRouteIndex
         array $collectionRoutes,
     ): void {
         if (isset($pageRoutes[$routeKey]) || isset($collectionRoutes[$routeKey])) {
-            throw new InvalidContentException(sprintf(
+            throw new InvalidContentException(\sprintf(
                 'Localized route collision for locale "%s" and path "%s".',
                 $locale,
                 $path,
@@ -273,14 +273,14 @@ final readonly class PageRouteIndex
 
     private function publicUrl(string $path, string $locale): string
     {
-        $prefix = $this->languages->isMultilingual() ? '/' . $locale : '';
+        $prefix = $this->languages->isMultilingual() ? "/{$locale}" : '';
 
-        return $path === '' ? ($prefix === '' ? '/' : $prefix . '/') : $prefix . '/' . $path;
+        return $path === '' ? ($prefix === '' ? '/' : "{$prefix}/") : "{$prefix}/{$path}";
     }
 
     private static function routeKey(string $locale, string $path): string
     {
-        return $locale . ':' . $path;
+        return "{$locale}:{$path}";
     }
 
     private static function identityLocaleKey(PageIdentity $identity, string $locale): string

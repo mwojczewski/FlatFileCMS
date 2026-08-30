@@ -34,9 +34,9 @@ final readonly class BlockScaffolder
             );
         }
 
-        $lock = fopen($this->blocksRoot . '/.cms-block-create.lock', 'c+b');
+        $lock = fopen("{$this->blocksRoot}/.cms-block-create.lock", 'c+b');
         if ($lock === false || !flock($lock, LOCK_EX)) {
-            if (is_resource($lock)) {
+            if (\is_resource($lock)) {
                 fclose($lock);
             }
 
@@ -54,12 +54,12 @@ final readonly class BlockScaffolder
     /** @return non-empty-list<string> */
     private function createLocked(string $type, bool $withAssets): array
     {
-        $targetDirectory = $this->blocksRoot . '/' . $type;
+        $targetDirectory = "{$this->blocksRoot}/{$type}";
         if (file_exists($targetDirectory) || is_link($targetDirectory)) {
-            throw new BlockScaffolderException(sprintf('Block "%s" already exists.', $type));
+            throw new BlockScaffolderException(\sprintf('Block "%s" already exists.', $type));
         }
 
-        $temporaryDirectory = $this->blocksRoot . '/.cms-block-' . bin2hex(random_bytes(12));
+        $temporaryDirectory = "{$this->blocksRoot}/.cms-block-" . bin2hex(random_bytes(12));
         if (!mkdir($temporaryDirectory, 0o700)) {
             throw new BlockScaffolderException('Unable to create temporary block directory.');
         }
@@ -75,13 +75,13 @@ final readonly class BlockScaffolder
 
         try {
             foreach ($files as $filename => $contents) {
-                $this->writeFile($temporaryDirectory . '/' . $filename, $contents);
+                $this->writeFile("{$temporaryDirectory}/{$filename}", $contents);
             }
             if (!chmod($temporaryDirectory, 0o750)) {
                 throw new BlockScaffolderException('Unable to set block directory permissions.');
             }
             if (file_exists($targetDirectory)) {
-                throw new BlockScaffolderException(sprintf('Block "%s" already exists.', $type));
+                throw new BlockScaffolderException(\sprintf('Block "%s" already exists.', $type));
             }
             if (!rename($temporaryDirectory, $targetDirectory)) {
                 throw new BlockScaffolderException('Unable to publish the new block directory atomically.');
@@ -97,7 +97,7 @@ final readonly class BlockScaffolder
 
         /** @var non-empty-list<string> */
         return array_map(
-            static fn(string $filename): string => 'blocks/' . $type . '/' . $filename,
+            static fn(string $filename): string => "blocks/{$type}/{$filename}",
             array_keys($files),
         );
     }
@@ -201,7 +201,7 @@ JS,
     private function writeFile(string $path, string $contents): void
     {
         $written = file_put_contents($path, $contents, LOCK_EX);
-        if ($written === false || $written !== strlen($contents) || !chmod($path, 0o640)) {
+        if ($written === false || $written !== \strlen($contents) || !chmod($path, 0o640)) {
             throw new BlockScaffolderException('Unable to write a generated block file.');
         }
     }
@@ -216,7 +216,7 @@ JS,
         if ($files !== false) {
             foreach ($files as $filename) {
                 if ($filename !== '.' && $filename !== '..') {
-                    unlink($directory . '/' . $filename);
+                    unlink("{$directory}/{$filename}");
                 }
             }
         }

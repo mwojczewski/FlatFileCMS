@@ -113,10 +113,10 @@ YAML);
     ): void {
         $slugYaml = $slugs === null
             ? ''
-            : sprintf("slug:\n  pl: %s\n  en: %s\n", $slugs['pl'], $slugs['en']);
+            : \sprintf("slug:\n  pl: %s\n  en: %s\n", $slugs['pl'], $slugs['en']);
         $this->project->write(
             'pages/' . $identity . '/content.yml',
-            sprintf(
+            \sprintf(
                 "schemaVersion: 1\nenabled: %s\n%stitle:\n  pl: %s\n  en: %s\nblocks: []\n",
                 $enabled ? 'true' : 'false',
                 $slugYaml,

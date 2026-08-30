@@ -49,6 +49,6 @@ final readonly class LanguageConfig
 
     public function isMultilingual(): bool
     {
-        return count($this->languages) > 1;
+        return \count($this->languages) > 1;
     }
 }

@@ -8,7 +8,7 @@ final readonly class PasswordHasher
 {
     public function hash(string $password): string
     {
-        $algorithm = in_array('argon2id', password_algos(), true) ? 'argon2id' : PASSWORD_DEFAULT;
+        $algorithm = \in_array('argon2id', password_algos(), true) ? 'argon2id' : PASSWORD_DEFAULT;
 
         return password_hash($password, $algorithm);
     }

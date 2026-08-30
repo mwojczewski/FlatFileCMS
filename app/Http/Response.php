@@ -25,7 +25,7 @@ final readonly class Response
     /** @param array<string, string> $headers */
     public static function redirect(string $location, int $status = 302, array $headers = []): self
     {
-        if (!in_array($status, [301, 302, 303, 307, 308], true)) {
+        if (!\in_array($status, [301, 302, 303, 307, 308], true)) {
             throw new InvalidArgumentException('Invalid redirect status.');
         }
 
@@ -66,7 +66,7 @@ final readonly class Response
     {
         http_response_code($this->status);
         foreach ($this->headers as $name => $value) {
-            header($name . ': ' . $value, true);
+            header("{$name}: {$value}", true);
         }
 
         echo $this->body;

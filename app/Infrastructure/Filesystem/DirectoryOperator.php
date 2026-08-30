@@ -20,7 +20,7 @@ final readonly class DirectoryOperator
         if (file_exists($absolutePath) || is_link($absolutePath)) {
             throw new FilesystemException('Destination directory already exists.');
         }
-        $parent = dirname($absolutePath);
+        $parent = \dirname($absolutePath);
         if (!is_dir($parent) || is_link($parent)) {
             throw new FilesystemException('Destination parent directory does not exist.');
         }
@@ -41,7 +41,7 @@ final readonly class DirectoryOperator
         if (file_exists($destinationPath) || is_link($destinationPath)) {
             throw new FilesystemException('Destination directory already exists.');
         }
-        if (!is_dir(dirname($destinationPath)) || is_link(dirname($destinationPath))) {
+        if (!is_dir(\dirname($destinationPath)) || is_link(\dirname($destinationPath))) {
             throw new FilesystemException('Destination parent directory does not exist.');
         }
         if (!rename($sourcePath, $destinationPath)) {

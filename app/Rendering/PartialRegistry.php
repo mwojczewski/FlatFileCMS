@@ -66,7 +66,7 @@ final class PartialRegistry
         }
 
         return $this->all()[$name]
-            ?? throw new RenderingException(sprintf('Unknown partial "%s".', $name));
+            ?? throw new RenderingException(\sprintf('Unknown partial "%s".', $name));
     }
 
     public function modifiedAt(): int

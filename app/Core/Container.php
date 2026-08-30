@@ -39,7 +39,7 @@ final class Container
         }
 
         if (!isset($this->factories[$id])) {
-            throw new RuntimeException(sprintf('Service "%s" is not registered.', $id));
+            throw new RuntimeException(\sprintf('Service "%s" is not registered.', $id));
         }
 
         $service = ($this->factories[$id])($this);

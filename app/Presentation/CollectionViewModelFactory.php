@@ -34,7 +34,7 @@ final readonly class CollectionViewModelFactory
                 'id' => $page->identity()->value(),
                 'url' => $routes->urlFor($page->identity(), $locale),
                 'title' => $page->title($locale, $languages->default()),
-                'attributes' => is_array($attributes) ? $attributes : [],
+                'attributes' => \is_array($attributes) ? $attributes : [],
             ];
         }
 

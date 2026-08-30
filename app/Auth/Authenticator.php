@@ -49,7 +49,7 @@ final readonly class Authenticator
     {
         $id = $this->session->get(self::PENDING_USER);
         $since = $this->session->get(self::PENDING_SINCE);
-        if (!is_int($id) || !is_int($since) || $since + 300 < time()) {
+        if (!\is_int($id) || !\is_int($since) || $since + 300 < time()) {
             $this->session->remove(self::PENDING_USER);
             $this->session->remove(self::PENDING_SINCE);
             throw new AuthenticationException('Second-factor authentication is not pending.');
@@ -69,7 +69,7 @@ final readonly class Authenticator
     public function user(): ?User
     {
         $id = $this->session->get(self::AUTHENTICATED_USER);
-        if (!is_int($id)) {
+        if (!\is_int($id)) {
             return null;
         }
         $user = $this->users->get($id);

@@ -18,8 +18,8 @@ final class ApplicationTest extends TestCase
     protected function setUp(): void
     {
         $router = new Router();
-        $registerRoutes = require dirname(__DIR__, 2) . '/config/routes.php';
-        if (!is_callable($registerRoutes)) {
+        $registerRoutes = require \dirname(__DIR__, 2) . '/config/routes.php';
+        if (!\is_callable($registerRoutes)) {
             throw new RuntimeException('Route configuration must return a callable.');
         }
 
@@ -34,7 +34,7 @@ final class ApplicationTest extends TestCase
         self::assertSame(200, $response->status());
         self::assertSame('application/json; charset=UTF-8', $response->headers()['Content-Type']);
         self::assertSame(
-            ['status' => 'ok', 'application' => 'FlatFile CMS', 'stage' => 8],
+            ['status' => 'ok', 'application' => 'FlatFile CMS', 'stage' => 9],
             json_decode($response->body(), true, flags: JSON_THROW_ON_ERROR),
         );
     }

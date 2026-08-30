@@ -66,7 +66,7 @@ final class LayoutRegistry
         }
 
         return $this->all()[$name]
-            ?? throw new RenderingException(sprintf('Unknown layout "%s".', $name));
+            ?? throw new RenderingException(\sprintf('Unknown layout "%s".', $name));
     }
 
     public function modifiedAt(string $name): int

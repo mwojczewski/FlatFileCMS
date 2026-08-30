@@ -46,7 +46,7 @@ final readonly class AdminAuthController
             $this->csrf->validate($request->parsedBody()['_csrf'] ?? null);
             $email = $request->parsedBody()['email'] ?? null;
             $password = $request->parsedBody()['password'] ?? null;
-            if (!is_string($email) || !is_string($password)) {
+            if (!\is_string($email) || !\is_string($password)) {
                 throw new AuthenticationException('Email and password are required.');
             }
             $requiresSecondFactor = $this->authenticator->passwordLogin($email, $password);
@@ -149,14 +149,14 @@ final readonly class AdminAuthController
             $currentPassword = $request->parsedBody()['current_password'] ?? null;
             $newPassword = $request->parsedBody()['new_password'] ?? null;
             $confirmation = $request->parsedBody()['new_password_confirmation'] ?? null;
-            if (!is_string($currentPassword) || !is_string($newPassword) || !is_string($confirmation)) {
+            if (!\is_string($currentPassword) || !\is_string($newPassword) || !\is_string($confirmation)) {
                 throw new InvalidArgumentException('All password fields are required.');
             }
             $updatedUser = $this->passwordChanger->change($user, $currentPassword, $newPassword, $confirmation);
             $this->authenticator->complete($updatedUser);
 
             return Response::redirect('/admin/security?password_changed=1', 303);
-        } catch (AuthenticationException|InvalidArgumentException $exception) {
+        } catch (AuthenticationException | InvalidArgumentException $exception) {
             return $this->page(
                 'Zmiana hasła',
                 '<p class="error">' . self::escape($exception->getMessage()) . '</p>' . $this->passwordFormHtml(),
@@ -171,7 +171,7 @@ final readonly class AdminAuthController
         $this->validateJsonCsrf($request);
         $data = $this->json($request);
         $password = $data['password'] ?? null;
-        if (!is_string($password) || !$this->passwords->verify($password, $user->passwordHash())) {
+        if (!\is_string($password) || !$this->passwords->verify($password, $user->passwordHash())) {
             throw new HttpException(401, 'PASSWORD_INVALID', 'Current password is invalid.');
         }
 
@@ -185,12 +185,12 @@ final readonly class AdminAuthController
         $data = $this->json($request);
         $name = $data['name'] ?? null;
         $credential = $data['credential'] ?? null;
-        if (!is_string($name) || !is_array($credential) || array_is_list($credential)) {
+        if (!\is_string($name) || !\is_array($credential) || array_is_list($credential)) {
             throw new HttpException(400, 'WEBAUTHN_DATA_INVALID', 'Security key data is invalid.');
         }
         $normalizedCredential = [];
         foreach ($credential as $key => $value) {
-            if (!is_string($key)) {
+            if (!\is_string($key)) {
                 throw new HttpException(400, 'WEBAUTHN_DATA_INVALID', 'Security key data is invalid.');
             }
             $normalizedCredential[$key] = $value;
@@ -243,13 +243,13 @@ final readonly class AdminAuthController
         } catch (JsonException $exception) {
             throw new HttpException(400, 'JSON_INVALID', 'Request JSON is invalid', previous: $exception);
         }
-        if (!is_array($data) || ($data !== [] && array_is_list($data))) {
+        if (!\is_array($data) || ($data !== [] && array_is_list($data))) {
             throw new HttpException(400, 'JSON_INVALID', 'Request JSON must be an object');
         }
 
         $normalized = [];
         foreach ($data as $key => $value) {
-            if (!is_string($key)) {
+            if (!\is_string($key)) {
                 throw new HttpException(400, 'JSON_INVALID', 'Request JSON object keys must be strings');
             }
             $normalized[$key] = $value;
@@ -294,7 +294,8 @@ final readonly class AdminAuthController
             . '<button type="submit" class="nav-logout">Wyloguj</button></form></nav></header>' : '';
         $mainClass = $authenticated ? 'admin-main' : 'auth-main';
 
-        return Response::html('<!doctype html><html lang="pl"><head><meta charset="utf-8">'
+        return Response::html(
+            '<!doctype html><html lang="pl"><head><meta charset="utf-8">'
             . '<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">'
             . '<meta name="csrf-token" content="' . self::escape($this->csrf->token()) . '"><title>' . self::escape($title)
             . ' — FlatFile CMS</title><style>:root{color-scheme:light;--ink:#101828;--muted:#667085;--line:#e4e7ec;--accent:#3157d5;'

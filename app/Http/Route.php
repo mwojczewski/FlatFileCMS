@@ -26,7 +26,7 @@ final readonly class Route
 
     public function allows(string $method): bool
     {
-        return in_array(strtoupper($method), $this->methods, true);
+        return \in_array(strtoupper($method), $this->methods, true);
     }
 
     public function matchesPath(string $path): bool
@@ -49,7 +49,7 @@ final readonly class Route
             $quoted,
         );
 
-        if (!is_string($expression) || preg_match('#^' . $expression . '$#D', $path, $matches) !== 1) {
+        if (!\is_string($expression) || preg_match("#^{$expression}$#D", $path, $matches) !== 1) {
             return null;
         }
 

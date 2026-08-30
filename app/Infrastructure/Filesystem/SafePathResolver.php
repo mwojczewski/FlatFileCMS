@@ -65,7 +65,7 @@ final class SafePathResolver
         $candidate = $this->projectRoot . DIRECTORY_SEPARATOR . $root->value;
         $resolved = realpath($candidate);
         if ($resolved === false || !is_dir($resolved)) {
-            throw new FilesystemException(sprintf('Filesystem root "%s" is unavailable.', $root->value));
+            throw new FilesystemException(\sprintf('Filesystem root "%s" is unavailable.', $root->value));
         }
 
         $this->assertWithinRoot($this->projectRoot, $resolved);
@@ -81,7 +81,7 @@ final class SafePathResolver
 
         if (
             $normalizedCandidate !== $normalizedRoot
-            && !str_starts_with($normalizedCandidate, $normalizedRoot . '/')
+            && !str_starts_with($normalizedCandidate, "{$normalizedRoot}/")
         ) {
             throw new PathEscapeException('Resolved path escapes its allowed filesystem root.');
         }

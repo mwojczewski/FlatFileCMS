@@ -38,20 +38,20 @@ final readonly class ChoiceFieldType implements FieldType
     {
         $allowed = FieldSettings::allowedValues($definition->settings());
         if (!$this->multiple) {
-            if (!is_string($value) || !in_array($value, $allowed, true)) {
+            if (!\is_string($value) || !\in_array($value, $allowed, true)) {
                 throw new FieldValueException('NOT_ALLOWED', 'Value is not an allowed option.');
             }
 
             return $value;
         }
 
-        if (!is_array($value) || !array_is_list($value)) {
+        if (!\is_array($value) || !array_is_list($value)) {
             throw new FieldValueException('INVALID_TYPE', 'Value must be a list of options.');
         }
 
         $normalized = [];
         foreach ($value as $item) {
-            if (!is_string($item) || !in_array($item, $allowed, true)) {
+            if (!\is_string($item) || !\in_array($item, $allowed, true)) {
                 throw new FieldValueException('NOT_ALLOWED', 'List contains an option that is not allowed.');
             }
 
@@ -60,11 +60,11 @@ final readonly class ChoiceFieldType implements FieldType
         $normalized = array_values(array_unique($normalized));
         $minimum = FieldSettings::integer($definition->settings(), 'minItems', 'min');
         $maximum = FieldSettings::integer($definition->settings(), 'maxItems', 'max');
-        if ($minimum !== null && count($normalized) < $minimum) {
-            throw new FieldValueException('TOO_FEW_ITEMS', sprintf('Select at least %d options.', $minimum));
+        if ($minimum !== null && \count($normalized) < $minimum) {
+            throw new FieldValueException('TOO_FEW_ITEMS', \sprintf('Select at least %d options.', $minimum));
         }
-        if ($maximum !== null && count($normalized) > $maximum) {
-            throw new FieldValueException('TOO_MANY_ITEMS', sprintf('Select at most %d options.', $maximum));
+        if ($maximum !== null && \count($normalized) > $maximum) {
+            throw new FieldValueException('TOO_MANY_ITEMS', \sprintf('Select at most %d options.', $maximum));
         }
 
         return $normalized;

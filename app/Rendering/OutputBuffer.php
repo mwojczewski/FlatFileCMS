@@ -18,7 +18,7 @@ final class OutputBuffer
         try {
             $render();
             $contents = ob_get_clean();
-            if (!is_string($contents)) {
+            if (!\is_string($contents)) {
                 throw new RenderingException('Unable to collect rendered output.');
             }
 

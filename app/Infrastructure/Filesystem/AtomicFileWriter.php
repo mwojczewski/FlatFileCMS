@@ -21,7 +21,7 @@ final readonly class AtomicFileWriter
             throw new FilesystemException('Cannot write to a filesystem root.');
         }
 
-        $resourceKey = $root->value . ':' . $relativePath->value();
+        $resourceKey = "{$root->value}:" . $relativePath->value();
 
         return $this->lockManager->exclusive(
             $resourceKey,
@@ -61,7 +61,7 @@ final readonly class AtomicFileWriter
             throw new RevisionConflictException($expectedRevision, $actualRevision);
         }
 
-        $parentDirectory = dirname($targetPath);
+        $parentDirectory = \dirname($targetPath);
         if (!is_dir($parentDirectory) && !mkdir($parentDirectory, 0o750, true) && !is_dir($parentDirectory)) {
             throw new FilesystemException('Unable to create the destination directory.');
         }

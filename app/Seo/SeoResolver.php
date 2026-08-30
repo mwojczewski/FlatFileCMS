@@ -71,7 +71,7 @@ final readonly class SeoResolver
         $title = $this->optionalString($pageSeo['title'] ?? null)
             ?? $resourceTitle;
         $suffix = $this->optionalString($global['titleSuffix'] ?? null);
-        $fullTitle = $suffix === null || str_ends_with($title, $suffix) ? $title : $title . ' — ' . $suffix;
+        $fullTitle = $suffix === null || str_ends_with($title, $suffix) ? $title : "{$title} — {$suffix}";
         $description = $this->optionalString($pageSeo['description'] ?? null)
             ?? $this->optionalString($global['description'] ?? null)
             ?? '';
@@ -111,13 +111,13 @@ final readonly class SeoResolver
     /** @return array<string, mixed> */
     private function map(mixed $value): array
     {
-        if (!is_array($value) || ($value !== [] && array_is_list($value))) {
+        if (!\is_array($value) || ($value !== [] && array_is_list($value))) {
             throw new InvalidContentException('SEO sections must be mappings.');
         }
 
         $result = [];
         foreach ($value as $key => $item) {
-            if (!is_string($key)) {
+            if (!\is_string($key)) {
                 throw new InvalidContentException('SEO mapping keys must be strings.');
             }
 
@@ -133,7 +133,7 @@ final readonly class SeoResolver
             return null;
         }
 
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             throw new InvalidContentException('SEO text values must be strings.');
         }
 
@@ -142,7 +142,7 @@ final readonly class SeoResolver
 
     private function boolean(mixed $value): bool
     {
-        if (!is_bool($value)) {
+        if (!\is_bool($value)) {
             throw new InvalidContentException('SEO robots values must be boolean.');
         }
 
@@ -166,7 +166,7 @@ final readonly class SeoResolver
 
         if (
             filter_var($configured, FILTER_VALIDATE_URL) === false
-            || !in_array(parse_url($configured, PHP_URL_SCHEME), ['http', 'https'], true)
+            || !\in_array(parse_url($configured, PHP_URL_SCHEME), ['http', 'https'], true)
         ) {
             throw new InvalidContentException('SEO canonical URL is invalid.');
         }

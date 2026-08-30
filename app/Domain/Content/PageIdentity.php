@@ -23,7 +23,7 @@ final readonly class PageIdentity
             $segments[] = Slug::fromString($rawSegment);
         }
 
-        if (count($segments) > 1) {
+        if (\count($segments) > 1) {
             foreach ($segments as $segment) {
                 if ($segment->value() === 'homepage') {
                     throw new InvalidArgumentException('The homepage identity cannot be nested.');
@@ -50,7 +50,7 @@ final readonly class PageIdentity
 
     public function isHomepage(): bool
     {
-        return count($this->segments) === 1 && $this->segments[0]->value() === 'homepage';
+        return \count($this->segments) === 1 && $this->segments[0]->value() === 'homepage';
     }
 
     /** @return non-empty-list<Slug> */

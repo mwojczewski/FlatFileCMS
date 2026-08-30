@@ -8,7 +8,7 @@ final readonly class LocalizedDataResolver
 {
     public function resolve(mixed $value, string $locale, LanguageConfig $languages): mixed
     {
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             return $value;
         }
 
@@ -35,7 +35,7 @@ final readonly class LocalizedDataResolver
 
         $hasLocale = false;
         foreach (array_keys($value) as $key) {
-            if (!is_string($key) || !$languages->has($key)) {
+            if (!\is_string($key) || !$languages->has($key)) {
                 return false;
             }
 

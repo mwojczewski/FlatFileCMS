@@ -81,7 +81,7 @@ final readonly class YamlFileRepository
         // the destination file.
         $normalizedData = $this->parser->parse($contents);
         $revision = $this->fileWriter->write($root, $relativePath, $contents, $expectedRevision);
-        $cacheKey = $root->value . ':' . $relativePath->value();
+        $cacheKey = "{$root->value}:" . $relativePath->value();
         $this->cache->put($cacheKey, $revision, $normalizedData);
 
         return new YamlDocument($normalizedData, $revision);

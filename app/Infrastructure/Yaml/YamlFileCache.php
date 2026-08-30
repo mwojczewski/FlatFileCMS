@@ -11,17 +11,19 @@ use FlatFileCms\Infrastructure\Filesystem\FilesystemRoot;
 use FlatFileCms\Infrastructure\Filesystem\RelativePath;
 use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
 use JsonException;
+use Throwable;
 
 final readonly class YamlFileCache
 {
     private const string CACHE_DIRECTORY = 'cache/yaml';
 
     public function __construct(
-        private bool $enabled,
+        private bool $jsonEnabled,
         private SafePathResolver $pathResolver,
         private AtomicFileWriter $fileWriter,
+        private bool $serializeEnabled = false,
     ) {
-        if ($this->enabled) {
+        if ($this->jsonEnabled || $this->serializeEnabled) {
             $cacheDirectory = $this->pathResolver->resolve(
                 FilesystemRoot::Storage,
                 RelativePath::fromString(self::CACHE_DIRECTORY),
@@ -36,11 +38,79 @@ final readonly class YamlFileCache
     /** @return array<string, mixed>|null */
     public function get(string $key, FileRevision $sourceRevision): ?array
     {
-        if (!$this->enabled) {
+        if (!$this->jsonEnabled && !$this->serializeEnabled) {
             return null;
         }
 
-        $relativePath = $this->cachePath($key);
+        if ($this->serializeEnabled) {
+            $data = $this->getSerialized($key, $sourceRevision);
+            if ($data !== null) {
+                if ($this->jsonEnabled && !$this->hasCacheFile($key, 'json')) {
+                    $this->putJson($key, $sourceRevision, $data);
+                }
+
+                return $data;
+            }
+        }
+
+        if (!$this->jsonEnabled) {
+            return null;
+        }
+
+        $data = $this->getJson($key, $sourceRevision);
+        if ($data !== null && $this->serializeEnabled && !$this->hasCacheFile($key, 'serialized')) {
+            $this->putSerialized($key, $sourceRevision, $data);
+        }
+
+        return $data;
+    }
+
+    /** @param array<string, mixed> $data */
+    public function put(string $key, FileRevision $sourceRevision, array $data): void
+    {
+        if ($this->jsonEnabled) {
+            $this->putJson($key, $sourceRevision, $data);
+        }
+        if ($this->serializeEnabled) {
+            $this->putSerialized($key, $sourceRevision, $data);
+        }
+    }
+
+    public function clear(): void
+    {
+        if (!$this->jsonEnabled && !$this->serializeEnabled) {
+            return;
+        }
+
+        $directory = $this->pathResolver->resolve(
+            FilesystemRoot::Storage,
+            RelativePath::fromString(self::CACHE_DIRECTORY),
+        );
+        $extensions = [];
+        if ($this->jsonEnabled) {
+            $extensions[] = 'json';
+        }
+        if ($this->serializeEnabled) {
+            $extensions[] = 'serialized';
+        }
+        foreach ($extensions as $extension) {
+            $files = glob($directory . DIRECTORY_SEPARATOR . '*.' . $extension);
+            if ($files === false) {
+                throw new FilesystemException('Unable to enumerate YAML cache files.');
+            }
+
+            foreach ($files as $file) {
+                if (is_file($file) && !unlink($file)) {
+                    throw new FilesystemException('Unable to remove a YAML cache file.');
+                }
+            }
+        }
+    }
+
+    /** @return array<string, mixed>|null */
+    private function getJson(string $key, FileRevision $sourceRevision): ?array
+    {
+        $relativePath = $this->cachePath($key, 'json');
         $cachePath = $this->pathResolver->resolve(FilesystemRoot::Storage, $relativePath);
         if (!is_file($cachePath)) {
             return null;
@@ -59,32 +129,12 @@ final readonly class YamlFileCache
             return null;
         }
 
-        if (!is_array($record) || ($record['revision'] ?? null) !== $sourceRevision->value()) {
-            return null;
-        }
-
-        $data = $record['data'] ?? null;
-        if (!is_array($data)) {
-            return null;
-        }
-
-        foreach (array_keys($data) as $dataKey) {
-            if (!is_string($dataKey)) {
-                return null;
-            }
-        }
-
-        /** @var array<string, mixed> $data */
-        return $data;
+        return $this->recordData($record, $sourceRevision);
     }
 
     /** @param array<string, mixed> $data */
-    public function put(string $key, FileRevision $sourceRevision, array $data): void
+    private function putJson(string $key, FileRevision $sourceRevision, array $data): void
     {
-        if (!$this->enabled) {
-            return;
-        }
-
         try {
             $contents = json_encode(
                 ['revision' => $sourceRevision->value(), 'data' => $data],
@@ -94,33 +144,105 @@ final readonly class YamlFileCache
             throw new FilesystemException('Unable to encode parsed YAML cache.', previous: $exception);
         }
 
-        $this->fileWriter->write(FilesystemRoot::Storage, $this->cachePath($key), $contents);
+        $this->fileWriter->write(FilesystemRoot::Storage, $this->cachePath($key, 'json'), $contents);
     }
 
-    public function clear(): void
+    /** @return array<string, mixed>|null */
+    private function getSerialized(string $key, FileRevision $sourceRevision): ?array
     {
-        if (!$this->enabled) {
-            return;
+        $relativePath = $this->cachePath($key, 'serialized');
+        $cachePath = $this->pathResolver->resolve(FilesystemRoot::Storage, $relativePath);
+        if (!is_file($cachePath)) {
+            return null;
+        }
+        $contents = file_get_contents($cachePath);
+        if ($contents === false) {
+            return null;
         }
 
-        $directory = $this->pathResolver->resolve(
+        $record = @unserialize($contents, ['allowed_classes' => false, 'max_depth' => 64]);
+        $data = $this->recordData($record, $sourceRevision);
+        if ($data === null) {
+            unlink($cachePath);
+        }
+
+        return $data;
+    }
+
+    /** @param array<string, mixed> $data */
+    private function putSerialized(string $key, FileRevision $sourceRevision, array $data): void
+    {
+        try {
+            $contents = serialize(['revision' => $sourceRevision->value(), 'data' => $data]);
+        } catch (Throwable $exception) {
+            throw new FilesystemException('Unable to serialize parsed YAML cache.', previous: $exception);
+        }
+
+        $this->fileWriter->write(
             FilesystemRoot::Storage,
-            RelativePath::fromString(self::CACHE_DIRECTORY),
+            $this->cachePath($key, 'serialized'),
+            $contents,
         );
-        $files = glob($directory . DIRECTORY_SEPARATOR . '*.json');
-        if ($files === false) {
-            throw new FilesystemException('Unable to enumerate YAML cache files.');
+    }
+
+    /** @return array<string, mixed>|null */
+    private function recordData(mixed $record, FileRevision $sourceRevision): ?array
+    {
+        if (!\is_array($record) || ($record['revision'] ?? null) !== $sourceRevision->value()) {
+            return null;
         }
 
-        foreach ($files as $file) {
-            if (is_file($file) && !unlink($file)) {
-                throw new FilesystemException('Unable to remove a YAML cache file.');
+        $data = $record['data'] ?? null;
+        if (!\is_array($data) || !$this->validData($data, 0)) {
+            return null;
+        }
+
+        foreach (array_keys($data) as $dataKey) {
+            if (!\is_string($dataKey)) {
+                return null;
             }
         }
+
+        /** @var array<string, mixed> $data */
+        return $data;
     }
 
-    private function cachePath(string $key): RelativePath
+    /** @param array<mixed> $data */
+    private function validData(array $data, int $depth): bool
     {
-        return RelativePath::fromString(self::CACHE_DIRECTORY . '/' . hash('sha256', $key) . '.json');
+        if ($depth > 64) {
+            return false;
+        }
+        foreach ($data as $value) {
+            if (\is_array($value)) {
+                if (!$this->validData($value, $depth + 1)) {
+                    return false;
+                }
+
+                continue;
+            }
+            if (!\is_string($value) && !\is_int($value) && !\is_float($value) && !\is_bool($value) && $value !== null) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function hasCacheFile(string $key, string $extension): bool
+    {
+        $path = $this->pathResolver->resolve(
+            FilesystemRoot::Storage,
+            $this->cachePath($key, $extension),
+        );
+
+        return is_file($path);
+    }
+
+    private function cachePath(string $key, string $extension): RelativePath
+    {
+        return RelativePath::fromString(
+            self::CACHE_DIRECTORY . '/' . hash('sha256', $key) . '.' . $extension,
+        );
     }
 }

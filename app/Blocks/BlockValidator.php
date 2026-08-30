@@ -67,7 +67,7 @@ final readonly class BlockValidator
         $normalized = [];
         foreach ($definitions as $name => $definition) {
             $fieldPath = $path . '.' . $name;
-            if (!array_key_exists($name, $values)) {
+            if (!\array_key_exists($name, $values)) {
                 if ($definition->required()) {
                     $errors[] = new ValidationError($fieldPath, 'REQUIRED', 'Field is required.');
                 }
@@ -84,7 +84,7 @@ final readonly class BlockValidator
 
                 $normalizedLocales = [];
                 foreach ($context->languages()->codes() as $locale) {
-                    if (!array_key_exists($locale, $localized)) {
+                    if (!\array_key_exists($locale, $localized)) {
                         if ($definition->required()) {
                             $errors[] = new ValidationError(
                                 $fieldPath . '.' . $locale,
@@ -158,13 +158,13 @@ final readonly class BlockValidator
             if ($definition->type() !== 'repeater') {
                 return ['valid' => true, 'value' => $normalized];
             }
-            if (!is_array($normalized) || !array_is_list($normalized)) {
+            if (!\is_array($normalized) || !array_is_list($normalized)) {
                 throw new FieldValueException('INVALID_TYPE', 'Repeater must normalize to a list.');
             }
 
             $items = [];
             foreach ($normalized as $index => $item) {
-                if (!is_array($item) || ($item !== [] && array_is_list($item))) {
+                if (!\is_array($item) || ($item !== [] && array_is_list($item))) {
                     $errors[] = new ValidationError(
                         $path . '.' . $index,
                         'INVALID_TYPE',
@@ -176,7 +176,7 @@ final readonly class BlockValidator
 
                 $mapping = [];
                 foreach ($item as $key => $nestedValue) {
-                    if (!is_string($key)) {
+                    if (!\is_string($key)) {
                         $errors[] = new ValidationError(
                             $path . '.' . $index,
                             'INVALID_TYPE',
@@ -219,7 +219,7 @@ final readonly class BlockValidator
         FieldContext $context,
         array &$errors,
     ): ?array {
-        if (!is_array($value) || ($value !== [] && array_is_list($value))) {
+        if (!\is_array($value) || ($value !== [] && array_is_list($value))) {
             $errors[] = new ValidationError($path, 'INVALID_TRANSLATIONS', 'Value must be a locale mapping.');
 
             return null;
@@ -227,9 +227,9 @@ final readonly class BlockValidator
 
         $localized = [];
         foreach ($value as $locale => $localizedValue) {
-            if (!is_string($locale) || !$context->languages()->has($locale)) {
+            if (!\is_string($locale) || !$context->languages()->has($locale)) {
                 $errors[] = new ValidationError(
-                    $path . '.' . (is_string($locale) ? $locale : '?'),
+                    $path . '.' . (\is_string($locale) ? $locale : '?'),
                     'UNKNOWN_LOCALE',
                     'Translation uses a language that is not enabled.',
                 );
@@ -256,13 +256,13 @@ final readonly class BlockValidator
     ): array {
         $localized = [];
         foreach ($definitions as $name => $definition) {
-            if (!array_key_exists($name, $values)) {
+            if (!\array_key_exists($name, $values)) {
                 continue;
             }
 
             $value = $values[$name];
             if ($definition->translatable()) {
-                if (!is_array($value)) {
+                if (!\is_array($value)) {
                     continue;
                 }
 
@@ -272,13 +272,13 @@ final readonly class BlockValidator
                 }
             }
 
-            if ($definition->type() === 'repeater' && is_array($value)) {
+            if ($definition->type() === 'repeater' && \is_array($value)) {
                 $items = [];
                 foreach ($value as $item) {
-                    if (is_array($item)) {
+                    if (\is_array($item)) {
                         $mapping = [];
                         foreach ($item as $key => $nestedValue) {
-                            if (is_string($key)) {
+                            if (\is_string($key)) {
                                 $mapping[$key] = $nestedValue;
                             }
                         }

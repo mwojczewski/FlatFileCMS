@@ -43,10 +43,10 @@ final readonly class CollectionService
             ),
         );
 
-        $totalItems = count($items);
+        $totalItems = \count($items);
         $totalPages = $totalItems === 0 ? 0 : (int) ceil($totalItems / $collection->perPage());
         $offset = ($pageNumber - 1) * $collection->perPage();
-        $pagedItems = array_slice($items, $offset, $collection->perPage());
+        $pagedItems = \array_slice($items, $offset, $collection->perPage());
         $modifiedAt = $collection->modifiedAt();
         foreach ($items as $item) {
             $modifiedAt = max($modifiedAt, $item->modifiedAt());
@@ -69,12 +69,12 @@ final readonly class CollectionService
         if ($value === null) {
             return 1;
         }
-        if (!is_string($value) || preg_match('/^[1-9][0-9]*$/D', $value) !== 1) {
+        if (!\is_string($value) || preg_match('/^[1-9][0-9]*$/D', $value) !== 1) {
             throw new InvalidCollectionQueryException('Page must be a positive integer.');
         }
 
         $page = filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
-        if (!is_int($page)) {
+        if (!\is_int($page)) {
             throw new InvalidCollectionQueryException('Page is outside the supported integer range.');
         }
 
@@ -94,11 +94,11 @@ final readonly class CollectionService
             if ($value === null || $value === '') {
                 continue;
             }
-            if (!is_string($value)) {
+            if (!\is_string($value)) {
                 throw new InvalidCollectionQueryException('Collection filter value must be a string.');
             }
-            if ($filter->allowedValues() !== [] && !in_array($value, $filter->allowedValues(), true)) {
-                throw new InvalidCollectionQueryException(sprintf(
+            if ($filter->allowedValues() !== [] && !\in_array($value, $filter->allowedValues(), true)) {
+                throw new InvalidCollectionQueryException(\sprintf(
                     'Value for filter "%s" is not allowed.',
                     $filter->parameter(),
                 ));
@@ -118,7 +118,7 @@ final readonly class CollectionService
             return false;
         }
 
-        return !str_contains(substr($identity, strlen($prefix)), '/');
+        return !str_contains(substr($identity, \strlen($prefix)), '/');
     }
 
     /** @param array<string, string> $activeFilters */
@@ -136,7 +136,7 @@ final readonly class CollectionService
             }
 
             $actual = $this->fieldValue($page, $filter->field(), $locale, $languages);
-            if (is_array($actual)) {
+            if (\is_array($actual)) {
                 $matches = false;
                 foreach ($actual as $value) {
                     if ($this->scalarString($value) === $expected) {
@@ -203,7 +203,7 @@ final readonly class CollectionService
     {
         $value = $attributes;
         foreach (explode('.', $field) as $segment) {
-            if (!is_array($value) || !array_key_exists($segment, $value)) {
+            if (!\is_array($value) || !\array_key_exists($segment, $value)) {
                 return null;
             }
             $value = $value[$segment];
@@ -214,7 +214,7 @@ final readonly class CollectionService
 
     private function compareValues(mixed $left, mixed $right): int
     {
-        if ((is_int($left) || is_float($left)) && (is_int($right) || is_float($right))) {
+        if ((\is_int($left) || \is_float($left)) && (\is_int($right) || \is_float($right))) {
             return $left <=> $right;
         }
 
@@ -233,9 +233,9 @@ final readonly class CollectionService
     private function scalarString(mixed $value): ?string
     {
         return match (true) {
-            is_string($value) => $value,
-            is_int($value), is_float($value) => (string) $value,
-            is_bool($value) => $value ? 'true' : 'false',
+            \is_string($value) => $value,
+            \is_int($value), \is_float($value) => (string) $value,
+            \is_bool($value) => $value ? 'true' : 'false',
             default => null,
         };
     }

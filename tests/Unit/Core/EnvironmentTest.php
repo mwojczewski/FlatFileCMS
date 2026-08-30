@@ -41,10 +41,10 @@ final class EnvironmentTest extends TestCase
 
     public function testItRejectsInvalidBooleanValue(): void
     {
-        file_put_contents($this->temporaryDirectory . '/.env.local', "YAML_CACHE_ENABLED=perhaps\n");
+        file_put_contents($this->temporaryDirectory . '/.env.local', "YAML_CACHE_JSON_ENABLED=perhaps\n");
         $environment = Environment::load($this->temporaryDirectory);
 
         $this->expectException(RuntimeException::class);
-        $environment->boolean('YAML_CACHE_ENABLED', true);
+        $environment->boolean('YAML_CACHE_JSON_ENABLED', true);
     }
 }

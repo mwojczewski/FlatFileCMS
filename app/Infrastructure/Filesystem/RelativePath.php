@@ -15,7 +15,7 @@ final readonly class RelativePath
 
     public static function fromString(string $value): self
     {
-        if (strlen($value) > self::MAX_LENGTH) {
+        if (\strlen($value) > self::MAX_LENGTH) {
             throw new InvalidArgumentException('Relative path is too long.');
         }
 
@@ -48,12 +48,12 @@ final readonly class RelativePath
                 throw new InvalidArgumentException('Relative path segment cannot end with a dot or space.');
             }
 
-            if (strlen($segment) > self::MAX_SEGMENT_LENGTH) {
+            if (\strlen($segment) > self::MAX_SEGMENT_LENGTH) {
                 throw new InvalidArgumentException('Relative path segment is too long.');
             }
 
             $portableName = strtoupper(explode('.', $segment, 2)[0]);
-            if (in_array($portableName, self::reservedWindowsNames(), true)) {
+            if (\in_array($portableName, self::reservedWindowsNames(), true)) {
                 throw new InvalidArgumentException('Relative path contains a reserved filename.');
             }
         }

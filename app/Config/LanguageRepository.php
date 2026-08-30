@@ -40,11 +40,11 @@ final readonly class LanguageRepository
 
             foreach ($definitions as $code => $definition) {
                 $language = ContentData::map($definition, 'languages.' . $code);
-                if (!ContentData::boolean($language['enabled'] ?? true, 'languages.' . $code . '.enabled')) {
+                if (!ContentData::boolean($language['enabled'] ?? true, "languages.{$code}.enabled")) {
                     continue;
                 }
 
-                $enabled[$code] = ContentData::string($language['name'] ?? null, 'languages.' . $code . '.name');
+                $enabled[$code] = ContentData::string($language['name'] ?? null, "languages.{$code}.name");
             }
 
             if ($enabled === []) {

@@ -18,7 +18,7 @@ final class FieldTypeRegistry
             throw new InvalidBlockDefinitionException('Field type name is invalid.');
         }
         if (isset($this->types[$name])) {
-            throw new InvalidBlockDefinitionException(sprintf('Field type "%s" is already registered.', $name));
+            throw new InvalidBlockDefinitionException(\sprintf('Field type "%s" is already registered.', $name));
         }
 
         $this->types[$name] = $type;
@@ -27,7 +27,7 @@ final class FieldTypeRegistry
     public function get(string $name): FieldType
     {
         return $this->types[$name]
-            ?? throw new InvalidBlockDefinitionException(sprintf('Unknown field type "%s".', $name));
+            ?? throw new InvalidBlockDefinitionException(\sprintf('Unknown field type "%s".', $name));
     }
 
     public function has(string $name): bool

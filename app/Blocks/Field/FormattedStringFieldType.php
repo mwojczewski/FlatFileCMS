@@ -21,7 +21,7 @@ final readonly class FormattedStringFieldType implements FieldType
 
     public function normalize(mixed $value, FieldDefinition $definition, FieldContext $context): string
     {
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             throw new FieldValueException('INVALID_TYPE', 'Value must be a string.');
         }
 
@@ -36,7 +36,7 @@ final readonly class FormattedStringFieldType implements FieldType
         };
 
         if (!$valid) {
-            throw new FieldValueException('INVALID_FORMAT', sprintf('Value is not a valid %s.', $this->name));
+            throw new FieldValueException('INVALID_FORMAT', \sprintf('Value is not a valid %s.', $this->name));
         }
 
         return $this->name === 'color' ? strtolower($value) : $value;
@@ -58,7 +58,7 @@ final readonly class FormattedStringFieldType implements FieldType
         }
 
         return filter_var($value, FILTER_VALIDATE_URL) !== false
-            && in_array(parse_url($value, PHP_URL_SCHEME), ['http', 'https'], true);
+            && \in_array(parse_url($value, PHP_URL_SCHEME), ['http', 'https'], true);
     }
 
     private function validDate(string $value, string $format): bool

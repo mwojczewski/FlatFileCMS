@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use FlatFileCms\Admin\AdminAuthController;
+use FlatFileCms\Admin\AdminPageBuilderController;
 use FlatFileCms\Admin\AdminPageController;
 use FlatFileCms\Api\PublicApiController;
 use FlatFileCms\Core\Container;
@@ -16,7 +17,7 @@ return static function (Router $router, ?Container $container = null): void {
     $router->get('/api/v1/health', static fn(Request $request): Response => Response::json([
         'status' => 'ok',
         'application' => 'FlatFile CMS',
-        'stage' => 8,
+        'stage' => 9,
     ]), 'api.health');
 
     if ($container !== null) {
@@ -64,6 +65,7 @@ return static function (Router $router, ?Container $container = null): void {
     if ($container !== null) {
         $admin = static fn(): AdminAuthController => $container->get(AdminAuthController::class);
         $pages = static fn(): AdminPageController => $container->get(AdminPageController::class);
+        $builder = static fn(): AdminPageBuilderController => $container->get(AdminPageBuilderController::class);
         $router->get('/admin/login', static fn(Request $request): Response => $admin()->loginForm($request), 'admin.login.form');
         $router->post('/admin/login', static fn(Request $request): Response => $admin()->login($request), 'admin.login');
         $router->get('/admin/2fa', static fn(Request $request): Response => $admin()->secondFactor($request), 'admin.2fa');
@@ -82,6 +84,17 @@ return static function (Router $router, ?Container $container = null): void {
         $router->post('/admin/pages/update', static fn(Request $request): Response => $pages()->update($request), 'admin.pages.update');
         $router->post('/admin/pages/move', static fn(Request $request): Response => $pages()->move($request), 'admin.pages.move');
         $router->post('/admin/pages/delete', static fn(Request $request): Response => $pages()->delete($request), 'admin.pages.delete');
+        $router->get('/admin/pages/builder', static fn(Request $request): Response => $builder()->index($request), 'admin.builder.index');
+        $router->get('/admin/pages/builder/picker', static fn(Request $request): Response => $builder()->picker($request), 'admin.builder.picker');
+        $router->get('/admin/pages/builder/preview', static fn(Request $request): Response => $builder()->preview($request), 'admin.builder.preview');
+        $router->get('/admin/pages/builder/create', static fn(Request $request): Response => $builder()->createForm($request), 'admin.builder.create.form');
+        $router->post('/admin/pages/builder/create', static fn(Request $request): Response => $builder()->create($request), 'admin.builder.create');
+        $router->get('/admin/pages/builder/edit', static fn(Request $request): Response => $builder()->editForm($request), 'admin.builder.edit.form');
+        $router->post('/admin/pages/builder/update', static fn(Request $request): Response => $builder()->update($request), 'admin.builder.update');
+        $router->post('/admin/pages/builder/duplicate', static fn(Request $request): Response => $builder()->duplicate($request), 'admin.builder.duplicate');
+        $router->post('/admin/pages/builder/toggle', static fn(Request $request): Response => $builder()->toggle($request), 'admin.builder.toggle');
+        $router->post('/admin/pages/builder/reorder', static fn(Request $request): Response => $builder()->reorder($request), 'admin.builder.reorder');
+        $router->post('/admin/pages/builder/delete', static fn(Request $request): Response => $builder()->delete($request), 'admin.builder.delete');
         $router->get('/admin', static fn(Request $request): Response => $admin()->dashboard($request), 'admin.entry');
     }
 

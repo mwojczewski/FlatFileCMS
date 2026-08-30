@@ -15,7 +15,7 @@ final class NativeSessionStore implements SessionStore
         bool $secure,
         string $sameSite,
     ) {
-        if (!in_array($sameSite, ['Lax', 'Strict'], true)) {
+        if (!\in_array($sameSite, ['Lax', 'Strict'], true)) {
             throw new RuntimeException('Session SameSite must be Lax or Strict.');
         }
         if (session_status() === PHP_SESSION_NONE) {
@@ -67,7 +67,7 @@ final class NativeSessionStore implements SessionStore
         if (session_status() === PHP_SESSION_ACTIVE) {
             $parameters = session_get_cookie_params();
             $sessionName = session_name();
-            if (!is_string($sessionName)) {
+            if (!\is_string($sessionName)) {
                 throw new RuntimeException('Unable to read session name.');
             }
             setcookie($sessionName, '', [

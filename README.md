@@ -2,10 +2,11 @@
 
 Reusable hybrid flat-file CMS for PHP 8.5+. The same domain model will serve normalized JSON through a REST API and render complete HTML through developer-defined PHP blocks and layouts.
 
-Stages 0–8 are complete in this revision: architecture/contracts, the executable
+Stages 0–9 are complete in this revision: architecture/contracts, the executable
 HTTP foundation, safe filesystem/YAML access and the localized public content
 API with schema-validated blocks, server-side HTML rendering, collections and
-the administrator authentication boundary and filesystem-backed page CRUD.
+the administrator authentication boundary, filesystem-backed page CRUD and the
+schema-driven page builder.
 
 ## Current capabilities
 
@@ -25,7 +26,7 @@ the administrator authentication boundary and filesystem-backed page CRUD.
 - exclusive file locking and atomic replacement;
 - SHA-256 revision conflict detection;
 - restrictive, bounded YAML parsing;
-- content-hash-invalidated parsed YAML cache;
+- content-hash-invalidated parsed YAML caches using independently switchable JSON and PHP serialization;
 - validated page, language, configuration and navigation repositories;
 - localized public route index with sibling-collision detection;
 - central SEO fallback resolution;
@@ -49,6 +50,9 @@ the administrator authentication boundary and filesystem-backed page CRUD.
 - authenticated page tree and metadata/SEO editor;
 - safe page creation, subtree moves and recursive deletion;
 - optimistic revision checks and localized-route collision prevention on every page write.
+- block picker generated automatically from developer `block.yml` definitions;
+- schema-driven multilingual block forms covering every built-in field type and repeaters;
+- revision-safe add, edit, duplicate, enable, reorder and delete block operations.
 
 ## Requirements
 
@@ -85,6 +89,7 @@ Create a developer block package with:
 ```bash
 php bin/cms block:create image-with-text
 php bin/cms block:create gallery-slider --with-assets
+php bin/cms cache:clear
 ```
 
 The first form creates the required `block.yml` and `render.php`. The optional
@@ -100,10 +105,12 @@ values.
 Configuration has one owner per concern: deployment/runtime values and secrets
 belong to `.env.local`; site URL, SEO, layouts and media behavior belong to
 `config/setup.yml`. See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for the
-complete boundary. `YAML_CACHE_ENABLED` controls only the infrastructure cache
-of parsed YAML and is intentionally not a site setting.
+complete boundary. `YAML_CACHE_JSON_ENABLED` controls the JSON infrastructure cache
+of parsed YAML, while `YAML_CACHE_SERIALIZE_ENABLED` independently controls the
+PHP-serialized representation. They may be enabled simultaneously and are
+intentionally not site settings.
 
-## HTTP routes through stage 8
+## HTTP routes through stage 9
 
 | Method | Route | Purpose |
 |---|---|---|
@@ -124,6 +131,15 @@ of parsed YAML and is intentionally not a site setting.
 | POST | `/admin/pages/update` | revision-safe page update |
 | POST | `/admin/pages/move` | atomically move a page subtree |
 | POST | `/admin/pages/delete` | permanently delete a page subtree |
+| GET | `/admin/pages/builder?path=…` | manage the ordered block list of a page |
+| GET | `/admin/pages/builder/picker?path=…` | choose a discovered block type |
+| GET, POST | `/admin/pages/builder/create` | render a schema form and add a block |
+| GET | `/admin/pages/builder/edit?path=…&id=…` | edit one block through its generated form |
+| POST | `/admin/pages/builder/update` | revision-safe block data update |
+| POST | `/admin/pages/builder/duplicate` | duplicate a block with a new UUID v7 |
+| POST | `/admin/pages/builder/toggle` | enable or disable a block |
+| POST | `/admin/pages/builder/reorder` | persist the complete drag-and-drop order |
+| POST | `/admin/pages/builder/delete` | permanently remove one block |
 | GET, HEAD | `/{path*}` | server-rendered website page or collection; locale-prefixed in multilingual mode |
 
 Unknown API routes use the documented JSON error envelope. Unknown website routes receive an HTML error without local paths or a stack trace.
@@ -154,6 +170,7 @@ Server-side rendering and template boundaries are documented in [docs/RENDERING.
 Collection contracts and queries are documented in [docs/COLLECTIONS.md](docs/COLLECTIONS.md).
 Authentication, roles and YubiKey recovery are documented in [docs/AUTHENTICATION.md](docs/AUTHENTICATION.md).
 Page administration and destructive-operation rules are documented in [docs/PAGE-ADMIN.md](docs/PAGE-ADMIN.md).
+Dynamic block forms and concurrency guarantees are documented in [docs/PAGE-BUILDER.md](docs/PAGE-BUILDER.md).
 
 ## Web-server setup
 
@@ -219,5 +236,5 @@ contracts and examples.
 
 ## Next stage
 
-Stage 9 introduces the schema-driven page builder over the CRUD foundation from
-stage 8. See `docs/ROADMAP.md` for the full sequence.
+Stage 10 introduces password reset and mail delivery. See `docs/ROADMAP.md` for
+the remaining production sequence.

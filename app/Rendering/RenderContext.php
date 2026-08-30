@@ -30,7 +30,7 @@ final readonly class RenderContext
     public function image(array $image): string
     {
         $src = $image['src'] ?? null;
-        if (!is_string($src) || $src === '') {
+        if (!\is_string($src) || $src === '') {
             throw new RenderingException('Normalized image data requires src.');
         }
 
@@ -41,13 +41,13 @@ final readonly class RenderContext
         }
 
         $alt = $image['alt'] ?? '';
-        if (!is_string($alt)) {
+        if (!\is_string($alt)) {
             throw new RenderingException('Normalized image alt must be a string.');
         }
 
         $base = $this->pageUrl === '/' ? '' : rtrim($this->pageUrl, '/');
 
-        return sprintf(
+        return \sprintf(
             '<img src="%s/%s" alt="%s" loading="lazy" decoding="async">',
             $this->escape($base),
             $this->escape($src),

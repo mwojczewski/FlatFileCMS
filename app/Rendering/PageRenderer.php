@@ -30,8 +30,8 @@ final readonly class PageRenderer
         $content = '';
 
         foreach ($page->blocks() as $index => $block) {
-            $type = ContentData::string($block['type'] ?? null, 'blocks.' . $index . '.type');
-            $data = ContentData::map($block['data'] ?? null, 'blocks.' . $index . '.data');
+            $type = ContentData::string($block['type'] ?? null, "blocks.{$index}.type");
+            $data = ContentData::map($block['data'] ?? null, "blocks.{$index}.data");
             $content .= $this->blocks->render($type, $data, $context);
         }
 

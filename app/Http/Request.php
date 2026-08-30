@@ -25,14 +25,14 @@ final readonly class Request
     public static function fromGlobals(): self
     {
         $serverMethod = $_SERVER['REQUEST_METHOD'] ?? null;
-        $method = is_string($serverMethod) ? strtoupper($serverMethod) : 'GET';
+        $method = \is_string($serverMethod) ? strtoupper($serverMethod) : 'GET';
         $serverUri = $_SERVER['REQUEST_URI'] ?? null;
-        $uri = is_string($serverUri) ? $serverUri : '/';
+        $uri = \is_string($serverUri) ? $serverUri : '/';
         $path = parse_url($uri, PHP_URL_PATH);
         $headers = [];
 
         foreach ($_SERVER as $key => $value) {
-            if (!is_string($value)) {
+            if (!\is_string($value)) {
                 continue;
             }
 
@@ -43,7 +43,7 @@ final readonly class Request
         }
 
         foreach (['CONTENT_TYPE' => 'content-type', 'CONTENT_LENGTH' => 'content-length'] as $serverKey => $name) {
-            if (isset($_SERVER[$serverKey]) && is_string($_SERVER[$serverKey])) {
+            if (isset($_SERVER[$serverKey]) && \is_string($_SERVER[$serverKey])) {
                 $headers[$name] = $_SERVER[$serverKey];
             }
         }
@@ -52,11 +52,11 @@ final readonly class Request
 
         return new self(
             method: $method,
-            path: self::normalizePath(is_string($path) ? $path : '/'),
+            path: self::normalizePath(\is_string($path) ? $path : '/'),
             headers: $headers,
             query: self::stringKeyedArray($_GET),
             parsedBody: self::stringKeyedArray($_POST),
-            rawBody: is_string($rawBody) ? $rawBody : '',
+            rawBody: \is_string($rawBody) ? $rawBody : '',
         );
     }
 
@@ -130,7 +130,7 @@ final readonly class Request
         $normalized = [];
 
         foreach ($values as $key => $value) {
-            if (is_string($key)) {
+            if (\is_string($key)) {
                 $normalized[$key] = $value;
             }
         }

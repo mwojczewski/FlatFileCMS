@@ -18,10 +18,10 @@ final readonly class BooleanFieldType implements FieldType
 
     public function normalize(mixed $value, FieldDefinition $definition, FieldContext $context): bool
     {
-        if (is_bool($value)) {
+        if (\is_bool($value)) {
             return $value;
         }
-        if (is_string($value)) {
+        if (\is_string($value)) {
             $normalized = filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
             if ($normalized !== null) {
                 return $normalized;

@@ -17,7 +17,7 @@ final readonly class ErrorHandler
         $publicMessage = $exception instanceof HttpException ? $exception->getMessage() : 'Internal server error';
 
         if (!$exception instanceof HttpException) {
-            error_log(sprintf(
+            error_log(\sprintf(
                 '[FlatFile CMS] %s: %s in %s:%d',
                 $exception::class,
                 $exception->getMessage(),

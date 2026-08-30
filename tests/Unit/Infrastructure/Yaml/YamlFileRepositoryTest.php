@@ -29,14 +29,7 @@ final class YamlFileRepositoryTest extends TestCase
     protected function setUp(): void
     {
         $this->project = TemporaryProject::create();
-        $resolver = new SafePathResolver($this->project->path());
-        $writer = new AtomicFileWriter($resolver, new FileLockManager($resolver));
-        $this->repository = new YamlFileRepository(
-            $resolver,
-            new YamlParser(),
-            new YamlFileCache(true, $resolver, $writer),
-            $writer,
-        );
+        $this->repository = $this->repository(jsonEnabled: true, serializeEnabled: false);
     }
 
     protected function tearDown(): void
@@ -88,5 +81,96 @@ final class YamlFileRepositoryTest extends TestCase
         } catch (InvalidYamlException) {
             self::assertFileDoesNotExist($this->project->path('pages/invalid/content.yml'));
         }
+    }
+
+    public function testSerializedCacheWorksWithoutJsonCache(): void
+    {
+        $this->project->write('config/setup.yml', "site:\n  name: Serialized\n");
+        $repository = $this->repository(jsonEnabled: false, serializeEnabled: true);
+
+        $first = $repository->read(FilesystemRoot::Config, RelativePath::fromString('setup.yml'));
+        $second = $repository->read(FilesystemRoot::Config, RelativePath::fromString('setup.yml'));
+
+        self::assertSame($first->data(), $second->data());
+        self::assertCount(1, $this->cacheFiles('serialized'));
+        self::assertSame([], $this->cacheFiles('json'));
+    }
+
+    public function testSourceRevisionInvalidatesSerializedCache(): void
+    {
+        $this->project->write('config/setup.yml', "site:\n  name: Before\n");
+        $path = RelativePath::fromString('setup.yml');
+        $repository = $this->repository(jsonEnabled: false, serializeEnabled: true);
+
+        $first = $repository->read(FilesystemRoot::Config, $path);
+        $this->project->write('config/setup.yml', "site:\n  name: After\n");
+        $second = $repository->read(FilesystemRoot::Config, $path);
+
+        self::assertSame(['name' => 'Before'], $first->data()['site']);
+        self::assertSame(['name' => 'After'], $second->data()['site']);
+        self::assertFalse($first->revision()->equals($second->revision()));
+    }
+
+    public function testBothCacheFormatsAreWrittenAndClearedIndependently(): void
+    {
+        $resolver = new SafePathResolver($this->project->path());
+        $writer = new AtomicFileWriter($resolver, new FileLockManager($resolver));
+        $cache = new YamlFileCache(true, $resolver, $writer, true);
+        $revision = FileRevision::fromContents('source');
+        $data = ['site' => ['name' => 'Both']];
+        $cache->put('config:setup.yml', $revision, $data);
+
+        self::assertCount(1, $this->cacheFiles('json'));
+        self::assertCount(1, $this->cacheFiles('serialized'));
+
+        unlink($this->cacheFiles('serialized')[0]);
+        self::assertSame($data, $cache->get('config:setup.yml', $revision));
+        self::assertCount(1, $this->cacheFiles('serialized'));
+
+        unlink($this->cacheFiles('json')[0]);
+        self::assertSame($data, $cache->get('config:setup.yml', $revision));
+        self::assertCount(1, $this->cacheFiles('json'));
+
+        $cache->clear();
+
+        self::assertSame([], $this->cacheFiles('json'));
+        self::assertSame([], $this->cacheFiles('serialized'));
+    }
+
+    public function testSerializedCacheNeverRestoresObjects(): void
+    {
+        $resolver = new SafePathResolver($this->project->path());
+        $writer = new AtomicFileWriter($resolver, new FileLockManager($resolver));
+        $cache = new YamlFileCache(false, $resolver, $writer, true);
+        $revision = FileRevision::fromContents('source');
+        $path = $this->project->path('storage/cache/yaml/' . hash('sha256', 'config:setup.yml') . '.serialized');
+        file_put_contents($path, serialize([
+            'revision' => $revision->value(),
+            'data' => ['unsafe' => new stdClass()],
+        ]));
+
+        self::assertNull($cache->get('config:setup.yml', $revision));
+        self::assertFileDoesNotExist($path);
+    }
+
+    private function repository(bool $jsonEnabled, bool $serializeEnabled): YamlFileRepository
+    {
+        $resolver = new SafePathResolver($this->project->path());
+        $writer = new AtomicFileWriter($resolver, new FileLockManager($resolver));
+
+        return new YamlFileRepository(
+            $resolver,
+            new YamlParser(),
+            new YamlFileCache($jsonEnabled, $resolver, $writer, $serializeEnabled),
+            $writer,
+        );
+    }
+
+    /** @return list<string> */
+    private function cacheFiles(string $extension): array
+    {
+        $files = glob($this->project->path("storage/cache/yaml/*.{$extension}"));
+
+        return $files === false ? [] : $files;
     }
 }

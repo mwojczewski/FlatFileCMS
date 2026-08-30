@@ -22,7 +22,7 @@ final readonly class YamlParser
     /** @return array<string, mixed> */
     public function parse(string $contents): array
     {
-        if (strlen($contents) > $this->maxBytes) {
+        if (\strlen($contents) > $this->maxBytes) {
             throw new InvalidYamlException('YAML document exceeds the configured size limit.');
         }
 
@@ -37,12 +37,12 @@ final readonly class YamlParser
             throw new InvalidYamlException('YAML document is malformed.', previous: $exception);
         }
 
-        if (!is_array($parsed)) {
+        if (!\is_array($parsed)) {
             throw new InvalidYamlException('YAML document root must be a mapping.');
         }
 
         foreach (array_keys($parsed) as $key) {
-            if (!is_string($key)) {
+            if (!\is_string($key)) {
                 throw new InvalidYamlException('YAML document root keys must be strings.');
             }
         }
@@ -65,11 +65,11 @@ final readonly class YamlParser
             throw new InvalidYamlException('YAML document exceeds the configured nesting depth.');
         }
 
-        if ($node === null || is_bool($node) || is_int($node)) {
+        if ($node === null || \is_bool($node) || \is_int($node)) {
             return;
         }
 
-        if (is_float($node)) {
+        if (\is_float($node)) {
             if (!is_finite($node)) {
                 throw new InvalidYamlException('YAML document contains a non-finite number.');
             }
@@ -77,7 +77,7 @@ final readonly class YamlParser
             return;
         }
 
-        if (is_string($node)) {
+        if (\is_string($node)) {
             if (!mb_check_encoding($node, 'UTF-8')) {
                 throw new InvalidYamlException('YAML document contains invalid UTF-8 text.');
             }
@@ -85,7 +85,7 @@ final readonly class YamlParser
             return;
         }
 
-        if (!is_array($node)) {
+        if (!\is_array($node)) {
             throw new InvalidYamlException('YAML document contains an unsupported value type.');
         }
 

@@ -73,7 +73,7 @@
 - permanent recursive deletion of page directories and their media;
 - localized route, block, layout and collection validation before publication.
 
-## Stage 9 — dynamic page builder
+## Stage 9 — dynamic page builder (complete)
 
 - block picker generated from `block.yml` definitions;
 - schema-driven block forms and language switching;

@@ -14,7 +14,7 @@ final readonly class Slug
 
     public static function fromString(string $value): self
     {
-        if ($value === '' || strlen($value) > self::MAX_LENGTH) {
+        if ($value === '' || \strlen($value) > self::MAX_LENGTH) {
             throw new InvalidArgumentException('Slug must contain between 1 and 120 characters.');
         }
 

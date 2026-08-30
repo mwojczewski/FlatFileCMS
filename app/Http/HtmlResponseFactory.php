@@ -21,7 +21,7 @@ final readonly class HtmlResponseFactory
         if ($ifNoneMatch !== null) {
             foreach (explode(',', $ifNoneMatch) as $candidate) {
                 $candidate = trim($candidate);
-                if ($candidate === '*' || $candidate === $etag || $candidate === 'W/' . $etag) {
+                if ($candidate === '*' || $candidate === $etag || $candidate === "W/{$etag}") {
                     return new Response('', 304, $headers);
                 }
             }

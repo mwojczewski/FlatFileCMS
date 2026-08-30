@@ -27,7 +27,7 @@ final readonly class TextFieldType implements FieldType
 
     public function normalize(mixed $value, FieldDefinition $definition, FieldContext $context): string
     {
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             throw new FieldValueException('INVALID_TYPE', 'Value must be a string.');
         }
 
@@ -36,10 +36,10 @@ final readonly class TextFieldType implements FieldType
         $minimum = FieldSettings::integer($definition->settings(), 'minLength', 'min');
         $maximum = FieldSettings::integer($definition->settings(), 'maxLength', 'max');
         if ($minimum !== null && $length < $minimum) {
-            throw new FieldValueException('TOO_SHORT', sprintf('Value must contain at least %d characters.', $minimum));
+            throw new FieldValueException('TOO_SHORT', \sprintf('Value must contain at least %d characters.', $minimum));
         }
         if ($maximum !== null && $length > $maximum) {
-            throw new FieldValueException('TOO_LONG', sprintf('Value may contain at most %d characters.', $maximum));
+            throw new FieldValueException('TOO_LONG', \sprintf('Value may contain at most %d characters.', $maximum));
         }
 
         return $value;

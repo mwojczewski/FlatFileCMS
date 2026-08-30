@@ -114,7 +114,7 @@ final readonly class PublicApiController
                 'defaultLocale' => $languages->default(),
                 'multilingual' => $languages->isMultilingual(),
                 'languages' => $languages->languages(),
-                'config' => is_array($localized) ? $localized : [],
+                'config' => \is_array($localized) ? $localized : [],
             ],
             max($languageDocument->modifiedAt(), $configuration->modifiedAt()),
         );
@@ -160,7 +160,7 @@ final readonly class PublicApiController
     private function locale(Request $request, LanguageConfig $languages): string
     {
         $value = $request->query()['lang'] ?? $languages->default();
-        if (!is_string($value) || !$languages->has($value)) {
+        if (!\is_string($value) || !$languages->has($value)) {
             throw new HttpException(400, 'LANGUAGE_NOT_AVAILABLE', 'Language is not available');
         }
 

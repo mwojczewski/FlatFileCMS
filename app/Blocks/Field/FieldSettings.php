@@ -15,8 +15,8 @@ final class FieldSettings
         if ($value === null) {
             return null;
         }
-        if (!is_int($value) || $value < 0) {
-            throw new FieldValueException('INVALID_SCHEMA_RULE', sprintf('Rule "%s" must be a non-negative integer.', $name));
+        if (!\is_int($value) || $value < 0) {
+            throw new FieldValueException('INVALID_SCHEMA_RULE', \sprintf('Rule "%s" must be a non-negative integer.', $name));
         }
 
         return $value;
@@ -29,8 +29,8 @@ final class FieldSettings
         if ($value === null) {
             return null;
         }
-        if (!is_int($value) && !is_float($value)) {
-            throw new FieldValueException('INVALID_SCHEMA_RULE', sprintf('Rule "%s" must be numeric.', $name));
+        if (!\is_int($value) && !\is_float($value)) {
+            throw new FieldValueException('INVALID_SCHEMA_RULE', \sprintf('Rule "%s" must be numeric.', $name));
         }
 
         return $value;
@@ -42,18 +42,18 @@ final class FieldSettings
     public static function allowedValues(array $settings): array
     {
         $raw = $settings['allowedValues'] ?? $settings['options'] ?? null;
-        if (!is_array($raw) || !array_is_list($raw) || $raw === []) {
+        if (!\is_array($raw) || !array_is_list($raw) || $raw === []) {
             throw new FieldValueException('INVALID_SCHEMA_RULE', 'Choice field requires a non-empty options list.');
         }
 
         $values = [];
         foreach ($raw as $option) {
-            if (is_string($option) && $option !== '') {
+            if (\is_string($option) && $option !== '') {
                 $values[] = $option;
 
                 continue;
             }
-            if (is_array($option) && isset($option['value']) && is_string($option['value']) && $option['value'] !== '') {
+            if (\is_array($option) && isset($option['value']) && \is_string($option['value']) && $option['value'] !== '') {
                 $values[] = $option['value'];
 
                 continue;

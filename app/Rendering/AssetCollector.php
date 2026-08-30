@@ -23,7 +23,7 @@ final readonly class AssetCollector
         $types = [];
 
         foreach ($blocks as $index => $block) {
-            $type = ContentData::string($block['type'] ?? null, 'blocks.' . $index . '.type');
+            $type = ContentData::string($block['type'] ?? null, "blocks.{$index}.type");
             if (isset($types[$type])) {
                 continue;
             }
@@ -31,12 +31,12 @@ final readonly class AssetCollector
 
             $definition = $this->registry->get($type);
             foreach (['style.css' => 'style', 'script.js' => 'script'] as $filename => $kind) {
-                $source = $definition->directory() . '/' . $filename;
+                $source = $definition->directory() . "/{$filename}";
                 if (!is_file($source)) {
                     continue;
                 }
                 if (is_link($source)) {
-                    throw new RenderingException(sprintf('Block "%s" asset cannot be a symlink.', $type));
+                    throw new RenderingException(\sprintf('Block "%s" asset cannot be a symlink.', $type));
                 }
 
                 $url = $this->publisher->publish($type, $source);

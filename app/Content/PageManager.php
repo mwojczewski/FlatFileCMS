@@ -109,12 +109,7 @@ final readonly class PageManager
         if (str_starts_with($destination->value() . '/', $source->value() . '/')) {
             throw new InvalidArgumentException('A page cannot be moved inside its own subtree.');
         }
-        $this->locks->exclusive(self::TREE_LOCK, function () use (
-            $source,
-            $destination,
-            $expectedRevision,
-            $languages,
-        ): void {
+        $this->locks->exclusive(self::TREE_LOCK, function () use ($source, $destination, $expectedRevision, $languages): void {
             $this->assertRevision($this->editable($source), $expectedRevision);
             $this->validateTree($languages);
             $sourcePath = RelativePath::fromString($source->value());
@@ -153,8 +148,7 @@ final readonly class PageManager
         PageMetadata $metadata,
         ?array $existing,
         LanguageConfig $languages,
-    ): array
-    {
+    ): array {
         $this->validateMetadata($identity, $metadata, $languages);
         $data = $existing ?? [];
         $data['schemaVersion'] = 1;
@@ -172,7 +166,7 @@ final readonly class PageManager
         $data['title'] = $metadata->titles();
 
         $seo = $data['seo'] ?? [];
-        if (!is_array($seo) || ($seo !== [] && array_is_list($seo))) {
+        if (!\is_array($seo) || ($seo !== [] && array_is_list($seo))) {
             throw new InvalidContentException('Page SEO must be a mapping.');
         }
         $seo['title'] = $metadata->seoTitles();
@@ -196,8 +190,7 @@ final readonly class PageManager
         PageIdentity $identity,
         PageMetadata $metadata,
         LanguageConfig $languages,
-    ): void
-    {
+    ): void {
         $this->assertLocales($metadata->titles(), $languages, 'Page titles');
         $this->assertLocales($metadata->seoTitles(), $languages, 'SEO titles');
         $this->assertLocales($metadata->seoDescriptions(), $languages, 'SEO descriptions');
@@ -210,7 +203,7 @@ final readonly class PageManager
         }
         foreach ($metadata->titles() as $locale => $title) {
             if ($title === '' || mb_strlen($title) > 200) {
-                throw new InvalidArgumentException(sprintf('Title for locale "%s" must contain 1–200 characters.', $locale));
+                throw new InvalidArgumentException(\sprintf('Title for locale "%s" must contain 1–200 characters.', $locale));
             }
         }
         if (!$identity->isHomepage()) {
@@ -234,7 +227,7 @@ final readonly class PageManager
         }
         if ($canonical !== null && !str_starts_with($canonical, '/')) {
             $scheme = parse_url($canonical, PHP_URL_SCHEME);
-            if (filter_var($canonical, FILTER_VALIDATE_URL) === false || !in_array($scheme, ['http', 'https'], true)) {
+            if (filter_var($canonical, FILTER_VALIDATE_URL) === false || !\in_array($scheme, ['http', 'https'], true)) {
                 throw new InvalidArgumentException('Canonical URL must be an HTTP(S) URL or an absolute site path.');
             }
         }
@@ -260,7 +253,7 @@ final readonly class PageManager
         $pages = array_values(array_filter(
             $this->pages->all($languages),
             static fn(Page $page): bool => $replacedIdentity === null
-                || $page->identity()->value() !== $replacedIdentity->value(),
+            || $page->identity()->value() !== $replacedIdentity->value(),
         ));
         $pages[] = $candidate;
         PageRouteIndex::build($pages, $languages, $this->collections->all($languages));
@@ -303,7 +296,7 @@ final readonly class PageManager
         sort($expected);
         sort($actual);
         if ($actual !== $expected) {
-            throw new InvalidArgumentException($field . ' must contain exactly all enabled languages.');
+            throw new InvalidArgumentException("{$field} must contain exactly all enabled languages.");
         }
     }
 
@@ -315,8 +308,8 @@ final readonly class PageManager
     {
         $result = [];
         foreach ($data as $key => $value) {
-            if (!is_string($key)) {
-                throw new InvalidContentException($section . ' keys must be strings.');
+            if (!\is_string($key)) {
+                throw new InvalidContentException("{$section} keys must be strings.");
             }
             $result[$key] = $value;
         }

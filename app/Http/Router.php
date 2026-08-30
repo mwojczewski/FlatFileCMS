@@ -31,7 +31,7 @@ final class Router
     public function add(array $methods, string $pattern, Closure $handler, string $name): void
     {
         if ($this->hasName($name)) {
-            throw new InvalidArgumentException(sprintf('Route name "%s" is already registered.', $name));
+            throw new InvalidArgumentException(\sprintf('Route name "%s" is already registered.', $name));
         }
 
         $normalizedPattern = $pattern === '/' ? '/' : rtrim($pattern, '/');

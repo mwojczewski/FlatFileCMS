@@ -72,7 +72,7 @@ final readonly class AdminPageController
         $items = '';
         foreach ($entries as $entry) {
             $identity = $entry['identity']->value();
-            $depth = count($entry['identity']->segments()) - 1;
+            $depth = \count($entry['identity']->segments()) - 1;
             $childAction = $entry['identity']->isHomepage() ? ''
                 : '<a class="button child" href="/admin/pages/create?parent=' . rawurlencode($identity)
                     . '">Dodaj podstronę</a>';
@@ -102,7 +102,7 @@ final readonly class AdminPageController
         $this->requireUser();
         $languages = $this->languages->get();
         $parent = $request->query()['parent'] ?? '';
-        if (!is_string($parent)) {
+        if (!\is_string($parent)) {
             $parent = '';
         }
 
@@ -144,7 +144,10 @@ final readonly class AdminPageController
 
         return $this->page(
             'Edycja strony',
-            $this->form('/admin/pages/update', $this->languages->get(), $editable, $identity),
+            '<div class="toolbar"><p>Zarządzaj metadanymi albo przejdź do układu bloków tej strony.</p>'
+                . '<a class="button child" href="/admin/pages/builder?path=' . rawurlencode($identity->value())
+                . '">Otwórz page builder</a></div>'
+                . $this->form('/admin/pages/update', $this->languages->get(), $editable, $identity),
         );
     }
 
@@ -221,7 +224,7 @@ final readonly class AdminPageController
 
     private function identity(mixed $value): PageIdentity
     {
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             throw new HttpException(400, 'PAGE_IDENTITY_REQUIRED', 'Page identity is required.');
         }
 
@@ -234,7 +237,7 @@ final readonly class AdminPageController
 
     private function revision(mixed $value): FileRevision
     {
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             throw new HttpException(400, 'PAGE_REVISION_REQUIRED', 'Page revision is required.');
         }
 
@@ -250,7 +253,7 @@ final readonly class AdminPageController
         $data = $request->parsedBody();
         $layout = $data['layout'] ?? null;
         $canonical = $data['canonical'] ?? null;
-        if (!is_string($layout) || !is_string($canonical)) {
+        if (!\is_string($layout) || !\is_string($canonical)) {
             throw new InvalidArgumentException('Page form contains invalid scalar values.');
         }
 
@@ -270,18 +273,18 @@ final readonly class AdminPageController
     /** @return array<string, string> */
     private function localizedStrings(mixed $value, LanguageConfig $languages, bool $required): array
     {
-        if (!is_array($value) || ($value !== [] && array_is_list($value))) {
+        if (!\is_array($value) || ($value !== [] && array_is_list($value))) {
             throw new InvalidArgumentException('Localized form value must be a mapping.');
         }
         $result = [];
         foreach ($languages->codes() as $locale) {
             $localized = $value[$locale] ?? null;
-            if (!is_string($localized)) {
+            if (!\is_string($localized)) {
                 throw new InvalidArgumentException('Localized form value is missing.');
             }
             $localized = trim($localized);
             if ($required && $localized === '') {
-                throw new InvalidArgumentException(sprintf('Value for locale "%s" is required.', $locale));
+                throw new InvalidArgumentException(\sprintf('Value for locale "%s" is required.', $locale));
             }
             $result[$locale] = $localized;
         }
@@ -318,14 +321,14 @@ final readonly class AdminPageController
         $homepage = $identity?->isHomepage() ?? false;
         $currentIdentity = $identity?->value() ?? $identityPrefix;
         $enabled = ($data['enabled'] ?? true) === true;
-        $layout = is_string($data['layout'] ?? null) ? $data['layout'] : '';
+        $layout = \is_string($data['layout'] ?? null) ? $data['layout'] : '';
         $title = $this->stringMapping($data['title'] ?? []);
         $slug = $this->stringMapping($data['slug'] ?? []);
         $seo = $this->mapping($data['seo'] ?? []);
         $seoTitle = $this->stringMapping($seo['title'] ?? []);
         $seoDescription = $this->stringMapping($seo['description'] ?? []);
         $robots = $this->mapping($seo['robots'] ?? []);
-        $canonical = is_string($seo['canonical'] ?? null) ? $seo['canonical'] : '';
+        $canonical = \is_string($seo['canonical'] ?? null) ? $seo['canonical'] : '';
         $fields = '';
         foreach ($languages->languages() as $locale => $name) {
             $fields .= '<fieldset><legend>' . self::escape($name) . ' <code>' . self::escape($locale) . '</code></legend>'
@@ -390,12 +393,12 @@ final readonly class AdminPageController
     /** @return array<string, mixed> */
     private function mapping(mixed $value): array
     {
-        if (!is_array($value) || ($value !== [] && array_is_list($value))) {
+        if (!\is_array($value) || ($value !== [] && array_is_list($value))) {
             return [];
         }
         $result = [];
         foreach ($value as $key => $item) {
-            if (is_string($key)) {
+            if (\is_string($key)) {
                 $result[$key] = $item;
             }
         }
@@ -408,7 +411,7 @@ final readonly class AdminPageController
     {
         $result = [];
         foreach ($this->mapping($value) as $key => $item) {
-            if (is_string($item)) {
+            if (\is_string($item)) {
                 $result[$key] = $item;
             }
         }

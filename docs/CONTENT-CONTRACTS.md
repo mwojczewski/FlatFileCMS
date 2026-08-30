@@ -133,7 +133,7 @@ media:
 `site.url` is the canonical public URL and is owned exclusively by this file.
 Media behavior is also site configuration. Runtime cache of parsed YAML is a
 separate infrastructure concern controlled exclusively through
-`YAML_CACHE_ENABLED` in `.env.local`.
+`YAML_CACHE_JSON_ENABLED` and `YAML_CACHE_SERIALIZE_ENABLED` in `.env.local`.
 
 ## Internal links
 

@@ -43,7 +43,7 @@ final readonly class ConfigurationRepository
             $url = ContentData::string($site['url'] ?? null, 'site.url');
             if (
                 filter_var($url, FILTER_VALIDATE_URL) === false
-                || !in_array(parse_url($url, PHP_URL_SCHEME), ['http', 'https'], true)
+                || !\in_array(parse_url($url, PHP_URL_SCHEME), ['http', 'https'], true)
             ) {
                 throw new InvalidArgumentException('site.url must be an absolute HTTP or HTTPS URL.');
             }
@@ -77,13 +77,13 @@ final readonly class ConfigurationRepository
     /** @return array<string, mixed> */
     private function mappingOrEmpty(mixed $value): array
     {
-        if (!is_array($value) || ($value !== [] && array_is_list($value))) {
+        if (!\is_array($value) || ($value !== [] && array_is_list($value))) {
             throw new InvalidContentException('Public setup configuration sections must be mappings.');
         }
 
         $result = [];
         foreach ($value as $key => $item) {
-            if (!is_string($key)) {
+            if (!\is_string($key)) {
                 throw new InvalidContentException('Public setup configuration uses a non-string key.');
             }
 

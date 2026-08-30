@@ -11,14 +11,14 @@ final readonly class PasswordReader
     public function read(): string
     {
         $environmentPassword = getenv('CMS_PASSWORD');
-        if (is_string($environmentPassword) && $environmentPassword !== '') {
+        if (\is_string($environmentPassword) && $environmentPassword !== '') {
             return $environmentPassword;
         }
 
         fwrite(STDOUT, 'Password: ');
         $definedFunctions = get_defined_functions();
         $hidden = DIRECTORY_SEPARATOR === '/'
-            && in_array('shell_exec', $definedFunctions['internal'], true);
+            && \in_array('shell_exec', $definedFunctions['internal'], true);
         if ($hidden) {
             shell_exec('stty -echo');
         }
@@ -30,7 +30,7 @@ final readonly class PasswordReader
                 fwrite(STDOUT, "\n");
             }
         }
-        if (!is_string($password)) {
+        if (!\is_string($password)) {
             throw new RuntimeException('Unable to read password.');
         }
 

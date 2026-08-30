@@ -26,17 +26,17 @@ final readonly class BlockProcessor
             foreach ($page->blocks() as $index => $block) {
                 $path = 'blocks.' . $index;
                 foreach (array_keys($block) as $property) {
-                    if (!in_array($property, ['id', 'type', 'enabled', 'data'], true)) {
-                        throw new InvalidArgumentException(sprintf('Unknown property "%s" at %s.', $property, $path));
+                    if (!\in_array($property, ['id', 'type', 'enabled', 'data'], true)) {
+                        throw new InvalidArgumentException(\sprintf('Unknown property "%s" at %s.', $property, $path));
                     }
                 }
 
                 $id = strtolower(ContentData::string($block['id'] ?? null, $path . '.id'));
                 if (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/D', $id) !== 1) {
-                    throw new InvalidArgumentException(sprintf('Block identifier at %s must be UUID v7.', $path));
+                    throw new InvalidArgumentException(\sprintf('Block identifier at %s must be UUID v7.', $path));
                 }
                 if (isset($identifiers[$id])) {
-                    throw new InvalidArgumentException(sprintf('Duplicate block identifier "%s".', $id));
+                    throw new InvalidArgumentException(\sprintf('Duplicate block identifier "%s".', $id));
                 }
                 $identifiers[$id] = true;
 
@@ -71,7 +71,7 @@ final readonly class BlockProcessor
             return $result;
         } catch (InvalidArgumentException|InvalidBlockDefinitionException|BlockValidationException $exception) {
             throw new InvalidContentException(
-                sprintf('Page "%s" contains invalid block data.', $page->identity()->value()),
+                \sprintf('Page "%s" contains invalid block data.', $page->identity()->value()),
                 previous: $exception,
             );
         }
@@ -89,7 +89,7 @@ final readonly class BlockProcessor
             return $modifiedAt;
         } catch (InvalidArgumentException|InvalidBlockDefinitionException $exception) {
             throw new InvalidContentException(
-                sprintf('Page "%s" contains an invalid block type.', $page->identity()->value()),
+                \sprintf('Page "%s" contains an invalid block type.', $page->identity()->value()),
                 previous: $exception,
             );
         }

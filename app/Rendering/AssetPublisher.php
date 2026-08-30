@@ -37,19 +37,19 @@ final class AssetPublisher
         }
 
         $extension = pathinfo($source, PATHINFO_EXTENSION);
-        if (!in_array($extension, ['css', 'js'], true)) {
+        if (!\in_array($extension, ['css', 'js'], true)) {
             throw new RenderingException('Block asset extension is not supported.');
         }
 
-        $directory = $this->publicRoot . '/assets/blocks/' . $type;
+        $directory = "{$this->publicRoot}/assets/blocks/{$type}";
         if (!is_dir($directory) && !mkdir($directory, 0o750, true) && !is_dir($directory)) {
             throw new RenderingException('Block asset directory cannot be created.');
         }
 
-        $filename = $type . '.' . substr(hash('sha256', $contents), 0, 16) . '.' . $extension;
-        $target = $directory . '/' . $filename;
+        $filename = "{$type}." . substr(hash('sha256', $contents), 0, 16) . ".{$extension}";
+        $target = "{$directory}/{$filename}";
         if (!is_file($target)) {
-            $temporary = $directory . '/.' . $filename . '.' . bin2hex(random_bytes(8)) . '.tmp';
+            $temporary = "{$directory}/.{$filename}." . bin2hex(random_bytes(8)) . '.tmp';
             try {
                 if (file_put_contents($temporary, $contents, LOCK_EX) === false || !chmod($temporary, 0o640)) {
                     throw new RenderingException('Block asset cannot be written.');
@@ -64,6 +64,6 @@ final class AssetPublisher
             }
         }
 
-        return '/assets/blocks/' . $type . '/' . $filename;
+        return "/assets/blocks/{$type}/{$filename}";
     }
 }
