@@ -66,6 +66,17 @@ final class RouterTest extends TestCase
         self::assertSame('', $response->body());
     }
 
+    public function testItDispatchesPostRoutes(): void
+    {
+        $router = new Router();
+        $router->post('/login', static fn(): Response => Response::json(['authenticated' => true]), 'login');
+
+        self::assertSame(
+            '{"authenticated":true}',
+            $router->dispatch(new Request('POST', '/login'))->body(),
+        );
+    }
+
     public function testItDistinguishesNotFoundAndMethodNotAllowed(): void
     {
         $router = new Router();

@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Cli;
 
+use FlatFileCms\Auth\Role;
+use InvalidArgumentException;
 use Throwable;
 
 final readonly class ConsoleApplication
 {
-    public function __construct(private BlockScaffolder $blocks) {}
+    public function __construct(
+        private BlockScaffolder $blocks,
+        private UserCommandService $users,
+        private PasswordReader $passwords,
+    ) {}
 
     /** @param list<string> $arguments */
     public function run(array $arguments): int
@@ -19,47 +25,42 @@ final readonly class ConsoleApplication
 
             return 0;
         }
-        if ($command !== 'block:create') {
-            $this->error(sprintf("Unknown command \"%s\".\n\n%s", $command, $this->help()));
-
-            return 2;
-        }
-
-        $type = null;
-        $withAssets = false;
-        foreach (array_slice($arguments, 2) as $argument) {
-            if ($argument === '--with-assets') {
-                $withAssets = true;
-
-                continue;
-            }
-            if (str_starts_with($argument, '-')) {
-                $this->error(sprintf("Unknown option \"%s\".\n", $argument));
-
-                return 2;
-            }
-            if ($type !== null) {
-                $this->error("Command block:create accepts exactly one block type.\n");
-
-                return 2;
-            }
-
-            $type = $argument;
-        }
-        if ($type === null) {
-            $this->error("Usage: php bin/cms block:create <type> [--with-assets]\n");
-
-            return 2;
-        }
 
         try {
-            $files = $this->blocks->create($type, $withAssets);
+            return match ($command) {
+                'block:create' => $this->createBlock(array_slice($arguments, 2)),
+                'install' => $this->createUser($arguments[2] ?? null, Role::Superadmin, install: true),
+                'user:create' => $this->createUser($arguments[2] ?? null, Role::Admin),
+                'user:create-superadmin' => $this->createUser($arguments[2] ?? null, Role::Superadmin),
+                'user:password' => $this->changePassword($arguments[2] ?? null),
+                'user:security-keys:clear' => $this->clearSecurityKeys($arguments[2] ?? null),
+                default => $this->unknown($command),
+            };
         } catch (Throwable $exception) {
             $this->error('Error: ' . $exception->getMessage() . "\n");
 
             return 1;
         }
+    }
 
+    /** @param list<string> $arguments */
+    private function createBlock(array $arguments): int
+    {
+        $type = null;
+        $withAssets = false;
+        foreach ($arguments as $argument) {
+            if ($argument === '--with-assets') {
+                $withAssets = true;
+            } elseif (str_starts_with($argument, '-') || $type !== null) {
+                throw new InvalidArgumentException('Usage: php bin/cms block:create <type> [--with-assets]');
+            } else {
+                $type = $argument;
+            }
+        }
+        if ($type === null) {
+            throw new InvalidArgumentException('Usage: php bin/cms block:create <type> [--with-assets]');
+        }
+        $files = $this->blocks->create($type, $withAssets);
         $this->output(sprintf("Block \"%s\" created:\n", $type));
         foreach ($files as $file) {
             $this->output('  - ' . $file . "\n");
@@ -68,16 +69,63 @@ final readonly class ConsoleApplication
         return 0;
     }
 
+    private function createUser(?string $email, Role $role, bool $install = false): int
+    {
+        $email ??= throw new InvalidArgumentException('Email argument is required.');
+        $password = $this->passwords->read();
+        if ($install) {
+            $this->users->install($email, $password);
+            $this->output("CMS database installed and first superadmin created.\n");
+        } else {
+            $this->users->create($email, $password, $role);
+            $this->output(sprintf("%s created.\n", $role->value));
+        }
+
+        return 0;
+    }
+
+    private function changePassword(?string $email): int
+    {
+        $email ??= throw new InvalidArgumentException('Email argument is required.');
+        $this->users->changePassword($email, $this->passwords->read());
+        $this->output("Password changed.\n");
+
+        return 0;
+    }
+
+    private function clearSecurityKeys(?string $email): int
+    {
+        $email ??= throw new InvalidArgumentException('Email argument is required.');
+        $count = $this->users->clearSecurityKeys($email);
+        $this->output(sprintf("Removed %d security key(s).\n", $count));
+
+        return 0;
+    }
+
+    private function unknown(string $command): int
+    {
+        $this->error(sprintf("Unknown command \"%s\".\n\n%s", $command, $this->help()));
+
+        return 2;
+    }
+
     private function help(): string
     {
         return <<<'TEXT'
 FlatFile CMS CLI
 
 Usage:
-  php bin/cms <command> [arguments] [options]
+  php bin/cms <command> [arguments]
 
 Commands:
-  block:create <type> [--with-assets]  Create a developer block package
+  install <email>                         Install SQLite and create the first superadmin
+  user:create <email>                     Create an admin
+  user:create-superadmin <email>          Create a technical superadmin
+  user:password <email>                   Change a user password
+  user:security-keys:clear <email>         Remove all WebAuthn/YubiKey credentials
+  block:create <type> [--with-assets]      Create a developer block package
+
+Set CMS_PASSWORD for non-interactive use. Avoid shell history and process arguments.
 
 TEXT;
     }

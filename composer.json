@@ -9,9 +9,11 @@
         "ext-filter": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
+        "ext-openssl": "*",
         "ext-pdo": "*",
         "ext-pdo_sqlite": "*",
         "league/commonmark": "^2.7",
+        "report-uri/passkeys-php": "^2.0",
         "symfony/yaml": "^8.1"
     },
     "require-dev": {

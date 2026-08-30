@@ -26,13 +26,20 @@ final readonly class ErrorHandler
             ));
         }
 
-        if (str_starts_with($request->path(), '/api/')) {
+        $expectsJson = str_starts_with($request->path(), '/api/')
+            || str_contains($request->header('accept') ?? '', 'application/json')
+            || str_starts_with($request->header('content-type') ?? '', 'application/json');
+        if ($expectsJson) {
             $error = ['code' => $code, 'message' => $publicMessage];
             if ($this->debug) {
                 $error['debug'] = $exception->getMessage();
             }
 
-            return Response::json(['error' => $error], $status);
+            $headers = str_starts_with($request->path(), '/admin/')
+                ? ['Cache-Control' => 'no-store', 'Pragma' => 'no-cache']
+                : [];
+
+            return Response::json(['error' => $error], $status, $headers);
         }
 
         $title = $status === 404 ? 'Nie znaleziono strony' : 'Wystąpił błąd';

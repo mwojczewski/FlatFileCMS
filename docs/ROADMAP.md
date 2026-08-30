@@ -55,7 +55,16 @@
 - direct-child source, sorting, equality filters and pagination;
 - REST API and server-side collection layouts.
 
-## Stages 7–12
+## Stage 7 — users and authentication (complete)
 
-Users/auth; page CRUD; dynamic page builder; media; navigation/config editors;
-CLI, hardening, complete documentation and production release.
+- SQLite schema limited to users and authentication mechanisms;
+- password policy and Argon2id-aware hashing;
+- role-aware user visibility with hidden superadmins;
+- secure administrator sessions, CSRF and login throttling;
+- optional, account-level YubiKey/WebAuthn second factor;
+- installation and recovery commands in CLI.
+
+## Stages 8–12
+
+Page CRUD; dynamic page builder; password reset and mail; audit log; media;
+navigation/config editors; hardening and production release.

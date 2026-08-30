@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use FlatFileCms\Admin\AdminAuthController;
 use FlatFileCms\Api\PublicApiController;
 use FlatFileCms\Core\Container;
 use FlatFileCms\Http\HttpException;
@@ -14,7 +15,7 @@ return static function (Router $router, ?Container $container = null): void {
     $router->get('/api/v1/health', static fn(Request $request): Response => Response::json([
         'status' => 'ok',
         'application' => 'FlatFile CMS',
-        'stage' => 6,
+        'stage' => 7,
     ]), 'api.health');
 
     if ($container !== null) {
@@ -59,16 +60,19 @@ return static function (Router $router, ?Container $container = null): void {
         );
     }
 
-    $router->get('/admin', static fn(Request $request): Response => Response::html(
-        '<!doctype html><html lang="pl"><head><meta charset="utf-8">'
-        . '<meta name="viewport" content="width=device-width,initial-scale=1">'
-        . '<meta name="robots" content="noindex,nofollow"><title>FlatFile CMS — panel</title>'
-        . '</head><body><main><h1>FlatFile CMS</h1>'
-        . '<p>Panel administracyjny zostanie udostępniony po wdrożeniu warstwy uwierzytelniania.</p>'
-        . '</main></body></html>',
-        status: 503,
-        headers: ['Retry-After' => '3600'],
-    ), 'admin.entry');
+    if ($container !== null) {
+        $admin = static fn(): AdminAuthController => $container->get(AdminAuthController::class);
+        $router->get('/admin/login', static fn(Request $request): Response => $admin()->loginForm($request), 'admin.login.form');
+        $router->post('/admin/login', static fn(Request $request): Response => $admin()->login($request), 'admin.login');
+        $router->get('/admin/2fa', static fn(Request $request): Response => $admin()->secondFactor($request), 'admin.2fa');
+        $router->post('/admin/webauthn/authentication/options', static fn(Request $request): Response => $admin()->authenticationOptions($request), 'admin.webauthn.authentication.options');
+        $router->post('/admin/webauthn/authentication/verify', static fn(Request $request): Response => $admin()->authenticationVerify($request), 'admin.webauthn.authentication.verify');
+        $router->get('/admin/security', static fn(Request $request): Response => $admin()->security($request), 'admin.security');
+        $router->post('/admin/security/webauthn/registration/options', static fn(Request $request): Response => $admin()->registrationOptions($request), 'admin.webauthn.registration.options');
+        $router->post('/admin/security/webauthn/registration/verify', static fn(Request $request): Response => $admin()->registrationVerify($request), 'admin.webauthn.registration.verify');
+        $router->post('/admin/logout', static fn(Request $request): Response => $admin()->logout($request), 'admin.logout');
+        $router->get('/admin', static fn(Request $request): Response => $admin()->dashboard($request), 'admin.entry');
+    }
 
     if ($container === null) {
         $router->get('/', static fn(Request $request): Response => Response::html(

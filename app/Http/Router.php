@@ -18,6 +18,12 @@ final class Router
         $this->add(['GET', 'HEAD'], $pattern, $handler, $name);
     }
 
+    /** @param Closure(Request): Response $handler */
+    public function post(string $pattern, Closure $handler, string $name): void
+    {
+        $this->add(['POST'], $pattern, $handler, $name);
+    }
+
     /**
      * @param list<string> $methods
      * @param Closure(Request): Response $handler

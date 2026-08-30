@@ -12,8 +12,9 @@ final class HttpException extends RuntimeException
         private readonly int $status,
         private readonly string $errorCode,
         string $message,
+        ?\Throwable $previous = null,
     ) {
-        parent::__construct($message);
+        parent::__construct($message, previous: $previous);
     }
 
     public function status(): int

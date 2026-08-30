@@ -1,6 +1,6 @@
 # FlatFile CMS — Architecture Decision Record
 
-Status: accepted for stages 0–6  
+Status: accepted for stages 0–7  
 Baseline: PHP 8.5+
 
 The project intentionally provides no compatibility layer for PHP 8.4 or older.
@@ -60,6 +60,12 @@ Admins can list, create, edit and delete other admins, but cannot delete themsel
 
 Superadmins are technical recovery/service accounts. They are created only through installation or `php bin/cms user:create-superadmin`; the admin UI and ordinary `user:create` command cannot assign that role. Superadmins cannot be deleted through the panel.
 
+An account may register one or more roaming WebAuthn credentials. Once the
+first credential is registered, password verification starts a pending login
+that is completed only after a valid WebAuthn assertion. No credential means
+password-only login. WebAuthn is implemented as origin-bound FIDO2/U2F rather
+than Yubico OTP and requires no Yubico cloud service.
+
 ## 6. Write model
 
 There is no draft/published workflow or version history. A valid write becomes public immediately. `enabled: false` removes a page from public API and HTML routing while retaining it in the admin panel.
@@ -87,6 +93,9 @@ Stage 1 implements the transport foundation. Content-aware errors will add stabl
 
 - `symfony/yaml` 8.1+: mature YAML parsing with pre-expansion alias rejection,
   without adopting Symfony Framework.
+- `report-uri/passkeys-php` 2.x: small maintained WebAuthn/FIDO2 verifier with
+  security fixes, used behind the CMS authentication service rather than
+  implementing browser-authenticator cryptography locally.
 - PHPUnit: executable regression tests.
 - PHPStan: maximum-level static analysis.
 - PHP-CS-Fixer: deterministic PER-CS 2.0 formatting.
@@ -115,3 +124,5 @@ adapter, safe template context and fingerprinted per-page developer assets. JSON
 and HTML consume the same `PageViewModelFactory`; neither adapter calls the other.
 Stage 6 adds file-backed collections as route ancestors and exposes the same
 localized collection result through JSON and HTML adapters.
+Stage 7 adds the isolated SQLite authentication boundary, native sessions,
+CSRF, throttled password login and optional WebAuthn security keys.

@@ -2,10 +2,20 @@
 
 declare(strict_types=1);
 
+use FlatFileCms\Admin\AdminAuthController;
 use FlatFileCms\Api\ApiResponseFactory;
 use FlatFileCms\Api\CollectionSerializer;
 use FlatFileCms\Api\PageSerializer;
 use FlatFileCms\Api\PublicApiController;
+use FlatFileCms\Auth\Authenticator;
+use FlatFileCms\Auth\CsrfTokenManager;
+use FlatFileCms\Auth\NativeSessionStore;
+use FlatFileCms\Auth\PasswordHasher;
+use FlatFileCms\Auth\RateLimiter;
+use FlatFileCms\Auth\SessionStore;
+use FlatFileCms\Auth\UserRepository;
+use FlatFileCms\Auth\WebAuthnCredentialRepository;
+use FlatFileCms\Auth\WebAuthnService;
 use FlatFileCms\Blocks\BlockProcessor;
 use FlatFileCms\Blocks\BlockRegistry;
 use FlatFileCms\Blocks\BlockValidator;
@@ -23,6 +33,7 @@ use FlatFileCms\Domain\Localization\LocalizedDataResolver;
 use FlatFileCms\Http\ErrorHandler;
 use FlatFileCms\Http\HtmlResponseFactory;
 use FlatFileCms\Http\Router;
+use FlatFileCms\Infrastructure\Database\Database;
 use FlatFileCms\Infrastructure\Filesystem\AtomicFileWriter;
 use FlatFileCms\Infrastructure\Filesystem\FileLockManager;
 use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
@@ -53,6 +64,77 @@ require $projectRoot . '/vendor/autoload.php';
 $environment = Environment::load($projectRoot);
 $container = new Container();
 $container->set(Environment::class, static fn(): Environment => $environment);
+$container->set(
+    Database::class,
+    static fn(Container $container): Database => new Database(
+        $container->get(Environment::class)->projectRoot() . '/storage/database/cms.sqlite',
+    ),
+);
+$container->set(
+    UserRepository::class,
+    static fn(Container $container): UserRepository => new UserRepository(
+        $container->get(Database::class)->connection(),
+    ),
+);
+$container->set(
+    WebAuthnCredentialRepository::class,
+    static fn(Container $container): WebAuthnCredentialRepository => new WebAuthnCredentialRepository(
+        $container->get(Database::class)->connection(),
+    ),
+);
+$container->set(PasswordHasher::class, static fn(): PasswordHasher => new PasswordHasher());
+$container->set(
+    SessionStore::class,
+    static fn(Container $container): SessionStore => new NativeSessionStore(
+        $container->get(Environment::class)->projectRoot() . '/storage/sessions',
+        $container->get(Environment::class)->get('SESSION_NAME', 'flatfile_cms_session'),
+        $container->get(Environment::class)->integer('SESSION_LIFETIME', 7200),
+        $container->get(Environment::class)->boolean('SESSION_COOKIE_SECURE', true),
+        $container->get(Environment::class)->get('SESSION_COOKIE_SAME_SITE', 'Lax'),
+    ),
+);
+$container->set(
+    CsrfTokenManager::class,
+    static fn(Container $container): CsrfTokenManager => new CsrfTokenManager($container->get(SessionStore::class)),
+);
+$container->set(
+    RateLimiter::class,
+    static fn(Container $container): RateLimiter => new RateLimiter(
+        $container->get(Database::class)->connection(),
+        $container->get(Environment::class)->get('APP_SECRET'),
+        $container->get(Environment::class)->integer('AUTH_LOGIN_MAX_ATTEMPTS', 5),
+        $container->get(Environment::class)->integer('AUTH_LOGIN_WINDOW_SECONDS', 900),
+    ),
+);
+$container->set(
+    Authenticator::class,
+    static fn(Container $container): Authenticator => new Authenticator(
+        $container->get(UserRepository::class),
+        $container->get(WebAuthnCredentialRepository::class),
+        $container->get(PasswordHasher::class),
+        $container->get(SessionStore::class),
+        $container->get(RateLimiter::class),
+    ),
+);
+$container->set(
+    WebAuthnService::class,
+    static fn(Container $container): WebAuthnService => new WebAuthnService(
+        $container->get(WebAuthnCredentialRepository::class),
+        $container->get(SessionStore::class),
+        $container->get(Environment::class)->get('WEBAUTHN_RP_NAME', 'FlatFile CMS'),
+        $container->get(Environment::class)->get('WEBAUTHN_RP_ID'),
+    ),
+);
+$container->set(
+    AdminAuthController::class,
+    static fn(Container $container): AdminAuthController => new AdminAuthController(
+        $container->get(Authenticator::class),
+        $container->get(CsrfTokenManager::class),
+        $container->get(PasswordHasher::class),
+        $container->get(WebAuthnCredentialRepository::class),
+        $container->get(WebAuthnService::class),
+    ),
+);
 $container->set(
     SafePathResolver::class,
     static fn(Container $container): SafePathResolver => new SafePathResolver(

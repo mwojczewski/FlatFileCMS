@@ -23,6 +23,8 @@ final readonly class TemporaryProject
             'public/assets/css',
             'storage/tmp',
             'storage/cache',
+            'storage/database',
+            'storage/sessions',
             'templates/layouts',
             'templates/partials',
         ] as $directory) {

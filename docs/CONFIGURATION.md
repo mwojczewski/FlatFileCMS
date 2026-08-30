@@ -16,11 +16,17 @@ predictably after its environment has been supplied.
 | Reverse proxy | `TRUSTED_PROXIES` |
 | Session deployment | `SESSION_NAME`, `SESSION_LIFETIME`, `SESSION_COOKIE_SECURE`, `SESSION_COOKIE_SAME_SITE` |
 | Auth protection | `AUTH_LOGIN_*`, `AUTH_RESET_*`, `AUTH_PASSWORD_RESET_TTL` |
+| WebAuthn deployment | `WEBAUTHN_RP_ID`, `WEBAUTHN_RP_NAME` |
 | Mail transport | `MAIL_*` |
 
 `HttpOnly` is not configurable: administrator session cookies must always use
 it. Other non-negotiable security guarantees should likewise be enforced in
 code instead of exposed as switches.
+
+`WEBAUTHN_RP_ID` is the exact admin hostname without scheme, port or path.
+WebAuthn credentials are cryptographically bound to it, so changing this value
+makes previously registered keys unusable. `WEBAUTHN_RP_NAME` is only the label
+shown by the browser during registration.
 
 `YAML_CACHE_ENABLED` controls only parsed mappings stored under
 `storage/cache/yaml/`. It exists in the environment because the useful choice

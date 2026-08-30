@@ -2,9 +2,10 @@
 
 Reusable hybrid flat-file CMS for PHP 8.5+. The same domain model will serve normalized JSON through a REST API and render complete HTML through developer-defined PHP blocks and layouts.
 
-Stages 0–6 are complete in this revision: architecture/contracts, the executable
+Stages 0–7 are complete in this revision: architecture/contracts, the executable
 HTTP foundation, safe filesystem/YAML access and the localized public content
-API with schema-validated blocks, server-side HTML rendering and collections.
+API with schema-validated blocks, server-side HTML rendering, collections and
+the administrator authentication boundary.
 
 ## Current capabilities
 
@@ -41,14 +42,18 @@ API with schema-validated blocks, server-side HTML rendering and collections.
 - cache validators for both JSON and HTML responses;
 - `pagination.yml` collections with translated routes, sorting, filtering and pagination;
 - collection output through both REST API and server-rendered layouts.
+- SQLite users with strict admin/superadmin visibility rules;
+- password login, secure sessions, CSRF and persistent login throttling;
+- optional YubiKey/WebAuthn second factor with multi-key support and CLI recovery.
 
-The admin application intentionally begins in a subsequent stage.
+Content-management screens begin in the next stage; authentication and account
+security are available now.
 
 ## Requirements
 
 - PHP 8.5 or newer; PHP 8.4 and older are intentionally unsupported;
 - Composer 2;
-- extensions: Ctype, Filter, JSON, Mbstring, PDO and PDO SQLite;
+- extensions: Ctype, Filter, JSON, Mbstring, OpenSSL, PDO and PDO SQLite;
 - a web server whose document root can be set to `public/`, or equivalent rewrite protection on shared hosting.
 
 The production dependencies are deliberately narrow. `symfony/yaml` provides a
@@ -63,10 +68,16 @@ CMS core would increase security risk without adding product value.
 composer install
 cp .env.example .env.local
 composer check
-php -S 127.0.0.1:8080 -t public public/index.php
+php -S localhost:8080 -t public public/index.php
 ```
 
-Open `http://127.0.0.1:8080/`. Operational status is available from `GET /api/v1/health`.
+Open `http://localhost:8080/`. Operational status is available from `GET /api/v1/health`.
+
+Install the authentication database and first technical superadmin:
+
+```bash
+php bin/cms install root@example.com
+```
 
 Create a developer block package with:
 
@@ -91,7 +102,7 @@ belong to `.env.local`; site URL, SEO, layouts and media behavior belong to
 complete boundary. `YAML_CACHE_ENABLED` controls only the infrastructure cache
 of parsed YAML and is intentionally not a site setting.
 
-## HTTP routes through stage 6
+## HTTP routes through stage 7
 
 | Method | Route | Purpose |
 |---|---|---|
@@ -102,7 +113,9 @@ of parsed YAML and is intentionally not a site setting.
 | GET, HEAD | `/api/v1/navigation?lang=pl` | localized navigation with resolved page links |
 | GET, HEAD | `/api/v1/config?lang=pl` | deliberate public configuration projection |
 | GET, HEAD | `/api/v1/collections/{path*}?lang=pl&page=1` | localized, filtered and paginated collection |
-| GET, HEAD | `/admin` | protected-panel availability notice until auth is implemented |
+| GET, HEAD | `/admin/login` | administrator password login |
+| GET, HEAD | `/admin` | authenticated panel entry |
+| GET, HEAD | `/admin/security` | register YubiKey/WebAuthn credentials |
 | GET, HEAD | `/{path*}` | server-rendered website page or collection; locale-prefixed in multilingual mode |
 
 Unknown API routes use the documented JSON error envelope. Unknown website routes receive an HTML error without local paths or a stack trace.
@@ -131,6 +144,7 @@ Configuration ownership is documented in [docs/CONFIGURATION.md](docs/CONFIGURAT
 Block packages, field rules and extension points are documented in [docs/BLOCKS.md](docs/BLOCKS.md).
 Server-side rendering and template boundaries are documented in [docs/RENDERING.md](docs/RENDERING.md).
 Collection contracts and queries are documented in [docs/COLLECTIONS.md](docs/COLLECTIONS.md).
+Authentication, roles and YubiKey recovery are documented in [docs/AUTHENTICATION.md](docs/AUTHENTICATION.md).
 
 ## Web-server setup
 
@@ -196,5 +210,5 @@ contracts and examples.
 
 ## Next stage
 
-Stage 7 introduces SQLite users, the CLI installer and role-aware user
-management. See `docs/ROADMAP.md` for the full sequence.
+Stage 8 introduces filesystem-backed page CRUD and the first content-management
+screens. See `docs/ROADMAP.md` for the full sequence.

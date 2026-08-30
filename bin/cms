@@ -3,13 +3,33 @@
 
 declare(strict_types=1);
 
+use FlatFileCms\Auth\PasswordHasher;
+use FlatFileCms\Auth\PasswordPolicy;
+use FlatFileCms\Auth\UserRepository;
+use FlatFileCms\Auth\WebAuthnCredentialRepository;
 use FlatFileCms\Cli\BlockScaffolder;
 use FlatFileCms\Cli\ConsoleApplication;
+use FlatFileCms\Cli\PasswordReader;
+use FlatFileCms\Cli\UserCommandService;
+use FlatFileCms\Infrastructure\Database\Database;
+use FlatFileCms\Infrastructure\Database\SchemaInstaller;
 
 $projectRoot = dirname(__DIR__);
 require $projectRoot . '/vendor/autoload.php';
 
-$console = new ConsoleApplication(new BlockScaffolder($projectRoot));
+$database = new Database($projectRoot . '/storage/database/cms.sqlite');
+$connection = $database->connection();
+$console = new ConsoleApplication(
+    new BlockScaffolder($projectRoot),
+    new UserCommandService(
+        new SchemaInstaller($connection),
+        new UserRepository($connection),
+        new WebAuthnCredentialRepository($connection),
+        new PasswordPolicy(),
+        new PasswordHasher(),
+    ),
+    new PasswordReader(),
+);
 
 /** @var list<string> $argv */
 exit($console->run($argv));

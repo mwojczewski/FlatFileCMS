@@ -74,6 +74,17 @@ final readonly class Environment
         return $parsed;
     }
 
+    public function integer(string $key, int $default, int $minimum = 1): int
+    {
+        $value = $this->get($key, (string) $default);
+        $parsed = filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => $minimum]]);
+        if (!is_int($parsed)) {
+            throw new RuntimeException(sprintf('Environment variable "%s" must be an integer of at least %d.', $key, $minimum));
+        }
+
+        return $parsed;
+    }
+
     public function get(string $key, ?string $default = null): string
     {
         if (array_key_exists($key, $this->values)) {
