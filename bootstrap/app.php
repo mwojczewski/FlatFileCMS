@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use FlatFileCms\Admin\AdminAuthController;
+use FlatFileCms\Admin\AdminPageController;
 use FlatFileCms\Api\ApiResponseFactory;
 use FlatFileCms\Api\CollectionSerializer;
 use FlatFileCms\Api\PageSerializer;
@@ -10,7 +11,9 @@ use FlatFileCms\Api\PublicApiController;
 use FlatFileCms\Auth\Authenticator;
 use FlatFileCms\Auth\CsrfTokenManager;
 use FlatFileCms\Auth\NativeSessionStore;
+use FlatFileCms\Auth\PasswordChanger;
 use FlatFileCms\Auth\PasswordHasher;
+use FlatFileCms\Auth\PasswordPolicy;
 use FlatFileCms\Auth\RateLimiter;
 use FlatFileCms\Auth\SessionStore;
 use FlatFileCms\Auth\UserRepository;
@@ -25,6 +28,7 @@ use FlatFileCms\Collections\CollectionRepository;
 use FlatFileCms\Collections\CollectionService;
 use FlatFileCms\Config\ConfigurationRepository;
 use FlatFileCms\Config\LanguageRepository;
+use FlatFileCms\Content\PageManager;
 use FlatFileCms\Content\PageRepository;
 use FlatFileCms\Core\Application;
 use FlatFileCms\Core\Container;
@@ -35,6 +39,7 @@ use FlatFileCms\Http\HtmlResponseFactory;
 use FlatFileCms\Http\Router;
 use FlatFileCms\Infrastructure\Database\Database;
 use FlatFileCms\Infrastructure\Filesystem\AtomicFileWriter;
+use FlatFileCms\Infrastructure\Filesystem\DirectoryOperator;
 use FlatFileCms\Infrastructure\Filesystem\FileLockManager;
 use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
 use FlatFileCms\Infrastructure\Yaml\YamlFileCache;
@@ -83,6 +88,15 @@ $container->set(
     ),
 );
 $container->set(PasswordHasher::class, static fn(): PasswordHasher => new PasswordHasher());
+$container->set(PasswordPolicy::class, static fn(): PasswordPolicy => new PasswordPolicy());
+$container->set(
+    PasswordChanger::class,
+    static fn(Container $container): PasswordChanger => new PasswordChanger(
+        $container->get(UserRepository::class),
+        $container->get(PasswordHasher::class),
+        $container->get(PasswordPolicy::class),
+    ),
+);
 $container->set(
     SessionStore::class,
     static fn(Container $container): SessionStore => new NativeSessionStore(
@@ -130,6 +144,7 @@ $container->set(
     static fn(Container $container): AdminAuthController => new AdminAuthController(
         $container->get(Authenticator::class),
         $container->get(CsrfTokenManager::class),
+        $container->get(PasswordChanger::class),
         $container->get(PasswordHasher::class),
         $container->get(WebAuthnCredentialRepository::class),
         $container->get(WebAuthnService::class),
@@ -193,6 +208,12 @@ $container->set(
         $container->get(SafePathResolver::class),
     ),
 );
+$container->set(
+    DirectoryOperator::class,
+    static fn(Container $container): DirectoryOperator => new DirectoryOperator(
+        $container->get(SafePathResolver::class),
+    ),
+);
 $container->set(LocalizedDataResolver::class, static fn(): LocalizedDataResolver => new LocalizedDataResolver());
 $container->set(
     CollectionRepository::class,
@@ -233,6 +254,30 @@ $container->set(
     static fn(Container $container): BlockProcessor => new BlockProcessor(
         $container->get(BlockRegistry::class),
         $container->get(BlockValidator::class),
+    ),
+);
+$container->set(
+    PageManager::class,
+    static fn(Container $container): PageManager => new PageManager(
+        $container->get(YamlFileRepository::class),
+        $container->get(PageRepository::class),
+        $container->get(CollectionRepository::class),
+        $container->get(BlockProcessor::class),
+        $container->get(LayoutRegistry::class),
+        $container->get(DirectoryOperator::class),
+        $container->get(FileLockManager::class),
+    ),
+);
+$container->set(
+    AdminPageController::class,
+    static fn(Container $container): AdminPageController => new AdminPageController(
+        $container->get(Authenticator::class),
+        $container->get(CsrfTokenManager::class),
+        $container->get(LanguageRepository::class),
+        $container->get(PageRepository::class),
+        $container->get(CollectionRepository::class),
+        $container->get(PageManager::class),
+        $container->get(LayoutRegistry::class),
     ),
 );
 $container->set(

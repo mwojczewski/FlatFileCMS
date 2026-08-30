@@ -2,10 +2,10 @@
 
 Reusable hybrid flat-file CMS for PHP 8.5+. The same domain model will serve normalized JSON through a REST API and render complete HTML through developer-defined PHP blocks and layouts.
 
-Stages 0–7 are complete in this revision: architecture/contracts, the executable
+Stages 0–8 are complete in this revision: architecture/contracts, the executable
 HTTP foundation, safe filesystem/YAML access and the localized public content
 API with schema-validated blocks, server-side HTML rendering, collections and
-the administrator authentication boundary.
+the administrator authentication boundary and filesystem-backed page CRUD.
 
 ## Current capabilities
 
@@ -44,10 +44,11 @@ the administrator authentication boundary.
 - collection output through both REST API and server-rendered layouts.
 - SQLite users with strict admin/superadmin visibility rules;
 - password login, secure sessions, CSRF and persistent login throttling;
+- authenticated password changes with current-password verification and session-ID rotation;
 - optional YubiKey/WebAuthn second factor with multi-key support and CLI recovery.
-
-Content-management screens begin in the next stage; authentication and account
-security are available now.
+- authenticated page tree and metadata/SEO editor;
+- safe page creation, subtree moves and recursive deletion;
+- optimistic revision checks and localized-route collision prevention on every page write.
 
 ## Requirements
 
@@ -102,7 +103,7 @@ belong to `.env.local`; site URL, SEO, layouts and media behavior belong to
 complete boundary. `YAML_CACHE_ENABLED` controls only the infrastructure cache
 of parsed YAML and is intentionally not a site setting.
 
-## HTTP routes through stage 7
+## HTTP routes through stage 8
 
 | Method | Route | Purpose |
 |---|---|---|
@@ -116,6 +117,13 @@ of parsed YAML and is intentionally not a site setting.
 | GET, HEAD | `/admin/login` | administrator password login |
 | GET, HEAD | `/admin` | authenticated panel entry |
 | GET, HEAD | `/admin/security` | register YubiKey/WebAuthn credentials |
+| GET, POST | `/admin/account/password` | change the authenticated account password |
+| GET, HEAD | `/admin/pages` | authenticated page tree |
+| GET, POST | `/admin/pages/create` | create a filesystem-backed page |
+| GET | `/admin/pages/edit?path=…` | edit page metadata and SEO |
+| POST | `/admin/pages/update` | revision-safe page update |
+| POST | `/admin/pages/move` | atomically move a page subtree |
+| POST | `/admin/pages/delete` | permanently delete a page subtree |
 | GET, HEAD | `/{path*}` | server-rendered website page or collection; locale-prefixed in multilingual mode |
 
 Unknown API routes use the documented JSON error envelope. Unknown website routes receive an HTML error without local paths or a stack trace.
@@ -145,6 +153,7 @@ Block packages, field rules and extension points are documented in [docs/BLOCKS.
 Server-side rendering and template boundaries are documented in [docs/RENDERING.md](docs/RENDERING.md).
 Collection contracts and queries are documented in [docs/COLLECTIONS.md](docs/COLLECTIONS.md).
 Authentication, roles and YubiKey recovery are documented in [docs/AUTHENTICATION.md](docs/AUTHENTICATION.md).
+Page administration and destructive-operation rules are documented in [docs/PAGE-ADMIN.md](docs/PAGE-ADMIN.md).
 
 ## Web-server setup
 
@@ -210,5 +219,5 @@ contracts and examples.
 
 ## Next stage
 
-Stage 8 introduces filesystem-backed page CRUD and the first content-management
-screens. See `docs/ROADMAP.md` for the full sequence.
+Stage 9 introduces the schema-driven page builder over the CRUD foundation from
+stage 8. See `docs/ROADMAP.md` for the full sequence.

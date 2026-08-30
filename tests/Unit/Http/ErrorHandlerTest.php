@@ -42,4 +42,18 @@ final class ErrorHandlerTest extends TestCase
         self::assertStringNotContainsString('Secret filesystem path', $response->body());
         self::assertStringContainsString('Internal server error', $response->body());
     }
+
+    public function testAdministratorHtmlErrorsAreNeverCachedOrFramed(): void
+    {
+        $handler = new ErrorHandler();
+
+        $response = $handler->render(
+            new Request('GET', '/admin/pages/edit'),
+            new HttpException(409, 'PAGE_REVISION_CONFLICT', 'Page changed in another session.'),
+        );
+
+        self::assertSame('no-store', $response->headers()['Cache-Control']);
+        self::assertSame('no-cache', $response->headers()['Pragma']);
+        self::assertSame('DENY', $response->headers()['X-Frame-Options']);
+    }
 }

@@ -7,6 +7,7 @@ namespace FlatFileCms\Tests\Unit\Auth;
 use FlatFileCms\Auth\ArraySessionStore;
 use FlatFileCms\Auth\AuthenticationException;
 use FlatFileCms\Auth\Authenticator;
+use FlatFileCms\Auth\PasswordChanger;
 use FlatFileCms\Auth\PasswordHasher;
 use FlatFileCms\Auth\PasswordPolicy;
 use FlatFileCms\Auth\RateLimiter;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Authenticator::class)]
+#[CoversClass(PasswordChanger::class)]
 #[CoversClass(UserRepository::class)]
 final class AuthenticationTest extends TestCase
 {
@@ -77,6 +79,30 @@ final class AuthenticationTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         (new PasswordPolicy())->validate('onlylowercase');
+    }
+
+    public function testAuthenticatedUserCanChangePassword(): void
+    {
+        [$users] = $this->repositories();
+        $hasher = new PasswordHasher();
+        $user = $users->create('admin@example.test', $hasher->hash('Old!Password1'), Role::Admin);
+        $changer = new PasswordChanger($users, $hasher, new PasswordPolicy());
+
+        $updated = $changer->change($user, 'Old!Password1', 'New!Password2', 'New!Password2');
+
+        self::assertTrue($hasher->verify('New!Password2', $updated->passwordHash()));
+        self::assertFalse($hasher->verify('Old!Password1', $updated->passwordHash()));
+    }
+
+    public function testPasswordChangeRejectsInvalidCurrentPassword(): void
+    {
+        [$users] = $this->repositories();
+        $hasher = new PasswordHasher();
+        $user = $users->create('admin@example.test', $hasher->hash('Old!Password1'), Role::Admin);
+        $changer = new PasswordChanger($users, $hasher, new PasswordPolicy());
+
+        $this->expectException(AuthenticationException::class);
+        $changer->change($user, 'Wrong!Password1', 'New!Password2', 'New!Password2');
     }
 
     /** @return array{UserRepository, WebAuthnCredentialRepository, \PDO} */

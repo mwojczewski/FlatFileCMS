@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use FlatFileCms\Admin\AdminAuthController;
+use FlatFileCms\Admin\AdminPageController;
 use FlatFileCms\Api\PublicApiController;
 use FlatFileCms\Core\Container;
 use FlatFileCms\Http\HttpException;
@@ -15,7 +16,7 @@ return static function (Router $router, ?Container $container = null): void {
     $router->get('/api/v1/health', static fn(Request $request): Response => Response::json([
         'status' => 'ok',
         'application' => 'FlatFile CMS',
-        'stage' => 7,
+        'stage' => 8,
     ]), 'api.health');
 
     if ($container !== null) {
@@ -62,15 +63,25 @@ return static function (Router $router, ?Container $container = null): void {
 
     if ($container !== null) {
         $admin = static fn(): AdminAuthController => $container->get(AdminAuthController::class);
+        $pages = static fn(): AdminPageController => $container->get(AdminPageController::class);
         $router->get('/admin/login', static fn(Request $request): Response => $admin()->loginForm($request), 'admin.login.form');
         $router->post('/admin/login', static fn(Request $request): Response => $admin()->login($request), 'admin.login');
         $router->get('/admin/2fa', static fn(Request $request): Response => $admin()->secondFactor($request), 'admin.2fa');
         $router->post('/admin/webauthn/authentication/options', static fn(Request $request): Response => $admin()->authenticationOptions($request), 'admin.webauthn.authentication.options');
         $router->post('/admin/webauthn/authentication/verify', static fn(Request $request): Response => $admin()->authenticationVerify($request), 'admin.webauthn.authentication.verify');
         $router->get('/admin/security', static fn(Request $request): Response => $admin()->security($request), 'admin.security');
+        $router->get('/admin/account/password', static fn(Request $request): Response => $admin()->passwordForm($request), 'admin.password.form');
+        $router->post('/admin/account/password', static fn(Request $request): Response => $admin()->changePassword($request), 'admin.password.change');
         $router->post('/admin/security/webauthn/registration/options', static fn(Request $request): Response => $admin()->registrationOptions($request), 'admin.webauthn.registration.options');
         $router->post('/admin/security/webauthn/registration/verify', static fn(Request $request): Response => $admin()->registrationVerify($request), 'admin.webauthn.registration.verify');
         $router->post('/admin/logout', static fn(Request $request): Response => $admin()->logout($request), 'admin.logout');
+        $router->get('/admin/pages', static fn(Request $request): Response => $pages()->index($request), 'admin.pages.index');
+        $router->get('/admin/pages/create', static fn(Request $request): Response => $pages()->createForm($request), 'admin.pages.create.form');
+        $router->post('/admin/pages/create', static fn(Request $request): Response => $pages()->create($request), 'admin.pages.create');
+        $router->get('/admin/pages/edit', static fn(Request $request): Response => $pages()->editForm($request), 'admin.pages.edit');
+        $router->post('/admin/pages/update', static fn(Request $request): Response => $pages()->update($request), 'admin.pages.update');
+        $router->post('/admin/pages/move', static fn(Request $request): Response => $pages()->move($request), 'admin.pages.move');
+        $router->post('/admin/pages/delete', static fn(Request $request): Response => $pages()->delete($request), 'admin.pages.delete');
         $router->get('/admin', static fn(Request $request): Response => $admin()->dashboard($request), 'admin.entry');
     }
 

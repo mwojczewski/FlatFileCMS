@@ -9,6 +9,7 @@ use FlatFileCms\Domain\Content\Page;
 use FlatFileCms\Domain\Content\PageIdentity;
 use FlatFileCms\Domain\Content\Slug;
 use FlatFileCms\Domain\Localization\LanguageConfig;
+use FlatFileCms\Infrastructure\Filesystem\FileRevision;
 use FlatFileCms\Infrastructure\Filesystem\FilesystemRoot;
 use FlatFileCms\Infrastructure\Filesystem\RelativePath;
 use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
@@ -70,7 +71,24 @@ final readonly class PageRepository
                 throw new InvalidContentException('Unable to read page modification time.');
             }
 
-            $data = $document->data();
+            return $this->fromData($identity, $document->data(), $languages, $document->revision(), $modifiedAt);
+        } catch (InvalidArgumentException $exception) {
+            throw new InvalidContentException(
+                sprintf('Page "%s" contains invalid content.', $identity->value()),
+                previous: $exception,
+            );
+        }
+    }
+
+    /** @param array<string, mixed> $data */
+    public function fromData(
+        PageIdentity $identity,
+        array $data,
+        LanguageConfig $languages,
+        FileRevision $revision,
+        int $modifiedAt,
+    ): Page {
+        try {
             if (ContentData::integer($data['schemaVersion'] ?? null, 'schemaVersion') !== 1) {
                 throw new InvalidArgumentException('Unsupported page schema version.');
             }
@@ -104,7 +122,7 @@ final readonly class PageRepository
                 $seo,
                 $blocks,
                 $attributes,
-                $document->revision(),
+                $revision,
                 $modifiedAt,
             );
         } catch (InvalidArgumentException $exception) {

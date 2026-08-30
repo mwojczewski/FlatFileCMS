@@ -44,6 +44,17 @@ login. If every key is lost, a server operator can restore password-only login:
 php bin/cms user:security-keys:clear admin@example.com
 ```
 
+## Changing the current password
+
+An authenticated user can open `/admin/account/password` from the account
+screen. The operation requires the current password, a different new password
+that satisfies the backend policy, matching confirmation and a valid CSRF
+token.
+
+After the database update the user remains logged in, but the session
+identifier is regenerated. Every authenticated admin screen exposes a
+CSRF-protected POST logout button in its navigation bar.
+
 `WEBAUTHN_RP_ID` is the exact hostname without scheme, port or path. Credentials
 are cryptographically bound to it. Production requires HTTPS; browsers allow
 plain HTTP only for localhost development.

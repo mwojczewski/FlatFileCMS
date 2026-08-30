@@ -64,7 +64,23 @@
 - optional, account-level YubiKey/WebAuthn second factor;
 - installation and recovery commands in CLI.
 
-## Stages 8–12
+## Stage 8 — filesystem page CRUD (complete)
 
-Page CRUD; dynamic page builder; password reset and mail; audit log; media;
-navigation/config editors; hardening and production release.
+- authenticated page tree and page-creation form;
+- localized title, slug, layout, enabled state and core SEO editing;
+- revision-safe YAML updates preserving blocks and custom attributes;
+- atomic page-subtree moves with rollback on invalid resulting routes;
+- permanent recursive deletion of page directories and their media;
+- localized route, block, layout and collection validation before publication.
+
+## Stage 9 — dynamic page builder
+
+- block picker generated from `block.yml` definitions;
+- schema-driven block forms and language switching;
+- add, edit, duplicate, enable, reorder and delete block operations;
+- revision-safe page-builder persistence.
+
+## Stages 10–12
+
+Password reset and mail; audit log; media; navigation/config editors; hardening
+and production release.

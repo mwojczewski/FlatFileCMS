@@ -45,6 +45,10 @@ final readonly class ErrorHandler
         $title = $status === 404 ? 'Nie znaleziono strony' : 'Wystąpił błąd';
         $detail = $this->debug ? $exception->getMessage() : $publicMessage;
 
+        $headers = str_starts_with($request->path(), '/admin')
+            ? ['Cache-Control' => 'no-store', 'Pragma' => 'no-cache', 'X-Frame-Options' => 'DENY']
+            : [];
+
         return Response::html(
             '<!doctype html><html lang="pl"><head><meta charset="utf-8">'
             . '<meta name="viewport" content="width=device-width,initial-scale=1">'
@@ -52,6 +56,7 @@ final readonly class ErrorHandler
             . self::escape($title) . '</title></head><body><main><h1>'
             . self::escape($title) . '</h1><p>' . self::escape($detail) . '</p></main></body></html>',
             $status,
+            $headers,
         );
     }
 

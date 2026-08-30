@@ -1,6 +1,6 @@
 # FlatFile CMS — Architecture Decision Record
 
-Status: accepted for stages 0–7  
+Status: accepted for stages 0–8  
 Baseline: PHP 8.5+
 
 The project intentionally provides no compatibility layer for PHP 8.4 or older.
@@ -126,3 +126,8 @@ Stage 6 adds file-backed collections as route ancestors and exposes the same
 localized collection result through JSON and HTML adapters.
 Stage 7 adds the isolated SQLite authentication boundary, native sessions,
 CSRF, throttled password login and optional WebAuthn security keys.
+Stage 8 adds the authenticated filesystem page-management boundary. Metadata
+writes preserve unknown attributes and block data, use content revisions, and
+validate the complete localized route index before becoming visible. Page
+directory moves are atomic and recursive deletion intentionally has no trash or
+version-history layer.
