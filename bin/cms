@@ -3,6 +3,7 @@
 
 declare(strict_types=1);
 
+use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Auth\PasswordHasher;
 use FlatFileCms\Auth\PasswordPolicy;
 use FlatFileCms\Auth\UserRepository;
@@ -17,10 +18,13 @@ use FlatFileCms\Infrastructure\Database\SchemaInstaller;
 use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
 
 $projectRoot = dirname(__DIR__);
-require $projectRoot . '/vendor/autoload.php';
+require "{$projectRoot}/vendor/autoload.php";
 
-$users = static function () use ($projectRoot): UserCommandService {
-    $database = new Database($projectRoot . '/storage/database/cms.sqlite');
+$paths = new SafePathResolver($projectRoot);
+$audit = new AuditLogger($paths);
+
+$users = static function () use ($projectRoot, $audit): UserCommandService {
+    $database = new Database("{$projectRoot}/storage/database/cms.sqlite");
     $connection = $database->connection();
 
     return new UserCommandService(
@@ -29,13 +33,14 @@ $users = static function () use ($projectRoot): UserCommandService {
         new WebAuthnCredentialRepository($connection),
         new PasswordPolicy(),
         new PasswordHasher(),
+        $audit,
     );
 };
 $console = new ConsoleApplication(
     new BlockScaffolder($projectRoot),
     $users,
     new PasswordReader(),
-    new CacheClearer(new SafePathResolver($projectRoot)),
+    new CacheClearer($paths),
 );
 
 /** @var list<string> $argv */

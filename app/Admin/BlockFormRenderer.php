@@ -101,7 +101,7 @@ final readonly class BlockFormRenderer
             return $this->choice($definition, $languages, $value, $name, $type === 'multiselect');
         }
         if (\in_array($type, ['textarea', 'markdown'], true)) {
-            $class = $type === 'markdown' ? ' class="markdown-input"' : '';
+            $class = $type === 'markdown' ? ' class="markdown-input" data-markdown-editor' : '';
 
             return '<textarea' . $class . ' name="' . self::escape($name) . '"'
                 . $this->attributes($definition, $languages) . '>'

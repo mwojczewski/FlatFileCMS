@@ -28,6 +28,18 @@ Forms support every built-in field type, localized fields, localized image ALT
 values and recursively generated repeaters. Language controls are generated
 from `config/languages.yml`, not hard-coded in the panel.
 
+Fields declared as `type: markdown` are progressively enhanced with the locally
+vendored EasyMDE 2.21.0 editor. The integration also initializes Markdown
+fields added later by repeater controls and refreshes hidden editors after a
+locale tab becomes visible. No editor CSS, JavaScript, fonts or icons are loaded
+from a CDN. Submitted values remain Markdown; EasyMDE never becomes a content
+storage format.
+
+Preview HTML is sanitized in the browser before insertion into the admin DOM.
+The public and server-side output still passes through the independent backend
+`MarkdownRenderer`, so client-side previewing does not weaken the content
+rendering boundary.
+
 ## Persistence and concurrency
 
 Every builder form carries the SHA-256 revision of the loaded `content.yml`.

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Cli;
 
+use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Auth\PasswordHasher;
 use FlatFileCms\Auth\PasswordPolicy;
 use FlatFileCms\Auth\Role;
@@ -20,6 +21,7 @@ final readonly class UserCommandService
         private WebAuthnCredentialRepository $credentials,
         private PasswordPolicy $policy,
         private PasswordHasher $hasher,
+        private AuditLogger $audit,
     ) {}
 
     public function install(string $email, string $password): void
@@ -35,7 +37,8 @@ final readonly class UserCommandService
     {
         $this->schema->install();
         $this->policy->validate($password);
-        $this->users->create($email, $this->hasher->hash($password), $role);
+        $user = $this->users->create($email, $this->hasher->hash($password), $role);
+        $this->audit->log('user.created', null, "users/{$user->id()}", 'cli', ['role' => $role->value]);
     }
 
     public function changePassword(string $email, string $password): void
@@ -44,13 +47,21 @@ final readonly class UserCommandService
         $this->policy->validate($password);
         $user = $this->users->findByEmail($email) ?? throw new RuntimeException('User not found.');
         $this->users->updatePassword($user, $this->hasher->hash($password));
+        $this->audit->log('auth.password_changed', null, "users/{$user->id()}", 'cli');
     }
 
     public function clearSecurityKeys(string $email): int
     {
         $this->schema->install();
         $user = $this->users->findByEmail($email) ?? throw new RuntimeException('User not found.');
+        $count = $this->credentials->clearForUser($user->id());
+        $this->audit->log('auth.security_keys_cleared', null, "users/{$user->id()}", 'cli', ['count' => $count]);
 
-        return $this->credentials->clearForUser($user->id());
+        return $count;
+    }
+
+    public function migrate(): void
+    {
+        $this->schema->install();
     }
 }

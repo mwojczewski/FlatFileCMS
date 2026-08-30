@@ -20,6 +20,7 @@ final readonly class Request
         private array $parsedBody = [],
         private string $rawBody = '',
         private array $attributes = [],
+        private string $clientIp = 'unknown',
     ) {}
 
     public static function fromGlobals(): self
@@ -49,6 +50,7 @@ final readonly class Request
         }
 
         $rawBody = file_get_contents('php://input');
+        $remoteAddress = $_SERVER['REMOTE_ADDR'] ?? null;
 
         return new self(
             method: $method,
@@ -57,6 +59,7 @@ final readonly class Request
             query: self::stringKeyedArray($_GET),
             parsedBody: self::stringKeyedArray($_POST),
             rawBody: \is_string($rawBody) ? $rawBody : '',
+            clientIp: \is_string($remoteAddress) && $remoteAddress !== '' ? $remoteAddress : 'unknown',
         );
     }
 
@@ -92,6 +95,11 @@ final readonly class Request
         return $this->rawBody;
     }
 
+    public function clientIp(): string
+    {
+        return $this->clientIp;
+    }
+
     public function attribute(string $name): ?string
     {
         return $this->attributes[$name] ?? null;
@@ -108,6 +116,7 @@ final readonly class Request
             parsedBody: $this->parsedBody,
             rawBody: $this->rawBody,
             attributes: [...$this->attributes, ...$attributes],
+            clientIp: $this->clientIp,
         );
     }
 

@@ -3,20 +3,25 @@
 declare(strict_types=1);
 
 use FlatFileCms\Admin\AdminAuthController;
+use FlatFileCms\Admin\AdminLayout;
 use FlatFileCms\Admin\AdminPageBuilderController;
 use FlatFileCms\Admin\AdminPageController;
 use FlatFileCms\Admin\BlockFormDataMapper;
 use FlatFileCms\Admin\BlockFormRenderer;
+use FlatFileCms\Admin\PasswordResetController;
 use FlatFileCms\Api\ApiResponseFactory;
 use FlatFileCms\Api\CollectionSerializer;
 use FlatFileCms\Api\PageSerializer;
 use FlatFileCms\Api\PublicApiController;
+use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Auth\Authenticator;
 use FlatFileCms\Auth\CsrfTokenManager;
 use FlatFileCms\Auth\NativeSessionStore;
 use FlatFileCms\Auth\PasswordChanger;
 use FlatFileCms\Auth\PasswordHasher;
 use FlatFileCms\Auth\PasswordPolicy;
+use FlatFileCms\Auth\PasswordResetRepository;
+use FlatFileCms\Auth\PasswordResetService;
 use FlatFileCms\Auth\RateLimiter;
 use FlatFileCms\Auth\SessionStore;
 use FlatFileCms\Auth\UserRepository;
@@ -49,6 +54,9 @@ use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
 use FlatFileCms\Infrastructure\Yaml\YamlFileCache;
 use FlatFileCms\Infrastructure\Yaml\YamlFileRepository;
 use FlatFileCms\Infrastructure\Yaml\YamlParser;
+use FlatFileCms\Mail\Mailer;
+use FlatFileCms\Mail\MailException;
+use FlatFileCms\Mail\SmtpMailer;
 use FlatFileCms\Navigation\NavigationRepository;
 use FlatFileCms\Presentation\CollectionViewModelFactory;
 use FlatFileCms\Presentation\PageViewModelFactory;
@@ -144,6 +152,13 @@ $container->set(
     ),
 );
 $container->set(
+    AdminLayout::class,
+    static fn(Container $container): AdminLayout => new AdminLayout(
+        $container->get(Authenticator::class),
+        $container->get(CsrfTokenManager::class),
+    ),
+);
+$container->set(
     AdminAuthController::class,
     static fn(Container $container): AdminAuthController => new AdminAuthController(
         $container->get(Authenticator::class),
@@ -152,12 +167,20 @@ $container->set(
         $container->get(PasswordHasher::class),
         $container->get(WebAuthnCredentialRepository::class),
         $container->get(WebAuthnService::class),
+        $container->get(AdminLayout::class),
+        $container->get(AuditLogger::class),
     ),
 );
 $container->set(
     SafePathResolver::class,
     static fn(Container $container): SafePathResolver => new SafePathResolver(
         $container->get(Environment::class)->projectRoot(),
+    ),
+);
+$container->set(
+    AuditLogger::class,
+    static fn(Container $container): AuditLogger => new AuditLogger(
+        $container->get(SafePathResolver::class),
     ),
 );
 $container->set(
@@ -204,6 +227,59 @@ $container->set(
     static fn(Container $container): ConfigurationRepository => new ConfigurationRepository(
         $container->get(YamlFileRepository::class),
         $container->get(SafePathResolver::class),
+    ),
+);
+$container->set(
+    PasswordResetRepository::class,
+    static fn(Container $container): PasswordResetRepository => new PasswordResetRepository(
+        $container->get(Database::class)->connection(),
+        $container->get(UserRepository::class),
+    ),
+);
+$container->set(
+    Mailer::class,
+    static function (Container $container): Mailer {
+        $environment = $container->get(Environment::class);
+        if ($environment->get('MAIL_TRANSPORT', 'smtp') !== 'smtp') {
+            throw new MailException('Only the smtp mail transport is supported.');
+        }
+
+        return new SmtpMailer(
+            $environment->get('MAIL_HOST', '127.0.0.1'),
+            $environment->integer('MAIL_PORT', 1025),
+            $environment->get('MAIL_ENCRYPTION', 'none'),
+            $environment->get('MAIL_USERNAME', ''),
+            $environment->get('MAIL_PASSWORD', ''),
+            $environment->get('MAIL_FROM_ADDRESS'),
+            $environment->get('MAIL_FROM_NAME', 'FlatFile CMS'),
+        );
+    },
+);
+$container->set(
+    PasswordResetService::class,
+    static fn(Container $container): PasswordResetService => new PasswordResetService(
+        $container->get(UserRepository::class),
+        $container->get(PasswordResetRepository::class),
+        $container->get(PasswordHasher::class),
+        $container->get(PasswordPolicy::class),
+        new RateLimiter(
+            $container->get(Database::class)->connection(),
+            $container->get(Environment::class)->get('APP_SECRET'),
+            $container->get(Environment::class)->integer('AUTH_RESET_MAX_ATTEMPTS', 3),
+            $container->get(Environment::class)->integer('AUTH_RESET_WINDOW_SECONDS', 3600),
+        ),
+        $container->get(Mailer::class),
+        $container->get(ConfigurationRepository::class),
+        $container->get(AuditLogger::class),
+        $container->get(Environment::class)->integer('AUTH_PASSWORD_RESET_TTL', 3600),
+    ),
+);
+$container->set(
+    PasswordResetController::class,
+    static fn(Container $container): PasswordResetController => new PasswordResetController(
+        $container->get(CsrfTokenManager::class),
+        $container->get(PasswordResetService::class),
+        $container->get(AdminLayout::class),
     ),
 );
 $container->set(
@@ -296,6 +372,8 @@ $container->set(
         $container->get(CollectionRepository::class),
         $container->get(PageManager::class),
         $container->get(LayoutRegistry::class),
+        $container->get(AdminLayout::class),
+        $container->get(AuditLogger::class),
     ),
 );
 $container->set(
@@ -308,6 +386,8 @@ $container->set(
         $container->get(BlockRegistry::class),
         $container->get(BlockFormDataMapper::class),
         $container->get(BlockFormRenderer::class),
+        $container->get(AdminLayout::class),
+        $container->get(AuditLogger::class),
     ),
 );
 $container->set(

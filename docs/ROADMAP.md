@@ -80,7 +80,24 @@
 - add, edit, duplicate, enable, reorder and delete block operations;
 - revision-safe page-builder persistence.
 
-## Stages 10–12
+## Stage 10 — admin experience, password recovery and audit (complete)
 
-Password reset and mail; audit log; media; navigation/config editors; hardening
-and production release.
+- unified responsive panel shell and reusable authentication layout;
+- locally vendored EasyMDE for schema-defined Markdown fields;
+- SMTP mail transport through PHPMailer;
+- enumeration-safe, rate-limited password-reset requests;
+- hashed, expiring and single-use password-reset tokens;
+- daily locked JSONL audit trail for authentication and content mutations;
+- additive `database:migrate` command for existing installations.
+
+## Stage 11 — media
+
+- page-local media browsing, upload, selection and deletion;
+- MIME verification, SVG sanitization and image metadata policy;
+- image variants, fingerprints and independently switchable transformations.
+
+## Stage 12 — configuration and release hardening
+
+- navigation and safe global-configuration editors;
+- authorization and deployment hardening;
+- production release checklist and complete operator documentation.

@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Admin;
 
+use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Auth\AuthenticationException;
 use FlatFileCms\Auth\Authenticator;
 use FlatFileCms\Auth\CsrfTokenManager;
+use FlatFileCms\Auth\User;
 use FlatFileCms\Collections\CollectionRepository;
 use FlatFileCms\Config\LanguageRepository;
 use FlatFileCms\Content\EditablePage;
@@ -35,7 +37,10 @@ final readonly class AdminPageController
         private CollectionRepository $collections,
         private PageManager $manager,
         private LayoutRegistry $layouts,
-    ) {}
+        private AdminLayout $layout,
+        private AuditLogger $audit,
+    ) {
+    }
 
     public function index(Request $request): Response
     {
@@ -74,12 +79,12 @@ final readonly class AdminPageController
             $identity = $entry['identity']->value();
             $depth = \count($entry['identity']->segments()) - 1;
             $childAction = $entry['identity']->isHomepage() ? ''
-                : '<a class="button child" href="/admin/pages/create?parent=' . rawurlencode($identity)
-                    . '">Dodaj podstronę</a>';
+                : '<a class="button compact child" href="/admin/pages/create?parent=' . rawurlencode($identity)
+                . '">Dodaj podstronę</a>';
             $editAction = $entry['collection'] ? '<span class="muted">Edycja kolekcji w kolejnym etapie</span>'
-                : '<a class="button secondary" href="/admin/pages/edit?path=' . rawurlencode($identity)
-                    . '">Edytuj</a>';
-            $items .= '<tr><td><span class="tree" style="--depth:' . $depth . '">'
+                : '<a class="button compact secondary" href="/admin/pages/edit?path=' . rawurlencode($identity)
+                . '">Edytuj</a>';
+            $items .= '<tr><td class="page-cell"><span class="tree" style="--depth:' . $depth . '">'
                 . self::escape($entry['title']) . '</span>'
                 . '<small>' . self::escape($identity) . '</small></td><td>'
                 . ($entry['collection'] ? '<span class="status collection">Kolekcja</span>'
@@ -87,12 +92,12 @@ final readonly class AdminPageController
                 . '</td><td><div class="row-actions">' . $childAction . $editAction . '</div></td></tr>';
         }
         if ($items === '') {
-            $items = '<tr><td colspan="3">Brak stron.</td></tr>';
+            $items = '<tr><td class="table-empty" colspan="3">Brak stron. Dodaj pierwszą stronę, aby rozpocząć.</td></tr>';
         }
 
-        return $this->page('Strony', '<div class="toolbar"><div><p class="eyebrow">Zawartość</p>'
+        return $this->page('Strony', '<div class="toolbar crud-toolbar"><div><p class="eyebrow">Zawartość</p>'
             . '<p class="lead">Zarządzaj fizycznym drzewem katalogu <code>pages/</code>.</p></div>'
-            . '<a class="button" href="/admin/pages/create">Dodaj stronę</a></div><div class="table-wrap"><table>'
+            . '<a class="button" href="/admin/pages/create">Dodaj stronę</a></div><div class="table-wrap crud-table"><table>'
             . '<thead><tr><th>Strona</th><th>Stan</th><th></th></tr></thead><tbody>' . $items
             . '</tbody></table></div>');
     }
@@ -117,17 +122,18 @@ final readonly class AdminPageController
 
     public function create(Request $request): Response
     {
-        $this->requireUser();
+        $actor = $this->requireUser();
         try {
             $this->validateCsrf($request);
             $languages = $this->languages->get();
             $identity = $this->identity($request->parsedBody()['identity'] ?? null);
             $this->manager->create($identity, $this->metadata($request, $languages, false), $languages);
+            $this->audit->log('page.created', $actor->id(), "pages/{$identity->value()}", $request->clientIp());
 
             return Response::redirect('/admin/pages?created=1', 303);
         } catch (RevisionConflictException $exception) {
             throw new HttpException(409, 'PAGE_REVISION_CONFLICT', 'Page changed in another session.', previous: $exception);
-        } catch (InvalidArgumentException|InvalidContentException|FilesystemException $exception) {
+        } catch (InvalidArgumentException | InvalidContentException | FilesystemException $exception) {
             throw new HttpException(422, 'PAGE_CREATE_INVALID', $exception->getMessage(), previous: $exception);
         }
     }
@@ -144,16 +150,16 @@ final readonly class AdminPageController
 
         return $this->page(
             'Edycja strony',
-            '<div class="toolbar"><p>Zarządzaj metadanymi albo przejdź do układu bloków tej strony.</p>'
-                . '<a class="button child" href="/admin/pages/builder?path=' . rawurlencode($identity->value())
-                . '">Otwórz page builder</a></div>'
-                . $this->form('/admin/pages/update', $this->languages->get(), $editable, $identity),
+            '<div class="toolbar crud-intro"><p>Zarządzaj metadanymi albo przejdź do układu bloków tej strony.</p>'
+            . '<a class="button child" href="/admin/pages/builder?path=' . rawurlencode($identity->value())
+            . '">Otwórz page builder</a></div>'
+            . $this->form('/admin/pages/update', $this->languages->get(), $editable, $identity),
         );
     }
 
     public function update(Request $request): Response
     {
-        $this->requireUser();
+        $actor = $this->requireUser();
         try {
             $this->validateCsrf($request);
             $languages = $this->languages->get();
@@ -165,18 +171,19 @@ final readonly class AdminPageController
                 $revision,
                 $languages,
             );
+            $this->audit->log('page.updated', $actor->id(), "pages/{$identity->value()}", $request->clientIp());
 
             return Response::redirect('/admin/pages/edit?path=' . rawurlencode($identity->value()) . '&saved=1', 303);
         } catch (RevisionConflictException $exception) {
             throw new HttpException(409, 'PAGE_REVISION_CONFLICT', 'Page changed in another session.', previous: $exception);
-        } catch (InvalidArgumentException|InvalidContentException|FilesystemException $exception) {
+        } catch (InvalidArgumentException | InvalidContentException | FilesystemException $exception) {
             throw new HttpException(422, 'PAGE_UPDATE_INVALID', $exception->getMessage(), previous: $exception);
         }
     }
 
     public function move(Request $request): Response
     {
-        $this->requireUser();
+        $actor = $this->requireUser();
         try {
             $this->validateCsrf($request);
             $source = $this->identity($request->parsedBody()['identity'] ?? null);
@@ -187,32 +194,41 @@ final readonly class AdminPageController
                 $this->revision($request->parsedBody()['revision'] ?? null),
                 $this->languages->get(),
             );
+            $this->audit->log(
+                'page.moved',
+                $actor->id(),
+                "pages/{$destination->value()}",
+                $request->clientIp(),
+                ['from' => $source->value()],
+            );
 
             return Response::redirect('/admin/pages/edit?path=' . rawurlencode($destination->value()) . '&moved=1', 303);
         } catch (RevisionConflictException $exception) {
             throw new HttpException(409, 'PAGE_REVISION_CONFLICT', 'Page changed in another session.', previous: $exception);
-        } catch (InvalidArgumentException|InvalidContentException|FilesystemException $exception) {
+        } catch (InvalidArgumentException | InvalidContentException | FilesystemException $exception) {
             throw new HttpException(422, 'PAGE_MOVE_INVALID', $exception->getMessage(), previous: $exception);
         }
     }
 
     public function delete(Request $request): Response
     {
-        $this->requireUser();
+        $actor = $this->requireUser();
         try {
             $this->validateCsrf($request);
             if (($request->parsedBody()['confirmation'] ?? null) !== 'delete') {
                 throw new InvalidArgumentException('Deletion must be explicitly confirmed.');
             }
+            $identity = $this->identity($request->parsedBody()['identity'] ?? null);
             $this->manager->delete(
-                $this->identity($request->parsedBody()['identity'] ?? null),
+                $identity,
                 $this->revision($request->parsedBody()['revision'] ?? null),
             );
+            $this->audit->log('page.deleted', $actor->id(), "pages/{$identity->value()}", $request->clientIp());
 
             return Response::redirect('/admin/pages?deleted=1', 303);
         } catch (RevisionConflictException $exception) {
             throw new HttpException(409, 'PAGE_REVISION_CONFLICT', 'Page changed in another session.', previous: $exception);
-        } catch (InvalidArgumentException|InvalidContentException|FilesystemException $exception) {
+        } catch (InvalidArgumentException | InvalidContentException | FilesystemException $exception) {
             throw new HttpException(422, 'PAGE_DELETE_INVALID', $exception->getMessage(), previous: $exception);
         }
     }
@@ -301,10 +317,10 @@ final readonly class AdminPageController
         }
     }
 
-    private function requireUser(): void
+    private function requireUser(): User
     {
         try {
-            $this->authenticator->requireUser();
+            return $this->authenticator->requireUser();
         } catch (AuthenticationException $exception) {
             throw new HttpException(401, 'AUTHENTICATION_REQUIRED', 'Authentication required.', previous: $exception);
         }
@@ -331,7 +347,8 @@ final readonly class AdminPageController
         $canonical = \is_string($seo['canonical'] ?? null) ? $seo['canonical'] : '';
         $fields = '';
         foreach ($languages->languages() as $locale => $name) {
-            $fields .= '<fieldset><legend>' . self::escape($name) . ' <code>' . self::escape($locale) . '</code></legend>'
+            $fields .= '<fieldset class="form-card locale-card"><legend>' . self::escape($name) . ' <code>'
+                . self::escape($locale) . '</code></legend>'
                 . $this->input('Tytuł strony', 'title[' . $locale . ']', $title[$locale] ?? '', true)
                 . ($homepage ? '' : $this->input('Publiczny slug', 'slug[' . $locale . ']', $slug[$locale] ?? '', true))
                 . $this->input('Tytuł SEO', 'seo_title[' . $locale . ']', $seoTitle[$locale] ?? '')
@@ -347,35 +364,53 @@ final readonly class AdminPageController
         $identityField = $editable === null
             ? $this->input('Ścieżka techniczna', 'identity', $currentIdentity, true, 'np. blog/nowy-wpis')
             : '<input type="hidden" name="identity" value="' . self::escape($currentIdentity) . '">'
-                . '<p><strong>Ścieżka techniczna:</strong> <code>' . self::escape($currentIdentity) . '</code></p>';
-        $content = '<form class="stack" method="post" action="' . self::escape($action) . '">'
+            . '<div class="technical-path"><span>Ścieżka techniczna</span><code>'
+            . self::escape($currentIdentity) . '</code></div>';
+        $content = '<form class="stack crud-form" method="post" action="' . self::escape($action) . '">'
             . $this->csrfField() . ($revision === null ? '' : '<input type="hidden" name="revision" value="'
-                . self::escape($revision) . '">') . $identityField
-            . '<label class="check"><input type="checkbox" name="enabled" value="1"' . ($enabled ? ' checked' : '')
-            . '> Strona dostępna publicznie</label><label>Layout<select name="layout">' . $layoutOptions
-            . '</select></label>' . $fields . '<fieldset><legend>SEO wspólne</legend>'
+            . self::escape($revision) . '">')
+            . '<section class="form-section"><div class="section-heading"><div><p class="eyebrow">Podstawowe</p>'
+            . '<h2>Ustawienia strony</h2></div><p>Widoczność, położenie i szablon dokumentu.</p></div>'
+            . '<div class="settings-grid"><div>' . $identityField . '</div>'
+            . '<div><label>Layout<select name="layout">' . $layoutOptions . '</select></label></div>'
+            . '<label class="check toggle-card"><input type="checkbox" name="enabled" value="1"'
+            . ($enabled ? ' checked' : '') . '><span><strong>Strona dostępna publicznie</strong>'
+            . '<small>Wyłączenie ukrywa stronę w publicznym API i renderowaniu HTML.</small></span></label></div></section>'
+            . '<section class="form-section"><div class="section-heading"><div><p class="eyebrow">Języki</p>'
+            . '<h2>Treść i adresy</h2></div><p>Uzupełnij dane niezależnie dla każdej aktywnej wersji językowej.</p></div>'
+            . '<div class="locale-grid">' . $fields . '</div></section>'
+            . '<section class="form-section"><div class="section-heading"><div><p class="eyebrow">Wyszukiwarki</p>'
+            . '<h2>Ustawienia SEO</h2></div><p>Wartości wspólne dla wszystkich wersji językowych.</p></div>'
+            . '<fieldset class="form-card seo-card"><legend>SEO wspólne</legend>'
             . $this->input('Canonical URL', 'canonical', $canonical, false, '/ścieżka lub https://example.com/ścieżka')
-            . '<label class="check"><input type="checkbox" name="robots_index" value="1"'
-            . (($robots['index'] ?? true) === true ? ' checked' : '') . '> Pozwól indeksować</label>'
+            . '<div class="robots-grid"><label class="check"><input type="checkbox" name="robots_index" value="1"'
+            . (($robots['index'] ?? true) === true ? ' checked' : '') . '><span><strong>Pozwól indeksować</strong>'
+            . '<small>Wyszukiwarki mogą umieścić stronę w wynikach.</small></span></label>'
             . '<label class="check"><input type="checkbox" name="robots_follow" value="1"'
-            . (($robots['follow'] ?? true) === true ? ' checked' : '') . '> Pozwól śledzić linki</label></fieldset>'
-            . '<div class="actions"><button type="submit">Zapisz</button><a class="button secondary" href="/admin/pages">Anuluj</a></div></form>';
+            . (($robots['follow'] ?? true) === true ? ' checked' : '') . '><span><strong>Pozwól śledzić linki</strong>'
+            . '<small>Roboty mogą przechodzić do odnośników na stronie.</small></span></label></div></fieldset></section>'
+            . '<div class="actions form-actions"><a class="button secondary" href="/admin/pages">Anuluj</a>'
+            . '<button type="submit">Zapisz zmiany</button></div></form>';
 
         if ($editable === null || $homepage || $revision === null) {
             return $content;
         }
 
-        return $content . '<section class="danger-zone"><h2>Operacje na katalogu</h2><form method="post" action="/admin/pages/move">'
+        return $content . '<section class="danger-zone"><div class="section-heading"><div><p class="eyebrow">Zaawansowane</p>'
+            . '<h2>Operacje na katalogu</h2></div><p>Te działania zmieniają fizyczną strukturę plików strony.</p></div>'
+            . '<div class="danger-grid"><form class="danger-action" method="post" action="/admin/pages/move">'
             . $this->csrfField() . '<input type="hidden" name="identity" value="' . self::escape($currentIdentity)
             . '"><input type="hidden" name="revision" value="' . self::escape($revision) . '">'
+            . '<h3>Przenieś stronę</h3><p>Zmień ścieżkę techniczną bez utraty zawartości.</p>'
             . $this->input('Nowa ścieżka techniczna', 'destination', $currentIdentity, true)
-            . '<button type="submit" class="warning">Przenieś katalog</button></form><hr>'
-            . '<form method="post" action="/admin/pages/delete">' . $this->csrfField()
+            . '<button type="submit" class="warning">Przenieś katalog</button></form>'
+            . '<form class="danger-action delete-action" method="post" action="/admin/pages/delete">' . $this->csrfField()
             . '<input type="hidden" name="identity" value="' . self::escape($currentIdentity) . '">'
             . '<input type="hidden" name="revision" value="' . self::escape($revision) . '">'
+            . '<h3>Usuń stronę</h3><p>Usunięty zostanie cały katalog wraz z podstronami i multimediami.</p>'
             . '<label>Wpisz <code>delete</code>, aby usunąć stronę, jej podstrony i multimedia'
             . '<input name="confirmation" required autocomplete="off"></label>'
-            . '<button type="submit" class="danger">Usuń katalog bezpowrotnie</button></form></section>';
+            . '<button type="submit" class="danger">Usuń katalog bezpowrotnie</button></form></div></section>';
     }
 
     private function input(
@@ -387,7 +422,7 @@ final readonly class AdminPageController
     ): string {
         return '<label>' . self::escape($label) . '<input name="' . self::escape($name) . '" value="'
             . self::escape($value) . '"' . ($required ? ' required' : '') . ($placeholder === '' ? '' : ' placeholder="'
-                . self::escape($placeholder) . '"') . '></label>';
+            . self::escape($placeholder) . '"') . '></label>';
     }
 
     /** @return array<string, mixed> */
@@ -426,45 +461,7 @@ final readonly class AdminPageController
 
     private function page(string $title, string $content): Response
     {
-        return Response::html('<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" '
-            . 'content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>'
-            . self::escape($title) . ' — FlatFile CMS</title><style>:root{color-scheme:light;--ink:#101828;--muted:#667085;'
-            . '--line:#e4e7ec;--accent:#3157d5;--accent-hover:#2848b8;--surface:#fff;--bg:#f4f6fa;--nav:#111827;--child:#087e8b;'
-            . '--child-hover:#086b76}*{box-sizing:border-box}body{margin:0;font:15px/1.55 Inter,ui-sans-serif,system-ui,sans-serif;background:var(--bg);'
-            . 'color:var(--ink);-webkit-font-smoothing:antialiased}header{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;'
-            . 'min-height:4.25rem;padding:.75rem clamp(1rem,4vw,3rem);background:var(--nav);color:#fff;box-shadow:0 1px 0 #ffffff14}header>a{font-size:1.05rem;'
-            . 'letter-spacing:-.015em}header a{color:inherit;text-decoration:none}nav{display:flex;align-items:center;gap:.35rem}nav>a{padding:.5rem .7rem;border-radius:.5rem;'
-            . 'color:#d0d5dd}nav>a:hover{background:#ffffff12;color:#fff}nav form{margin:0}.nav-logout{margin-left:.35rem;padding:.45rem .75rem;background:transparent;'
-            . 'border:1px solid #475467;color:#f2f4f7}.nav-logout:hover{background:#ffffff12;border-color:#667085}main{width:min(76rem,calc(100% - 2rem));margin:2rem auto;'
-            . 'padding:clamp(1.25rem,3vw,2.25rem);background:var(--surface);border:1px solid var(--line);border-radius:1rem;box-shadow:0 18px 45px #1018280a}'
-            . 'h1{margin:0 0 1.5rem;font-size:clamp(1.65rem,3vw,2rem);letter-spacing:-.025em}h2{font-size:1.15rem}p{color:#475467}.lead{margin:.2rem 0 0}'
-            . '.eyebrow{margin:0;color:var(--accent);font-size:.75rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase}a{color:var(--accent)}'
-            . '.toolbar,.actions{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}.button,button{display:inline-flex;align-items:center;'
-            . 'justify-content:center;min-height:2.55rem;border:0;border-radius:.6rem;background:var(--accent);color:#fff;text-decoration:none;padding:.65rem .95rem;font:inherit;'
-            . 'font-weight:700;line-height:1.2;cursor:pointer;transition:background .15s ease,box-shadow .15s ease,transform .15s ease}.button:hover,button:hover{background:var(--accent-hover);'
-            . 'box-shadow:0 4px 12px #3157d529}.button:active,button:active{transform:translateY(1px)}.secondary{background:#eef2ff;color:#273a8a}.secondary:hover{'
-            . 'background:#e0e7ff;box-shadow:none}.child{background:var(--child);color:#fff}.child:hover{background:var(--child-hover);box-shadow:0 4px 12px #087e8b29}'
-            . '.warning{background:#b54708}.danger{background:#b42318}.row-actions{display:flex;align-items:center;justify-content:flex-end;gap:.55rem;white-space:nowrap}'
-            . '.table-wrap{overflow:auto;margin-top:1.5rem;border:1px solid var(--line);border-radius:.8rem}table{width:100%;border-collapse:collapse}thead{background:#f9fafb}'
-            . 'th,td{padding:.85rem 1rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}th{color:#475467;font-size:.78rem;letter-spacing:.045em;'
-            . 'text-transform:uppercase}tbody tr:last-child td{border-bottom:0}tbody tr:hover{background:#fcfcfd}small{display:block;margin-top:.12rem;color:var(--muted)}'
-            . '.tree{display:block;padding-left:calc(var(--depth)*1.25rem);font-weight:700}.status{display:inline-block;padding:.25rem .55rem;border-radius:999px;'
-            . 'background:#f2f4f7;color:#475467;font-size:.8rem;font-weight:700}.status.on{background:#ecfdf3;color:#027a48}.status.collection{background:#eef4ff;color:#3538cd}'
-            . '.muted{max-width:12rem;color:var(--muted);font-size:.85rem;white-space:normal}.stack{display:grid;gap:1.25rem}fieldset{border:1px solid var(--line);'
-            . 'border-radius:.8rem;padding:1rem}legend{padding:0 .4rem;font-weight:700}label{display:grid;gap:.4rem;margin:.75rem 0;color:#344054;font-weight:600}'
-            . 'input,textarea,select{width:100%;border:1px solid #cfd4dc;border-radius:.6rem;background:#fff;padding:.7rem;font:inherit;color:var(--ink);outline:none}'
-            . 'input:focus,textarea:focus,select:focus{border-color:#6172f3;box-shadow:0 0 0 3px #6172f31f}textarea{min-height:7rem;resize:vertical}.check{display:flex;'
-            . 'grid-template-columns:auto 1fr;align-items:center;justify-content:flex-start}.check input{width:auto}.danger-zone{margin-top:2rem;padding:1rem;border:1px solid #fecdca;'
-            . 'border-radius:.8rem;background:#fffbfa}code{font:13px ui-monospace,SFMono-Regular,monospace}hr{border:0;border-top:1px solid #fecdca;margin:1.5rem 0}'
-            . '@media(max-width:720px){header{position:static;align-items:flex-start;gap:.75rem}nav{justify-content:flex-end;flex-wrap:wrap}.row-actions{align-items:stretch;'
-            . 'flex-direction:column;white-space:normal}.row-actions .button{width:100%}.muted{max-width:none;text-align:center}}@media(max-width:600px){main{width:100%;margin:0;'
-            . 'border:0;border-radius:0;box-shadow:none}.toolbar,.actions{align-items:stretch;flex-direction:column}.toolbar>.button,.actions>.button,.actions>button{width:100%}'
-            . 'th:nth-child(2),td:nth-child(2){display:none}.table-wrap{margin-inline:-.5rem}th,td{padding:.75rem}.tree{padding-left:calc(var(--depth)*.7rem)}}</style>'
-            . '</head><body><header><a href="/admin"><strong>FlatFile CMS</strong></a><nav><a href="/admin">Panel</a>'
-            . '<a href="/admin/pages">Strony</a><a href="/admin/security">Konto</a><form method="post" action="/admin/logout">'
-            . $this->csrfField() . '<button type="submit" class="nav-logout">Wyloguj</button></form></nav></header><main><h1>'
-            . self::escape($title) . '</h1>' . $content
-            . '</main></body></html>', headers: ['Cache-Control' => 'no-store', 'Pragma' => 'no-cache', 'X-Frame-Options' => 'DENY']);
+        return $this->layout->render($title, $content, active: 'pages');
     }
 
     private static function escape(string $value): string

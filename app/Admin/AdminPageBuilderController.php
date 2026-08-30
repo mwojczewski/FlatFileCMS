@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Admin;
 
+use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Auth\AuthenticationException;
 use FlatFileCms\Auth\Authenticator;
 use FlatFileCms\Auth\CsrfTokenManager;
+use FlatFileCms\Auth\User;
 use FlatFileCms\Blocks\BlockDefinition;
 use FlatFileCms\Blocks\BlockRegistry;
 use FlatFileCms\Blocks\BlockValidationException;
@@ -36,6 +38,8 @@ final readonly class AdminPageBuilderController
         private BlockRegistry $registry,
         private BlockFormDataMapper $dataMapper,
         private BlockFormRenderer $forms,
+        private AdminLayout $layout,
+        private AuditLogger $audit,
     ) {}
 
     public function index(Request $request): Response
@@ -157,7 +161,7 @@ final readonly class AdminPageBuilderController
 
     public function create(Request $request): Response
     {
-        $this->requireUser();
+        $actor = $this->requireUser();
         try {
             $this->validateCsrf($request);
             $identity = $this->bodyIdentity($request);
@@ -165,6 +169,13 @@ final readonly class AdminPageBuilderController
             $definition = $this->bodyDefinition($request);
             $data = $this->dataMapper->map($definition, $request->parsedBody()['data'] ?? [], $languages);
             $this->manager->add($identity, $definition->type(), $data, $this->bodyRevision($request), $languages);
+            $this->audit->log(
+                'block.created',
+                $actor->id(),
+                "pages/{$identity->value()}",
+                $request->clientIp(),
+                ['type' => $definition->type()],
+            );
 
             return $this->redirect($identity, 'created');
         } catch (BlockValidationException $exception) {
@@ -195,7 +206,7 @@ final readonly class AdminPageBuilderController
 
     public function update(Request $request): Response
     {
-        $this->requireUser();
+        $actor = $this->requireUser();
         try {
             $this->validateCsrf($request);
             $identity = $this->bodyIdentity($request);
@@ -205,6 +216,12 @@ final readonly class AdminPageBuilderController
             $definition = $this->registry->get(ContentData::string($block['type'] ?? null, 'block.type'));
             $data = $this->dataMapper->map($definition, $request->parsedBody()['data'] ?? [], $languages);
             $this->manager->update($identity, $id, $data, $this->bodyRevision($request), $languages);
+            $this->audit->log(
+                'block.updated',
+                $actor->id(),
+                "pages/{$identity->value()}/blocks/{$id}",
+                $request->clientIp(),
+            );
 
             return $this->redirect($identity, 'updated');
         } catch (BlockValidationException $exception) {
@@ -233,7 +250,7 @@ final readonly class AdminPageBuilderController
 
     public function reorder(Request $request): Response
     {
-        $this->requireUser();
+        $actor = $this->requireUser();
         try {
             $this->validateCsrf($request);
             $identity = $this->bodyIdentity($request);
@@ -249,6 +266,13 @@ final readonly class AdminPageBuilderController
                 $order[] = $id;
             }
             $this->manager->reorder($identity, $order, $this->bodyRevision($request), $this->languages->get());
+            $this->audit->log(
+                'block.moved',
+                $actor->id(),
+                "pages/{$identity->value()}/blocks",
+                $request->clientIp(),
+                ['order' => $order],
+            );
 
             return $this->redirect($identity, 'reordered');
         } catch (RevisionConflictException $exception) {
@@ -260,7 +284,7 @@ final readonly class AdminPageBuilderController
 
     private function simpleMutation(Request $request, string $operation): Response
     {
-        $this->requireUser();
+        $actor = $this->requireUser();
         try {
             $this->validateCsrf($request);
             $identity = $this->bodyIdentity($request);
@@ -273,6 +297,18 @@ final readonly class AdminPageBuilderController
                 'delete' => $this->manager->delete($identity, $id, $revision, $languages),
                 default => throw new InvalidArgumentException('Unknown block operation.'),
             };
+            $action = match ($operation) {
+                'duplicate' => 'block.created',
+                'toggle' => 'block.updated',
+                'delete' => 'block.deleted',
+            };
+            $this->audit->log(
+                $action,
+                $actor->id(),
+                "pages/{$identity->value()}/blocks/{$id}",
+                $request->clientIp(),
+                ['operation' => $operation],
+            );
 
             return $this->redirect($identity, $operation);
         } catch (RevisionConflictException $exception) {
@@ -457,10 +493,10 @@ final readonly class AdminPageBuilderController
         }
     }
 
-    private function requireUser(): void
+    private function requireUser(): User
     {
         try {
-            $this->authenticator->requireUser();
+            return $this->authenticator->requireUser();
         } catch (AuthenticationException $exception) {
             throw new HttpException(401, 'AUTHENTICATION_REQUIRED', 'Authentication required.', previous: $exception);
         }
@@ -493,48 +529,13 @@ final readonly class AdminPageBuilderController
 
     private function page(string $title, string $content, bool $scripts = false): Response
     {
-        $script = $scripts ? '<script src="/assets/admin/page-builder.js" defer></script>' : '';
-
-        return Response::html('<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" '
-            . 'content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>'
-            . self::escape($title) . ' — FlatFile CMS</title><style>:root{color-scheme:light;--ink:#101828;--muted:#667085;--line:#e4e7ec;'
-            . '--accent:#3157d5;--accent-hover:#2848b8;--surface:#fff;--bg:#f4f6fa;--nav:#111827;--child:#087e8b}*{box-sizing:border-box}'
-            . 'body{margin:0;font:15px/1.55 Inter,ui-sans-serif,system-ui,sans-serif;background:var(--bg);color:var(--ink)}header{position:sticky;top:0;z-index:5;'
-            . 'display:flex;align-items:center;justify-content:space-between;min-height:4.25rem;padding:.75rem clamp(1rem,4vw,3rem);background:var(--nav);color:#fff}'
-            . 'header a{color:inherit;text-decoration:none}nav{display:flex;align-items:center;gap:.35rem}nav>a{padding:.5rem .7rem;border-radius:.5rem;color:#d0d5dd}'
-            . 'nav>a:hover{background:#ffffff12;color:#fff}nav form{margin:0}.nav-logout{margin-left:.35rem;padding:.45rem .75rem;background:transparent;border:1px solid #475467;color:#fff}'
-            . 'main{width:min(76rem,calc(100% - 2rem));margin:2rem auto;padding:clamp(1.25rem,3vw,2.25rem);background:var(--surface);border:1px solid var(--line);'
-            . 'border-radius:1rem;box-shadow:0 18px 45px #1018280a}h1{margin:0 0 1.5rem;font-size:clamp(1.65rem,3vw,2rem)}p{color:#475467}.lead{margin:.2rem 0 0}'
-            . '.eyebrow{margin:0;color:var(--accent);font-size:.75rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase}code{font:13px ui-monospace,monospace}'
-            . '.toolbar,.actions{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap}.button,button{display:inline-flex;align-items:center;justify-content:center;'
-            . 'min-height:2.45rem;border:0;border-radius:.6rem;background:var(--accent);color:#fff;text-decoration:none;padding:.6rem .9rem;font:inherit;font-weight:700;cursor:pointer}'
-            . '.button:hover,button:hover{background:var(--accent-hover)}.secondary,.subtle{background:#eef2ff;color:#273a8a}.child{background:var(--child)}.danger-text{background:#fef3f2;color:#b42318}'
-            . '.builder-list{display:grid;gap:.75rem;margin-top:1.5rem}.builder-item{display:grid;grid-template-columns:auto minmax(12rem,1fr) auto;align-items:center;gap:.85rem;padding:1rem;'
-            . 'border:1px solid var(--line);border-radius:.8rem;background:#fff}.builder-item.dragging{opacity:.45}.builder-item.disabled{background:#f9fafb}.drag-handle{padding:.35rem;background:transparent;color:#98a2b3;cursor:grab}'
-            . '.block-summary{display:flex;align-items:center;gap:.75rem}.block-summary small{display:block;color:var(--muted)}.position{display:grid;place-items:center;width:2rem;height:2rem;border-radius:.5rem;'
-            . 'background:#f2f4f7;color:#475467;font-weight:750}.block-actions{display:flex;align-items:center;justify-content:flex-end;gap:.4rem;flex-wrap:wrap}.block-actions form{margin:0}'
-            . '.block-actions .button{min-height:2.15rem;padding:.45rem .65rem;font-size:.86rem}.order-form{display:flex;justify-content:flex-end;margin-top:1rem}.order-form button:disabled{opacity:.45;cursor:not-allowed}'
-            . '.empty-state{padding:2.5rem;text-align:center;border:1px dashed #cfd4dc;border-radius:.8rem;background:#fcfcfd}.picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(16rem,1fr));gap:1rem}'
-            . '.picker-card{display:grid;grid-template-rows:9rem auto;overflow:hidden;border:1px solid var(--line);border-radius:.8rem;color:var(--ink);text-decoration:none;background:#fff;transition:.15s}'
-            . '.picker-card:hover{border-color:#9ba8ef;box-shadow:0 10px 24px #10182812;transform:translateY(-1px)}.picker-card img{width:100%;height:100%;object-fit:cover}.picker-card>span:last-child{display:grid;gap:.25rem;padding:1rem}'
-            . '.picker-card small{color:var(--muted)}.block-icon{display:grid;place-items:center;background:#f2f4ff;color:#3538cd;font-size:1rem;font-weight:800}.stack{display:grid;gap:1rem}.generated-fields{display:grid;gap:1rem}'
-            . '.field{display:grid;gap:.55rem;padding:1rem;border:1px solid var(--line);border-radius:.8rem}.field-heading{display:grid;gap:.15rem;font-weight:700}.field-heading small{color:var(--muted);font-weight:400}.required{color:#d92d20}'
-            . 'input,textarea,select{width:100%;border:1px solid #cfd4dc;border-radius:.6rem;background:#fff;padding:.7rem;font:inherit;color:var(--ink);outline:none}input:focus,textarea:focus,select:focus{border-color:#6172f3;box-shadow:0 0 0 3px #6172f31f}'
-            . 'textarea{min-height:8rem;resize:vertical}.markdown-input{min-height:14rem;font-family:ui-monospace,SFMono-Regular,monospace}.switch{display:flex;align-items:center;gap:.55rem}.switch input[type=checkbox]{width:auto}'
-            . '.locale-tabs{display:flex;gap:.35rem;border-bottom:1px solid var(--line)}.locale-tab{min-height:2rem;padding:.35rem .6rem;border-radius:.4rem .4rem 0 0;background:transparent;color:var(--muted)}'
-            . '.locale-tab.active{background:#eef2ff;color:#273a8a}.locale-panel{display:none}.locale-panel.active{display:block}.repeater{display:grid;gap:.75rem}.repeater-item{position:relative;margin:0;padding:1rem;border:1px solid var(--line);border-radius:.7rem}'
-            . '.repeater-item>legend{font-weight:700}.repeater-item>.icon-button{position:absolute;top:.5rem;right:.5rem;min-height:2rem;padding:.3rem .5rem}.alt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.7rem;margin-top:.6rem}'
-            . '.alt-grid label{display:grid;gap:.3rem;color:#475467;font-size:.85rem}.footer-actions{margin-top:1.5rem}@media(max-width:760px){header{position:static;align-items:flex-start;gap:.75rem}nav{flex-wrap:wrap;justify-content:flex-end}'
-            . 'main{width:100%;margin:0;border:0;border-radius:0;box-shadow:none}.builder-item{grid-template-columns:auto 1fr}.block-actions{grid-column:1/-1;justify-content:stretch}.block-actions>*{flex:1}.block-actions .button{width:100%}'
-            . '.toolbar{align-items:stretch;flex-direction:column}.toolbar>.actions{justify-content:stretch}.toolbar>.actions .button{flex:1}.picker-grid{grid-template-columns:1fr}}</style>'
-            . $script . '</head><body><header><a href="/admin"><strong>FlatFile CMS</strong></a><nav><a href="/admin">Panel</a>'
-            . '<a href="/admin/pages">Strony</a><a href="/admin/security">Konto</a><form method="post" action="/admin/logout">'
-            . $this->csrfField() . '<button type="submit" class="nav-logout">Wyloguj</button></form></nav></header><main><h1>'
-            . self::escape($title) . '</h1>' . $content . '</main></body></html>', headers: [
-                'Cache-Control' => 'no-store',
-                'Pragma' => 'no-cache',
-                'X-Frame-Options' => 'DENY',
-            ]);
+        return $this->layout->render(
+            $title,
+            $content,
+            active: 'pages',
+            builderScript: $scripts,
+            markdownEditor: $scripts,
+        );
     }
 
     private static function escape(string $value): string

@@ -15,6 +15,7 @@ document.addEventListener('click', (event) => {
             translated.querySelectorAll(':scope > .locale-panel').forEach((panel) => {
                 panel.classList.toggle('active', panel.getAttribute('data-locale-panel') === locale);
             });
+            translated.dispatchEvent(new CustomEvent('cms:locale-changed', {bubbles: true}));
         }
         return;
     }
@@ -31,6 +32,7 @@ document.addEventListener('click', (event) => {
                 const html = template.innerHTML.replaceAll(token, String(index));
                 items.insertAdjacentHTML('beforeend', html);
                 repeater.dataset.nextIndex = String(index + 1);
+                items.dispatchEvent(new CustomEvent('cms:content-added', {bubbles: true}));
             }
         }
         return;

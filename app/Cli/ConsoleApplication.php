@@ -33,6 +33,7 @@ final readonly class ConsoleApplication
             return match ($command) {
                 'block:create' => $this->createBlock(\array_slice($arguments, 2)),
                 'cache:clear' => $this->clearCache(\array_slice($arguments, 2)),
+                'database:migrate' => $this->migrateDatabase(\array_slice($arguments, 2)),
                 'install' => $this->createUser($arguments[2] ?? null, Role::Superadmin, install: true),
                 'user:create' => $this->createUser($arguments[2] ?? null, Role::Admin),
                 'user:create-superadmin' => $this->createUser($arguments[2] ?? null, Role::Superadmin),
@@ -119,6 +120,19 @@ final readonly class ConsoleApplication
         return 0;
     }
 
+    /** @param list<string> $arguments */
+    private function migrateDatabase(array $arguments): int
+    {
+        if ($arguments !== []) {
+            throw new InvalidArgumentException('Usage: php bin/cms database:migrate');
+        }
+
+        $this->users()->migrate();
+        $this->output("Database schema is up to date.\n");
+
+        return 0;
+    }
+
     private function unknown(string $command): int
     {
         $this->error(\sprintf("Unknown command \"%s\".\n\n%s", $command, $this->help()));
@@ -147,6 +161,7 @@ Commands:
   user:security-keys:clear <email>         Remove all WebAuthn/YubiKey credentials
   block:create <type> [--with-assets]      Create a developer block package
   cache:clear                              Remove all generated cache entries
+  database:migrate                         Apply authentication database schema changes
 
 Set CMS_PASSWORD for non-interactive use. Avoid shell history and process arguments.
 TEXT;

@@ -37,6 +37,11 @@ fallback. Both switches belong to the environment because the useful choice
 depends on the server and deployment mode and because reading `setup.yml`
 itself uses these caches.
 
+`MAIL_TRANSPORT` currently accepts only `smtp`. `MAIL_ENCRYPTION` accepts
+`none`, `starttls` or `smtps`; production deployments should use the mode
+required by their provider and keep SMTP credentials exclusively in the
+environment. `MAIL_FROM_ADDRESS` is required when password recovery is used.
+
 ## `config/setup.yml`
 
 `setup.yml` is versioned, copied with the site and may later be managed through

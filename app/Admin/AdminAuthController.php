@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Admin;
 
+use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Auth\AuthenticationException;
 use FlatFileCms\Auth\Authenticator;
 use FlatFileCms\Auth\CsrfTokenManager;
@@ -26,6 +27,8 @@ final readonly class AdminAuthController
         private PasswordHasher $passwords,
         private WebAuthnCredentialRepository $credentials,
         private WebAuthnService $webAuthn,
+        private AdminLayout $layout,
+        private AuditLogger $audit,
     ) {}
 
     public function loginForm(Request $request): Response
@@ -34,10 +37,14 @@ final readonly class AdminAuthController
             return Response::redirect('/admin');
         }
 
-        return $this->page('Logowanie', '<form method="post" action="/admin/login">'
+        $message = ($request->query()['password_reset'] ?? null) === '1'
+            ? '<p class="success">Hasło zostało zmienione. Możesz się zalogować.</p>'
+            : '';
+
+        return $this->page('Logowanie', $message . '<form method="post" action="/admin/login">'
             . $this->csrfField() . '<label>Email<input type="email" name="email" required autocomplete="username"></label>'
             . '<label>Hasło<input type="password" name="password" required autocomplete="current-password"></label>'
-            . '<button type="submit">Zaloguj się</button></form>');
+            . '<button type="submit">Zaloguj się</button></form><p class="hint"><a href="/admin/password/forgot">Nie pamiętasz hasła?</a></p>');
     }
 
     public function login(Request $request): Response
@@ -50,9 +57,18 @@ final readonly class AdminAuthController
                 throw new AuthenticationException('Email and password are required.');
             }
             $requiresSecondFactor = $this->authenticator->passwordLogin($email, $password);
+            if (!$requiresSecondFactor) {
+                $this->audit->log(
+                    'auth.login',
+                    $this->authenticator->requireUser()->id(),
+                    'auth/session',
+                    $request->clientIp(),
+                );
+            }
 
             return Response::redirect($requiresSecondFactor ? '/admin/2fa' : '/admin', 303);
         } catch (AuthenticationException $exception) {
+            $this->audit->log('auth.login_failed', null, 'auth/session', $request->clientIp());
             return $this->page('Logowanie', '<p class="error">' . self::escape($exception->getMessage()) . '</p>'
                 . '<p><a href="/admin/login">Spróbuj ponownie</a></p>', 401);
         }
@@ -92,6 +108,7 @@ final readonly class AdminAuthController
             $user = $this->authenticator->pendingUser();
             $this->webAuthn->authenticate($user, $this->json($request));
             $this->authenticator->complete($user);
+            $this->audit->log('auth.login', $user->id(), 'auth/session', $request->clientIp(), ['second_factor' => true]);
 
             return $this->jsonResponse(['success' => true, 'redirect' => '/admin']);
         } catch (AuthenticationException $exception) {
@@ -154,6 +171,7 @@ final readonly class AdminAuthController
             }
             $updatedUser = $this->passwordChanger->change($user, $currentPassword, $newPassword, $confirmation);
             $this->authenticator->complete($updatedUser);
+            $this->audit->log('auth.password_changed', $user->id(), "users/{$user->id()}", $request->clientIp());
 
             return Response::redirect('/admin/security?password_changed=1', 303);
         } catch (AuthenticationException | InvalidArgumentException $exception) {
@@ -203,7 +221,9 @@ final readonly class AdminAuthController
     public function logout(Request $request): Response
     {
         $this->validateFormCsrf($request);
+        $user = $this->authenticator->user();
         $this->authenticator->logout();
+        $this->audit->log('auth.logout', $user?->id(), 'auth/session', $request->clientIp());
 
         return Response::redirect('/admin/login', 303);
     }
@@ -286,48 +306,13 @@ final readonly class AdminAuthController
 
     private function page(string $title, string $content, int $status = 200, bool $scripts = false): Response
     {
-        $script = $scripts ? '<script src="/assets/admin/auth.js" defer></script>' : '';
-        $authenticated = $this->authenticator->user() !== null;
-        $header = $authenticated ? '<header><a href="/admin"><strong>FlatFile CMS</strong></a><nav>'
-            . '<a href="/admin">Panel</a><a href="/admin/pages">Strony</a><a href="/admin/security">Konto</a>'
-            . '<form method="post" action="/admin/logout">' . $this->csrfField()
-            . '<button type="submit" class="nav-logout">Wyloguj</button></form></nav></header>' : '';
-        $mainClass = $authenticated ? 'admin-main' : 'auth-main';
+        $active = match ($title) {
+            'Panel' => 'dashboard',
+            'Konto', 'Zmiana hasła' => 'account',
+            default => '',
+        };
 
-        return Response::html(
-            '<!doctype html><html lang="pl"><head><meta charset="utf-8">'
-            . '<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">'
-            . '<meta name="csrf-token" content="' . self::escape($this->csrf->token()) . '"><title>' . self::escape($title)
-            . ' — FlatFile CMS</title><style>:root{color-scheme:light;--ink:#101828;--muted:#667085;--line:#e4e7ec;--accent:#3157d5;'
-            . '--accent-hover:#2848b8;--bg:#f4f6fa;--nav:#111827}*{box-sizing:border-box}body{font:15px/1.55 Inter,ui-sans-serif,system-ui,sans-serif;'
-            . 'margin:0;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}header{position:sticky;top:0;z-index:2;display:flex;align-items:center;'
-            . 'justify-content:space-between;min-height:4.25rem;padding:.75rem clamp(1rem,4vw,3rem);background:var(--nav);color:#fff;box-shadow:0 1px 0 #ffffff14}'
-            . 'header>a{font-size:1.05rem;letter-spacing:-.015em}header a{color:inherit;text-decoration:none}nav{display:flex;align-items:center;gap:.35rem}nav>a{padding:.5rem .7rem;'
-            . 'border-radius:.5rem;color:#d0d5dd}nav>a:hover{background:#ffffff12;color:#fff}nav form{margin:0}.nav-logout{margin-left:.35rem;padding:.45rem .75rem;'
-            . 'background:transparent;border:1px solid #475467;color:#f2f4f7}.nav-logout:hover{background:#ffffff12;border-color:#667085;box-shadow:none}main{background:#fff;'
-            . 'border:1px solid var(--line);border-radius:1rem;box-shadow:0 18px 45px #1018280a}.auth-main{max-width:34rem;margin:8vh auto;padding:2rem}'
-            . '.admin-main{width:min(76rem,calc(100% - 2rem));margin:2rem auto;padding:clamp(1.25rem,3vw,2.25rem)}h1{margin:0 0 1.5rem;'
-            . 'font-size:clamp(1.65rem,3vw,2rem);letter-spacing:-.025em}h2{letter-spacing:-.01em}p{color:#475467}.lead{margin:.2rem 0 0}.eyebrow{margin:0;'
-            . 'color:var(--accent);font-size:.75rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase}label{display:grid;gap:.4rem;margin:1rem 0;color:#344054;'
-            . 'font-weight:600}input,button{font:inherit;padding:.75rem;border:1px solid #cfd4dc;border-radius:.6rem}input{width:100%;outline:none}input:focus{border-color:#6172f3;'
-            . 'box-shadow:0 0 0 3px #6172f31f}button,.button{display:inline-flex;align-items:center;justify-content:center;min-height:2.55rem;background:var(--accent);'
-            . 'color:#fff;cursor:pointer;text-decoration:none;padding:.65rem .95rem;border:0;border-radius:.6rem;font-weight:700;line-height:1.2;transition:background .15s ease,box-shadow .15s ease,transform .15s ease}'
-            . 'button:hover,.button:hover{background:var(--accent-hover);box-shadow:0 4px 12px #3157d529}button:active,.button:active{transform:translateY(1px)}'
-            . '.secondary{background:#eef2ff;color:#273a8a}.secondary:hover{background:#e0e7ff;box-shadow:none}.error{padding:.7rem .85rem;border-radius:.6rem;background:#fef3f2;'
-            . 'color:#b42318}.error:empty{display:none}.success{padding:.75rem 1rem;border-radius:.6rem;background:#ecfdf3;color:#027a48}.hint{color:var(--muted)}'
-            . '.toolbar,.actions{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}.stack{display:grid;gap:.5rem}'
-            . '.dashboard-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:1rem;margin-top:1.75rem}.dashboard-links a{display:grid;gap:.25rem;'
-            . 'padding:1.3rem;border:1px solid var(--line);border-radius:.8rem;color:var(--ink);text-decoration:none;background:#fff;transition:border-color .15s ease,box-shadow .15s ease,transform .15s ease}'
-            . '.dashboard-links a:hover{border-color:#b2bafc;box-shadow:0 10px 24px #10182812;transform:translateY(-1px)}.dashboard-links span{font-weight:750}'
-            . '.dashboard-links small{color:var(--muted);font-size:.87rem;font-weight:400}hr{border:0;border-top:1px solid var(--line);margin:2rem 0}'
-            . '@media(max-width:650px){header{position:static;align-items:flex-start;gap:.75rem}nav{flex-wrap:wrap;justify-content:flex-end}.admin-main{width:100%;margin:0;'
-            . 'border:0;border-radius:0;box-shadow:none}.auth-main{margin:0;min-height:100vh;border:0;border-radius:0;box-shadow:none}.toolbar,.actions{align-items:stretch;'
-            . 'flex-direction:column}.toolbar>.button,.actions>.button,.actions>button{width:100%}}</style>'
-            . $script . '</head><body>' . $header . '<main class="' . $mainClass . '"><h1>' . self::escape($title) . '</h1>'
-            . $content . '</main></body></html>',
-            $status,
-            ['Cache-Control' => 'no-store', 'Pragma' => 'no-cache', 'X-Frame-Options' => 'DENY'],
-        );
+        return $this->layout->render($title, $content, $status, $active, authScript: $scripts);
     }
 
     private static function escape(string $value): string

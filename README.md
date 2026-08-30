@@ -2,11 +2,12 @@
 
 Reusable hybrid flat-file CMS for PHP 8.5+. The same domain model will serve normalized JSON through a REST API and render complete HTML through developer-defined PHP blocks and layouts.
 
-Stages 0–9 are complete in this revision: architecture/contracts, the executable
+Stages 0–10 are complete in this revision: architecture/contracts, the executable
 HTTP foundation, safe filesystem/YAML access and the localized public content
 API with schema-validated blocks, server-side HTML rendering, collections and
 the administrator authentication boundary, filesystem-backed page CRUD and the
-schema-driven page builder.
+schema-driven page builder, unified responsive admin UI, password recovery,
+SMTP delivery and a filesystem audit trail.
 
 ## Current capabilities
 
@@ -53,6 +54,11 @@ schema-driven page builder.
 - block picker generated automatically from developer `block.yml` definitions;
 - schema-driven multilingual block forms covering every built-in field type and repeaters;
 - revision-safe add, edit, duplicate, enable, reorder and delete block operations.
+- local EasyMDE editor for every schema-defined Markdown field, including fields added dynamically in repeaters;
+- unified responsive admin shell shared by the dashboard, pages, account and authentication screens;
+- enumeration-safe, rate-limited, one-time password reset with hashed SQLite tokens;
+- SMTP mail delivery through PHPMailer;
+- daily, locked JSONL audit logs stored under `storage/audit/`.
 
 ## Requirements
 
@@ -64,8 +70,9 @@ schema-driven page builder.
 The production dependencies are deliberately narrow. `symfony/yaml` provides a
 mature restrictive YAML parser without pulling in Symfony Framework;
 `league/commonmark` provides standards-compliant Markdown rendering with raw
-HTML stripping and unsafe-link protection. Implementing either parser in the
-CMS core would increase security risk without adding product value.
+HTML stripping and unsafe-link protection; `phpmailer/phpmailer` provides
+maintained SMTP transport and TLS handling. Implementing these protocols and
+parsers in CMS core would increase security risk without adding product value.
 
 ## Installation for development
 
@@ -73,7 +80,7 @@ CMS core would increase security risk without adding product value.
 composer install
 cp .env.example .env.local
 composer check
-php -S localhost:8080 -t public public/index.php
+php -S localhost:8080 -t public public/router.php
 ```
 
 Open `http://localhost:8080/`. Operational status is available from `GET /api/v1/health`.
@@ -82,6 +89,13 @@ Install the authentication database and first technical superadmin:
 
 ```bash
 php bin/cms install root@example.com
+```
+
+For an installation created before stage 10, apply the additive authentication
+schema migration once:
+
+```bash
+php bin/cms database:migrate
 ```
 
 Create a developer block package with:
@@ -110,37 +124,39 @@ of parsed YAML, while `YAML_CACHE_SERIALIZE_ENABLED` independently controls the
 PHP-serialized representation. They may be enabled simultaneously and are
 intentionally not site settings.
 
-## HTTP routes through stage 9
+## HTTP routes through stage 10
 
-| Method | Route | Purpose |
-|---|---|---|
-| GET, HEAD | `/` | server-rendered homepage; redirects to the default locale in multilingual mode |
-| GET, HEAD | `/api/v1/health` | JSON operational health |
-| GET, HEAD | `/api/v1/pages?lang=pl` | localized homepage data |
-| GET, HEAD | `/api/v1/pages/{path*}?lang=pl` | localized page data resolved from public slugs |
-| GET, HEAD | `/api/v1/navigation?lang=pl` | localized navigation with resolved page links |
-| GET, HEAD | `/api/v1/config?lang=pl` | deliberate public configuration projection |
-| GET, HEAD | `/api/v1/collections/{path*}?lang=pl&page=1` | localized, filtered and paginated collection |
-| GET, HEAD | `/admin/login` | administrator password login |
-| GET, HEAD | `/admin` | authenticated panel entry |
-| GET, HEAD | `/admin/security` | register YubiKey/WebAuthn credentials |
-| GET, POST | `/admin/account/password` | change the authenticated account password |
-| GET, HEAD | `/admin/pages` | authenticated page tree |
-| GET, POST | `/admin/pages/create` | create a filesystem-backed page |
-| GET | `/admin/pages/edit?path=…` | edit page metadata and SEO |
-| POST | `/admin/pages/update` | revision-safe page update |
-| POST | `/admin/pages/move` | atomically move a page subtree |
-| POST | `/admin/pages/delete` | permanently delete a page subtree |
-| GET | `/admin/pages/builder?path=…` | manage the ordered block list of a page |
-| GET | `/admin/pages/builder/picker?path=…` | choose a discovered block type |
-| GET, POST | `/admin/pages/builder/create` | render a schema form and add a block |
-| GET | `/admin/pages/builder/edit?path=…&id=…` | edit one block through its generated form |
-| POST | `/admin/pages/builder/update` | revision-safe block data update |
-| POST | `/admin/pages/builder/duplicate` | duplicate a block with a new UUID v7 |
-| POST | `/admin/pages/builder/toggle` | enable or disable a block |
-| POST | `/admin/pages/builder/reorder` | persist the complete drag-and-drop order |
-| POST | `/admin/pages/builder/delete` | permanently remove one block |
-| GET, HEAD | `/{path*}` | server-rendered website page or collection; locale-prefixed in multilingual mode |
+| Method    | Route                                        | Purpose                                                                          |
+| --------- | -------------------------------------------- | -------------------------------------------------------------------------------- |
+| GET, HEAD | `/`                                          | server-rendered homepage; redirects to the default locale in multilingual mode   |
+| GET, HEAD | `/api/v1/health`                             | JSON operational health                                                          |
+| GET, HEAD | `/api/v1/pages?lang=pl`                      | localized homepage data                                                          |
+| GET, HEAD | `/api/v1/pages/{path*}?lang=pl`              | localized page data resolved from public slugs                                   |
+| GET, HEAD | `/api/v1/navigation?lang=pl`                 | localized navigation with resolved page links                                    |
+| GET, HEAD | `/api/v1/config?lang=pl`                     | deliberate public configuration projection                                       |
+| GET, HEAD | `/api/v1/collections/{path*}?lang=pl&page=1` | localized, filtered and paginated collection                                     |
+| GET, HEAD | `/admin/login`                               | administrator password login                                                     |
+| GET, POST | `/admin/password/forgot`                     | enumeration-safe password-reset request                                          |
+| GET, POST | `/admin/password/reset`                      | validate a one-time token and set a new password                                 |
+| GET, HEAD | `/admin`                                     | authenticated panel entry                                                        |
+| GET, HEAD | `/admin/security`                            | register YubiKey/WebAuthn credentials                                            |
+| GET, POST | `/admin/account/password`                    | change the authenticated account password                                        |
+| GET, HEAD | `/admin/pages`                               | authenticated page tree                                                          |
+| GET, POST | `/admin/pages/create`                        | create a filesystem-backed page                                                  |
+| GET       | `/admin/pages/edit?path=…`                   | edit page metadata and SEO                                                       |
+| POST      | `/admin/pages/update`                        | revision-safe page update                                                        |
+| POST      | `/admin/pages/move`                          | atomically move a page subtree                                                   |
+| POST      | `/admin/pages/delete`                        | permanently delete a page subtree                                                |
+| GET       | `/admin/pages/builder?path=…`                | manage the ordered block list of a page                                          |
+| GET       | `/admin/pages/builder/picker?path=…`         | choose a discovered block type                                                   |
+| GET, POST | `/admin/pages/builder/create`                | render a schema form and add a block                                             |
+| GET       | `/admin/pages/builder/edit?path=…&id=…`      | edit one block through its generated form                                        |
+| POST      | `/admin/pages/builder/update`                | revision-safe block data update                                                  |
+| POST      | `/admin/pages/builder/duplicate`             | duplicate a block with a new UUID v7                                             |
+| POST      | `/admin/pages/builder/toggle`                | enable or disable a block                                                        |
+| POST      | `/admin/pages/builder/reorder`               | persist the complete drag-and-drop order                                         |
+| POST      | `/admin/pages/builder/delete`                | permanently remove one block                                                     |
+| GET, HEAD | `/{path*}`                                   | server-rendered website page or collection; locale-prefixed in multilingual mode |
 
 Unknown API routes use the documented JSON error envelope. Unknown website routes receive an HTML error without local paths or a stack trace.
 
@@ -169,6 +185,8 @@ Block packages, field rules and extension points are documented in [docs/BLOCKS.
 Server-side rendering and template boundaries are documented in [docs/RENDERING.md](docs/RENDERING.md).
 Collection contracts and queries are documented in [docs/COLLECTIONS.md](docs/COLLECTIONS.md).
 Authentication, roles and YubiKey recovery are documented in [docs/AUTHENTICATION.md](docs/AUTHENTICATION.md).
+SMTP password recovery is covered by the same authentication guide, while the
+filesystem event format and retention boundary are documented in [docs/AUDIT-LOG.md](docs/AUDIT-LOG.md).
 Page administration and destructive-operation rules are documented in [docs/PAGE-ADMIN.md](docs/PAGE-ADMIN.md).
 Dynamic block forms and concurrency guarantees are documented in [docs/PAGE-BUILDER.md](docs/PAGE-BUILDER.md).
 
@@ -236,5 +254,5 @@ contracts and examples.
 
 ## Next stage
 
-Stage 10 introduces password reset and mail delivery. See `docs/ROADMAP.md` for
-the remaining production sequence.
+Stage 11 introduces the page-local media manager and image pipeline. See
+`docs/ROADMAP.md` for the remaining production sequence.

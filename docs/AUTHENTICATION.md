@@ -55,6 +55,31 @@ After the database update the user remains logged in, but the session
 identifier is regenerated. Every authenticated admin screen exposes a
 CSRF-protected POST logout button in its navigation bar.
 
+## Password recovery
+
+The unauthenticated `/admin/password/forgot` form always returns the same
+outcome regardless of whether an enabled account exists. Requests are throttled
+independently by source IP and normalized email address. A successful request
+creates 32 random bytes, sends only the URL-safe token by email and stores only
+its SHA-256 digest in SQLite.
+
+The token expires after `AUTH_PASSWORD_RESET_TTL`, can be claimed only once and
+is invalidated together with every other reset token for that user after a
+successful password change. A failed SMTP delivery revokes the newly created
+token. Configure `MAIL_HOST`, `MAIL_PORT`, `MAIL_ENCRYPTION`, credentials and
+the sender identity in `.env.local`; accepted encryption values are `none`,
+`starttls` and `smtps`.
+
+Existing installations must add the token table before enabling the route:
+
+```bash
+php bin/cms database:migrate
+```
+
+Password-reset requests and completions are written to the filesystem audit
+trail. The mail body uses `site.url` from `config/setup.yml` as the canonical
+base URL, keeping the public site identity outside the secret environment.
+
 `WEBAUTHN_RP_ID` is the exact hostname without scheme, port or path. Credentials
 are cryptographically bound to it. Production requires HTTPS; browsers allow
 plain HTTP only for localhost development.
