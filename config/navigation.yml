@@ -14,3 +14,17 @@ main:
   - label: { pl: Insights, en: Insights }
     link: { type: collection, collection: insights }
     target: _self
+
+footer:
+  - label: { pl: Możliwości, en: Features }
+    link: { type: url, url: "/#mozliwosci" }
+    target: _self
+  - label: { pl: Architektura, en: Architecture }
+    link: { type: url, url: "/#architektura" }
+    target: _self
+  - label: { pl: Status API, en: API Status }
+    link: { type: url, url: /api/v1/health }
+    target: _blank
+  - label: { pl: Panel, en: Panel }
+    link: { type: url, url: /admin }
+    target: _self
