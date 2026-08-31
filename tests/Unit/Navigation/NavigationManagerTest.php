@@ -12,9 +12,9 @@ use FlatFileCms\Domain\Localization\LocalizedDataResolver;
 use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
 use FlatFileCms\Navigation\NavigationManager;
 use FlatFileCms\Navigation\NavigationRepository;
+use FlatFileCms\Support\ContentData;
 use FlatFileCms\Tests\Support\TemporaryProject;
 use FlatFileCms\Tests\Support\TestContentFactory;
-use FlatFileCms\Support\ContentData;
 use PHPUnit\Framework\TestCase;
 
 final class NavigationManagerTest extends TestCase
@@ -92,7 +92,7 @@ YAML);
     public function testItDoesNotWriteNavigationWithMissingPageReference(): void
     {
         $editable = $this->manager->editable();
-        $before = \file_get_contents($this->project->path('config/navigation.yml'));
+        $before = file_get_contents($this->project->path('config/navigation.yml'));
 
         try {
             $this->manager->update([
@@ -103,7 +103,7 @@ YAML);
             ], $editable->revision());
             self::fail('Expected invalid navigation to be rejected.');
         } catch (InvalidContentException) {
-            self::assertSame($before, \file_get_contents($this->project->path('config/navigation.yml')));
+            self::assertSame($before, file_get_contents($this->project->path('config/navigation.yml')));
         }
     }
 }

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Tests\Unit\Auth;
 
-use FlatFileCms\Auth\ArraySessionStore;
 use FlatFileCms\Auth\AdminUserManager;
+use FlatFileCms\Auth\ArraySessionStore;
 use FlatFileCms\Auth\AuthenticationException;
 use FlatFileCms\Auth\Authenticator;
 use FlatFileCms\Auth\PasswordChanger;

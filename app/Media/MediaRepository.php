@@ -26,7 +26,7 @@ final readonly class MediaRepository
             RelativePath::fromString($identity->value()),
             mustExist: true,
         );
-        $entries = \scandir($directory);
+        $entries = scandir($directory);
         if ($entries === false) {
             throw new MediaException('Page media directory cannot be read.');
         }
@@ -39,7 +39,7 @@ final readonly class MediaRepository
                 continue;
             }
             $candidate = "{$directory}/{$entry}";
-            if (!\is_file($candidate) || \is_link($candidate)) {
+            if (!is_file($candidate) || is_link($candidate)) {
                 continue;
             }
             try {
@@ -48,7 +48,7 @@ final readonly class MediaRepository
                 continue;
             }
         }
-        \usort($items, static fn(MediaItem $left, MediaItem $right): int => $right->modifiedAt() <=> $left->modifiedAt());
+        usort($items, static fn(MediaItem $left, MediaItem $right): int => $right->modifiedAt() <=> $left->modifiedAt());
 
         return $items;
     }
@@ -60,17 +60,17 @@ final readonly class MediaRepository
             RelativePath::fromString($identity->value()),
             mustExist: true,
         );
-        if (\is_link("{$directory}/{$name->value()}")) {
+        if (is_link("{$directory}/{$name->value()}")) {
             throw new MediaException('Media symlinks are not allowed.');
         }
         $path = $this->relativePath($identity, $name);
         $absolutePath = $this->paths->resolve(FilesystemRoot::Pages, $path, mustExist: true);
-        if (!\is_file($absolutePath) || \is_link($absolutePath)) {
+        if (!is_file($absolutePath) || is_link($absolutePath)) {
             throw new MediaException('Media file does not exist.');
         }
-        $contents = \file_get_contents($absolutePath);
-        $size = \filesize($absolutePath);
-        $modifiedAt = \filemtime($absolutePath);
+        $contents = file_get_contents($absolutePath);
+        $size = filesize($absolutePath);
+        $modifiedAt = filemtime($absolutePath);
         if ($contents === false || $size === false || $modifiedAt === false || $size !== \strlen($contents)) {
             throw new MediaException('Media file metadata cannot be read.');
         }
@@ -86,7 +86,7 @@ final readonly class MediaRepository
             $inspected['mimeType'],
             \strlen($safeContents),
             $modifiedAt,
-            \hash('sha256', $safeContents),
+            hash('sha256', $safeContents),
             $inspected['width'],
             $inspected['height'],
         );
@@ -101,7 +101,7 @@ final readonly class MediaRepository
             RelativePath::fromString($identity->value()),
             mustExist: true,
         );
-        $entries = \scandir($directory);
+        $entries = scandir($directory);
         if ($entries === false) {
             throw new MediaException('Page media directory cannot be read.');
         }
@@ -114,14 +114,14 @@ final readonly class MediaRepository
                 continue;
             }
             $candidate = "{$directory}/{$entry}";
-            if (!\is_file($candidate) || \is_link($candidate)) {
+            if (!is_file($candidate) || is_link($candidate)) {
                 continue;
             }
-            $timestamp = \filemtime($candidate);
+            $timestamp = filemtime($candidate);
             if ($timestamp === false) {
                 throw new MediaException('Media file modification time cannot be read.');
             }
-            $modifiedAt = \max($modifiedAt, $timestamp);
+            $modifiedAt = max($modifiedAt, $timestamp);
         }
 
         return $modifiedAt;

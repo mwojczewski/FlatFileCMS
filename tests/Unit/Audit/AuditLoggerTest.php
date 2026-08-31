@@ -31,15 +31,15 @@ final class AuditLoggerTest extends TestCase
         $logger->log('page.updated', 7, 'pages/oferta', '192.0.2.10', ['revision' => 'abc']);
         $logger->log('auth.logout', 7, 'auth/session', '192.0.2.10');
 
-        $files = \glob($this->project->path('storage/audit/*.jsonl'));
+        $files = glob($this->project->path('storage/audit/*.jsonl'));
         self::assertIsArray($files);
         self::assertCount(1, $files);
-        $lines = \file($files[0], FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $lines = file($files[0], FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         self::assertIsArray($lines);
         self::assertCount(2, $lines);
 
         /** @var array<string, mixed> $entry */
-        $entry = \json_decode($lines[0], true, flags: JSON_THROW_ON_ERROR);
+        $entry = json_decode($lines[0], true, flags: JSON_THROW_ON_ERROR);
         self::assertSame('page.updated', $entry['action']);
         self::assertSame(7, $entry['user_id']);
         self::assertSame('pages/oferta', $entry['resource']);

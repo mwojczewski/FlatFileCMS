@@ -25,7 +25,7 @@ final class MediaTypes
     /** @return list<string> */
     public static function defaults(): array
     {
-        return \array_keys(self::EXTENSIONS);
+        return array_keys(self::EXTENSIONS);
     }
 
     public static function extension(string $mimeType): ?string
@@ -35,7 +35,7 @@ final class MediaTypes
 
     public static function isImage(string $mimeType): bool
     {
-        return \str_starts_with($mimeType, 'image/');
+        return str_starts_with($mimeType, 'image/');
     }
 
     public static function isTransformable(string $mimeType): bool

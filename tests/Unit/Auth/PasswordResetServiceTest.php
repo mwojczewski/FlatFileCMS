@@ -118,7 +118,7 @@ YAML);
 
     private function tokenFrom(string $message): string
     {
-        $matched = \preg_match('~token=([A-Za-z0-9_-]{43})~', $message, $matches);
+        $matched = preg_match('~token=([A-Za-z0-9_-]{43})~', $message, $matches);
         if ($matched !== 1) {
             self::fail('Password reset token is missing from the email.');
         }

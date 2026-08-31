@@ -1,19 +1,16 @@
 main:
-  - label:
-      pl: Start
-    link:
-      type: page
-      page: homepage
+  - label: { pl: Możliwości, en: Features }
+    link: { type: url, url: "/#mozliwosci" }
     target: _self
-  - label:
-      pl: Blog
-    link:
-      type: collection
-      collection: blog
+  - label: { pl: Architektura, en: Architecture }
+    link: { type: url, url: "/#architektura" }
     target: _self
-  - label:
-      pl: Health
-    link:
-      type: url
-      url: /api/v1/health
+  - label: { pl: Dla deweloperów, en: Developers }
+    link: { type: url, url: "/#developer-experience" }
+    target: _self
+  - label: { pl: API, en: API }
+    link: { type: url, url: /api/v1/pages/homepage }
     target: _blank
+  - label: { pl: Insights, en: Insights }
+    link: { type: collection, collection: insights }
+    target: _self

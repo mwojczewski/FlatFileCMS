@@ -1,0 +1,41 @@
+schemaVersion: 1
+name: { pl: Stos technologiczny, en: Technology stack }
+description:
+  {
+    pl: Lista technologii tworzących projekt.,
+    en: Technologies powering the project.,
+  }
+icon: layer-group
+fields:
+  label:
+    {
+      type: text,
+      required: true,
+      translatable: true,
+      maxLength: 100,
+      label: { pl: Nagłówek, en: Heading },
+    }
+  items:
+    type: repeater
+    required: true
+    translatable: false
+    minItems: 3
+    maxItems: 10
+    label: { pl: Technologie, en: Technologies }
+    fields:
+      name:
+        {
+          type: text,
+          required: true,
+          translatable: false,
+          maxLength: 40,
+          label: { pl: Nazwa, en: Name },
+        }
+      detail:
+        {
+          type: text,
+          required: true,
+          translatable: false,
+          maxLength: 60,
+          label: { pl: Szczegół, en: Detail },
+        }

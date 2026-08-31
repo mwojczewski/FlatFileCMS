@@ -1,0 +1,27 @@
+schemaVersion: 1
+type: collection
+enabled: true
+layout: insights
+slug:
+  pl: insights
+  en: insights
+title:
+  pl: Engineering Insights
+  en: Engineering Insights
+seo:
+  title:
+    pl: Engineering Insights
+    en: Engineering Insights
+  description:
+    pl: Artykuły o architekturze, bezpieczeństwie i projektowaniu FlatFile CMS.
+    en: Articles about the architecture, security and design of FlatFile CMS.
+source: children
+sort:
+  field: date
+  direction: desc
+pagination:
+  perPage: 8
+filters:
+  - parameter: category
+    field: category
+    allowedValues: [architecture, security]

@@ -19,7 +19,8 @@ final readonly class PasswordResetController
         private PasswordResetService $passwords,
         private AdminView $views,
         private AdminLayout $layout,
-    ) {}
+    ) {
+    }
 
     public function requestForm(Request $request): Response
     {

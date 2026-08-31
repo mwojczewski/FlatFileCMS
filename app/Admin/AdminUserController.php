@@ -28,7 +28,8 @@ final readonly class AdminUserController
         private AdminView $views,
         private AdminLayout $layout,
         private AuditLogger $audit,
-    ) {}
+    ) {
+    }
 
     public function index(Request $request): Response
     {
@@ -67,7 +68,7 @@ final readonly class AdminUserController
             $this->audit->log('user.created', $actor->id(), "users/{$user->id()}", $request->clientIp());
 
             return Response::redirect('/admin/users?created=1', 303);
-        } catch (AuthenticationException|InvalidArgumentException $exception) {
+        } catch (AuthenticationException | InvalidArgumentException $exception) {
             return $this->page('Nowy administrator', 'users/form', [
                 'user' => null,
                 'actor' => $actor,
@@ -108,7 +109,7 @@ final readonly class AdminUserController
             $this->audit->log('user.updated', $actor->id(), "users/{$user->id()}", $request->clientIp());
 
             return Response::redirect("/admin/users/edit?id={$user->id()}&saved=1", 303);
-        } catch (AuthenticationException|InvalidArgumentException|UserNotFoundException $exception) {
+        } catch (AuthenticationException | InvalidArgumentException | UserNotFoundException $exception) {
             $user = $this->visibleAdmin($id, $actor);
 
             return $this->page('Edycja administratora', 'users/form', [
@@ -132,7 +133,7 @@ final readonly class AdminUserController
             $this->audit->log('user.deleted', $actor->id(), "users/{$id}", $request->clientIp());
 
             return Response::redirect('/admin/users?deleted=1', 303);
-        } catch (AuthenticationException|InvalidArgumentException|UserNotFoundException $exception) {
+        } catch (AuthenticationException | InvalidArgumentException | UserNotFoundException $exception) {
             throw new HttpException(422, 'USER_DELETE_INVALID', $exception->getMessage(), previous: $exception);
         }
     }
@@ -165,7 +166,7 @@ final readonly class AdminUserController
 
     private function id(mixed $value): int
     {
-        if (!is_string($value) || preg_match('/^[1-9][0-9]*$/D', $value) !== 1) {
+        if (!\is_string($value) || preg_match('/^[1-9][0-9]*$/D', $value) !== 1) {
             throw new HttpException(400, 'USER_ID_INVALID', 'User identifier is invalid.');
         }
 
@@ -175,7 +176,7 @@ final readonly class AdminUserController
     private function bodyString(Request $request, string $key): string
     {
         $value = $request->parsedBody()[$key] ?? null;
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             throw new InvalidArgumentException("Field {$key} is required.");
         }
 
@@ -186,7 +187,7 @@ final readonly class AdminUserController
     {
         $value = $request->parsedBody()[$key] ?? '';
 
-        return is_string($value) ? $value : '';
+        return \is_string($value) ? $value : '';
     }
 
     private function validateCsrf(Request $request): void

@@ -44,8 +44,7 @@ final readonly class RenderContext
         ?string $format = null,
         string $fit = 'contain',
         array $attributes = [],
-    ): string
-    {
+    ): string {
         $file = $this->mediaFile($image);
         $src = $this->variantUrl($file, $width, $height, $format, $fit);
         $alt = $this->imageAlt($image);
@@ -99,23 +98,23 @@ final readonly class RenderContext
             }
             $normalizedWidths[] = $width;
         }
-        $normalizedWidths = \array_values(\array_unique($normalizedWidths));
-        \sort($normalizedWidths);
+        $normalizedWidths = array_values(array_unique($normalizedWidths));
+        sort($normalizedWidths);
         if ($fit === 'cover' && ($aspectRatio === null || $aspectRatio <= 0)) {
             throw new RenderingException('Cover picture variants require a positive aspect ratio.');
         }
-        if ($sizes === '' || \preg_match('/[\x00-\x1F\x7F"\'<>]/', $sizes) === 1) {
+        if ($sizes === '' || preg_match('/[\x00-\x1F\x7F"\'<>]/', $sizes) === 1) {
             throw new RenderingException('Responsive image sizes expression is invalid.');
         }
 
         $file = $this->mediaFile($image);
         $sources = [];
         foreach ($normalizedWidths as $width) {
-            $height = $aspectRatio === null ? null : \max(1, (int) \round($width / $aspectRatio));
+            $height = $aspectRatio === null ? null : max(1, (int) round($width / $aspectRatio));
             $sources[] = $this->variantUrl($file, $width, $height, $format, $fit) . " {$width}w";
         }
-        $fallbackWidth = $normalizedWidths[\array_key_last($normalizedWidths)];
-        $fallbackHeight = $aspectRatio === null ? null : \max(1, (int) \round($fallbackWidth / $aspectRatio));
+        $fallbackWidth = $normalizedWidths[array_key_last($normalizedWidths)];
+        $fallbackHeight = $aspectRatio === null ? null : max(1, (int) round($fallbackWidth / $aspectRatio));
         $fallback = $this->variantUrl($file, $fallbackWidth, $fallbackHeight, null, $fit);
         $alt = $this->imageAlt($image);
         [$htmlWidth, $htmlHeight] = $this->displayDimensions($file, $fallbackWidth, $fallbackHeight, $fit);
@@ -123,7 +122,7 @@ final readonly class RenderContext
         return \sprintf(
             '<picture><source type="%s" srcset="%s" sizes="%s"><img src="%s" alt="%s"%s%s></picture>',
             $this->escape($this->formatMimeType($format)),
-            $this->escape(\implode(', ', $sources)),
+            $this->escape(implode(', ', $sources)),
             $this->escape($sizes),
             $this->escape($fallback),
             $this->escape($alt),
@@ -240,7 +239,7 @@ final readonly class RenderContext
         $allowed = ['class', 'decoding', 'fetchpriority', 'id', 'loading'];
         $html = '';
         foreach ($attributes as $name => $value) {
-            if (!\in_array($name, $allowed, true) || \preg_match('/^[A-Za-z0-9 _-]*$/D', $value) !== 1) {
+            if (!\in_array($name, $allowed, true) || preg_match('/^[A-Za-z0-9 _-]*$/D', $value) !== 1) {
                 throw new RenderingException('Image HTML attribute is invalid.');
             }
             $html .= ' ' . $name . '="' . $this->escape($value) . '"';

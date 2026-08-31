@@ -1,0 +1,47 @@
+schemaVersion: 1
+name: { pl: Hero artykułu, en: Article hero }
+description:
+  {
+    pl: Nagłówek wpisu z metadanymi i obrazem.,
+    en: Article heading with metadata and cover image.,
+  }
+icon: newspaper
+fields:
+  category:
+    {
+      type: text,
+      required: true,
+      translatable: true,
+      maxLength: 50,
+      label: { pl: Kategoria, en: Category },
+    }
+  date:
+    {
+      type: date,
+      required: true,
+      translatable: false,
+      label: { pl: Data, en: Date },
+    }
+  title:
+    {
+      type: text,
+      required: true,
+      translatable: true,
+      maxLength: 180,
+      label: { pl: Tytuł, en: Title },
+    }
+  lead:
+    {
+      type: textarea,
+      required: true,
+      translatable: true,
+      maxLength: 600,
+      label: { pl: Lead, en: Lead },
+    }
+  image:
+    {
+      type: image,
+      required: true,
+      translatable: false,
+      label: { pl: Okładka, en: Cover },
+    }

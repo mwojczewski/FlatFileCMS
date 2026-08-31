@@ -17,7 +17,7 @@ final readonly class MediaInspector
             throw new MediaException('Media file cannot be empty.');
         }
 
-        $extension = $clientFilename === null ? '' : \strtolower(\pathinfo($clientFilename, PATHINFO_EXTENSION));
+        $extension = $clientFilename === null ? '' : strtolower(pathinfo($clientFilename, PATHINFO_EXTENSION));
         if ($extension === 'svg') {
             $contents = $this->svg->sanitize($contents);
 
@@ -33,7 +33,7 @@ final readonly class MediaInspector
         $width = null;
         $height = null;
         if (MediaTypes::isImage($mimeType)) {
-            $dimensions = @\getimagesizefromstring($contents);
+            $dimensions = @getimagesizefromstring($contents);
             if ($dimensions === false) {
                 throw new MediaException('Image structure could not be verified.');
             }

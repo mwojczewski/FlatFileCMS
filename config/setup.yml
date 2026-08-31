@@ -5,7 +5,7 @@ site:
   defaultLayout: default
 seo:
   titleSuffix: FlatFile CMS
-  description: ''
+  description: ""
   ogImage: null
 media:
   maxUploadBytes: 26214400

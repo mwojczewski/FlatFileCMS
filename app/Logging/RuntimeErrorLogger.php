@@ -12,8 +12,8 @@ final class RuntimeErrorLogger
 
     public static function register(LoggerInterface $logger): void
     {
-        \set_error_handler(static function (int $severity, string $message, string $file, int $line) use ($logger): bool {
-            if ((\error_reporting() & $severity) === 0) {
+        set_error_handler(static function (int $severity, string $message, string $file, int $line) use ($logger): bool {
+            if ((error_reporting() & $severity) === 0) {
                 return false;
             }
 
@@ -27,8 +27,8 @@ final class RuntimeErrorLogger
             return false;
         });
 
-        \register_shutdown_function(static function () use ($logger): void {
-            $error = \error_get_last();
+        register_shutdown_function(static function () use ($logger): void {
+            $error = error_get_last();
             if ($error === null || !\in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
                 return;
             }

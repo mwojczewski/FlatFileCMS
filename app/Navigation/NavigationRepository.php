@@ -11,12 +11,12 @@ use FlatFileCms\Content\PageRouteIndex;
 use FlatFileCms\Domain\Content\PageIdentity;
 use FlatFileCms\Domain\Localization\LanguageConfig;
 use FlatFileCms\Domain\Localization\LocalizedDataResolver;
-use FlatFileCms\Infrastructure\Filesystem\FilesystemRoot;
 use FlatFileCms\Infrastructure\Filesystem\FileRevision;
+use FlatFileCms\Infrastructure\Filesystem\FilesystemRoot;
 use FlatFileCms\Infrastructure\Filesystem\RelativePath;
 use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
-use FlatFileCms\Infrastructure\Yaml\YamlFileRepository;
 use FlatFileCms\Infrastructure\Yaml\YamlDocument;
+use FlatFileCms\Infrastructure\Yaml\YamlFileRepository;
 use FlatFileCms\Support\ContentData;
 use InvalidArgumentException;
 
@@ -133,7 +133,7 @@ final readonly class NavigationRepository
                 throw new InvalidArgumentException('Navigation contains too many items.');
             }
             $entry = ContentData::map($item, $field . '.' . $index);
-            foreach (\array_keys($entry) as $property) {
+            foreach (array_keys($entry) as $property) {
                 if (!\in_array($property, ['label', 'link', 'url', 'target', 'children'], true)) {
                     throw new InvalidArgumentException("Unknown navigation property \"{$property}\".");
                 }
@@ -179,7 +179,7 @@ final readonly class NavigationRepository
                 'url' => ['type', 'url'],
                 default => throw new InvalidArgumentException('Navigation link type is invalid.'),
             };
-            foreach (\array_keys($link) as $property) {
+            foreach (array_keys($link) as $property) {
                 if (!\in_array($property, $allowed, true)) {
                     throw new InvalidArgumentException("Unknown navigation link property \"{$property}\".");
                 }
@@ -223,7 +223,7 @@ final readonly class NavigationRepository
     {
         $labels = ContentData::map($value, 'label');
         foreach ($labels as $locale => $label) {
-            if (!$languages->has($locale) || \trim(ContentData::string($label, "label.{$locale}")) === '') {
+            if (!$languages->has($locale) || trim(ContentData::string($label, "label.{$locale}")) === '') {
                 throw new InvalidArgumentException('Navigation label contains an invalid locale or value.');
             }
         }

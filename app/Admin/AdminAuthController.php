@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Admin;
 
+use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Auth\AuthenticationException;
 use FlatFileCms\Auth\Authenticator;
 use FlatFileCms\Auth\CsrfTokenManager;
@@ -11,7 +12,6 @@ use FlatFileCms\Auth\PasswordChanger;
 use FlatFileCms\Auth\PasswordHasher;
 use FlatFileCms\Auth\WebAuthnCredentialRepository;
 use FlatFileCms\Auth\WebAuthnService;
-use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Http\HttpException;
 use FlatFileCms\Http\Request;
 use FlatFileCms\Http\Response;
@@ -30,7 +30,8 @@ final readonly class AdminAuthController
         private AdminView $views,
         private AdminLayout $layout,
         private AuditLogger $audit,
-    ) {}
+    ) {
+    }
 
     public function loginForm(Request $request): Response
     {
@@ -131,7 +132,7 @@ final readonly class AdminAuthController
         $user = $this->requireUser();
         return $this->page('Konto', $this->views->render('account/index', [
             'passwordChanged' => ($request->query()['password_changed'] ?? null) === '1',
-            'credentialCount' => count($this->credentials->forUser($user->id())),
+            'credentialCount' => \count($this->credentials->forUser($user->id())),
         ]));
     }
 
@@ -150,7 +151,7 @@ final readonly class AdminAuthController
         $user = $this->requireUser();
         $this->validateFormCsrf($request);
         $id = $request->parsedBody()['id'] ?? null;
-        if (!is_string($id) || preg_match('/^[1-9][0-9]*$/D', $id) !== 1) {
+        if (!\is_string($id) || preg_match('/^[1-9][0-9]*$/D', $id) !== 1) {
             throw new HttpException(400, 'WEBAUTHN_CREDENTIAL_INVALID', 'Security key identifier is invalid.');
         }
         $this->credentials->deleteForUser((int) $id, $user->id());

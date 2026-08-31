@@ -63,12 +63,12 @@ final readonly class BlockFormRenderer
                 . '" data-locale-target="' . self::escape($locale) . '">' . self::escape($languageName) . '</button>';
             $panels .= '<div class="locale-panel' . ($active ? ' active' : '') . '" data-locale-panel="'
                 . self::escape($locale) . '">' . $this->control(
-                    $definition,
-                    $languages,
-                    $localized[$locale] ?? null,
-                    $name . '[' . $locale . ']',
-                    $depth,
-                ) . '</div>';
+                        $definition,
+                        $languages,
+                        $localized[$locale] ?? null,
+                        $name . '[' . $locale . ']',
+                        $depth,
+                    ) . '</div>';
         }
 
         return '<div class="field translated"><div class="field-heading"><span>' . self::escape($label) . $required

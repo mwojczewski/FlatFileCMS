@@ -1,0 +1,62 @@
+schemaVersion: 1
+name: { pl: Architektura, en: Architecture }
+description:
+  { pl: Schemat przepływu danych przez CMS., en: CMS data-flow diagram. }
+icon: diagram-project
+fields:
+  eyebrow:
+    {
+      type: text,
+      required: true,
+      translatable: true,
+      maxLength: 80,
+      label: { pl: Etykieta, en: Eyebrow },
+    }
+  title:
+    {
+      type: text,
+      required: true,
+      translatable: true,
+      maxLength: 160,
+      label: { pl: Nagłówek, en: Heading },
+    }
+  intro:
+    {
+      type: textarea,
+      required: true,
+      translatable: true,
+      maxLength: 500,
+      label: { pl: Wprowadzenie, en: Introduction },
+    }
+  steps:
+    type: repeater
+    required: true
+    translatable: false
+    minItems: 3
+    maxItems: 6
+    label: { pl: Etapy, en: Steps }
+    fields:
+      label:
+        {
+          type: text,
+          required: true,
+          translatable: true,
+          maxLength: 70,
+          label: { pl: Nazwa, en: Name },
+        }
+      detail:
+        {
+          type: text,
+          required: true,
+          translatable: true,
+          maxLength: 120,
+          label: { pl: Szczegół, en: Detail },
+        }
+  note:
+    {
+      type: text,
+      required: true,
+      translatable: true,
+      maxLength: 180,
+      label: { pl: Notatka, en: Note },
+    }

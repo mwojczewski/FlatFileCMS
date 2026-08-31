@@ -29,7 +29,7 @@ final readonly class LoggerFactory
 
     private static function level(Environment $environment): Level
     {
-        return match (\strtolower($environment->get('LOG_LEVEL', $environment->debug() ? 'debug' : 'notice'))) {
+        return match (strtolower($environment->get('LOG_LEVEL', $environment->debug() ? 'debug' : 'notice'))) {
             'debug' => Level::Debug,
             'info' => Level::Info,
             'notice' => Level::Notice,

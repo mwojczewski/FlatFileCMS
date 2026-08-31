@@ -1,0 +1,37 @@
+schemaVersion: 1
+name: { pl: Galeria artykułu, en: Article gallery }
+description:
+  { pl: Szeroka galeria ilustracji we wpisie., en: Wide article image gallery. }
+icon: images
+fields:
+  title:
+    {
+      type: text,
+      required: true,
+      translatable: true,
+      maxLength: 120,
+      label: { pl: Tytuł, en: Title },
+    }
+  images:
+    type: repeater
+    required: true
+    translatable: false
+    minItems: 1
+    maxItems: 6
+    label: { pl: Obrazy, en: Images }
+    fields:
+      image:
+        {
+          type: image,
+          required: true,
+          translatable: false,
+          label: { pl: Obraz, en: Image },
+        }
+      caption:
+        {
+          type: text,
+          required: false,
+          translatable: true,
+          maxLength: 240,
+          label: { pl: Podpis, en: Caption },
+        }

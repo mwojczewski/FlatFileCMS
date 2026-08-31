@@ -25,8 +25,7 @@ final readonly class MediaVariantService
         ?int $height,
         ?string $format,
         string $fit = 'contain',
-    ): MediaVariant
-    {
+    ): MediaVariant {
         $item = $file->item();
         $config = MediaConfig::fromDocument($this->configuration->get());
         if (!$config->transformationsEnabled() || ($width === null && $height === null && $format === null)) {
@@ -44,7 +43,7 @@ final readonly class MediaVariantService
         if ($outputFormat === null || !$this->formatAllowed($outputFormat, $item->mimeType(), $config)) {
             throw new MediaException('Requested media output format is not enabled.');
         }
-        $key = \hash('sha256', \implode(':', [
+        $key = hash('sha256', implode(':', [
             $item->hash(),
             (string) ($width ?? 0),
             (string) ($height ?? 0),
@@ -52,11 +51,11 @@ final readonly class MediaVariantService
             $fit,
             (string) $config->quality(),
         ]));
-        $cachePath = RelativePath::fromString('cache/media/' . \substr($key, 0, 2) . "/{$key}.{$outputFormat}");
+        $cachePath = RelativePath::fromString('cache/media/' . substr($key, 0, 2) . "/{$key}.{$outputFormat}");
         if ($config->cacheEnabled()) {
             $cached = $this->paths->resolve(FilesystemRoot::Storage, $cachePath);
-            if (\is_file($cached) && !\is_link($cached)) {
-                $contents = \file_get_contents($cached);
+            if (is_file($cached) && !is_link($cached)) {
+                $contents = file_get_contents($cached);
                 if ($contents !== false) {
                     return $this->variant($contents, $outputFormat, $key, $item);
                 }
@@ -123,8 +122,8 @@ final readonly class MediaVariantService
 
     private function variantFilename(MediaItem $source, string $hash, string $extension): string
     {
-        $stem = \pathinfo($source->name()->value(), PATHINFO_FILENAME);
+        $stem = pathinfo($source->name()->value(), PATHINFO_FILENAME);
 
-        return "{$stem}." . \substr($hash, 0, 16) . ".{$extension}";
+        return "{$stem}." . substr($hash, 0, 16) . ".{$extension}";
     }
 }

@@ -1,0 +1,65 @@
+schemaVersion: 1
+name: { pl: Kod i treść, en: Code showcase }
+description:
+  {
+    pl: Przykład konfiguracji bloku w YAML.,
+    en: YAML block configuration example.,
+  }
+icon: code
+fields:
+  eyebrow:
+    {
+      type: text,
+      required: true,
+      translatable: true,
+      maxLength: 80,
+      label: { pl: Etykieta, en: Eyebrow },
+    }
+  title:
+    {
+      type: text,
+      required: true,
+      translatable: true,
+      maxLength: 160,
+      label: { pl: Nagłówek, en: Heading },
+    }
+  description:
+    {
+      type: textarea,
+      required: true,
+      translatable: true,
+      maxLength: 500,
+      label: { pl: Opis, en: Description },
+    }
+  filename:
+    {
+      type: text,
+      required: true,
+      translatable: false,
+      maxLength: 80,
+      label: { pl: Nazwa pliku, en: Filename },
+    }
+  code:
+    {
+      type: textarea,
+      required: true,
+      translatable: false,
+      maxLength: 5000,
+      label: { pl: Kod, en: Code },
+    }
+  bullets:
+    type: repeater
+    required: true
+    translatable: false
+    minItems: 2
+    maxItems: 5
+    label: { pl: Korzyści, en: Benefits }
+    fields:
+      text:
+        {
+          type: text,
+          required: true,
+          translatable: true,
+          maxLength: 160,
+          label: { pl: Tekst, en: Text },
+        }

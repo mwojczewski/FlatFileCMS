@@ -158,7 +158,7 @@ YAML);
             $this->manager->add(
                 $this->identity,
                 'text',
-                ['title' => ['pl' => 'Brak angielskiego'], 'highlighted' => false],
+                ['title' => ['pl' => ''], 'highlighted' => false],
                 $before->revision(),
                 $this->languages,
             );

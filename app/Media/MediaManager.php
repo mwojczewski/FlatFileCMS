@@ -46,7 +46,7 @@ final readonly class MediaManager
             $inspected['width'] !== null
             && $inspected['height'] !== null
             && $inspected['height'] > 0
-            && $inspected['width'] > \intdiv($config->maximumPixels(), $inspected['height'])
+            && $inspected['width'] > intdiv($config->maximumPixels(), $inspected['height'])
         ) {
             throw new MediaException('Uploaded image pixel count exceeds the configured limit.');
         }
@@ -82,7 +82,7 @@ final readonly class MediaManager
                 $this->media->relativePath($identity, $name),
                 mustExist: true,
             );
-            if (!\is_file($path) || \is_link($path) || !\unlink($path)) {
+            if (!is_file($path) || is_link($path) || !unlink($path)) {
                 throw new MediaException('Media file could not be deleted.');
             }
         });
@@ -90,12 +90,12 @@ final readonly class MediaManager
 
     private function availableName(PageIdentity $identity, MediaName $base): MediaName
     {
-        $extension = \pathinfo($base->value(), PATHINFO_EXTENSION);
-        $stem = \pathinfo($base->value(), PATHINFO_FILENAME);
+        $extension = pathinfo($base->value(), PATHINFO_EXTENSION);
+        $stem = pathinfo($base->value(), PATHINFO_FILENAME);
         for ($suffix = 1; $suffix <= 999; ++$suffix) {
             $candidate = MediaName::fromString($suffix === 1 ? $base->value() : "{$stem}-{$suffix}.{$extension}");
             $path = $this->paths->resolve(FilesystemRoot::Pages, $this->media->relativePath($identity, $candidate));
-            if (!\file_exists($path) && !\is_link($path)) {
+            if (!file_exists($path) && !is_link($path)) {
                 return $candidate;
             }
         }

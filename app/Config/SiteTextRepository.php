@@ -45,13 +45,13 @@ final readonly class SiteTextRepository
     {
         $relative = RelativePath::fromString($filename);
         $path = $this->paths->resolve(FilesystemRoot::Config, $relative);
-        if (!\file_exists($path)) {
+        if (!file_exists($path)) {
             return new SiteTextDocument('', FileRevision::missing());
         }
-        if (!\is_file($path) || \is_link($path)) {
+        if (!is_file($path) || is_link($path)) {
             throw new FilesystemException("Config text file {$filename} is unsafe.");
         }
-        $contents = \file_get_contents($path);
+        $contents = file_get_contents($path);
         if ($contents === false) {
             throw new FilesystemException("Unable to read {$filename}.");
         }
@@ -61,11 +61,11 @@ final readonly class SiteTextRepository
 
     private function write(string $filename, string $contents, FileRevision $revision): SiteTextDocument
     {
-        if (\strlen($contents) > self::MAX_BYTES || \str_contains($contents, "\0")) {
+        if (\strlen($contents) > self::MAX_BYTES || str_contains($contents, "\0")) {
             throw new InvalidArgumentException("{$filename} is too large or contains a null byte.");
         }
-        $normalized = \str_replace(["\r\n", "\r"], "\n", $contents);
-        if ($normalized !== '' && !\str_ends_with($normalized, "\n")) {
+        $normalized = str_replace(["\r\n", "\r"], "\n", $contents);
+        if ($normalized !== '' && !str_ends_with($normalized, "\n")) {
             $normalized .= "\n";
         }
         $newRevision = $this->writer->write(

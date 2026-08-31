@@ -30,7 +30,7 @@ final readonly class RedirectRepository
     {
         $data = [
             'schemaVersion' => 1,
-            'redirects' => \array_map(static fn(RedirectRule $rule): array => $rule->toArray(), $rules),
+            'redirects' => array_map(static fn(RedirectRule $rule): array => $rule->toArray(), $rules),
         ];
         $validated = $this->fromData($data, $revision);
         $written = $this->yaml->write(
@@ -83,7 +83,7 @@ final readonly class RedirectRepository
 
     private function id(string $id): string
     {
-        if (\preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/D', $id) !== 1) {
+        if (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/D', $id) !== 1) {
             throw new InvalidArgumentException('Redirect identifier must be a UUID v7.');
         }
 
@@ -92,7 +92,7 @@ final readonly class RedirectRepository
 
     private function source(string $source): string
     {
-        if ($source !== '/' && (\preg_match('#^/(?:[A-Za-z0-9._~-]+/)*[A-Za-z0-9._~-]+$#D', $source) !== 1 || \str_contains($source, '..'))) {
+        if ($source !== '/' && (preg_match('#^/(?:[A-Za-z0-9._~-]+/)*[A-Za-z0-9._~-]+$#D', $source) !== 1 || str_contains($source, '..'))) {
             throw new InvalidArgumentException('Redirect source must be a normalized absolute site path.');
         }
 
@@ -101,19 +101,19 @@ final readonly class RedirectRepository
 
     private function target(string $target): string
     {
-        if ($target === '' || \str_contains($target, "\0") || \preg_match('/[\x01-\x1F\x7F\\\\]/', $target) === 1) {
+        if ($target === '' || str_contains($target, "\0") || preg_match('/[\x01-\x1F\x7F\\\\]/', $target) === 1) {
             throw new InvalidArgumentException('Redirect target contains unsafe characters.');
         }
-        if (\str_starts_with($target, '/') && !\str_starts_with($target, '//')) {
-            $path = \parse_url($target, PHP_URL_PATH);
-            if (!\is_string($path) || \in_array('..', \explode('/', $path), true)) {
+        if (str_starts_with($target, '/') && !str_starts_with($target, '//')) {
+            $path = parse_url($target, PHP_URL_PATH);
+            if (!\is_string($path) || \in_array('..', explode('/', $path), true)) {
                 throw new InvalidArgumentException('Redirect target path is invalid.');
             }
 
             return $target;
         }
-        $scheme = \parse_url($target, PHP_URL_SCHEME);
-        if (\filter_var($target, FILTER_VALIDATE_URL) === false || !\in_array($scheme, ['http', 'https'], true)) {
+        $scheme = parse_url($target, PHP_URL_SCHEME);
+        if (filter_var($target, FILTER_VALIDATE_URL) === false || !\in_array($scheme, ['http', 'https'], true)) {
             throw new InvalidArgumentException('Redirect target must be a site path or absolute HTTP(S) URL.');
         }
 
@@ -132,7 +132,7 @@ final readonly class RedirectRepository
     /** @param array<string, string> $targets */
     private function assertNoCycles(array $targets): void
     {
-        foreach (\array_keys($targets) as $source) {
+        foreach (array_keys($targets) as $source) {
             $visited = [];
             $current = $source;
             while (isset($targets[$current])) {
@@ -141,7 +141,7 @@ final readonly class RedirectRepository
                 }
                 $visited[$current] = true;
                 $target = $targets[$current];
-                $current = \str_starts_with($target, '/') ? (\parse_url($target, PHP_URL_PATH) ?: '/') : '';
+                $current = str_starts_with($target, '/') ? (parse_url($target, PHP_URL_PATH) ?: '/') : '';
                 if ($current === '') {
                     break;
                 }

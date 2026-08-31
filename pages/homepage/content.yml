@@ -2,40 +2,248 @@ schemaVersion: 1
 enabled: true
 layout: default
 title:
-  pl: 'Strona główna'
+  pl: FlatFile CMS — nowoczesny CMS w PHP
+  en: FlatFile CMS — a modern CMS built with PHP
 seo:
   title:
-    pl: 'Strona główna'
+    pl: FlatFile CMS — treść pod kontrolą, kod bez kompromisów
+    en: FlatFile CMS — content under control, code without compromise
   description:
-    pl: 'Przykładowa strona główna FlatFile CMS.'
+    pl: Nowoczesny, bezpieczny i szybki flat-file CMS oparty na PHP 8.5, YAML, SSR i publicznym API.
+    en: A modern, secure and fast flat-file CMS powered by PHP 8.5, YAML, SSR and a public API.
   robots:
     index: true
     follow: true
-  openGraph: {}
+  openGraph:
+    type: website
   twitter: {}
-  jsonLd: {}
+  jsonLd:
+    "@context": https://schema.org
+    "@type": SoftwareApplication
+    name: FlatFile CMS
+    applicationCategory: DeveloperApplication
+    operatingSystem: Cross-platform
 blocks:
-  -
-    id: 01a052ab-7261-7325-8134-8163b0458afb
-    type: hero
+  - id: 01a05810-1111-7001-8001-000000000001
+    type: tech-hero
     enabled: true
     data:
+      eyebrow:
+        pl: CMS zaprojektowany dla nowoczesnego webu
+        en: A CMS engineered for the modern web
       title:
-        pl: 'Witaj we FlatFileCMS'
-      content:
-        pl: 'Zaawansowanym, Polskim headless, flatfile CMS!'
-      alignment: left
-  -
-    id: 01994d31-4fd1-7f32-9c2a-e89d624cda37
-    type: rich-text
+        pl: Treść pod kontrolą. Kod bez kompromisów.
+        en: Content under control. Code without compromise.
+      lead:
+        pl: FlatFile CMS łączy prostotę plików YAML z bezpiecznym panelem administracyjnym, renderowaniem po stronie serwera i gotowym API — bez ciężkiej bazy danych.
+        en: FlatFile CMS combines the simplicity of YAML files with a secure admin panel, server-side rendering and a ready-to-use API — without a heavy database.
+      primary_label:
+        pl: Poznaj możliwości
+        en: Explore features
+      primary_url: /#mozliwosci
+      secondary_label:
+        pl: Zobacz architekturę
+        en: See the architecture
+      secondary_url: /#architektura
+      version: "8.5+"
+      metrics:
+        - value: "0"
+          label:
+            {
+              pl: wymaganych usług zewnętrznych,
+              en: required external services,
+            }
+        - value: "<50 ms"
+          label: { pl: typowy czas odpowiedzi, en: typical response time }
+        - value: "100%"
+          label:
+            {
+              pl: treści w Twoim repozytorium,
+              en: content stored in your repository,
+            }
+  - id: 01a05810-1111-7002-8002-000000000002
+    type: tech-stack
     enabled: true
     data:
-      content:
-        pl: |-
-          ## FlatFile CMS
-
-          Warstwa contentu i publiczne API działają poprawnie.
-
-          ### Nawigacja
-
-          Nawigacja powyżej kieruje na strony testowe
+      label:
+        pl: Zbudowany na sprawdzonych fundamentach
+        en: Built on proven foundations
+      items:
+        - { name: PHP, detail: "8.5+ / strict types" }
+        - { name: YAML, detail: "human-readable" }
+        - { name: SQLite, detail: "auth & runtime" }
+        - { name: CommonMark, detail: "safe markdown" }
+        - { name: REST API, detail: "/api/v1" }
+  - id: 01a05810-1111-7003-8003-000000000003
+    type: feature-grid
+    enabled: true
+    data:
+      eyebrow:
+        pl: Jeden silnik, wiele możliwości
+        en: One engine, many possibilities
+      title:
+        pl: Wszystko, czego potrzebuje nowoczesny CMS.
+        en: Everything a modern CMS needs.
+      intro:
+        pl: Od modelowania treści po bezpieczne publikowanie. Każda warstwa została zaprojektowana jako czytelny, testowalny moduł.
+        en: From content modelling to secure publishing. Every layer is designed as a clear, testable module.
+      items:
+        - number: "01"
+          title: { pl: Bloki bez ograniczeń, en: Blocks without limits }
+          description:
+            {
+              pl: "Definiuj pola w YAML, dodaj renderer PHP i opcjonalne zasoby. CMS automatycznie odkrywa nowy komponent.",
+              en: "Define fields in YAML, add a PHP renderer and optional assets. The CMS discovers the component automatically.",
+            }
+          accent: mint
+        - number: "02"
+          title: { pl: Hybrydowe renderowanie, en: Hybrid rendering }
+          description:
+            {
+              pl: "Ta sama, zwalidowana treść zasila szybki HTML po stronie serwera oraz publiczne REST API.",
+              en: "The same validated content powers fast server-rendered HTML and the public REST API.",
+            }
+          accent: violet
+        - number: "03"
+          title: { pl: Bezpieczny filesystem, en: Secure filesystem }
+          description:
+            {
+              pl: "Atomowe zapisy, kontrolowane ścieżki i odrzucanie symlinków chronią treść na każdym etapie.",
+              en: "Atomic writes, controlled paths and symlink rejection protect content at every stage.",
+            }
+          accent: amber
+        - number: "04"
+          title: { pl: Wielojęzyczność, en: Multilingual by design }
+          description:
+            {
+              pl: "Lokalne adresy, tłumaczone pola i inteligentny fallback języka domyślnego są częścią kontraktu.",
+              en: "Localized URLs, translated fields and intelligent default-language fallback are part of the contract.",
+            }
+          accent: violet
+        - number: "05"
+          title: { pl: Media gotowe do sieci, en: Web-ready media }
+          description:
+            {
+              pl: "Walidacja MIME, sanitizacja SVG, warianty obrazów i fingerprintowane adresy bez ręcznej pracy.",
+              en: "MIME validation, SVG sanitization, image variants and fingerprinted URLs work automatically.",
+            }
+          accent: amber
+        - number: "06"
+          title: { pl: Administracja i audyt, en: Administration and audit }
+          description:
+            {
+              pl: "Role użytkowników, passkeys, CSRF, limity żądań i dziennik zmian dają kontrolę bez utraty prostoty.",
+              en: "User roles, passkeys, CSRF protection, rate limits and audit logs provide control without sacrificing simplicity.",
+            }
+          accent: mint
+  - id: 01a05810-1111-7004-8004-000000000004
+    type: architecture
+    enabled: true
+    data:
+      eyebrow:
+        pl: Przejrzysta architektura
+        en: Transparent architecture
+      title:
+        pl: Od pliku do gotowej strony.
+        en: From file to finished page.
+      intro:
+        pl: Treść przechodzi przez jedną, konsekwentną ścieżkę. API i HTML korzystają z tego samego modelu, dlatego rezultat pozostaje spójny.
+        en: Content follows one consistent path. The API and HTML use the same model, keeping every output aligned.
+      steps:
+        - label: { pl: Treść w YAML, en: Content in YAML }
+          detail:
+            {
+              pl: "Czytelna dla człowieka, przyjazna Gitowi",
+              en: "Human-readable and Git-friendly",
+            }
+        - label: { pl: Repozytorium treści, en: Content repository }
+          detail:
+            {
+              pl: Bezpieczny odczyt i stabilna tożsamość stron,
+              en: Secure reads and stable page identities,
+            }
+        - label: { pl: Walidacja bloków, en: Block validation }
+          detail:
+            {
+              pl: "Typy, reguły i lokalizacja danych",
+              en: "Types, rules and content localization",
+            }
+        - label: { pl: Wspólny ViewModel, en: Shared ViewModel }
+          detail:
+            {
+              pl: "SEO, nawigacja, media i treść w jednym miejscu",
+              en: "SEO, navigation, media and content in one place",
+            }
+        - label: { pl: HTML lub JSON, en: HTML or JSON }
+          detail:
+            {
+              pl: "SSR dla użytkownika, API dla integracji",
+              en: "SSR for visitors, API for integrations",
+            }
+      note:
+        pl: Jedno źródło prawdy. Zero ukrytej synchronizacji.
+        en: One source of truth. No hidden synchronization.
+  - id: 01a05810-1111-7005-8005-000000000005
+    type: code-showcase
+    enabled: true
+    data:
+      eyebrow:
+        pl: Developer experience
+        en: Developer experience
+      title:
+        pl: Nowy blok w trzech prostych plikach.
+        en: A new block in three simple files.
+      description:
+        pl: Schemat opisuje panel i walidację, renderer odpowiada za semantyczny HTML, a CSS jest automatycznie publikowany z fingerprintem tylko wtedy, gdy blok występuje na stronie.
+        en: The schema drives the admin UI and validation, the renderer owns semantic HTML, and fingerprinted CSS is published automatically only when the block is present.
+      filename: blocks/feature-grid/block.yml
+      code: |-
+        schemaVersion: 1
+        name:
+          pl: Siatka możliwości
+        icon: grid-2
+        fields:
+          title:
+            type: text
+            required: true
+            translatable: true
+          items:
+            type: repeater
+            minItems: 3
+            fields:
+              title:
+                type: text
+                translatable: true
+      bullets:
+        - text:
+            {
+              pl: Automatyczne formularze w panelu administracyjnym,
+              en: Automatic forms in the administration panel,
+            }
+        - text:
+            {
+              pl: Walidacja i lokalizacja bez kodu w kontrolerze,
+              en: Validation and localization without controller code,
+            }
+        - text:
+            {
+              pl: CSS i JavaScript ładowane tylko na używanych stronach,
+              en: CSS and JavaScript loaded only on pages that use them,
+            }
+  - id: 01a05810-1111-7006-8006-000000000006
+    type: call-to-action
+    enabled: true
+    data:
+      eyebrow:
+        pl: Flat-file, full power
+        en: Flat-file, full power
+      title:
+        pl: Zbudujmy lepszą warstwę treści.
+        en: Let’s build a better content layer.
+      description:
+        pl: Lekki rdzeń, przewidywalne kontrakty i pełna kontrola nad kodem. FlatFile CMS jest gotowy na pierwszy prawdziwy projekt.
+        en: A lightweight core, predictable contracts and complete control over the code. FlatFile CMS is ready for its first real project.
+      button_label:
+        pl: Otwórz panel CMS
+        en: Open the CMS panel
+      button_url: /admin

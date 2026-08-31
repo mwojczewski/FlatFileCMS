@@ -15,8 +15,8 @@ use FlatFileCms\Content\PageRouteIndex;
 use FlatFileCms\Core\Environment;
 use FlatFileCms\Core\ProductionGuard;
 use FlatFileCms\Navigation\NavigationRepository;
-use FlatFileCms\Rendering\LayoutRegistry;
 use FlatFileCms\Redirects\RedirectRepository;
+use FlatFileCms\Rendering\LayoutRegistry;
 use PDO;
 use Throwable;
 
@@ -46,9 +46,9 @@ final readonly class ReleaseChecker
             }),
             $this->check('Extensions', function (): string {
                 $required = ['ctype', 'dom', 'fileinfo', 'filter', 'gd', 'json', 'mbstring', 'openssl', 'pdo', 'pdo_sqlite'];
-                $missing = \array_values(\array_filter($required, static fn(string $name): bool => !\extension_loaded($name)));
+                $missing = array_values(array_filter($required, static fn(string $name): bool => !\extension_loaded($name)));
                 if ($missing !== []) {
-                    throw new \RuntimeException('Missing: ' . \implode(', ', $missing));
+                    throw new \RuntimeException('Missing: ' . implode(', ', $missing));
                 }
 
                 return 'all required extensions loaded';
@@ -89,7 +89,7 @@ final readonly class ReleaseChecker
             'public/assets/blocks',
         ] as $relative) {
             $path = "{$this->projectRoot}/{$relative}";
-            if (!\is_dir($path) || \is_link($path) || !\is_writable($path)) {
+            if (!is_dir($path) || is_link($path) || !is_writable($path)) {
                 throw new \RuntimeException("Directory {$relative} must exist, be writable and not be a symlink.");
             }
         }
@@ -105,7 +105,7 @@ final readonly class ReleaseChecker
             throw new \RuntimeException('Site configuration is missing.');
         }
         $siteUrl = $site['url'] ?? null;
-        if (!\is_string($siteUrl) || !\str_starts_with($siteUrl, 'https://')) {
+        if (!\is_string($siteUrl) || !str_starts_with($siteUrl, 'https://')) {
             throw new \RuntimeException('site.url must use HTTPS in production.');
         }
         $languages = $this->languages->get();
@@ -169,11 +169,11 @@ final readonly class ReleaseChecker
 
         foreach ($requiredFiles as $relative) {
             $path = "{$this->projectRoot}/{$relative}";
-            if (!\is_file($path) || \is_link($path)) {
+            if (!is_file($path) || is_link($path)) {
                 throw new \RuntimeException("Required release file {$relative} is missing or unsafe.");
             }
         }
-        if (\is_file("{$this->projectRoot}/public/.env") || \is_file("{$this->projectRoot}/public/.env.local")) {
+        if (is_file("{$this->projectRoot}/public/.env") || is_file("{$this->projectRoot}/public/.env.local")) {
             throw new \RuntimeException('Environment files must not exist below public/.');
         }
 

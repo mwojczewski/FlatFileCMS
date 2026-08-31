@@ -29,7 +29,8 @@ final readonly class AdminRedirectController
         private AdminView $views,
         private AdminLayout $layout,
         private AuditLogger $audit,
-    ) {}
+    ) {
+    }
 
     public function index(Request $request): Response
     {
@@ -85,14 +86,14 @@ final readonly class AdminRedirectController
             return Response::redirect('/admin/redirects?saved=1', 303);
         } catch (RevisionConflictException $exception) {
             throw new HttpException(409, 'REDIRECT_REVISION_CONFLICT', 'Redirect rules changed in another session.', previous: $exception);
-        } catch (InvalidArgumentException|InvalidContentException $exception) {
+        } catch (InvalidArgumentException | InvalidContentException $exception) {
             throw new HttpException(422, 'REDIRECT_INVALID', $exception->getMessage(), previous: $exception);
         }
     }
 
     private function status(mixed $value): int
     {
-        if (!\is_string($value) || \preg_match('/^30[12378]$/D', $value) !== 1) {
+        if (!\is_string($value) || preg_match('/^30[12378]$/D', $value) !== 1) {
             throw new InvalidArgumentException('Redirect status is invalid.');
         }
 
@@ -101,11 +102,11 @@ final readonly class AdminRedirectController
 
     private function requiredString(mixed $value, string $label): string
     {
-        if (!\is_string($value) || \trim($value) === '') {
+        if (!\is_string($value) || trim($value) === '') {
             throw new InvalidArgumentException("{$label} is required.");
         }
 
-        return \trim($value);
+        return trim($value);
     }
 
     private function revision(mixed $value): FileRevision

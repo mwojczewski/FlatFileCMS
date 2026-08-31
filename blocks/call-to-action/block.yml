@@ -1,0 +1,45 @@
+schemaVersion: 1
+name: { pl: Wezwanie do działania, en: Call to action }
+description:
+  { pl: Końcowa sekcja z przyciskiem., en: Closing section with an action. }
+icon: arrow-right
+fields:
+  eyebrow:
+    {
+      type: text,
+      required: true,
+      translatable: true,
+      maxLength: 80,
+      label: { pl: Etykieta, en: Eyebrow },
+    }
+  title:
+    {
+      type: text,
+      required: true,
+      translatable: true,
+      maxLength: 180,
+      label: { pl: Nagłówek, en: Heading },
+    }
+  description:
+    {
+      type: textarea,
+      required: true,
+      translatable: true,
+      maxLength: 400,
+      label: { pl: Opis, en: Description },
+    }
+  button_label:
+    {
+      type: text,
+      required: true,
+      translatable: true,
+      maxLength: 60,
+      label: { pl: Przycisk, en: Button },
+    }
+  button_url:
+    {
+      type: url,
+      required: true,
+      translatable: false,
+      label: { pl: Adres, en: URL },
+    }

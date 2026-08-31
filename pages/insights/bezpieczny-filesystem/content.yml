@@ -1,0 +1,119 @@
+schemaVersion: 1
+enabled: true
+layout: default
+slug:
+  pl: bezpieczny-filesystem-cms
+  en: secure-cms-filesystem
+title:
+  pl: Bezpieczny filesystem jako fundament CMS-a
+  en: A secure filesystem as the foundation of a CMS
+date: "2026-08-29"
+category: security
+excerpt:
+  pl: Dlaczego atomowe zapisy, kontrola ścieżek i walidacja mediów są ważniejsze niż efektowny edytor.
+  en: Why atomic writes, path control and media validation matter more than a flashy editor.
+seo:
+  title:
+    pl: Bezpieczny filesystem w FlatFile CMS
+    en: A secure filesystem in FlatFile CMS
+  description:
+    pl: Techniczne spojrzenie na atomowe zapisy, ochronę ścieżek i bezpieczne media w flat-file CMS.
+    en: A technical look at atomic writes, path protection and safe media handling in a flat-file CMS.
+blocks:
+  - id: 01a05820-2222-7201-8201-000000000001
+    type: article-hero
+    enabled: true
+    data:
+      category: { pl: Bezpieczeństwo, en: Security }
+      date: "2026-08-29"
+      title:
+        {
+          pl: Bezpieczny filesystem jako fundament CMS-a,
+          en: A secure filesystem as the foundation of a CMS,
+        }
+      lead:
+        {
+          pl: "Flat-file nie oznacza naiwnych operacji na plikach. To świadomy model danych, którego bezpieczeństwo zaczyna się długo przed formularzem w panelu.",
+          en: "Flat-file does not mean naïve file operations. It is a deliberate data model whose security starts long before an admin form.",
+        }
+      image:
+        src: cover.png
+        alt:
+          {
+            pl: "Dokumenty przechodzące przez transparentne bramki walidacji",
+            en: "Documents passing through transparent validation gates",
+          }
+  - id: 01a05820-2222-7202-8202-000000000002
+    type: article-content
+    enabled: true
+    data:
+      content:
+        pl: |-
+          ## Ścieżka jest częścią danych wejściowych
+
+          Najgroźniejsze błędy w systemie plikowym często zaczynają się niewinnie: od sklejenia katalogu z nazwą przesłaną przez formularz. FlatFile CMS rozwiązuje ścieżki względem znanych katalogów bazowych i odrzuca próby wyjścia poza ich granice.
+
+          Dotyczy to stron, konfiguracji, mediów i rendererów. Pakiety bloków są kodem deweloperskim — panel może zarządzać ich danymi, ale nigdy plikami PHP.
+
+          ## Zapis musi być atomowy
+
+          Modyfikacja YAML nie powinna pozostawić połowy dokumentu po przerwaniu procesu. Nowa zawartość najpierw trafia do prywatnego pliku tymczasowego. Dopiero po pełnym zapisie i walidacji następuje bezpieczna zamiana.
+
+          Ten sam wzorzec wspiera blokadę zapisu i kontrolę konfliktów. Administrator otrzymuje błąd, a poprzednia wersja treści pozostaje poprawna.
+
+          ## Media nie są wyjątkiem
+
+          Rozszerzenie pliku nie decyduje o jego rodzaju. Warstwa mediów sprawdza MIME, limity rozmiaru i wymiary obrazu. SVG przechodzi sanitizację, a warianty rastrowe powstają w kontrolowanych granicach pamięci.
+
+          Publiczny adres zawiera fingerprint. Można więc ustawić długi cache, nie ryzykując, że użytkownik zobaczy starą wersję pliku.
+
+          ## Audyt domyka proces
+
+          Operacje administracyjne zapisują kto, kiedy i jaki zasób zmienił. Dziennik nie zastępuje kontroli dostępu, ale pozwala zrozumieć historię systemu bez analizowania czasu modyfikacji plików.
+        en: |-
+          ## A path is part of the input
+
+          The most dangerous filesystem bugs often begin innocently: by joining a base directory with a name submitted through a form. FlatFile CMS resolves paths against known roots and rejects every attempt to escape their boundaries.
+
+          This applies to pages, configuration, media and renderers. Block packages are developer-owned code — the panel can manage their data, but never their PHP files.
+
+          ## Writes must be atomic
+
+          Updating YAML must not leave half a document behind if the process is interrupted. New content first goes to a private temporary file. Only after a complete write and successful validation is it safely moved into place.
+
+          The same pattern supports write locks and conflict control. An administrator receives an error while the previous content remains valid.
+
+          ## Media is no exception
+
+          A filename extension does not determine its actual type. The media layer verifies MIME, file-size limits and image dimensions. SVG files are sanitized and raster variants are generated within controlled memory boundaries.
+
+          Public URLs contain fingerprints, enabling long-lived caching without serving stale assets.
+
+          ## Audit closes the loop
+
+          Administrative operations record who changed which resource and when. The log does not replace access control, but it explains system history without relying on filesystem timestamps.
+      note:
+        pl: Prostota flat-file jest zaletą tylko wtedy, gdy wszystkie operacje zapisu mają jasno określone granice i zachowanie awaryjne.
+        en: Flat-file simplicity is an advantage only when every write operation has clearly defined boundaries and failure behavior.
+  - id: 01a05820-2222-7203-8203-000000000003
+    type: article-gallery
+    enabled: true
+    data:
+      title:
+        {
+          pl: Każdy dokument przechodzi kontrolowaną drogę,
+          en: Every document follows a controlled path,
+        }
+      images:
+        - image:
+            src: cover.png
+            alt:
+              {
+                pl: "Świecące dokumenty przechodzące przez bramki bezpieczeństwa",
+                en: "Glowing documents passing through security gates",
+              }
+          caption:
+            {
+              pl: "Walidacja odbywa się przed opublikowaniem zmiany w docelowym katalogu.",
+              en: "Validation completes before the change is published in its destination directory.",
+            }

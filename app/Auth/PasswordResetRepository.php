@@ -26,7 +26,7 @@ SQL);
                 'user_id' => $user->id(),
                 'token_hash' => $tokenHash,
                 'expires_at' => $expiresAt,
-                'created_at' => \time(),
+                'created_at' => time(),
             ]);
             $this->database->commit();
         } catch (\Throwable $exception) {

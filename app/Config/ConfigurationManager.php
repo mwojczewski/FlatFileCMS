@@ -31,7 +31,7 @@ final readonly class ConfigurationManager
         $site = $this->mapping($current['site'] ?? []);
         $current['site'] = [...$site, ...[
             'name' => $input->siteName,
-            'url' => \rtrim($input->siteUrl, '/'),
+            'url' => rtrim($input->siteUrl, '/'),
             'defaultLayout' => $input->defaultLayout,
         ]];
         $seo = $this->mapping($current['seo'] ?? []);

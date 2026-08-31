@@ -57,7 +57,7 @@ final readonly class CollectionManager
             $data['layout'] = $settings->layout;
             $data['slug'] = $settings->slugs;
             $data['title'] = $settings->titles;
-            $seo = isset($data['seo']) && is_array($data['seo']) && !array_is_list($data['seo']) ? $data['seo'] : [];
+            $seo = isset($data['seo']) && \is_array($data['seo']) && !array_is_list($data['seo']) ? $data['seo'] : [];
             $seo['title'] = $settings->seoTitles;
             $seo['description'] = $settings->seoDescriptions;
             $seo['robots'] = ['index' => $settings->robotsIndex, 'follow' => $settings->robotsFollow];
@@ -123,7 +123,7 @@ final readonly class CollectionManager
         }
         if ($canonical !== null && !str_starts_with($canonical, '/')) {
             $scheme = parse_url($canonical, PHP_URL_SCHEME);
-            if (filter_var($canonical, FILTER_VALIDATE_URL) === false || !in_array($scheme, ['http', 'https'], true)) {
+            if (filter_var($canonical, FILTER_VALIDATE_URL) === false || !\in_array($scheme, ['http', 'https'], true)) {
                 throw new InvalidArgumentException('Collection canonical must be an HTTP(S) URL or absolute site path.');
             }
         }

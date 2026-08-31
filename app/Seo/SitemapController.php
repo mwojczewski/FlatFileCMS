@@ -31,7 +31,7 @@ final readonly class SitemapController
         $collections = $this->collections->all($languages);
         $routes = PageRouteIndex::build($pages, $languages, $collections);
         $site = ContentData::map($this->configuration->get()->data()['site'] ?? null, 'site');
-        $baseUrl = \rtrim(ContentData::string($site['url'] ?? null, 'site.url'), '/');
+        $baseUrl = rtrim(ContentData::string($site['url'] ?? null, 'site.url'), '/');
         $entries = [];
 
         foreach ($languages->codes() as $locale) {
@@ -46,7 +46,7 @@ final readonly class SitemapController
                 }
             }
         }
-        \ksort($entries);
+        ksort($entries);
 
         $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
@@ -71,6 +71,6 @@ final readonly class SitemapController
 
     private static function xml(string $value): string
     {
-        return \htmlspecialchars($value, ENT_XML1 | ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        return htmlspecialchars($value, ENT_XML1 | ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 }

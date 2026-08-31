@@ -54,7 +54,7 @@ ENV);
 
         ProductionGuard::initialize(Environment::load($this->project->path()));
 
-        self::assertSame('Europe/Warsaw', \date_default_timezone_get());
-        \date_default_timezone_set('UTC');
+        self::assertSame('Europe/Warsaw', date_default_timezone_get());
+        date_default_timezone_set('UTC');
     }
 }

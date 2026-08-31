@@ -34,7 +34,8 @@ final readonly class AdminMediaController
         private AdminView $views,
         private AdminLayout $layout,
         private AuditLogger $audit,
-    ) {}
+    ) {
+    }
 
     public function index(Request $request): Response
     {
@@ -80,7 +81,7 @@ final readonly class AdminMediaController
             );
 
             return $this->redirect($identity, 'uploaded');
-        } catch (MediaException|InvalidArgumentException $exception) {
+        } catch (MediaException | InvalidArgumentException $exception) {
             throw new HttpException(422, 'MEDIA_UPLOAD_INVALID', $exception->getMessage(), previous: $exception);
         }
     }
@@ -101,7 +102,7 @@ final readonly class AdminMediaController
             );
 
             return $this->redirect($identity, 'deleted');
-        } catch (MediaException|InvalidArgumentException $exception) {
+        } catch (MediaException | InvalidArgumentException $exception) {
             throw new HttpException(422, 'MEDIA_DELETE_INVALID', $exception->getMessage(), previous: $exception);
         }
     }
@@ -131,7 +132,7 @@ final readonly class AdminMediaController
             ];
         }
 
-        return Response::json(['items' => $items, 'manageUrl' => '/admin/media?path=' . \rawurlencode($identity->value())], headers: [
+        return Response::json(['items' => $items, 'manageUrl' => '/admin/media?path=' . rawurlencode($identity->value())], headers: [
             'Cache-Control' => 'no-store',
             'X-Content-Type-Options' => 'nosniff',
         ]);
@@ -162,7 +163,7 @@ final readonly class AdminMediaController
             throw new HttpException(400, 'PAGE_IDENTITY_REQUIRED', 'Page identity is required.');
         }
 
-        return PageIdentity::fromString(\trim($value, '/'));
+        return PageIdentity::fromString(trim($value, '/'));
     }
 
     private function name(mixed $value): MediaName
@@ -194,14 +195,14 @@ final readonly class AdminMediaController
 
     private function redirect(PageIdentity $identity, string $status): Response
     {
-        return Response::redirect('/admin/media?path=' . \rawurlencode($identity->value()) . "&{$status}=1", 303);
+        return Response::redirect('/admin/media?path=' . rawurlencode($identity->value()) . "&{$status}=1", 303);
     }
 
     private function size(int $bytes): string
     {
         return $bytes >= 1_048_576
-            ? \number_format($bytes / 1_048_576, 1, ',', ' ') . ' MB'
-            : \number_format($bytes / 1024, 1, ',', ' ') . ' KB';
+            ? number_format($bytes / 1_048_576, 1, ',', ' ') . ' MB'
+            : number_format($bytes / 1024, 1, ',', ' ') . ' KB';
     }
 
 }

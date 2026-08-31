@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Admin;
 
+use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Auth\AuthenticationException;
 use FlatFileCms\Auth\Authenticator;
 use FlatFileCms\Auth\CsrfTokenManager;
 use FlatFileCms\Auth\User;
-use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Blocks\BlockDefinition;
 use FlatFileCms\Blocks\BlockRegistry;
 use FlatFileCms\Blocks\BlockValidationException;
@@ -41,7 +41,8 @@ final readonly class AdminPageBuilderController
         private AdminView $views,
         private AdminLayout $layout,
         private AuditLogger $audit,
-    ) {}
+    ) {
+    }
 
     public function index(Request $request): Response
     {

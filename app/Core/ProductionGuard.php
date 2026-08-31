@@ -19,7 +19,7 @@ final class ProductionGuard
         if (!\in_array($timezone, DateTimeZone::listIdentifiers(), true)) {
             throw new RuntimeException('APP_TIMEZONE is invalid.');
         }
-        \date_default_timezone_set($timezone);
+        date_default_timezone_set($timezone);
 
         if ($name === 'production') {
             self::assertProduction($environment);
@@ -36,7 +36,7 @@ final class ProductionGuard
             throw new RuntimeException('APP_TIMEZONE is invalid.');
         }
         $secret = $environment->get('APP_SECRET');
-        if (\strlen($secret) < 32 || \str_contains(\strtoupper($secret), 'CHANGE_ME')) {
+        if (\strlen($secret) < 32 || str_contains(strtoupper($secret), 'CHANGE_ME')) {
             throw new RuntimeException('APP_SECRET must contain at least 32 non-placeholder bytes.');
         }
         if ($environment->debug()) {

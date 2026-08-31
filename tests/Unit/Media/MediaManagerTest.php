@@ -153,7 +153,7 @@ final class MediaManagerTest extends TestCase
 
         self::assertSame('image/webp', $variant->mimeType());
         self::assertNotSame('', $variant->contents());
-        self::assertNotEmpty(\glob($this->project->path('storage/cache/media/*/*.webp')) ?: []);
+        self::assertNotEmpty(glob($this->project->path('storage/cache/media/*/*.webp')) ?: []);
 
         $controller = new PublicMediaController($this->repository, $this->variants);
         $path = "offer/{$item->fingerprint()}/{$item->name()->value()}";
@@ -187,7 +187,7 @@ final class MediaManagerTest extends TestCase
         $item = $this->manager->upload($this->identity, $this->sizedImageUpload('wide.png', 4, 2));
         $file = $this->repository->get($this->identity, $item->name());
         $variant = $this->variants->create($file, 2, 2, 'webp', 'cover');
-        $dimensions = \getimagesizefromstring($variant->contents());
+        $dimensions = getimagesizefromstring($variant->contents());
 
         self::assertIsArray($dimensions);
         self::assertSame(2, $dimensions[0]);
@@ -196,14 +196,14 @@ final class MediaManagerTest extends TestCase
 
     private function imageUpload(string $clientFilename): UploadedFile
     {
-        $contents = \base64_decode(
+        $contents = base64_decode(
             'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
             true,
         );
         if ($contents === false) {
             throw new RuntimeException('Test image fixture is invalid.');
         }
-        $path = 'storage/tmp/' . \bin2hex(\random_bytes(5)) . '.png';
+        $path = 'storage/tmp/' . bin2hex(random_bytes(5)) . '.png';
         $this->project->write($path, $contents);
 
         return new UploadedFile($this->project->path($path), $clientFilename, \strlen($contents));
@@ -214,23 +214,23 @@ final class MediaManagerTest extends TestCase
         if ($width < 1 || $height < 1) {
             throw new RuntimeException('Image fixture dimensions must be positive.');
         }
-        $image = \imagecreatetruecolor($width, $height);
-        $color = \imagecolorallocate($image, 24, 120, 220);
+        $image = imagecreatetruecolor($width, $height);
+        $color = imagecolorallocate($image, 24, 120, 220);
         if ($color === false) {
             throw new RuntimeException('Unable to allocate image fixture color.');
         }
-        \imagefill($image, 0, 0, $color);
-        \ob_start();
+        imagefill($image, 0, 0, $color);
+        ob_start();
         try {
-            \imagepng($image);
-            $contents = \ob_get_contents();
+            imagepng($image);
+            $contents = ob_get_contents();
         } finally {
-            \ob_end_clean();
+            ob_end_clean();
         }
         if (!\is_string($contents) || $contents === '') {
             throw new RuntimeException('Unable to create image fixture.');
         }
-        $path = 'storage/tmp/' . \bin2hex(\random_bytes(5)) . '.png';
+        $path = 'storage/tmp/' . bin2hex(random_bytes(5)) . '.png';
         $this->project->write($path, $contents);
 
         return new UploadedFile($this->project->path($path), $clientFilename, \strlen($contents));

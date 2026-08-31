@@ -33,13 +33,13 @@ final class RasterImageProcessor
         if (!MediaTypes::isTransformable($mimeType)) {
             throw new MediaException('This image type cannot be transformed.');
         }
-        $dimensions = @\getimagesizefromstring($contents);
+        $dimensions = @getimagesizefromstring($contents);
         if ($dimensions === false) {
             throw new MediaException('Image dimensions could not be read.');
         }
         $sourceWidth = $dimensions[0];
         $sourceHeight = $dimensions[1];
-        if ($sourceWidth < 1 || $sourceHeight < 1 || $sourceWidth > \intdiv($maximumPixels, $sourceHeight)) {
+        if ($sourceWidth < 1 || $sourceHeight < 1 || $sourceWidth > intdiv($maximumPixels, $sourceHeight)) {
             throw new MediaException('Image pixel count exceeds the configured limit.');
         }
 
@@ -48,7 +48,7 @@ final class RasterImageProcessor
             throw new MediaException('Calculated image dimensions are invalid.');
         }
         $source = $this->decode($contents);
-        $target = \imagecreatetruecolor($width, $height);
+        $target = imagecreatetruecolor($width, $height);
         $this->prepareTransparency($target, $format);
         [$sourceX, $sourceY, $cropWidth, $cropHeight] = $this->crop(
             $sourceWidth,
@@ -57,7 +57,7 @@ final class RasterImageProcessor
             $height,
             $fit,
         );
-        \imagecopyresampled(
+        imagecopyresampled(
             $target,
             $source,
             0,
@@ -83,7 +83,7 @@ final class RasterImageProcessor
 
     private function decode(string $contents): GdImage
     {
-        $image = @\imagecreatefromstring($contents);
+        $image = @imagecreatefromstring($contents);
         if (!$image instanceof GdImage) {
             throw new MediaException('Image decoder rejected the file.');
         }
@@ -93,18 +93,18 @@ final class RasterImageProcessor
 
     private function encode(GdImage $image, string $format, int $quality): string
     {
-        \ob_start();
+        ob_start();
         try {
             $success = match ($format) {
-                'avif' => \function_exists('imageavif') && \imageavif($image, null, $quality),
-                'jpg', 'jpeg' => \imagejpeg($image, null, $quality),
-                'png' => \imagepng($image, null, (int) \round((100 - $quality) * 9 / 100)),
-                'webp' => \function_exists('imagewebp') && \imagewebp($image, null, $quality),
+                'avif' => \function_exists('imageavif') && imageavif($image, null, $quality),
+                'jpg', 'jpeg' => imagejpeg($image, null, $quality),
+                'png' => imagepng($image, null, (int) round((100 - $quality) * 9 / 100)),
+                'webp' => \function_exists('imagewebp') && imagewebp($image, null, $quality),
                 default => false,
             };
-            $output = \ob_get_contents();
+            $output = ob_get_contents();
         } finally {
-            \ob_end_clean();
+            ob_end_clean();
         }
         if (!$success || !\is_string($output) || $output === '') {
             throw new MediaException('Requested image encoder is unavailable.');
@@ -120,8 +120,7 @@ final class RasterImageProcessor
         ?int $width,
         ?int $height,
         string $fit,
-    ): array
-    {
+    ): array {
         if (!\in_array($fit, ['contain', 'cover'], true)) {
             throw new MediaException('Requested image fit mode is invalid.');
         }
@@ -129,18 +128,18 @@ final class RasterImageProcessor
             if ($width === null || $height === null) {
                 throw new MediaException('Cover image variants require both width and height.');
             }
-            $scale = \min($sourceWidth / $width, $sourceHeight / $height, 1.0);
+            $scale = min($sourceWidth / $width, $sourceHeight / $height, 1.0);
 
-            return [\max(1, (int) \round($width * $scale)), \max(1, (int) \round($height * $scale))];
+            return [max(1, (int) round($width * $scale)), max(1, (int) round($height * $scale))];
         }
         if ($width === null && $height === null) {
             return [$sourceWidth, $sourceHeight];
         }
         $widthRatio = $width === null ? 1.0 : $width / $sourceWidth;
         $heightRatio = $height === null ? 1.0 : $height / $sourceHeight;
-        $ratio = \min($widthRatio, $heightRatio, 1.0);
+        $ratio = min($widthRatio, $heightRatio, 1.0);
 
-        return [\max(1, (int) \round($sourceWidth * $ratio)), \max(1, (int) \round($sourceHeight * $ratio))];
+        return [max(1, (int) round($sourceWidth * $ratio)), max(1, (int) round($sourceHeight * $ratio))];
     }
 
     /** @return array{int, int, int, int} */
@@ -158,14 +157,14 @@ final class RasterImageProcessor
         $sourceRatio = $sourceWidth / $sourceHeight;
         $targetRatio = $targetWidth / $targetHeight;
         if ($sourceRatio > $targetRatio) {
-            $cropWidth = \max(1, (int) \round($sourceHeight * $targetRatio));
+            $cropWidth = max(1, (int) round($sourceHeight * $targetRatio));
 
-            return [(int) \floor(($sourceWidth - $cropWidth) / 2), 0, $cropWidth, $sourceHeight];
+            return [(int) floor(($sourceWidth - $cropWidth) / 2), 0, $cropWidth, $sourceHeight];
         }
 
-        $cropHeight = \max(1, (int) \round($sourceWidth / $targetRatio));
+        $cropHeight = max(1, (int) round($sourceWidth / $targetRatio));
 
-        return [0, (int) \floor(($sourceHeight - $cropHeight) / 2), $sourceWidth, $cropHeight];
+        return [0, (int) floor(($sourceHeight - $cropHeight) / 2), $sourceWidth, $cropHeight];
     }
 
     private function prepareTransparency(GdImage $image, string $format): void
@@ -173,11 +172,11 @@ final class RasterImageProcessor
         if (!\in_array($format, ['avif', 'png', 'webp'], true)) {
             return;
         }
-        \imagealphablending($image, false);
-        \imagesavealpha($image, true);
-        $transparent = \imagecolorallocatealpha($image, 0, 0, 0, 127);
+        imagealphablending($image, false);
+        imagesavealpha($image, true);
+        $transparent = imagecolorallocatealpha($image, 0, 0, 0, 127);
         if ($transparent !== false) {
-            \imagefill($image, 0, 0, $transparent);
+            imagefill($image, 0, 0, $transparent);
         }
     }
 }

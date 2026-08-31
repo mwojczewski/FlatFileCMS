@@ -1,0 +1,119 @@
+schemaVersion: 1
+enabled: true
+layout: default
+slug:
+  pl: od-yaml-do-html
+  en: from-yaml-to-html
+title:
+  pl: Od YAML do HTML — jedna ścieżka, dwa interfejsy
+  en: From YAML to HTML — one path, two interfaces
+date: "2026-08-31"
+category: architecture
+excerpt:
+  pl: Jak wspólny ViewModel zasila SSR i REST API bez synchronizacji oraz powielania logiki.
+  en: How a shared ViewModel powers SSR and the REST API without synchronization or duplicated logic.
+seo:
+  title:
+    pl: Od YAML do HTML — architektura renderowania FlatFile CMS
+    en: From YAML to HTML — the FlatFile CMS rendering architecture
+  description:
+    pl: Poznaj drogę treści od pliku YAML przez walidację bloków do HTML i REST API.
+    en: Follow content from a YAML file through block validation to HTML and the REST API.
+blocks:
+  - id: 01a05820-2111-7101-8101-000000000001
+    type: article-hero
+    enabled: true
+    data:
+      category: { pl: Architektura, en: Architecture }
+      date: "2026-08-31"
+      title:
+        {
+          pl: "Od YAML do HTML: jedna ścieżka, dwa interfejsy",
+          en: "From YAML to HTML: one path, two interfaces",
+        }
+      lead:
+        {
+          pl: "FlatFile CMS nie zmusza HTML i API do udawania, że są tym samym. Łączy je wcześniej — na poziomie poprawnie złożonego modelu strony.",
+          en: "FlatFile CMS does not force HTML and the API to pretend they are the same. It connects them earlier — through a correctly assembled page model.",
+        }
+      image:
+        src: cover.png
+        alt:
+          {
+            pl: "Abstrakcyjny przepływ treści przez silnik PHP do gotowej strony",
+            en: "An abstract content flow through the PHP engine into a finished page",
+          }
+  - id: 01a05820-2111-7102-8102-000000000002
+    type: article-content
+    enabled: true
+    data:
+      content:
+        pl: |-
+          ## Treść pozostaje zwykłym plikiem
+
+          Punktem wyjścia jest `content.yml`: stabilny kontrakt, który można przeczytać bez specjalistycznego narzędzia, śledzić w Git i bezpiecznie przenosić między środowiskami. To nie format pomocniczy — to źródło prawdy.
+
+          Każdy wpis bloku przechodzi przez rejestr definicji. CMS sprawdza typ, wymagane pola, tłumaczenia, reguły długości oraz odwołania do mediów. Dopiero znormalizowane dane trafiają dalej.
+
+          ## Wspólny model zamiast dwóch implementacji
+
+          `PageViewModelFactory` składa lokalną wersję tytułu, SEO, nawigację, media oraz aktywne bloki. Na tym poziomie nie istnieje jeszcze ani odpowiedź JSON, ani dokument HTML.
+
+          Następnie model wybiera jedną z dwóch dróg:
+
+          - `PageSerializer` tworzy przewidywalną odpowiedź REST API,
+          - `PageRenderer` uruchamia renderery bloków i osadza wynik w layoucie,
+          - oba adaptery otrzymują identyczne, zwalidowane dane.
+
+          ## Zasoby podążają za treścią
+
+          Renderer nie utrzymuje globalnego pakietu wszystkich stylów. Jeśli strona używa bloku `article-hero`, kolektor publikuje jego CSS pod adresem zawierającym skrót treści. Nieużywane bloki nie obciążają dokumentu.
+
+          Dzięki temu nowy komponent pozostaje lokalną zmianą: schemat YAML, PHP i opcjonalny CSS lub JavaScript.
+        en: |-
+          ## Content remains an ordinary file
+
+          Everything starts with `content.yml`: a stable contract that can be read without specialist software, tracked in Git and moved safely between environments. It is not an intermediate format — it is the source of truth.
+
+          Every block passes through the definition registry. The CMS checks its type, required fields, translations, length rules and media references before normalized data can move forward.
+
+          ## One model instead of two implementations
+
+          `PageViewModelFactory` assembles the localized title, SEO, navigation, media and active blocks. At this point the result is neither JSON nor an HTML document.
+
+          The model then takes one of two paths:
+
+          - `PageSerializer` creates a predictable REST response,
+          - `PageRenderer` runs block renderers and places their output in a layout,
+          - both adapters receive identical validated data.
+
+          ## Assets follow the content
+
+          The renderer does not ship one global bundle containing every style. When a page uses `article-hero`, its CSS is published under a fingerprinted URL. Unused blocks add no weight to the document.
+
+          A new component therefore remains a local change: a YAML schema, PHP and optional CSS or JavaScript.
+      note:
+        pl: Granica między modelem a adapterem pozwala rozwijać stronę i API niezależnie, bez rozjazdu danych.
+        en: The boundary between the model and its adapters lets the website and API evolve independently without data drift.
+  - id: 01a05820-2111-7103-8103-000000000003
+    type: article-gallery
+    enabled: true
+    data:
+      title:
+        {
+          pl: "Treść przepływa, ale pozostaje spójna",
+          en: "Content flows while remaining consistent",
+        }
+      images:
+        - image:
+            src: cover.png
+            alt:
+              {
+                pl: "Wizualizacja dokumentów, silnika i interfejsu strony",
+                en: "A visualization of documents, the engine and a website interface",
+              }
+          caption:
+            {
+              pl: "Jeden model treści zasila dwa niezależne adaptery wyjściowe.",
+              en: "One content model powers two independent output adapters.",
+            }

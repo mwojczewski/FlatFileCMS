@@ -1,0 +1,99 @@
+.feature-grid {
+  padding: clamp(5rem, 10vw, 9rem) 0;
+  background: #f4f7f5;
+}
+.section-heading {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 4rem;
+  align-items: end;
+  margin-bottom: 4rem;
+}
+.section-heading h2 {
+  max-width: 12ch;
+  margin: 0;
+  color: #0a1713;
+  font-size: clamp(2.7rem, 5vw, 5.2rem);
+  line-height: 1;
+  letter-spacing: -0.055em;
+}
+.section-heading > p {
+  max-width: 32rem;
+  margin: 0 0 0.5rem;
+  color: #61716b;
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+.section-kicker--dark {
+  color: #168b66;
+}
+.feature-grid__items {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid #cfd9d5;
+  border-left: 1px solid #cfd9d5;
+}
+.feature-card {
+  position: relative;
+  min-height: 18rem;
+  padding: 2rem;
+  border-right: 1px solid #cfd9d5;
+  border-bottom: 1px solid #cfd9d5;
+  background: #fff;
+  transition:
+    transform 0.25s,
+    box-shadow 0.25s;
+  overflow: hidden;
+}
+.feature-card:hover {
+  z-index: 1;
+  transform: translateY(-5px);
+  box-shadow: 0 1.5rem 4rem rgba(20, 54, 43, 0.11);
+}
+.feature-card__number {
+  color: #90a099;
+  font:
+    600 0.68rem ui-monospace,
+    monospace;
+  letter-spacing: 0.12em;
+}
+.feature-card__icon {
+  width: 2.7rem;
+  height: 2.7rem;
+  margin: 2.6rem 0 2.2rem;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  color: #1ac58b;
+  background: radial-gradient(circle, currentColor 0 2px, transparent 3px);
+}
+.feature-card--violet .feature-card__icon {
+  color: #7968dc;
+}
+.feature-card--amber .feature-card__icon {
+  color: #e29c32;
+}
+.feature-card h3 {
+  margin: 0;
+  color: #12201b;
+  font-size: 1.2rem;
+}
+.feature-card p {
+  margin: 1rem 0 0;
+  color: #6b7a75;
+  font-size: 0.91rem;
+  line-height: 1.7;
+}
+@media (max-width: 850px) {
+  .section-heading {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .feature-grid__items {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 570px) {
+  .feature-grid__items {
+    grid-template-columns: 1fr;
+  }
+}

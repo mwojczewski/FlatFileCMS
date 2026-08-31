@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Admin;
 
+use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Auth\AuthenticationException;
 use FlatFileCms\Auth\Authenticator;
 use FlatFileCms\Auth\CsrfTokenManager;
 use FlatFileCms\Auth\User;
-use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Collections\CollectionRepository;
 use FlatFileCms\Config\ConfigurationRepository;
 use FlatFileCms\Config\LanguageRepository;
@@ -43,7 +43,8 @@ final readonly class AdminPageController
         private AdminView $views,
         private AdminLayout $layout,
         private AuditLogger $audit,
-    ) {}
+    ) {
+    }
 
     public function index(Request $request): Response
     {
@@ -113,7 +114,7 @@ final readonly class AdminPageController
             return Response::redirect('/admin/pages?created=1', 303);
         } catch (RevisionConflictException $exception) {
             throw new HttpException(409, 'PAGE_REVISION_CONFLICT', 'Page changed in another session.', previous: $exception);
-        } catch (InvalidArgumentException|InvalidContentException|FilesystemException $exception) {
+        } catch (InvalidArgumentException | InvalidContentException | FilesystemException $exception) {
             throw new HttpException(422, 'PAGE_CREATE_INVALID', $exception->getMessage(), previous: $exception);
         }
     }
@@ -160,7 +161,7 @@ final readonly class AdminPageController
             return Response::redirect('/admin/pages/edit?path=' . rawurlencode($identity->value()) . '&saved=1', 303);
         } catch (RevisionConflictException $exception) {
             throw new HttpException(409, 'PAGE_REVISION_CONFLICT', 'Page changed in another session.', previous: $exception);
-        } catch (InvalidArgumentException|InvalidContentException|FilesystemException $exception) {
+        } catch (InvalidArgumentException | InvalidContentException | FilesystemException $exception) {
             throw new HttpException(422, 'PAGE_UPDATE_INVALID', $exception->getMessage(), previous: $exception);
         }
     }
@@ -189,7 +190,7 @@ final readonly class AdminPageController
             return Response::redirect('/admin/pages/edit?path=' . rawurlencode($destination->value()) . '&moved=1', 303);
         } catch (RevisionConflictException $exception) {
             throw new HttpException(409, 'PAGE_REVISION_CONFLICT', 'Page changed in another session.', previous: $exception);
-        } catch (InvalidArgumentException|InvalidContentException|FilesystemException $exception) {
+        } catch (InvalidArgumentException | InvalidContentException | FilesystemException $exception) {
             throw new HttpException(422, 'PAGE_MOVE_INVALID', $exception->getMessage(), previous: $exception);
         }
     }
@@ -212,7 +213,7 @@ final readonly class AdminPageController
             return Response::redirect('/admin/pages?deleted=1', 303);
         } catch (RevisionConflictException $exception) {
             throw new HttpException(409, 'PAGE_REVISION_CONFLICT', 'Page changed in another session.', previous: $exception);
-        } catch (InvalidArgumentException|InvalidContentException|FilesystemException $exception) {
+        } catch (InvalidArgumentException | InvalidContentException | FilesystemException $exception) {
             throw new HttpException(422, 'PAGE_DELETE_INVALID', $exception->getMessage(), previous: $exception);
         }
     }
@@ -332,7 +333,7 @@ final readonly class AdminPageController
             'identityPrefix' => $identityPrefix,
             'layouts' => array_keys($this->layouts->all()),
             'csrfToken' => $this->csrf->token(),
-            'siteUrl' => is_string($site['url'] ?? null) ? rtrim($site['url'], '/') : '',
+            'siteUrl' => \is_string($site['url'] ?? null) ? rtrim($site['url'], '/') : '',
             'canonicalBasePath' => $this->canonicalBasePath($identityPrefix, $languages),
         ];
     }

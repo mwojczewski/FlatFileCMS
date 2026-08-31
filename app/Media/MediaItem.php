@@ -16,13 +16,40 @@ final readonly class MediaItem
         private ?int $height = null,
     ) {}
 
-    public function name(): MediaName { return $this->name; }
-    public function mimeType(): string { return $this->mimeType; }
-    public function size(): int { return $this->size; }
-    public function modifiedAt(): int { return $this->modifiedAt; }
-    public function hash(): string { return $this->hash; }
-    public function fingerprint(): string { return \substr($this->hash, 0, 16); }
-    public function width(): ?int { return $this->width; }
-    public function height(): ?int { return $this->height; }
-    public function isImage(): bool { return MediaTypes::isImage($this->mimeType); }
+    public function name(): MediaName
+    {
+        return $this->name;
+    }
+    public function mimeType(): string
+    {
+        return $this->mimeType;
+    }
+    public function size(): int
+    {
+        return $this->size;
+    }
+    public function modifiedAt(): int
+    {
+        return $this->modifiedAt;
+    }
+    public function hash(): string
+    {
+        return $this->hash;
+    }
+    public function fingerprint(): string
+    {
+        return substr($this->hash, 0, 16);
+    }
+    public function width(): ?int
+    {
+        return $this->width;
+    }
+    public function height(): ?int
+    {
+        return $this->height;
+    }
+    public function isImage(): bool
+    {
+        return MediaTypes::isImage($this->mimeType);
+    }
 }

@@ -36,7 +36,8 @@ final readonly class AdminCollectionController
         private AdminView $views,
         private AdminLayout $layout,
         private AuditLogger $audit,
-    ) {}
+    ) {
+    }
 
     public function edit(Request $request): Response
     {
@@ -75,7 +76,7 @@ final readonly class AdminCollectionController
             return Response::redirect('/admin/collections/edit?path=' . rawurlencode($identity->value()) . '&saved=1', 303);
         } catch (RevisionConflictException $exception) {
             throw new HttpException(409, 'COLLECTION_REVISION_CONFLICT', 'Collection changed in another session.', previous: $exception);
-        } catch (InvalidArgumentException|InvalidContentException|FilesystemException|JsonException $exception) {
+        } catch (InvalidArgumentException | InvalidContentException | FilesystemException | JsonException $exception) {
             throw new HttpException(422, 'COLLECTION_UPDATE_INVALID', $exception->getMessage(), previous: $exception);
         }
     }
@@ -96,7 +97,7 @@ final readonly class AdminCollectionController
         }
         if ($canonical !== '' && !str_starts_with($canonical, '/')) {
             $scheme = parse_url($canonical, PHP_URL_SCHEME);
-            if (filter_var($canonical, FILTER_VALIDATE_URL) === false || !in_array($scheme, ['http', 'https'], true)) {
+            if (filter_var($canonical, FILTER_VALIDATE_URL) === false || !\in_array($scheme, ['http', 'https'], true)) {
                 throw new InvalidArgumentException('Canonical URL must be an HTTP(S) URL or an absolute site path.');
             }
         }
@@ -121,27 +122,27 @@ final readonly class AdminCollectionController
     /** @return list<array{parameter: string, field: string, allowedValues: list<string>}> */
     private function filters(mixed $value): array
     {
-        if (!is_string($value) || strlen($value) > 131_072) {
+        if (!\is_string($value) || \strlen($value) > 131_072) {
             throw new InvalidArgumentException('Collection filters must be bounded JSON.');
         }
         $decoded = json_decode($value, true, flags: JSON_THROW_ON_ERROR);
-        if (!is_array($decoded) || !array_is_list($decoded)) {
+        if (!\is_array($decoded) || !array_is_list($decoded)) {
             throw new InvalidArgumentException('Collection filters must be a JSON array.');
         }
         $filters = [];
         foreach ($decoded as $item) {
-            if (!is_array($item) || array_is_list($item)) {
+            if (!\is_array($item) || array_is_list($item)) {
                 throw new InvalidArgumentException('Each collection filter must be an object.');
             }
             $parameter = $item['parameter'] ?? null;
             $field = $item['field'] ?? null;
             $allowed = $item['allowedValues'] ?? [];
-            if (!is_string($parameter) || !is_string($field) || !is_array($allowed) || !array_is_list($allowed)) {
+            if (!\is_string($parameter) || !\is_string($field) || !\is_array($allowed) || !array_is_list($allowed)) {
                 throw new InvalidArgumentException('Collection filter structure is invalid.');
             }
             $values = [];
             foreach ($allowed as $allowedValue) {
-                if (!is_string($allowedValue)) {
+                if (!\is_string($allowedValue)) {
                     throw new InvalidArgumentException('Collection filter allowed values must be strings.');
                 }
                 $values[] = $allowedValue;
@@ -155,13 +156,13 @@ final readonly class AdminCollectionController
     /** @return array<string, string> */
     private function localized(mixed $value, LanguageConfig $languages, bool $required): array
     {
-        if (!is_array($value) || ($value !== [] && array_is_list($value))) {
+        if (!\is_array($value) || ($value !== [] && array_is_list($value))) {
             throw new InvalidArgumentException('Localized value must be a mapping.');
         }
         $result = [];
         foreach ($languages->codes() as $locale) {
             $localized = $value[$locale] ?? null;
-            if (!is_string($localized)) {
+            if (!\is_string($localized)) {
                 throw new InvalidArgumentException("Localized value for {$locale} is invalid.");
             }
             $localized = trim($localized);
@@ -179,7 +180,7 @@ final readonly class AdminCollectionController
 
     private function identity(mixed $value): PageIdentity
     {
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             throw new HttpException(400, 'COLLECTION_IDENTITY_REQUIRED', 'Collection identity is required.');
         }
 
@@ -188,7 +189,7 @@ final readonly class AdminCollectionController
 
     private function revision(mixed $value): FileRevision
     {
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             throw new InvalidArgumentException('Collection revision is required.');
         }
 
@@ -197,7 +198,7 @@ final readonly class AdminCollectionController
 
     private function string(mixed $value, string $label): string
     {
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             throw new InvalidArgumentException("{$label} is required.");
         }
 

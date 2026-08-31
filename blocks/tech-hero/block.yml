@@ -1,0 +1,75 @@
+schemaVersion: 1
+name: { pl: Hero technologiczny, en: Technology hero }
+description:
+  {
+    pl: Otwierająca sekcja produktu z metrykami i przyciskami.,
+    en: Product opening with metrics and actions.,
+  }
+icon: rocket
+fields:
+  eyebrow:
+    type: text
+    required: true
+    translatable: true
+    maxLength: 80
+    label: { pl: Etykieta, en: Eyebrow }
+  title:
+    type: text
+    required: true
+    translatable: true
+    maxLength: 180
+    label: { pl: Nagłówek, en: Heading }
+  lead:
+    type: textarea
+    required: true
+    translatable: true
+    maxLength: 600
+    label: { pl: Wprowadzenie, en: Introduction }
+  primary_label:
+    type: text
+    required: true
+    translatable: true
+    maxLength: 50
+    label: { pl: Główny przycisk, en: Primary button }
+  primary_url:
+    type: url
+    required: true
+    translatable: false
+    label: { pl: Adres główny, en: Primary URL }
+  secondary_label:
+    type: text
+    required: true
+    translatable: true
+    maxLength: 50
+    label: { pl: Drugi przycisk, en: Secondary button }
+  secondary_url:
+    type: url
+    required: true
+    translatable: false
+    label: { pl: Drugi adres, en: Secondary URL }
+  version:
+    type: text
+    required: true
+    translatable: false
+    maxLength: 20
+    label: { pl: Wersja PHP, en: PHP version }
+  metrics:
+    type: repeater
+    required: true
+    translatable: false
+    minItems: 2
+    maxItems: 4
+    label: { pl: Metryki, en: Metrics }
+    fields:
+      value:
+        type: text
+        required: true
+        translatable: false
+        maxLength: 20
+        label: { pl: Wartość, en: Value }
+      label:
+        type: text
+        required: true
+        translatable: true
+        maxLength: 70
+        label: { pl: Opis, en: Label }

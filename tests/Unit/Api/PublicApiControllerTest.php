@@ -102,12 +102,12 @@ final class PublicApiControllerTest extends TestCase
         );
         $first = $this->controller->page($request);
         $path = $this->project->path('pages/services/hero.png');
-        $contents = \file_get_contents($path);
+        $contents = file_get_contents($path);
         if ($contents === false) {
             throw new \RuntimeException('Test image fixture cannot be read.');
         }
         $this->project->write('pages/services/hero.png', $contents . 'changed');
-        \touch($path, \time() + 2);
+        touch($path, time() + 2);
 
         $second = $this->controller->page(new Request(
             'GET',
@@ -254,7 +254,7 @@ blocks:
         src: hero.png
         alt: { pl: Bohater, en: Hero }
 YAML);
-        $image = \base64_decode(
+        $image = base64_decode(
             'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
             true,
         );

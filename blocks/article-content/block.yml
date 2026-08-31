@@ -1,0 +1,26 @@
+schemaVersion: 1
+name: { pl: Treść artykułu, en: Article content }
+description:
+  {
+    pl: Treść Markdown z opcjonalną notatką.,
+    en: Markdown content with an optional note.,
+  }
+icon: align-left
+fields:
+  content:
+    {
+      type: markdown,
+      required: true,
+      translatable: true,
+      minLength: 1,
+      maxLength: 30000,
+      label: { pl: Treść, en: Content },
+    }
+  note:
+    {
+      type: textarea,
+      required: false,
+      translatable: true,
+      maxLength: 600,
+      label: { pl: Notatka, en: Note },
+    }

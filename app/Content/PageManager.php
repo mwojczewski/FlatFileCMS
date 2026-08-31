@@ -294,14 +294,13 @@ final readonly class PageManager
         LanguageConfig $languages,
         string $field,
         bool $requireDefault = false,
-    ): void
-    {
+    ): void {
         foreach (array_keys($values) as $locale) {
             if (!$languages->has($locale)) {
                 throw new InvalidArgumentException("{$field} contains a language that is not enabled.");
             }
         }
-        if ($requireDefault && !array_key_exists($languages->default(), $values)) {
+        if ($requireDefault && !\array_key_exists($languages->default(), $values)) {
             throw new InvalidArgumentException("{$field} must contain the default language.");
         }
     }

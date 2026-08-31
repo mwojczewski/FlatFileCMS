@@ -52,7 +52,7 @@ final readonly class RedirectManager
     public function delete(string $id, FileRevision $revision): RedirectDocument
     {
         $current = $this->redirects->get()->rules();
-        $rules = \array_values(\array_filter(
+        $rules = array_values(array_filter(
             $current,
             static fn(RedirectRule $rule): bool => $rule->id() !== $id,
         ));

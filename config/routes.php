@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 use FlatFileCms\Admin\AdminAuthController;
 use FlatFileCms\Admin\AdminCollectionController;
+use FlatFileCms\Admin\AdminMediaController;
 use FlatFileCms\Admin\AdminPageBuilderController;
 use FlatFileCms\Admin\AdminPageController;
 use FlatFileCms\Admin\AdminRedirectController;
 use FlatFileCms\Admin\AdminSettingsController;
 use FlatFileCms\Admin\AdminUserController;
-use FlatFileCms\Admin\AdminMediaController;
 use FlatFileCms\Admin\PasswordResetController;
 use FlatFileCms\Api\PublicApiController;
 use FlatFileCms\Core\Container;
@@ -17,9 +17,9 @@ use FlatFileCms\Http\HttpException;
 use FlatFileCms\Http\Request;
 use FlatFileCms\Http\Response;
 use FlatFileCms\Http\Router;
-use FlatFileCms\Rendering\SiteController;
 use FlatFileCms\Media\PublicMediaController;
 use FlatFileCms\Redirects\RedirectController;
+use FlatFileCms\Rendering\SiteController;
 use FlatFileCms\Seo\SitemapController;
 use FlatFileCms\Seo\SiteTextController;
 

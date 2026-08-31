@@ -3,3 +3,6 @@ languages:
   pl:
     name: Polski
     enabled: true
+  en:
+    name: English
+    enabled: true

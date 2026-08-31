@@ -44,18 +44,18 @@ final readonly class UploadedFile
         if ($this->size < 1 || $this->size > $maximumBytes) {
             throw new RuntimeException('Uploaded file size is outside the allowed range.');
         }
-        if (!\is_file($this->temporaryPath) || \is_link($this->temporaryPath)) {
+        if (!is_file($this->temporaryPath) || is_link($this->temporaryPath)) {
             throw new RuntimeException('Uploaded file is unavailable.');
         }
-        if ($this->httpUpload && !\is_uploaded_file($this->temporaryPath)) {
+        if ($this->httpUpload && !is_uploaded_file($this->temporaryPath)) {
             throw new RuntimeException('File was not received through HTTP upload.');
         }
 
-        $actualSize = \filesize($this->temporaryPath);
+        $actualSize = filesize($this->temporaryPath);
         if ($actualSize === false || $actualSize !== $this->size || $actualSize > $maximumBytes) {
             throw new RuntimeException('Uploaded file size could not be verified.');
         }
-        $contents = \file_get_contents($this->temporaryPath);
+        $contents = file_get_contents($this->temporaryPath);
         if ($contents === false || \strlen($contents) !== $actualSize) {
             throw new RuntimeException('Uploaded file could not be read.');
         }

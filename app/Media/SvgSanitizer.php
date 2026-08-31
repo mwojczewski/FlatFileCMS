@@ -16,19 +16,19 @@ final class SvgSanitizer
 
     public function sanitize(string $contents): string
     {
-        if (\preg_match('/<!DOCTYPE|<!ENTITY/i', $contents) === 1) {
+        if (preg_match('/<!DOCTYPE|<!ENTITY/i', $contents) === 1) {
             throw new MediaException('SVG document declarations and entities are not allowed.');
         }
 
         $document = new DOMDocument();
-        $previous = \libxml_use_internal_errors(true);
+        $previous = libxml_use_internal_errors(true);
         try {
             $loaded = $document->loadXML($contents, LIBXML_NONET | LIBXML_COMPACT | LIBXML_NOBLANKS);
         } finally {
-            \libxml_clear_errors();
-            \libxml_use_internal_errors($previous);
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous);
         }
-        if (!$loaded || !$document->documentElement instanceof DOMElement || \strtolower($document->documentElement->localName ?? '') !== 'svg') {
+        if (!$loaded || !$document->documentElement instanceof DOMElement || strtolower($document->documentElement->localName ?? '') !== 'svg') {
             throw new MediaException('Uploaded SVG is not a valid SVG document.');
         }
 
@@ -37,7 +37,7 @@ final class SvgSanitizer
             $nodes[] = $node;
         }
         foreach ($nodes as $element) {
-            if (\in_array(\strtolower($element->localName ?? ''), self::BLOCKED_ELEMENTS, true)) {
+            if (\in_array(strtolower($element->localName ?? ''), self::BLOCKED_ELEMENTS, true)) {
                 $element->parentNode?->removeChild($element);
 
                 continue;
@@ -47,14 +47,14 @@ final class SvgSanitizer
                 $attributes[] = $attribute;
             }
             foreach ($attributes as $attribute) {
-                $name = \strtolower($attribute->nodeName);
-                $value = \trim($attribute->nodeValue ?? '');
+                $name = strtolower($attribute->nodeName);
+                $value = trim($attribute->nodeValue ?? '');
                 if (
-                    \str_starts_with($name, 'on')
+                    str_starts_with($name, 'on')
                     || $name === 'style'
                     || (\in_array($name, ['href', 'xlink:href', 'src'], true) && !$this->safeReference($value))
-                    || \preg_match('/(?:javascript|vbscript|data)\s*:/i', $value) === 1
-                    || \preg_match('/url\s*\(/i', $value) === 1
+                    || preg_match('/(?:javascript|vbscript|data)\s*:/i', $value) === 1
+                    || preg_match('/url\s*\(/i', $value) === 1
                 ) {
                     $element->removeAttributeNode($attribute);
                 }
@@ -71,6 +71,6 @@ final class SvgSanitizer
 
     private function safeReference(string $value): bool
     {
-        return $value === '' || (\str_starts_with($value, '#') && \preg_match('/^#[A-Za-z_][A-Za-z0-9_.:-]*$/D', $value) === 1);
+        return $value === '' || (str_starts_with($value, '#') && preg_match('/^#[A-Za-z_][A-Za-z0-9_.:-]*$/D', $value) === 1);
     }
 }

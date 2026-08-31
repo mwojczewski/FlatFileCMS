@@ -44,7 +44,8 @@ final readonly class AdminSettingsController
         private AdminView $views,
         private AdminLayout $layout,
         private AuditLogger $audit,
-    ) {}
+    ) {
+    }
 
     public function navigation(Request $request): Response
     {
@@ -88,7 +89,7 @@ final readonly class AdminSettingsController
             if (!\is_string($payload) || $payload === '' || \strlen($payload) > 524_288) {
                 throw new InvalidArgumentException('Navigation payload is missing or too large.');
             }
-            $decoded = \json_decode($payload, true, flags: JSON_THROW_ON_ERROR);
+            $decoded = json_decode($payload, true, flags: JSON_THROW_ON_ERROR);
             $data = $this->stringMapping($decoded, 'navigation');
             $this->navigation->update($data, $this->revision($request->parsedBody()['revision'] ?? null));
             $this->audit->log('navigation.updated', $actor->id(), 'config/navigation.yml', $request->clientIp());
@@ -96,7 +97,7 @@ final readonly class AdminSettingsController
             return Response::redirect('/admin/navigation?saved=1', 303);
         } catch (RevisionConflictException $exception) {
             throw new HttpException(409, 'NAVIGATION_REVISION_CONFLICT', 'Navigation changed in another session.', previous: $exception);
-        } catch (InvalidArgumentException|InvalidContentException|JsonException $exception) {
+        } catch (InvalidArgumentException | InvalidContentException | JsonException $exception) {
             throw new HttpException(422, 'NAVIGATION_INVALID', $exception->getMessage(), previous: $exception);
         }
     }
@@ -167,7 +168,7 @@ final readonly class AdminSettingsController
             return Response::redirect('/admin/settings?saved=1', 303);
         } catch (RevisionConflictException $exception) {
             throw new HttpException(409, 'CONFIG_REVISION_CONFLICT', 'Configuration changed in another session.', previous: $exception);
-        } catch (InvalidArgumentException|InvalidContentException|JsonException $exception) {
+        } catch (InvalidArgumentException | InvalidContentException | JsonException $exception) {
             throw new HttpException(422, 'CONFIG_INVALID', $exception->getMessage(), previous: $exception);
         }
     }
@@ -244,7 +245,7 @@ final readonly class AdminSettingsController
             throw new InvalidArgumentException("{$label} must be a bounded JSON object.");
         }
 
-        return $this->stringMapping(\json_decode($value, true, flags: JSON_THROW_ON_ERROR), $label);
+        return $this->stringMapping(json_decode($value, true, flags: JSON_THROW_ON_ERROR), $label);
     }
 
     /** @return array<mixed> */
@@ -253,7 +254,7 @@ final readonly class AdminSettingsController
         if (!\is_string($value) || \strlen($value) > 131_072) {
             throw new InvalidArgumentException("{$label} must be bounded JSON.");
         }
-        $decoded = \json_decode($value, true, flags: JSON_THROW_ON_ERROR);
+        $decoded = json_decode($value, true, flags: JSON_THROW_ON_ERROR);
         if (!\is_array($decoded)) {
             throw new InvalidArgumentException("{$label} must be a JSON object or array.");
         }
@@ -290,7 +291,7 @@ final readonly class AdminSettingsController
             if (!\is_string($item)) {
                 throw new InvalidArgumentException("Localized value for {$locale} is missing.");
             }
-            $item = \trim($item);
+            $item = trim($item);
             if ($item === '' && $locale !== $languages->default()) {
                 continue;
             }
@@ -307,7 +308,7 @@ final readonly class AdminSettingsController
     private function localizedStrings(mixed $value, array $locales): array
     {
         if (\is_string($value)) {
-            return \array_fill_keys($locales, $value);
+            return array_fill_keys($locales, $value);
         }
         $mapping = $this->mapping($value);
         $result = [];
@@ -333,12 +334,12 @@ final readonly class AdminSettingsController
             $result[] = $item;
         }
 
-        return \array_values(\array_unique($result));
+        return array_values(array_unique($result));
     }
 
     private function integer(mixed $value, string $label): int
     {
-        if (!\is_string($value) || \preg_match('/^[1-9][0-9]*$/D', $value) !== 1) {
+        if (!\is_string($value) || preg_match('/^[1-9][0-9]*$/D', $value) !== 1) {
             throw new InvalidArgumentException("{$label} must be a positive integer.");
         }
 
@@ -347,11 +348,11 @@ final readonly class AdminSettingsController
 
     private function requiredString(mixed $value, string $label): string
     {
-        if (!\is_string($value) || \trim($value) === '') {
+        if (!\is_string($value) || trim($value) === '') {
             throw new InvalidArgumentException("{$label} is required.");
         }
 
-        return \trim($value);
+        return trim($value);
     }
 
     private function optionalBodyString(mixed $value): ?string
@@ -359,7 +360,7 @@ final readonly class AdminSettingsController
         if (!\is_string($value)) {
             throw new InvalidArgumentException('Optional string field is invalid.');
         }
-        $value = \trim($value);
+        $value = trim($value);
 
         return $value === '' ? null : $value;
     }

@@ -3,21 +3,21 @@
 
 declare(strict_types=1);
 
+use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Auth\PasswordHasher;
 use FlatFileCms\Auth\PasswordPolicy;
 use FlatFileCms\Auth\UserRepository;
 use FlatFileCms\Auth\WebAuthnCredentialRepository;
-use FlatFileCms\Audit\AuditLogger;
+use FlatFileCms\Blocks\BlockProcessor;
+use FlatFileCms\Blocks\BlockRegistry;
+use FlatFileCms\Blocks\BlockValidator;
+use FlatFileCms\Blocks\BuiltinFieldTypes;
 use FlatFileCms\Cli\BlockScaffolder;
 use FlatFileCms\Cli\CacheClearer;
 use FlatFileCms\Cli\ConsoleApplication;
 use FlatFileCms\Cli\PasswordReader;
 use FlatFileCms\Cli\ReleaseChecker;
 use FlatFileCms\Cli\UserCommandService;
-use FlatFileCms\Blocks\BlockProcessor;
-use FlatFileCms\Blocks\BlockRegistry;
-use FlatFileCms\Blocks\BlockValidator;
-use FlatFileCms\Blocks\BuiltinFieldTypes;
 use FlatFileCms\Collections\CollectionRepository;
 use FlatFileCms\Config\ConfigurationRepository;
 use FlatFileCms\Config\LanguageRepository;
@@ -26,15 +26,15 @@ use FlatFileCms\Core\Environment;
 use FlatFileCms\Domain\Localization\LocalizedDataResolver;
 use FlatFileCms\Infrastructure\Database\Database;
 use FlatFileCms\Infrastructure\Database\SchemaInstaller;
-use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
 use FlatFileCms\Infrastructure\Filesystem\AtomicFileWriter;
 use FlatFileCms\Infrastructure\Filesystem\FileLockManager;
+use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
 use FlatFileCms\Infrastructure\Yaml\YamlFileCache;
 use FlatFileCms\Infrastructure\Yaml\YamlFileRepository;
 use FlatFileCms\Infrastructure\Yaml\YamlParser;
 use FlatFileCms\Navigation\NavigationRepository;
-use FlatFileCms\Rendering\LayoutRegistry;
 use FlatFileCms\Redirects\RedirectRepository;
+use FlatFileCms\Rendering\LayoutRegistry;
 
 $projectRoot = dirname(__DIR__);
 require "{$projectRoot}/vendor/autoload.php";

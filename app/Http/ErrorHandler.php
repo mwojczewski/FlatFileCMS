@@ -87,7 +87,7 @@ final readonly class ErrorHandler
         }
 
         if (!$exception instanceof HttpException) {
-            \error_log(\sprintf(
+            error_log(\sprintf(
                 '[FlatFile CMS] %s: %s in %s:%d',
                 $exception::class,
                 $exception->getMessage(),

@@ -1,0 +1,97 @@
+.architecture {
+  padding: clamp(5rem, 10vw, 9rem) 0;
+  background: #0a1713;
+  color: #f5faf8;
+}
+.architecture__layout {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: clamp(4rem, 10vw, 10rem);
+}
+.architecture__copy {
+  position: sticky;
+  top: 7rem;
+  align-self: start;
+}
+.architecture h2 {
+  max-width: 9ch;
+  margin: 0;
+  font-size: clamp(2.8rem, 5vw, 5rem);
+  line-height: 1;
+  letter-spacing: -0.055em;
+}
+.architecture__copy > p:not(.section-kicker) {
+  max-width: 28rem;
+  margin: 2rem 0;
+  color: #94a8a0;
+  line-height: 1.8;
+}
+.architecture__note {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #263a33;
+  color: #b7c8c2;
+  font-size: 0.84rem;
+}
+.architecture__note span {
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: #59e4ae;
+  color: #092117;
+}
+.architecture__flow {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.architecture__flow li {
+  display: grid;
+  grid-template-columns: 4rem 1fr;
+  gap: 1rem;
+  min-height: 8rem;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid #294039;
+}
+.architecture__flow li > span {
+  color: #5ce0ad;
+  font:
+    600 0.68rem ui-monospace,
+    monospace;
+}
+.architecture__flow div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.architecture__flow strong {
+  font-size: clamp(1.25rem, 2vw, 1.7rem);
+  font-weight: 520;
+}
+.architecture__flow small {
+  max-width: 16rem;
+  color: #778b84;
+  line-height: 1.6;
+  text-align: right;
+}
+@media (max-width: 800px) {
+  .architecture__layout {
+    grid-template-columns: 1fr;
+  }
+  .architecture__copy {
+    position: static;
+  }
+  .architecture__flow div {
+    display: block;
+  }
+  .architecture__flow small {
+    display: block;
+    margin-top: 0.5rem;
+    text-align: left;
+  }
+}

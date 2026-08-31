@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace FlatFileCms\Config;
 
 use FlatFileCms\Content\InvalidContentException;
-use FlatFileCms\Infrastructure\Filesystem\FilesystemRoot;
 use FlatFileCms\Infrastructure\Filesystem\FileRevision;
+use FlatFileCms\Infrastructure\Filesystem\FilesystemRoot;
 use FlatFileCms\Infrastructure\Filesystem\RelativePath;
 use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
-use FlatFileCms\Infrastructure\Yaml\YamlFileRepository;
 use FlatFileCms\Infrastructure\Yaml\YamlDocument;
+use FlatFileCms\Infrastructure\Yaml\YamlFileRepository;
 use FlatFileCms\Media\MediaConfig;
 use FlatFileCms\Support\ContentData;
 use InvalidArgumentException;
@@ -46,7 +46,7 @@ final readonly class ConfigurationRepository
     /** @param array<string, mixed> $data */
     public function update(array $data, FileRevision $expectedRevision): ConfigurationDocument
     {
-        $this->validated($data, $expectedRevision, \time());
+        $this->validated($data, $expectedRevision, time());
         $this->yaml->write(
             FilesystemRoot::Config,
             RelativePath::fromString(self::FILE),

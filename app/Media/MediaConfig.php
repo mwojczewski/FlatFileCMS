@@ -105,7 +105,7 @@ final readonly class MediaConfig
     /** @return array<string, mixed> */
     private static function mapping(mixed $value): array
     {
-        if (!\is_array($value) || ($value !== [] && \array_is_list($value))) {
+        if (!\is_array($value) || ($value !== [] && array_is_list($value))) {
             throw new InvalidArgumentException('Media configuration section must be a mapping.');
         }
 
@@ -141,7 +141,7 @@ final readonly class MediaConfig
     /** @return list<string> */
     private static function strings(mixed $value, string $path): array
     {
-        if (!\is_array($value) || !\array_is_list($value) || $value === []) {
+        if (!\is_array($value) || !array_is_list($value) || $value === []) {
             throw new InvalidArgumentException("{$path} must be a non-empty list.");
         }
 
@@ -153,7 +153,7 @@ final readonly class MediaConfig
             $result[] = $item;
         }
 
-        return \array_values(\array_unique($result));
+        return array_values(array_unique($result));
     }
 
     /** @return list<string> */

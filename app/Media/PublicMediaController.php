@@ -22,7 +22,7 @@ final readonly class PublicMediaController
         try {
             [$identity, $fingerprint, $name] = $this->target((string) $request->attribute('path'));
             $file = $this->media->get($identity, $name);
-            if (!\hash_equals($file->item()->fingerprint(), $fingerprint)) {
+            if (!hash_equals($file->item()->fingerprint(), $fingerprint)) {
                 throw new HttpException(404, 'MEDIA_NOT_FOUND', 'Media not found.');
             }
             $variant = $this->variants->create(
@@ -58,7 +58,7 @@ final readonly class PublicMediaController
         $range = $this->range($request->header('range'), \strlen($variant->contents()));
         if ($range !== null) {
             [$start, $end] = $range;
-            $contents = \substr($variant->contents(), $start, $end - $start + 1);
+            $contents = substr($variant->contents(), $start, $end - $start + 1);
             $headers['Content-Length'] = (string) \strlen($contents);
             $headers['Content-Range'] = "bytes {$start}-{$end}/" . \strlen($variant->contents());
 
@@ -71,17 +71,17 @@ final readonly class PublicMediaController
     /** @return array{PageIdentity, string, MediaName} */
     private function target(string $path): array
     {
-        $segments = \explode('/', \trim($path, '/'));
+        $segments = explode('/', trim($path, '/'));
         if (\count($segments) < 3) {
             throw new InvalidArgumentException('Media URL is incomplete.');
         }
-        $filename = \array_pop($segments);
-        $fingerprint = \array_pop($segments);
-        if (\preg_match('/^[a-f0-9]{16}$/D', $fingerprint) !== 1) {
+        $filename = array_pop($segments);
+        $fingerprint = array_pop($segments);
+        if (preg_match('/^[a-f0-9]{16}$/D', $fingerprint) !== 1) {
             throw new InvalidArgumentException('Media fingerprint is invalid.');
         }
 
-        return [PageIdentity::fromString(\implode('/', $segments)), $fingerprint, MediaName::fromString($filename)];
+        return [PageIdentity::fromString(implode('/', $segments)), $fingerprint, MediaName::fromString($filename)];
     }
 
     private function integerQuery(Request $request, string $name): ?int
@@ -90,7 +90,7 @@ final readonly class PublicMediaController
         if ($value === null || $value === '') {
             return null;
         }
-        if (!\is_string($value) || \preg_match('/^[1-9][0-9]*$/D', $value) !== 1) {
+        if (!\is_string($value) || preg_match('/^[1-9][0-9]*$/D', $value) !== 1) {
             throw new MediaException("Image {$name} parameter is invalid.");
         }
 
@@ -126,7 +126,7 @@ final readonly class PublicMediaController
         if ($header === null) {
             return null;
         }
-        if (\preg_match('/^bytes=([0-9]+)-([0-9]*)$/D', $header, $matches) !== 1) {
+        if (preg_match('/^bytes=([0-9]+)-([0-9]*)$/D', $header, $matches) !== 1) {
             throw new HttpException(416, 'MEDIA_RANGE_INVALID', 'Requested media range is invalid.');
         }
         $start = (int) $matches[1];
