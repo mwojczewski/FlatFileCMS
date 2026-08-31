@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Admin;
 
-use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Auth\AuthenticationException;
 use FlatFileCms\Auth\Authenticator;
 use FlatFileCms\Auth\CsrfTokenManager;
 use FlatFileCms\Auth\User;
+use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Blocks\BlockDefinition;
 use FlatFileCms\Blocks\BlockRegistry;
 use FlatFileCms\Blocks\BlockValidationException;
@@ -38,6 +38,7 @@ final readonly class AdminPageBuilderController
         private BlockRegistry $registry,
         private BlockFormDataMapper $dataMapper,
         private BlockFormRenderer $forms,
+        private AdminView $views,
         private AdminLayout $layout,
         private AuditLogger $audit,
     ) {}
@@ -52,7 +53,8 @@ final readonly class AdminPageBuilderController
         } catch (InvalidArgumentException | InvalidContentException | FilesystemException $exception) {
             throw new HttpException(404, 'PAGE_NOT_FOUND', 'Page not found.', previous: $exception);
         }
-        $items = '';
+        $viewBlocks = [];
+        $languages = $this->languages->get();
         foreach ($blocks as $position => $block) {
             $id = ContentData::string($block['id'] ?? null, 'block.id');
             $type = ContentData::string($block['type'] ?? null, 'block.type');
@@ -61,36 +63,20 @@ final readonly class AdminPageBuilderController
                 throw new HttpException(422, 'BLOCK_STATE_INVALID', 'Block enabled state is invalid.');
             }
             $definition = $this->registry->get($type);
-            $name = $this->localized($definition->name(), $this->languages->get(), $type);
-            $items .= '<article class="builder-item' . ($enabled ? '' : ' disabled') . '" draggable="true" data-block-id="'
-                . self::escape($id) . '"><button type="button" class="drag-handle" aria-label="Przeciągnij blok">⋮⋮</button>'
-                . '<div class="block-summary"><span class="position">' . ($position + 1) . '</span><div><strong>'
-                . self::escape($name) . '</strong><small>' . self::escape($type) . ' · ' . ($enabled ? 'włączony' : 'wyłączony')
-                . '</small></div></div><div class="block-actions"><a class="button secondary" href="/admin/pages/builder/edit?path='
-                . rawurlencode($identity->value()) . '&id=' . rawurlencode($id) . '">Edytuj</a>'
-                . $this->actionForm('/admin/pages/builder/toggle', $identity, $id, $editable->revision(), $enabled ? 'Wyłącz' : 'Włącz')
-                . $this->actionForm('/admin/pages/builder/duplicate', $identity, $id, $editable->revision(), 'Duplikuj')
-                . $this->actionForm('/admin/pages/builder/delete', $identity, $id, $editable->revision(), 'Usuń', 'danger-text')
-                . '</div></article>';
+            $viewBlocks[] = [
+                'id' => $id,
+                'type' => $type,
+                'enabled' => $enabled,
+                'position' => $position + 1,
+                'name' => $this->localized($definition->name(), $languages, $type),
+            ];
         }
-        if ($items === '') {
-            $items = '<div class="empty-state"><strong>Ta strona nie ma jeszcze bloków.</strong>'
-                . '<p>Dodaj pierwszy blok, a formularz zostanie wygenerowany z jego definicji YAML.</p></div>';
-        }
-        $orderFields = '';
-        foreach ($blocks as $block) {
-            $id = ContentData::string($block['id'] ?? null, 'block.id');
-            $orderFields .= '<input type="hidden" name="order[]" value="' . self::escape($id) . '" data-order-field>';
-        }
-        $content = '<div class="toolbar"><div><p class="eyebrow">Page builder</p><p class="lead"><code>'
-            . self::escape($identity->value()) . '</code></p></div><div class="actions"><a class="button secondary" href="/admin/pages/edit?path='
-            . rawurlencode($identity->value()) . '">Ustawienia strony</a><a class="button" href="/admin/pages/builder/picker?path='
-            . rawurlencode($identity->value()) . '">Dodaj blok</a></div></div><div class="builder-list" data-builder-list>'
-            . $items . '</div><form class="order-form" method="post" action="/admin/pages/builder/reorder" data-order-form>'
-            . $this->csrfField() . '<input type="hidden" name="identity" value="' . self::escape($identity->value())
-            . '"><input type="hidden" name="revision" value="' . self::escape($editable->revision()->value()) . '">'
-            . '<span data-order-fields>' . $orderFields . '</span><button type="submit" class="button child" disabled data-order-submit>'
-            . 'Zapisz kolejność</button></form>';
+        $content = $this->views->render('builder/index', [
+            'identity' => $identity,
+            'blocks' => $viewBlocks,
+            'revision' => $editable->revision(),
+            'csrfToken' => $this->csrf->token(),
+        ]);
 
         return $this->page('Bloki strony', $content, scripts: true);
     }
@@ -105,21 +91,22 @@ final readonly class AdminPageBuilderController
             throw new HttpException(404, 'PAGE_NOT_FOUND', 'Page not found.', previous: $exception);
         }
         $languages = $this->languages->get();
-        $cards = '';
+        $cards = [];
         foreach ($this->registry->all() as $definition) {
             $name = $this->localized($definition->name(), $languages, $definition->type());
             $description = $this->localized($definition->description(), $languages, '');
-            $preview = is_file($definition->directory() . '/preview.webp')
-                ? '<img src="/admin/pages/builder/preview?type=' . rawurlencode($definition->type()) . '" alt="">'
-                : '<span class="block-icon">' . self::escape($definition->icon() ?? 'block') . '</span>';
-            $cards .= '<a class="picker-card" href="/admin/pages/builder/create?path=' . rawurlencode($identity->value())
-                . '&type=' . rawurlencode($definition->type()) . '">' . $preview . '<span><strong>' . self::escape($name)
-                . '</strong><small>' . self::escape($description) . '</small></span></a>';
+            $cards[] = [
+                'definition' => $definition,
+                'name' => $name,
+                'description' => $description,
+                'preview' => is_file($definition->directory() . '/preview.webp'),
+            ];
         }
 
-        return $this->page('Wybierz blok', '<div class="picker-grid">' . $cards . '</div><div class="actions footer-actions">'
-            . '<a class="button secondary" href="/admin/pages/builder?path=' . rawurlencode($identity->value())
-            . '">Wróć do bloków</a></div>');
+        return $this->page('Wybierz blok', $this->views->render('builder/picker', [
+            'identity' => $identity,
+            'cards' => $cards,
+        ]));
     }
 
     public function preview(Request $request): Response
@@ -371,34 +358,18 @@ final readonly class AdminPageBuilderController
     ): Response {
         $languages = $this->languages->get();
         $name = $this->localized($definition->name(), $languages, $definition->type());
-        $hiddenId = $id === null ? '' : '<input type="hidden" name="id" value="' . self::escape($id) . '">';
-        $content = '<p class="lead"><strong>' . self::escape($name) . '</strong> <code>'
-            . self::escape($definition->type()) . '</code></p><form class="stack block-form" method="post" action="'
-            . self::escape($action) . '">' . $this->csrfField() . '<input type="hidden" name="identity" value="'
-            . self::escape($identity->value()) . '"><input type="hidden" name="type" value="'
-            . self::escape($definition->type()) . '"><input type="hidden" name="revision" value="'
-            . self::escape($revision->value()) . '">' . $hiddenId . $this->forms->render($definition, $languages, $data)
-            . '<div class="actions footer-actions"><button type="submit">Zapisz blok</button><a class="button secondary" href="'
-            . '/admin/pages/builder?path=' . rawurlencode($identity->value()) . '">Anuluj</a></div></form>';
+        $content = $this->views->render('builder/form', [
+            'name' => $name,
+            'action' => $action,
+            'identity' => $identity,
+            'definition' => $definition,
+            'revision' => $revision,
+            'id' => $id,
+            'fields' => $this->forms->render($definition, $languages, $data),
+            'csrfToken' => $this->csrf->token(),
+        ]);
 
         return $this->page($title, $content, scripts: true);
-    }
-
-    private function actionForm(
-        string $action,
-        PageIdentity $identity,
-        string $id,
-        FileRevision $revision,
-        string $label,
-        string $class = 'subtle',
-    ): string {
-        $confirmation = $label === 'Usuń' ? ' data-confirm="Usunąć ten blok bezpowrotnie?"' : '';
-
-        return '<form method="post" action="' . self::escape($action) . '"' . $confirmation . '>' . $this->csrfField()
-            . '<input type="hidden" name="identity" value="' . self::escape($identity->value()) . '">'
-            . '<input type="hidden" name="id" value="' . self::escape($id) . '">'
-            . '<input type="hidden" name="revision" value="' . self::escape($revision->value()) . '">'
-            . '<button type="submit" class="button ' . self::escape($class) . '">' . self::escape($label) . '</button></form>';
     }
 
     private function queryDefinition(Request $request): BlockDefinition
@@ -502,11 +473,6 @@ final readonly class AdminPageBuilderController
         }
     }
 
-    private function csrfField(): string
-    {
-        return '<input type="hidden" name="_csrf" value="' . self::escape($this->csrf->token()) . '">';
-    }
-
     private function redirect(PageIdentity $identity, string $status): Response
     {
         return Response::redirect('/admin/pages/builder?path=' . rawurlencode($identity->value()) . '&' . $status . '=1', 303);
@@ -538,8 +504,4 @@ final readonly class AdminPageBuilderController
         );
     }
 
-    private static function escape(string $value): string
-    {
-        return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-    }
 }

@@ -21,7 +21,6 @@ final readonly class CollectionRenderer
     {
         $context = new RenderContext(
             $view->locale(),
-            $view->url(),
             $this->markdown,
             $this->partials,
         );

@@ -6,9 +6,12 @@ namespace FlatFileCms\Config;
 
 use FlatFileCms\Content\InvalidContentException;
 use FlatFileCms\Infrastructure\Filesystem\FilesystemRoot;
+use FlatFileCms\Infrastructure\Filesystem\FileRevision;
 use FlatFileCms\Infrastructure\Filesystem\RelativePath;
 use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
 use FlatFileCms\Infrastructure\Yaml\YamlFileRepository;
+use FlatFileCms\Infrastructure\Yaml\YamlDocument;
+use FlatFileCms\Media\MediaConfig;
 use FlatFileCms\Support\ContentData;
 use InvalidArgumentException;
 
@@ -24,7 +27,7 @@ final readonly class ConfigurationRepository
     public function get(): ConfigurationDocument
     {
         $path = RelativePath::fromString(self::FILE);
-        $document = $this->yaml->read(FilesystemRoot::Config, $path);
+        $document = $this->raw();
         $absolutePath = $this->paths->resolve(FilesystemRoot::Config, $path, mustExist: true);
         clearstatcache(true, $absolutePath);
         $modifiedAt = filemtime($absolutePath);
@@ -32,8 +35,32 @@ final readonly class ConfigurationRepository
             throw new InvalidContentException('Unable to read setup.yml modification time.');
         }
 
+        return $this->validated($document->data(), $document->revision(), $modifiedAt);
+    }
+
+    public function raw(): YamlDocument
+    {
+        return $this->yaml->read(FilesystemRoot::Config, RelativePath::fromString(self::FILE));
+    }
+
+    /** @param array<string, mixed> $data */
+    public function update(array $data, FileRevision $expectedRevision): ConfigurationDocument
+    {
+        $this->validated($data, $expectedRevision, \time());
+        $this->yaml->write(
+            FilesystemRoot::Config,
+            RelativePath::fromString(self::FILE),
+            $data,
+            $expectedRevision,
+        );
+
+        return $this->get();
+    }
+
+    /** @param array<string, mixed> $data */
+    private function validated(array $data, FileRevision $revision, int $modifiedAt): ConfigurationDocument
+    {
         try {
-            $data = $document->data();
             if (ContentData::integer($data['schemaVersion'] ?? null, 'schemaVersion') !== 1) {
                 throw new InvalidArgumentException('Unsupported setup schema version.');
             }
@@ -53,10 +80,16 @@ final readonly class ConfigurationRepository
                 throw new InvalidArgumentException('Default layout name is invalid.');
             }
 
-            ContentData::map($data['seo'] ?? [], 'seo');
             ContentData::map($data['media'] ?? [], 'media');
+            $seo = ContentData::map($data['seo'] ?? [], 'seo');
+            foreach (['openGraph', 'twitter'] as $section) {
+                if (isset($seo[$section])) {
+                    ContentData::map($seo[$section], "seo.{$section}");
+                }
+            }
+            MediaConfig::fromDocument(new ConfigurationDocument($data, $revision, $modifiedAt));
 
-            return new ConfigurationDocument($data, $document->revision(), $modifiedAt);
+            return new ConfigurationDocument($data, $revision, $modifiedAt);
         } catch (InvalidArgumentException $exception) {
             throw new InvalidContentException('Invalid setup.yml configuration.', previous: $exception);
         }

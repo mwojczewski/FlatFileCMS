@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Http;
 
+use Psr\Log\LoggerInterface;
 use Throwable;
 
 final readonly class ErrorHandler
 {
-    public function __construct(private bool $debug = false) {}
+    public function __construct(
+        private bool $debug = false,
+        private ?LoggerInterface $logger = null,
+    ) {}
 
     public function render(Request $request, Throwable $exception): Response
     {
@@ -16,15 +20,7 @@ final readonly class ErrorHandler
         $code = $exception instanceof HttpException ? $exception->errorCode() : 'INTERNAL_SERVER_ERROR';
         $publicMessage = $exception instanceof HttpException ? $exception->getMessage() : 'Internal server error';
 
-        if (!$exception instanceof HttpException) {
-            error_log(\sprintf(
-                '[FlatFile CMS] %s: %s in %s:%d',
-                $exception::class,
-                $exception->getMessage(),
-                $exception->getFile(),
-                $exception->getLine(),
-            ));
-        }
+        $this->log($request, $exception, $status, $code);
 
         $expectsJson = str_starts_with($request->path(), '/api/')
             || str_contains($request->header('accept') ?? '', 'application/json')
@@ -40,6 +36,13 @@ final readonly class ErrorHandler
                 : [];
 
             return Response::json(['error' => $error], $status, $headers);
+        }
+
+        if ($status === 401 && str_starts_with($request->path(), '/admin')) {
+            return Response::redirect('/admin/login', 302, [
+                'Cache-Control' => 'no-store',
+                'Pragma' => 'no-cache',
+            ]);
         }
 
         $title = $status === 404 ? 'Nie znaleziono strony' : 'Wystąpił błąd';
@@ -58,6 +61,40 @@ final readonly class ErrorHandler
             $status,
             $headers,
         );
+    }
+
+    private function log(Request $request, Throwable $exception, int $status, string $code): void
+    {
+        $context = [
+            'status' => $status,
+            'error_code' => $code,
+            'method' => $request->method(),
+            'path' => $request->path(),
+            'client_ip' => $request->clientIp(),
+            'exception' => $exception,
+        ];
+
+        if ($this->logger !== null) {
+            if ($status >= 500) {
+                $this->logger->error('Unhandled application exception', $context);
+            } elseif ($status === 404) {
+                $this->logger->notice('Public route not found', $context);
+            } else {
+                $this->logger->warning('HTTP request failed', $context);
+            }
+
+            return;
+        }
+
+        if (!$exception instanceof HttpException) {
+            \error_log(\sprintf(
+                '[FlatFile CMS] %s: %s in %s:%d',
+                $exception::class,
+                $exception->getMessage(),
+                $exception->getFile(),
+                $exception->getLine(),
+            ));
+        }
     }
 
     private static function escape(string $value): string

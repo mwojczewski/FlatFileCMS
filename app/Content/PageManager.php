@@ -191,11 +191,11 @@ final readonly class PageManager
         PageMetadata $metadata,
         LanguageConfig $languages,
     ): void {
-        $this->assertLocales($metadata->titles(), $languages, 'Page titles');
+        $this->assertLocales($metadata->titles(), $languages, 'Page titles', true);
         $this->assertLocales($metadata->seoTitles(), $languages, 'SEO titles');
         $this->assertLocales($metadata->seoDescriptions(), $languages, 'SEO descriptions');
         if (!$identity->isHomepage()) {
-            $this->assertLocales($metadata->slugs(), $languages, 'Public slugs');
+            $this->assertLocales($metadata->slugs(), $languages, 'Public slugs', true);
         }
         $layout = $metadata->layout();
         if ($layout !== null) {
@@ -289,14 +289,20 @@ final readonly class PageManager
     }
 
     /** @param array<string, string> $values */
-    private function assertLocales(array $values, LanguageConfig $languages, string $field): void
+    private function assertLocales(
+        array $values,
+        LanguageConfig $languages,
+        string $field,
+        bool $requireDefault = false,
+    ): void
     {
-        $expected = $languages->codes();
-        $actual = array_keys($values);
-        sort($expected);
-        sort($actual);
-        if ($actual !== $expected) {
-            throw new InvalidArgumentException("{$field} must contain exactly all enabled languages.");
+        foreach (array_keys($values) as $locale) {
+            if (!$languages->has($locale)) {
+                throw new InvalidArgumentException("{$field} contains a language that is not enabled.");
+            }
+        }
+        if ($requireDefault && !array_key_exists($languages->default(), $values)) {
+            throw new InvalidArgumentException("{$field} must contain the default language.");
         }
     }
 

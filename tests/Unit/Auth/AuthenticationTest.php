@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FlatFileCms\Tests\Unit\Auth;
 
 use FlatFileCms\Auth\ArraySessionStore;
+use FlatFileCms\Auth\AdminUserManager;
 use FlatFileCms\Auth\AuthenticationException;
 use FlatFileCms\Auth\Authenticator;
 use FlatFileCms\Auth\PasswordChanger;
@@ -103,6 +104,40 @@ final class AuthenticationTest extends TestCase
 
         $this->expectException(AuthenticationException::class);
         $changer->change($user, 'Wrong!Password1', 'New!Password2', 'New!Password2');
+    }
+
+    public function testAdminUserManagerCreatesAndUpdatesOnlyAdminAccounts(): void
+    {
+        [$users] = $this->repositories();
+        $hasher = new PasswordHasher();
+        $actor = $users->create('actor@example.test', $hasher->hash('Valid!Password1'), Role::Admin);
+        $manager = new AdminUserManager($users, new PasswordPolicy(), $hasher);
+
+        $created = $manager->create($actor, 'new@example.test', 'Valid!Password2', 'Valid!Password2');
+        $updated = $manager->update($actor, $created->id(), 'edited@example.test', false, '', '');
+
+        self::assertSame(Role::Admin, $created->role());
+        self::assertSame('edited@example.test', $updated->email());
+        self::assertFalse($updated->enabled());
+    }
+
+    public function testAdminUserManagerCannotDeleteSelfOrTechnicalSuperadmin(): void
+    {
+        [$users] = $this->repositories();
+        $hasher = new PasswordHasher();
+        $actor = $users->create('actor@example.test', $hasher->hash('Valid!Password1'), Role::Admin);
+        $superadmin = $users->create('root@example.test', $hasher->hash('Valid!Password1'), Role::Superadmin);
+        $manager = new AdminUserManager($users, new PasswordPolicy(), $hasher);
+
+        try {
+            $manager->delete($actor, $actor->id());
+            self::fail('Expected self deletion to be rejected.');
+        } catch (\InvalidArgumentException) {
+            self::assertNotNull($users->findByEmail('actor@example.test'));
+        }
+
+        $this->expectException(\FlatFileCms\Auth\UserNotFoundException::class);
+        $manager->delete($actor, $superadmin->id());
     }
 
     /** @return array{UserRepository, WebAuthnCredentialRepository, \PDO} */

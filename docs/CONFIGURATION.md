@@ -12,6 +12,7 @@ predictably after its environment has been supplied.
 | Concern | Variables |
 |---|---|
 | Runtime | `APP_ENV`, `APP_DEBUG`, `APP_SECRET`, `APP_TIMEZONE` |
+| Diagnostics | `LOG_LEVEL`, `LOG_MAX_FILES` |
 | Infrastructure cache | `YAML_CACHE_JSON_ENABLED`, `YAML_CACHE_SERIALIZE_ENABLED` |
 | Reverse proxy | `TRUSTED_PROXIES` |
 | Session deployment | `SESSION_NAME`, `SESSION_LIFETIME`, `SESSION_COOKIE_SECURE`, `SESSION_COOKIE_SAME_SITE` |
@@ -27,6 +28,10 @@ code instead of exposed as switches.
 WebAuthn credentials are cryptographically bound to it, so changing this value
 makes previously registered keys unusable. `WEBAUTHN_RP_NAME` is only the label
 shown by the browser during registration.
+
+`TRUSTED_PROXIES` is enforced by the request boundary. It accepts exact IPs and
+CIDR ranges; forwarded client addresses are ignored unless the direct peer is
+trusted. Never configure a catch-all network. See [DEPLOYMENT.md](DEPLOYMENT.md).
 
 `YAML_CACHE_JSON_ENABLED` controls the JSON representation of parsed
 mappings under `storage/cache/yaml/`. `YAML_CACHE_SERIALIZE_ENABLED` controls an
@@ -52,17 +57,26 @@ the admin application.
 | Site identity | `site.name`, `site.url` |
 | Rendering | `site.defaultLayout` |
 | SEO defaults | `seo.*` |
-| Media transforms | `media.transformations.enabled`, `media.formats` |
+| Upload policy | `media.maxUploadBytes`, `media.allowedMimeTypes`, `media.stripMetadata` |
+| Media transforms | `media.transformations.enabled`, `quality`, `maxWidth`, `maxHeight`, `maxPixels`, `media.formats` |
 | Generated media cache | `media.cache.enabled` |
 
 `site.url` is the sole canonical site URL. There is no `APP_URL` environment
 override. Media processing has no environment override either; copying the
 site preserves its declared media contract.
 
+Image transformations and their generated-file cache are independent:
+`media.transformations.enabled: false` delegates processing to an edge service,
+while `media.cache.enabled: false` still permits on-demand transforms without
+persisting variants. Neither value controls the JSON or serialized parsed-YAML
+cache. See [MEDIA.md](MEDIA.md) for limits, supported types and public URLs.
+
 ## Other YAML files
 
 - `config/languages.yml` owns enabled languages and the default locale;
 - `config/navigation.yml` owns menus;
+- `config/redirects.yml` owns exact public redirect rules;
+- optional `config/llms.txt` and `config/security.txt` own public text files;
 - `pages/**/content.yml` owns page content, localized slugs, page SEO and
   blocks;
 - `blocks/*/block.yml` is developer-owned schema, not administrator content.
@@ -70,3 +84,8 @@ site preserves its declared media contract.
 Secrets are forbidden in every YAML file. SMTP passwords, application secrets
 and future external-service credentials belong only to the environment or an
 equivalent secret manager exposed as environment variables.
+
+The authenticated `/admin/settings` form updates only an explicit set of site,
+SEO and media keys while preserving custom developer keys. `/admin/navigation`
+edits `navigation.yml` and validates all localized links before writing. See
+[SETTINGS-ADMIN.md](SETTINGS-ADMIN.md).

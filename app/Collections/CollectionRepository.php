@@ -79,7 +79,24 @@ final readonly class CollectionRepository
                 throw new InvalidArgumentException('Unable to read pagination.yml modification time.');
             }
 
-            $data = $document->data();
+            return $this->fromData($identity, $document->data(), $languages, $document->revision(), $modifiedAt);
+        } catch (InvalidArgumentException $exception) {
+            throw new InvalidContentException(
+                \sprintf('Collection "%s" contains invalid configuration.', $identity->value()),
+                previous: $exception,
+            );
+        }
+    }
+
+    /** @param array<string, mixed> $data */
+    public function fromData(
+        PageIdentity $identity,
+        array $data,
+        LanguageConfig $languages,
+        \FlatFileCms\Infrastructure\Filesystem\FileRevision $revision,
+        int $modifiedAt,
+    ): Collection {
+        try {
             if (ContentData::integer($data['schemaVersion'] ?? null, 'schemaVersion') !== 1) {
                 throw new InvalidArgumentException('Unsupported collection schema version.');
             }
@@ -121,7 +138,7 @@ final readonly class CollectionRepository
                 $sortDirection,
                 $perPage,
                 $this->filters($data['filters'] ?? []),
-                $document->revision(),
+                $revision,
                 $modifiedAt,
             );
         } catch (InvalidArgumentException $exception) {
@@ -148,9 +165,13 @@ final readonly class CollectionRepository
     private function localizedStrings(mixed $value, string $field, LanguageConfig $languages): array
     {
         $mapping = ContentData::map($value, $field);
+        $fallback = ContentData::string(
+            $mapping[$languages->default()] ?? null,
+            $field . '.' . $languages->default(),
+        );
         $localized = [];
         foreach ($languages->codes() as $locale) {
-            $localized[$locale] = ContentData::string($mapping[$locale] ?? null, $field . '.' . $locale);
+            $localized[$locale] = ContentData::string($mapping[$locale] ?? $fallback, $field . '.' . $locale);
         }
 
         return $localized;

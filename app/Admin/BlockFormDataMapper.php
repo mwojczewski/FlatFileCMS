@@ -38,7 +38,10 @@ final readonly class BlockFormDataMapper
                         continue;
                     }
                     $normalized = $this->value($definition, $localized[$locale], $languages);
-                    if (!$this->empty($normalized) || $definition->required()) {
+                    if (
+                        !$this->empty($normalized)
+                        || ($definition->required() && $locale === $languages->default())
+                    ) {
                         $translations[$locale] = $normalized;
                     }
                 }

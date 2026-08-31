@@ -68,4 +68,25 @@ YAML);
             $mapped['cards'],
         );
     }
+
+    public function testItOmitsBlankNonDefaultTranslationsSoFallbackRemainsActive(): void
+    {
+        $paths = new SafePathResolver($this->project->path());
+        $registry = new BlockRegistry(
+            $this->project->path(),
+            new YamlParser(),
+            BuiltinFieldTypes::create($paths),
+        );
+        $mapped = (new BlockFormDataMapper())->map(
+            $registry->get('cards'),
+            [
+                'heading' => ['pl' => 'Nagłówek', 'en' => ''],
+                'visible' => 'true',
+                'cards' => [],
+            ],
+            new LanguageConfig('pl', ['pl' => 'Polski', 'en' => 'English']),
+        );
+
+        self::assertSame(['pl' => 'Nagłówek'], $mapped['heading']);
+    }
 }

@@ -6,6 +6,9 @@ namespace FlatFileCms\Rendering;
 
 use FlatFileCms\Presentation\PageViewModel;
 use FlatFileCms\Support\ContentData;
+use FlatFileCms\Domain\Content\PageIdentity;
+use FlatFileCms\Media\MediaRepository;
+use FlatFileCms\Media\MediaUrlGenerator;
 
 final readonly class PageRenderer
 {
@@ -15,6 +18,8 @@ final readonly class PageRenderer
         private AssetCollector $assets,
         private MarkdownRenderer $markdown,
         private PartialRenderer $partials,
+        private MediaRepository $media,
+        private MediaUrlGenerator $mediaUrls,
     ) {}
 
     /** @param array<string, list<array<string, mixed>>> $navigation */
@@ -22,9 +27,11 @@ final readonly class PageRenderer
     {
         $context = new RenderContext(
             $page->locale(),
-            $page->url(),
             $this->markdown,
             $this->partials,
+            PageIdentity::fromString($page->id()),
+            $this->media,
+            $this->mediaUrls,
         );
         $assets = $this->assets->collect($page->blocks());
         $content = '';

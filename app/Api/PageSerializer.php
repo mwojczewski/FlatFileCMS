@@ -29,4 +29,9 @@ final readonly class PageSerializer
     {
         return $this->pages->blockDefinitionsModifiedAt($page);
     }
+
+    public function mediaModifiedAt(Page $page): int
+    {
+        return $this->pages->mediaModifiedAt($page);
+    }
 }

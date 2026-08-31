@@ -11,6 +11,7 @@ final readonly class Request
      * @param array<string, mixed> $query
      * @param array<string, mixed> $parsedBody
      * @param array<string, string> $attributes
+     * @param array<string, UploadedFile> $files
      */
     public function __construct(
         private string $method,
@@ -21,6 +22,7 @@ final readonly class Request
         private string $rawBody = '',
         private array $attributes = [],
         private string $clientIp = 'unknown',
+        private array $files = [],
     ) {}
 
     public static function fromGlobals(): self
@@ -60,6 +62,7 @@ final readonly class Request
             parsedBody: self::stringKeyedArray($_POST),
             rawBody: \is_string($rawBody) ? $rawBody : '',
             clientIp: \is_string($remoteAddress) && $remoteAddress !== '' ? $remoteAddress : 'unknown',
+            files: self::uploadedFiles($_FILES),
         );
     }
 
@@ -100,6 +103,17 @@ final readonly class Request
         return $this->clientIp;
     }
 
+    public function file(string $name): ?UploadedFile
+    {
+        return $this->files[$name] ?? null;
+    }
+
+    /** @return array<string, UploadedFile> */
+    public function files(): array
+    {
+        return $this->files;
+    }
+
     public function attribute(string $name): ?string
     {
         return $this->attributes[$name] ?? null;
@@ -117,6 +131,22 @@ final readonly class Request
             rawBody: $this->rawBody,
             attributes: [...$this->attributes, ...$attributes],
             clientIp: $this->clientIp,
+            files: $this->files,
+        );
+    }
+
+    public function withClientIp(string $clientIp): self
+    {
+        return new self(
+            method: $this->method,
+            path: $this->path,
+            headers: $this->headers,
+            query: $this->query,
+            parsedBody: $this->parsedBody,
+            rawBody: $this->rawBody,
+            attributes: $this->attributes,
+            clientIp: $clientIp,
+            files: $this->files,
         );
     }
 
@@ -142,6 +172,30 @@ final readonly class Request
             if (\is_string($key)) {
                 $normalized[$key] = $value;
             }
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * @param array<mixed> $files
+     * @return array<string, UploadedFile>
+     */
+    private static function uploadedFiles(array $files): array
+    {
+        $normalized = [];
+        foreach ($files as $name => $file) {
+            if (!\is_string($name) || !\is_array($file)) {
+                continue;
+            }
+            $temporaryPath = $file['tmp_name'] ?? null;
+            $clientFilename = $file['name'] ?? null;
+            $size = $file['size'] ?? null;
+            $error = $file['error'] ?? null;
+            if (!\is_string($temporaryPath) || !\is_string($clientFilename) || !\is_int($size) || !\is_int($error)) {
+                continue;
+            }
+            $normalized[$name] = UploadedFile::fromHttpUpload($temporaryPath, $clientFilename, $size, $error);
         }
 
         return $normalized;

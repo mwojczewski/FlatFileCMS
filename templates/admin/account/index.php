@@ -1,0 +1,2 @@
+<?php if ($passwordChanged): ?><p class="success">Hasło zostało zmienione.</p><?php endif; ?>
+<div class="dashboard-links account-links"><a href="/admin/account/password"><span>Zmień hasło</span><small>Ustaw nowe hasło własnego konta.</small></a><a href="/admin/account/security-keys"><span>Klucze bezpieczeństwa</span><small><?= $credentialCount === 0 ? 'Brak kluczy — logowanie tylko hasłem.' : 'Zarejestrowane klucze: ' . $credentialCount ?></small></a></div>

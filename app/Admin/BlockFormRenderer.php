@@ -172,8 +172,10 @@ final readonly class BlockFormRenderer
     ): string {
         $media = $this->mapping($value);
         $src = \is_string($media['src'] ?? null) ? $media['src'] : '';
-        $html = '<input type="text" name="' . self::escape($name . '[src]') . '" value="' . self::escape($src)
-            . '" placeholder="np. hero.jpg">';
+        $html = '<div class="media-field-control" data-media-field><input type="text" data-media-source name="'
+            . self::escape($name . '[src]') . '" value="' . self::escape($src)
+            . '" placeholder="np. hero.jpg"><button type="button" class="button secondary" data-media-open data-media-kind="'
+            . self::escape($definition->type()) . '">Wybierz z biblioteki</button></div>';
         if ($definition->type() !== 'image') {
             return $html;
         }

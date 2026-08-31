@@ -28,13 +28,24 @@ Only CLI installation and `user:create-superadmin` can create a superadmin.
 Repository queries hide every superadmin from an admin, including direct ID
 lookups.
 
+`/admin/users` provides CRUD for regular administrator accounts. Admins and
+superadmins can create, edit, enable, disable and delete `ROLE_ADMIN` accounts.
+The backend never permits creating or modifying a superadmin through HTTP,
+prevents self-disable/self-delete, and makes an admin's direct request for a
+superadmin behave like a missing user. A superadmin is shown only to another
+superadmin as a technical, CLI-managed account.
+
 ## YubiKey / WebAuthn
 
-The account security page at `/admin/security` can register multiple roaming
+The dedicated page at `/admin/account/security-keys` can register multiple roaming
 WebAuthn credentials such as YubiKey over USB, NFC or BLE. Registration requires
 an authenticated session and the current password. The private key never
 leaves the authenticator; SQLite stores the credential ID, public key,
 signature counter and declared transports.
+
+Each credential can be removed independently. The delete query is scoped to
+the authenticated user's ID, so a forged credential ID cannot remove another
+account's key.
 
 Adding the first key enables mandatory second-factor verification for that
 account. Accounts without a registered key continue to use password-only

@@ -10,6 +10,7 @@ use FlatFileCms\Infrastructure\Filesystem\FilesystemException;
 use FlatFileCms\Infrastructure\Filesystem\FilesystemRoot;
 use FlatFileCms\Infrastructure\Filesystem\RelativePath;
 use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
+use FlatFileCms\Media\MediaName;
 use InvalidArgumentException;
 
 final readonly class MediaFieldType implements FieldType
@@ -38,7 +39,8 @@ final readonly class MediaFieldType implements FieldType
         }
 
         try {
-            $relative = RelativePath::fromString($src);
+            $name = MediaName::fromString($src);
+            $relative = RelativePath::fromString($name->value());
         } catch (InvalidArgumentException $exception) {
             throw new FieldValueException('INVALID_MEDIA_PATH', $exception->getMessage());
         }

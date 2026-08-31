@@ -25,6 +25,11 @@ use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
 use FlatFileCms\Infrastructure\Yaml\YamlFileCache;
 use FlatFileCms\Infrastructure\Yaml\YamlFileRepository;
 use FlatFileCms\Infrastructure\Yaml\YamlParser;
+use FlatFileCms\Media\MediaInspector;
+use FlatFileCms\Media\MediaOutputEnricher;
+use FlatFileCms\Media\MediaRepository;
+use FlatFileCms\Media\MediaUrlGenerator;
+use FlatFileCms\Media\SvgSanitizer;
 use FlatFileCms\Navigation\NavigationRepository;
 use FlatFileCms\Presentation\CollectionViewModelFactory;
 use FlatFileCms\Presentation\PageViewModelFactory;
@@ -73,16 +78,19 @@ final class TestContentFactory
         $blockRegistry = new BlockRegistry($project->path(), new YamlParser(), $fieldTypes);
         $blockProcessor = new BlockProcessor($blockRegistry, new BlockValidator($fieldTypes));
         $collectionViews = new CollectionViewModelFactory($localization, $seo);
+        $configuration = new ConfigurationRepository($yaml, $paths);
+        $media = new MediaRepository($paths, $configuration, new MediaInspector(new SvgSanitizer()));
+        $mediaOutput = new MediaOutputEnricher($blockRegistry, $media, new MediaUrlGenerator());
 
         return new PublicApiController(
             new LanguageRepository($yaml, $paths),
-            new ConfigurationRepository($yaml, $paths),
+            $configuration,
             new PageRepository($yaml, $paths),
             new CollectionRepository($yaml, $paths),
             new CollectionService($localization),
             new NavigationRepository($yaml, $paths, $localization),
             $localization,
-            new PageSerializer(new PageViewModelFactory($blockProcessor, $seo)),
+            new PageSerializer(new PageViewModelFactory($blockProcessor, $seo, $mediaOutput)),
             new CollectionSerializer($collectionViews),
             new ApiResponseFactory(),
         );
@@ -102,21 +110,29 @@ final class TestContentFactory
         $fieldTypes = BuiltinFieldTypes::create($paths);
         $registry = new BlockRegistry($project->path(), new YamlParser(), $fieldTypes);
         $blocks = new BlockProcessor($registry, new BlockValidator($fieldTypes));
-        $views = new PageViewModelFactory($blocks, new SeoResolver($localization));
         $collectionViews = new CollectionViewModelFactory($localization, new SeoResolver($localization));
         $buffer = new OutputBuffer();
         $partials = new PartialRenderer(new PartialRegistry($project->path()), $buffer);
+        $configuration = new ConfigurationRepository($yaml, $paths);
+        $media = new MediaRepository($paths, $configuration, new MediaInspector(new SvgSanitizer()));
+        $views = new PageViewModelFactory(
+            $blocks,
+            new SeoResolver($localization),
+            new MediaOutputEnricher($registry, $media, new MediaUrlGenerator()),
+        );
         $renderer = new PageRenderer(
             new BlockRenderer($registry, $buffer),
             new LayoutRenderer(new LayoutRegistry($project->path()), $buffer),
             new AssetCollector($registry, new AssetPublisher($project->path())),
             new MarkdownRenderer(),
             $partials,
+            $media,
+            new MediaUrlGenerator(),
         );
 
         return new SiteController(
             new LanguageRepository($yaml, $paths),
-            new ConfigurationRepository($yaml, $paths),
+            $configuration,
             new PageRepository($yaml, $paths),
             new CollectionRepository($yaml, $paths),
             new CollectionService($localization),

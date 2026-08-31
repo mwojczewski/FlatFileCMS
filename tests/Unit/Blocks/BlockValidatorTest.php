@@ -118,10 +118,44 @@ final class BlockValidatorTest extends TestCase
             );
 
             self::assertContains('data.unexpected', $paths);
-            self::assertContains('data.title.en', $paths);
+            self::assertNotContains('data.title.en', $paths);
             self::assertContains('data.count', $paths);
             self::assertContains('data.image', $paths);
         }
+    }
+
+    public function testRequiredTranslatedFieldsUseTheDefaultLanguageAsFallback(): void
+    {
+        $definition = $this->registry->get('complex');
+        $normalized = $this->validator->validate(
+            $definition,
+            [
+                'title' => ['pl' => 'Oferta'],
+                'count' => 4,
+                'active' => true,
+                'tone' => 'dark',
+                'tags' => ['new'],
+                'website' => 'https://example.com/offer',
+                'date' => '2026-08-29',
+                'color' => '#aabbcc',
+                'image' => ['src' => 'photo.jpg'],
+                'items' => [['label' => ['pl' => 'Pierwsza']]],
+            ],
+            $this->languages,
+            PageIdentity::fromString('offer'),
+        );
+        $english = $this->validator->localize(
+            $definition,
+            $normalized,
+            'en',
+            $this->languages,
+            PageIdentity::fromString('offer'),
+        );
+        $items = ContentData::list($english['items'] ?? null, 'items');
+        $firstItem = ContentData::map($items[0] ?? null, 'items.0');
+
+        self::assertSame('Oferta', $english['title']);
+        self::assertSame('Pierwsza', $firstItem['label']);
     }
 
     private function writeDefinition(): void

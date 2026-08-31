@@ -56,4 +56,29 @@ final class ErrorHandlerTest extends TestCase
         self::assertSame('no-cache', $response->headers()['Pragma']);
         self::assertSame('DENY', $response->headers()['X-Frame-Options']);
     }
+
+    public function testUnauthenticatedAdministratorHtmlRequestRedirectsToLogin(): void
+    {
+        $handler = new ErrorHandler();
+        $response = $handler->render(
+            new Request('GET', '/admin/pages'),
+            new HttpException(401, 'AUTHENTICATION_REQUIRED', 'Authentication required.'),
+        );
+
+        self::assertSame(302, $response->status());
+        self::assertSame('/admin/login', $response->headers()['Location']);
+        self::assertSame('no-store', $response->headers()['Cache-Control']);
+    }
+
+    public function testUnauthenticatedJsonRequestKeepsErrorEnvelope(): void
+    {
+        $handler = new ErrorHandler();
+        $response = $handler->render(
+            new Request('GET', '/admin/media/picker', headers: ['accept' => 'application/json']),
+            new HttpException(401, 'AUTHENTICATION_REQUIRED', 'Authentication required.'),
+        );
+
+        self::assertSame(401, $response->status());
+        self::assertStringContainsString('AUTHENTICATION_REQUIRED', $response->body());
+    }
 }

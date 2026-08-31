@@ -28,6 +28,11 @@ Forms support every built-in field type, localized fields, localized image ALT
 values and recursively generated repeaters. Language controls are generated
 from `config/languages.yml`, not hard-coded in the panel.
 
+Every `image` and `file` control can open the authenticated media picker for
+the page being edited. Selection writes only the page-local filename into the
+form. Upload, previews and deletion live in the linked page media library; a
+referenced file cannot be deleted until its block reference is removed.
+
 Fields declared as `type: markdown` are progressively enhanced with the locally
 vendored EasyMDE 2.21.0 editor. The integration also initializes Markdown
 fields added later by repeater controls and refreshes hidden editors after a

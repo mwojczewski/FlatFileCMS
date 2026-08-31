@@ -55,6 +55,15 @@ final class PublicApiControllerTest extends TestCase
         self::assertSame('Services', $data['title']);
         self::assertSame('/en/services', $data['url']);
         self::assertSame('Welcome', $blockData['heading']);
+        $image = ContentData::map($blockData['image'] ?? null, 'blocks.0.data.image');
+        self::assertSame('hero.png', $image['src']);
+        self::assertSame('image/png', $image['mimeType']);
+        self::assertSame(1, $image['width']);
+        self::assertSame(1, $image['height']);
+        self::assertMatchesRegularExpression(
+            '#^/media/services/[a-f0-9]{16}/hero\.png$#D',
+            ContentData::string($image['url'] ?? null, 'blocks.0.data.image.url'),
+        );
         self::assertSame('Services — Example', $seo['title']);
         self::assertSame('Global description', $seo['description']);
         self::assertMatchesRegularExpression('/^"[a-f0-9]{64}"$/D', $response->headers()['ETag']);
@@ -81,6 +90,35 @@ final class PublicApiControllerTest extends TestCase
 
         self::assertSame(304, $second->status());
         self::assertSame('', $second->body());
+    }
+
+    public function testMediaChangeInvalidatesPageLastModifiedValidator(): void
+    {
+        $request = new Request(
+            'GET',
+            '/api/v1/pages/services',
+            query: ['lang' => 'en'],
+            attributes: ['path' => 'services'],
+        );
+        $first = $this->controller->page($request);
+        $path = $this->project->path('pages/services/hero.png');
+        $contents = \file_get_contents($path);
+        if ($contents === false) {
+            throw new \RuntimeException('Test image fixture cannot be read.');
+        }
+        $this->project->write('pages/services/hero.png', $contents . 'changed');
+        \touch($path, \time() + 2);
+
+        $second = $this->controller->page(new Request(
+            'GET',
+            '/api/v1/pages/services',
+            headers: ['if-modified-since' => $first->headers()['Last-Modified']],
+            query: ['lang' => 'en'],
+            attributes: ['path' => 'services'],
+        ));
+
+        self::assertSame(200, $second->status());
+        self::assertNotSame($first->body(), $second->body());
     }
 
     public function testItResolvesNavigationPageReferencesForLocale(): void
@@ -164,6 +202,10 @@ fields:
     translatable: true
     minLength: 1
     maxLength: 160
+  image:
+    type: image
+    required: true
+    translatable: false
 YAML);
         $this->project->write('blocks/hero/render.php', "<?php\n\ndeclare(strict_types=1);\n");
         $this->project->write('config/languages.yml', <<<'YAML'
@@ -208,7 +250,18 @@ blocks:
     enabled: true
     data:
       heading: { pl: Witaj, en: Welcome }
+      image:
+        src: hero.png
+        alt: { pl: Bohater, en: Hero }
 YAML);
+        $image = \base64_decode(
+            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
+            true,
+        );
+        if ($image === false) {
+            throw new \RuntimeException('Test image fixture is invalid.');
+        }
+        $this->project->write('pages/services/hero.png', $image);
     }
 
     /** @return array<string, mixed> */

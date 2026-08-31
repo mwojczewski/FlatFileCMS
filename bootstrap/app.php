@@ -3,18 +3,25 @@
 declare(strict_types=1);
 
 use FlatFileCms\Admin\AdminAuthController;
+use FlatFileCms\Admin\AdminCollectionController;
 use FlatFileCms\Admin\AdminLayout;
+use FlatFileCms\Admin\AdminMediaController;
 use FlatFileCms\Admin\AdminPageBuilderController;
 use FlatFileCms\Admin\AdminPageController;
+use FlatFileCms\Admin\AdminRedirectController;
+use FlatFileCms\Admin\AdminSettingsController;
+use FlatFileCms\Admin\AdminUserController;
+use FlatFileCms\Admin\AdminView;
+use FlatFileCms\Admin\PasswordResetController;
 use FlatFileCms\Admin\BlockFormDataMapper;
 use FlatFileCms\Admin\BlockFormRenderer;
-use FlatFileCms\Admin\PasswordResetController;
+use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Api\ApiResponseFactory;
 use FlatFileCms\Api\CollectionSerializer;
 use FlatFileCms\Api\PageSerializer;
 use FlatFileCms\Api\PublicApiController;
-use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Auth\Authenticator;
+use FlatFileCms\Auth\AdminUserManager;
 use FlatFileCms\Auth\CsrfTokenManager;
 use FlatFileCms\Auth\NativeSessionStore;
 use FlatFileCms\Auth\PasswordChanger;
@@ -33,19 +40,24 @@ use FlatFileCms\Blocks\BlockValidator;
 use FlatFileCms\Blocks\BuiltinFieldTypes;
 use FlatFileCms\Blocks\Field\FieldTypeRegistry;
 use FlatFileCms\Collections\CollectionRepository;
+use FlatFileCms\Collections\CollectionManager;
 use FlatFileCms\Collections\CollectionService;
 use FlatFileCms\Config\ConfigurationRepository;
+use FlatFileCms\Config\ConfigurationManager;
 use FlatFileCms\Config\LanguageRepository;
+use FlatFileCms\Config\SiteTextRepository;
 use FlatFileCms\Content\PageBlockManager;
 use FlatFileCms\Content\PageManager;
 use FlatFileCms\Content\PageRepository;
 use FlatFileCms\Core\Application;
 use FlatFileCms\Core\Container;
 use FlatFileCms\Core\Environment;
+use FlatFileCms\Core\ProductionGuard;
 use FlatFileCms\Domain\Localization\LocalizedDataResolver;
 use FlatFileCms\Http\ErrorHandler;
 use FlatFileCms\Http\HtmlResponseFactory;
 use FlatFileCms\Http\Router;
+use FlatFileCms\Http\TrustedProxyResolver;
 use FlatFileCms\Infrastructure\Database\Database;
 use FlatFileCms\Infrastructure\Filesystem\AtomicFileWriter;
 use FlatFileCms\Infrastructure\Filesystem\DirectoryOperator;
@@ -57,7 +69,19 @@ use FlatFileCms\Infrastructure\Yaml\YamlParser;
 use FlatFileCms\Mail\Mailer;
 use FlatFileCms\Mail\MailException;
 use FlatFileCms\Mail\SmtpMailer;
+use FlatFileCms\Logging\LoggerFactory;
+use FlatFileCms\Logging\RuntimeErrorLogger;
+use FlatFileCms\Media\MediaInspector;
+use FlatFileCms\Media\MediaManager;
+use FlatFileCms\Media\MediaOutputEnricher;
+use FlatFileCms\Media\MediaRepository;
+use FlatFileCms\Media\MediaUrlGenerator;
+use FlatFileCms\Media\MediaVariantService;
+use FlatFileCms\Media\PublicMediaController;
+use FlatFileCms\Media\RasterImageProcessor;
+use FlatFileCms\Media\SvgSanitizer;
 use FlatFileCms\Navigation\NavigationRepository;
+use FlatFileCms\Navigation\NavigationManager;
 use FlatFileCms\Presentation\CollectionViewModelFactory;
 use FlatFileCms\Presentation\PageViewModelFactory;
 use FlatFileCms\Rendering\AssetCollector;
@@ -72,15 +96,31 @@ use FlatFileCms\Rendering\PageRenderer;
 use FlatFileCms\Rendering\PartialRegistry;
 use FlatFileCms\Rendering\PartialRenderer;
 use FlatFileCms\Rendering\SiteController;
+use FlatFileCms\Redirects\RedirectController;
+use FlatFileCms\Redirects\RedirectManager;
+use FlatFileCms\Redirects\RedirectRepository;
 use FlatFileCms\Seo\SeoResolver;
+use FlatFileCms\Seo\SitemapController;
+use FlatFileCms\Seo\SiteTextController;
+use Psr\Log\LoggerInterface;
 
 $projectRoot = dirname(__DIR__);
 
 require "{$projectRoot}/vendor/autoload.php";
 
 $environment = Environment::load($projectRoot);
+ProductionGuard::initialize($environment);
+$logger = LoggerFactory::create($environment);
+RuntimeErrorLogger::register($logger);
 $container = new Container();
 $container->set(Environment::class, static fn(): Environment => $environment);
+$container->set(LoggerInterface::class, static fn(): LoggerInterface => $logger);
+$container->set(
+    TrustedProxyResolver::class,
+    static fn(Container $container): TrustedProxyResolver => TrustedProxyResolver::fromString(
+        $container->get(Environment::class)->get('TRUSTED_PROXIES', ''),
+    ),
+);
 $container->set(
     Database::class,
     static fn(Container $container): Database => new Database(
@@ -152,10 +192,18 @@ $container->set(
     ),
 );
 $container->set(
+    AdminView::class,
+    static fn(Container $container): AdminView => new AdminView(
+        $container->get(Environment::class)->projectRoot(),
+        $container->get(OutputBuffer::class),
+    ),
+);
+$container->set(
     AdminLayout::class,
     static fn(Container $container): AdminLayout => new AdminLayout(
         $container->get(Authenticator::class),
         $container->get(CsrfTokenManager::class),
+        $container->get(AdminView::class),
     ),
 );
 $container->set(
@@ -167,6 +215,7 @@ $container->set(
         $container->get(PasswordHasher::class),
         $container->get(WebAuthnCredentialRepository::class),
         $container->get(WebAuthnService::class),
+        $container->get(AdminView::class),
         $container->get(AdminLayout::class),
         $container->get(AuditLogger::class),
     ),
@@ -196,6 +245,13 @@ $container->set(
         $container->get(FileLockManager::class),
     ),
 );
+$container->set(
+    SiteTextRepository::class,
+    static fn(Container $container): SiteTextRepository => new SiteTextRepository(
+        $container->get(SafePathResolver::class),
+        $container->get(AtomicFileWriter::class),
+    ),
+);
 $container->set(YamlParser::class, static fn(): YamlParser => new YamlParser());
 $container->set(
     YamlFileCache::class,
@@ -216,6 +272,24 @@ $container->set(
     ),
 );
 $container->set(
+    RedirectRepository::class,
+    static fn(Container $container): RedirectRepository => new RedirectRepository(
+        $container->get(YamlFileRepository::class),
+    ),
+);
+$container->set(
+    RedirectManager::class,
+    static fn(Container $container): RedirectManager => new RedirectManager(
+        $container->get(RedirectRepository::class),
+    ),
+);
+$container->set(
+    RedirectController::class,
+    static fn(Container $container): RedirectController => new RedirectController(
+        $container->get(RedirectRepository::class),
+    ),
+);
+$container->set(
     LanguageRepository::class,
     static fn(Container $container): LanguageRepository => new LanguageRepository(
         $container->get(YamlFileRepository::class),
@@ -227,6 +301,37 @@ $container->set(
     static fn(Container $container): ConfigurationRepository => new ConfigurationRepository(
         $container->get(YamlFileRepository::class),
         $container->get(SafePathResolver::class),
+    ),
+);
+$container->set(SvgSanitizer::class, static fn(): SvgSanitizer => new SvgSanitizer());
+$container->set(
+    MediaInspector::class,
+    static fn(Container $container): MediaInspector => new MediaInspector($container->get(SvgSanitizer::class)),
+);
+$container->set(RasterImageProcessor::class, static fn(): RasterImageProcessor => new RasterImageProcessor());
+$container->set(MediaUrlGenerator::class, static fn(): MediaUrlGenerator => new MediaUrlGenerator());
+$container->set(
+    MediaRepository::class,
+    static fn(Container $container): MediaRepository => new MediaRepository(
+        $container->get(SafePathResolver::class),
+        $container->get(ConfigurationRepository::class),
+        $container->get(MediaInspector::class),
+    ),
+);
+$container->set(
+    MediaVariantService::class,
+    static fn(Container $container): MediaVariantService => new MediaVariantService(
+        $container->get(ConfigurationRepository::class),
+        $container->get(RasterImageProcessor::class),
+        $container->get(SafePathResolver::class),
+        $container->get(AtomicFileWriter::class),
+    ),
+);
+$container->set(
+    PublicMediaController::class,
+    static fn(Container $container): PublicMediaController => new PublicMediaController(
+        $container->get(MediaRepository::class),
+        $container->get(MediaVariantService::class),
     ),
 );
 $container->set(
@@ -279,6 +384,7 @@ $container->set(
     static fn(Container $container): PasswordResetController => new PasswordResetController(
         $container->get(CsrfTokenManager::class),
         $container->get(PasswordResetService::class),
+        $container->get(AdminView::class),
         $container->get(AdminLayout::class),
     ),
 );
@@ -307,6 +413,16 @@ $container->set(
     CollectionService::class,
     static fn(Container $container): CollectionService => new CollectionService(
         $container->get(LocalizedDataResolver::class),
+    ),
+);
+$container->set(
+    CollectionManager::class,
+    static fn(Container $container): CollectionManager => new CollectionManager(
+        $container->get(YamlFileRepository::class),
+        $container->get(CollectionRepository::class),
+        $container->get(PageRepository::class),
+        $container->get(LayoutRegistry::class),
+        $container->get(FileLockManager::class),
     ),
 );
 $container->set(
@@ -348,6 +464,19 @@ $container->set(
         $container->get(FileLockManager::class),
     ),
 );
+$container->set(
+    MediaManager::class,
+    static fn(Container $container): MediaManager => new MediaManager(
+        $container->get(MediaRepository::class),
+        $container->get(PageBlockManager::class),
+        $container->get(ConfigurationRepository::class),
+        $container->get(MediaInspector::class),
+        $container->get(RasterImageProcessor::class),
+        $container->get(SafePathResolver::class),
+        $container->get(AtomicFileWriter::class),
+        $container->get(FileLockManager::class),
+    ),
+);
 $container->set(BlockFormDataMapper::class, static fn(): BlockFormDataMapper => new BlockFormDataMapper());
 $container->set(BlockFormRenderer::class, static fn(): BlockFormRenderer => new BlockFormRenderer());
 $container->set(
@@ -372,6 +501,41 @@ $container->set(
         $container->get(CollectionRepository::class),
         $container->get(PageManager::class),
         $container->get(LayoutRegistry::class),
+        $container->get(ConfigurationRepository::class),
+        $container->get(AdminView::class),
+        $container->get(AdminLayout::class),
+        $container->get(AuditLogger::class),
+    ),
+);
+$container->set(
+    AdminCollectionController::class,
+    static fn(Container $container): AdminCollectionController => new AdminCollectionController(
+        $container->get(Authenticator::class),
+        $container->get(CsrfTokenManager::class),
+        $container->get(LanguageRepository::class),
+        $container->get(CollectionManager::class),
+        $container->get(LayoutRegistry::class),
+        $container->get(AdminView::class),
+        $container->get(AdminLayout::class),
+        $container->get(AuditLogger::class),
+    ),
+);
+$container->set(
+    AdminUserManager::class,
+    static fn(Container $container): AdminUserManager => new AdminUserManager(
+        $container->get(UserRepository::class),
+        $container->get(PasswordPolicy::class),
+        $container->get(PasswordHasher::class),
+    ),
+);
+$container->set(
+    AdminUserController::class,
+    static fn(Container $container): AdminUserController => new AdminUserController(
+        $container->get(Authenticator::class),
+        $container->get(CsrfTokenManager::class),
+        $container->get(UserRepository::class),
+        $container->get(AdminUserManager::class),
+        $container->get(AdminView::class),
         $container->get(AdminLayout::class),
         $container->get(AuditLogger::class),
     ),
@@ -386,6 +550,21 @@ $container->set(
         $container->get(BlockRegistry::class),
         $container->get(BlockFormDataMapper::class),
         $container->get(BlockFormRenderer::class),
+        $container->get(AdminView::class),
+        $container->get(AdminLayout::class),
+        $container->get(AuditLogger::class),
+    ),
+);
+$container->set(
+    AdminMediaController::class,
+    static fn(Container $container): AdminMediaController => new AdminMediaController(
+        $container->get(Authenticator::class),
+        $container->get(CsrfTokenManager::class),
+        $container->get(PageBlockManager::class),
+        $container->get(MediaRepository::class),
+        $container->get(MediaManager::class),
+        $container->get(MediaUrlGenerator::class),
+        $container->get(AdminView::class),
         $container->get(AdminLayout::class),
         $container->get(AuditLogger::class),
     ),
@@ -399,9 +578,62 @@ $container->set(
     ),
 );
 $container->set(
+    NavigationManager::class,
+    static fn(Container $container): NavigationManager => new NavigationManager(
+        $container->get(NavigationRepository::class),
+        $container->get(LanguageRepository::class),
+        $container->get(PageRepository::class),
+        $container->get(CollectionRepository::class),
+    ),
+);
+$container->set(
+    ConfigurationManager::class,
+    static fn(Container $container): ConfigurationManager => new ConfigurationManager(
+        $container->get(ConfigurationRepository::class),
+        $container->get(LayoutRegistry::class),
+    ),
+);
+$container->set(
+    AdminSettingsController::class,
+    static fn(Container $container): AdminSettingsController => new AdminSettingsController(
+        $container->get(Authenticator::class),
+        $container->get(CsrfTokenManager::class),
+        $container->get(LanguageRepository::class),
+        $container->get(PageRepository::class),
+        $container->get(CollectionRepository::class),
+        $container->get(NavigationManager::class),
+        $container->get(ConfigurationManager::class),
+        $container->get(SiteTextRepository::class),
+        $container->get(LayoutRegistry::class),
+        $container->get(AdminView::class),
+        $container->get(AdminLayout::class),
+        $container->get(AuditLogger::class),
+    ),
+);
+$container->set(
+    AdminRedirectController::class,
+    static fn(Container $container): AdminRedirectController => new AdminRedirectController(
+        $container->get(Authenticator::class),
+        $container->get(CsrfTokenManager::class),
+        $container->get(RedirectRepository::class),
+        $container->get(RedirectManager::class),
+        $container->get(AdminView::class),
+        $container->get(AdminLayout::class),
+        $container->get(AuditLogger::class),
+    ),
+);
+$container->set(
     SeoResolver::class,
     static fn(Container $container): SeoResolver => new SeoResolver(
         $container->get(LocalizedDataResolver::class),
+    ),
+);
+$container->set(
+    MediaOutputEnricher::class,
+    static fn(Container $container): MediaOutputEnricher => new MediaOutputEnricher(
+        $container->get(BlockRegistry::class),
+        $container->get(MediaRepository::class),
+        $container->get(MediaUrlGenerator::class),
     ),
 );
 $container->set(
@@ -409,6 +641,7 @@ $container->set(
     static fn(Container $container): PageViewModelFactory => new PageViewModelFactory(
         $container->get(BlockProcessor::class),
         $container->get(SeoResolver::class),
+        $container->get(MediaOutputEnricher::class),
     ),
 );
 $container->set(
@@ -502,6 +735,8 @@ $container->set(
         $container->get(AssetCollector::class),
         $container->get(MarkdownRenderer::class),
         $container->get(PartialRenderer::class),
+        $container->get(MediaRepository::class),
+        $container->get(MediaUrlGenerator::class),
     ),
 );
 $container->set(
@@ -530,6 +765,21 @@ $container->set(
         $container->get(HtmlResponseFactory::class),
     ),
 );
+$container->set(
+    SitemapController::class,
+    static fn(Container $container): SitemapController => new SitemapController(
+        $container->get(LanguageRepository::class),
+        $container->get(ConfigurationRepository::class),
+        $container->get(PageRepository::class),
+        $container->get(CollectionRepository::class),
+    ),
+);
+$container->set(
+    SiteTextController::class,
+    static fn(Container $container): SiteTextController => new SiteTextController(
+        $container->get(SiteTextRepository::class),
+    ),
+);
 $container->set(Router::class, static function (Container $container) use ($projectRoot): Router {
     $router = new Router();
     $registerRoutes = require "{$projectRoot}/config/routes.php";
@@ -543,9 +793,11 @@ $container->set(Router::class, static function (Container $container) use ($proj
 });
 $container->set(ErrorHandler::class, static fn(Container $container): ErrorHandler => new ErrorHandler(
     debug: $container->get(Environment::class)->debug(),
+    logger: $container->get(LoggerInterface::class),
 ));
 
 return new Application(
     router: $container->get(Router::class),
     errorHandler: $container->get(ErrorHandler::class),
+    trustedProxies: $container->get(TrustedProxyResolver::class),
 );

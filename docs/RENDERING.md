@@ -42,7 +42,9 @@ The template context deliberately exposes only:
 
 - `escape()` for HTML text and attributes;
 - `markdown()` using CommonMark with raw HTML stripped and unsafe links disabled;
-- `image()` for normalized page-local image data;
+- `image()` for a normalized page-local image and an optional fixed variant;
+- `imageUrl()` for developer-defined media markup;
+- `picture()` for validated responsive source sets and controlled cropping;
 - `asset()` for root-relative published assets;
 - `url()` for validated URLs;
 - `locale()`;
@@ -82,6 +84,8 @@ redirected to the same path under the configured default locale:
 HTML responses use the same page visibility and translated-slug route index as
 the API. They also include ETag, Last-Modified and revalidation cache headers.
 
-Page-local media references remain relative to the rendered page URL. Upload,
-sanitized SVG delivery, image transformations and dedicated media routing are
-implemented in the later media stage.
+Page-local media values retain their direct `src` filename but the shared page
+view model adds a fingerprinted public `url`, MIME information, size and image
+dimensions. `RenderContext::image()` emits that immutable URL with intrinsic
+dimensions; the REST adapter exposes the same resolved media data. Originals,
+SVG security and optional GD variants are described in [MEDIA.md](MEDIA.md).

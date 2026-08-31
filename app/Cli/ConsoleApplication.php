@@ -11,12 +11,16 @@ use Throwable;
 
 final readonly class ConsoleApplication
 {
-    /** @param Closure(): UserCommandService $users */
+    /**
+     * @param Closure(): UserCommandService $users
+     * @param Closure(): ReleaseChecker $release
+     */
     public function __construct(
         private BlockScaffolder $blocks,
         private Closure $users,
         private PasswordReader $passwords,
         private CacheClearer $cache,
+        private Closure $release,
     ) {}
 
     /** @param list<string> $arguments */
@@ -34,6 +38,7 @@ final readonly class ConsoleApplication
                 'block:create' => $this->createBlock(\array_slice($arguments, 2)),
                 'cache:clear' => $this->clearCache(\array_slice($arguments, 2)),
                 'database:migrate' => $this->migrateDatabase(\array_slice($arguments, 2)),
+                'release:check' => $this->releaseCheck(\array_slice($arguments, 2)),
                 'install' => $this->createUser($arguments[2] ?? null, Role::Superadmin, install: true),
                 'user:create' => $this->createUser($arguments[2] ?? null, Role::Admin),
                 'user:create-superadmin' => $this->createUser($arguments[2] ?? null, Role::Superadmin),
@@ -133,6 +138,22 @@ final readonly class ConsoleApplication
         return 0;
     }
 
+    /** @param list<string> $arguments */
+    private function releaseCheck(array $arguments): int
+    {
+        if ($arguments !== []) {
+            throw new InvalidArgumentException('Usage: php bin/cms release:check');
+        }
+
+        $failed = false;
+        foreach (($this->release)()->run() as $result) {
+            $this->output(($result->passed ? '[OK]   ' : '[FAIL] ') . "{$result->name}: {$result->message}\n");
+            $failed = $failed || !$result->passed;
+        }
+
+        return $failed ? 1 : 0;
+    }
+
     private function unknown(string $command): int
     {
         $this->error(\sprintf("Unknown command \"%s\".\n\n%s", $command, $this->help()));
@@ -162,6 +183,7 @@ Commands:
   block:create <type> [--with-assets]      Create a developer block package
   cache:clear                              Remove all generated cache entries
   database:migrate                         Apply authentication database schema changes
+  release:check                            Validate production runtime, content and deployment
 
 Set CMS_PASSWORD for non-interactive use. Avoid shell history and process arguments.
 TEXT;

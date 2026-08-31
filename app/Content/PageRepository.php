@@ -149,10 +149,14 @@ final readonly class PageRepository
     private function localizedStrings(mixed $value, string $field, LanguageConfig $languages): array
     {
         $mapping = ContentData::map($value, $field);
+        $fallback = ContentData::string(
+            $mapping[$languages->default()] ?? null,
+            $field . '.' . $languages->default(),
+        );
         $localized = [];
 
         foreach ($languages->codes() as $locale) {
-            $localized[$locale] = ContentData::string($mapping[$locale] ?? null, $field . '.' . $locale);
+            $localized[$locale] = ContentData::string($mapping[$locale] ?? $fallback, $field . '.' . $locale);
         }
 
         return $localized;

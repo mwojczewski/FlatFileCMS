@@ -18,8 +18,9 @@ Daily filenames provide time-based rotation without rewriting an active file.
 
 Covered events include login success/failure, logout, password changes and
 resets, page lifecycle operations and all page-builder block mutations. CLI
-user creation and password recovery actions are also recorded. Authentication
-failures intentionally omit secrets and submitted passwords.
+user creation, password recovery, media upload/deletion, navigation writes and
+global configuration writes are also recorded. Authentication failures
+intentionally omit secrets and submitted passwords.
 
 Retention, archival and off-host collection remain deployment policy. Operators
 may ship completed daily files after midnight, but must never expose

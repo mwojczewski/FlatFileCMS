@@ -92,6 +92,36 @@ YAML);
         $this->routes();
     }
 
+    public function testLanguageAddedAfterPageCreationUsesDefaultContentAndSlug(): void
+    {
+        $this->project->write('config/languages.yml', <<<'YAML'
+default: pl
+languages:
+  pl: { name: Polski, enabled: true }
+  en: { name: English, enabled: true }
+  de: { name: Deutsch, enabled: true }
+YAML);
+        $this->project->write('pages/homepage/content.yml', <<<'YAML'
+schemaVersion: 1
+enabled: true
+title: { pl: Start }
+blocks: []
+YAML);
+        $this->project->write('pages/services/content.yml', <<<'YAML'
+schemaVersion: 1
+enabled: true
+slug: { pl: oferta }
+title: { pl: Oferta }
+blocks: []
+YAML);
+
+        [, $routes] = $this->routes();
+        $page = $routes->resolve('oferta', 'de');
+
+        self::assertSame('Oferta', $page->title('de', 'pl'));
+        self::assertSame('/de/oferta', $routes->urlFor($page->identity(), 'de'));
+    }
+
     /** @return array{LanguageConfig, PageRouteIndex} */
     private function routes(): array
     {

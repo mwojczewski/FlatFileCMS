@@ -1,6 +1,6 @@
 # FlatFile CMS — Architecture Decision Record
 
-Status: accepted for stages 0–8  
+Status: accepted for stages 0–12
 Baseline: PHP 8.5+
 
 The project intentionally provides no compatibility layer for PHP 8.4 or older.
@@ -131,3 +131,8 @@ writes preserve unknown attributes and block data, use content revisions, and
 validate the complete localized route index before becoming visible. Page
 directory moves are atomic and recursive deletion intentionally has no trash or
 version-history layer.
+Stages 9–11 add schema-generated block editing, the unified administrator
+experience, password recovery, audit and page-local media without changing the
+domain boundary. Stage 12 adds revision-safe configuration/navigation editors
+and fail-closed production validation. All administrator-managed content still
+resides in YAML and media files; SQLite remains restricted to authentication.

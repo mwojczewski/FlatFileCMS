@@ -109,6 +109,7 @@ final readonly class SiteController
             max(
                 $page->modifiedAt(),
                 $this->pageViews->blockDefinitionsModifiedAt($page),
+                $this->pageViews->mediaModifiedAt($page),
                 $rendered->assetsModifiedAt(),
                 $routes->modifiedAt(),
                 $languageDocument->modifiedAt(),

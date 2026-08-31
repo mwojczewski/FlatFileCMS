@@ -9,6 +9,7 @@ use FlatFileCms\Config\ConfigurationDocument;
 use FlatFileCms\Content\PageRouteIndex;
 use FlatFileCms\Domain\Content\Page;
 use FlatFileCms\Domain\Localization\LanguageConfig;
+use FlatFileCms\Media\MediaOutputEnricher;
 use FlatFileCms\Seo\SeoResolver;
 use FlatFileCms\Support\ContentData;
 
@@ -17,6 +18,7 @@ final readonly class PageViewModelFactory
     public function __construct(
         private BlockProcessor $blocks,
         private SeoResolver $seo,
+        private MediaOutputEnricher $media,
     ) {}
 
     public function create(
@@ -35,13 +37,21 @@ final readonly class PageViewModelFactory
             $page->layout() ?? $this->defaultLayout($configuration),
             $page->title($locale, $languages->default()),
             $this->seo->resolve($page, $locale, $url, $languages, $configuration),
-            $this->blocks->forPublicPage($page, $locale, $languages),
+            $this->media->enrich(
+                $page->identity(),
+                $this->blocks->forPublicPage($page, $locale, $languages),
+            ),
         );
     }
 
     public function blockDefinitionsModifiedAt(Page $page): int
     {
         return $this->blocks->definitionsModifiedAt($page);
+    }
+
+    public function mediaModifiedAt(Page $page): int
+    {
+        return $this->media->modifiedAt($page->identity());
     }
 
     private function defaultLayout(ConfigurationDocument $configuration): string

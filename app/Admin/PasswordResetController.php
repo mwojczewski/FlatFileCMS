@@ -17,16 +17,15 @@ final readonly class PasswordResetController
     public function __construct(
         private CsrfTokenManager $csrf,
         private PasswordResetService $passwords,
+        private AdminView $views,
         private AdminLayout $layout,
     ) {}
 
     public function requestForm(Request $request): Response
     {
-        return $this->layout->render('Reset hasła', '<p class="lead">Podaj adres przypisany do konta administratora.</p>'
-            . '<form method="post" action="/admin/password/forgot">' . $this->csrfField()
-            . '<label>Email<input type="email" name="email" required autocomplete="email"></label>'
-            . '<button type="submit">Wyślij link resetujący</button></form>'
-            . '<p class="hint"><a href="/admin/login">Wróć do logowania</a></p>');
+        return $this->layout->render('Reset hasła', $this->views->render('password-reset/request', [
+            'csrfToken' => $this->csrf->token(),
+        ]));
     }
 
     public function request(Request $request): Response
@@ -42,15 +41,14 @@ final readonly class PasswordResetController
         } catch (AuthenticationException) {
             return $this->layout->render(
                 'Reset hasła',
-                '<p class="error">Przekroczono limit prób. Spróbuj ponownie później.</p>',
+                $this->views->render('password-reset/message', ['type' => 'error', 'message' => 'Przekroczono limit prób. Spróbuj ponownie później.', 'url' => '/admin/login', 'label' => 'Wróć do logowania']),
                 429,
             );
         }
 
         return $this->layout->render(
             'Sprawdź skrzynkę',
-            '<p class="success">Jeśli konto istnieje, wysłaliśmy wiadomość z dalszymi instrukcjami.</p>'
-                . '<p><a class="button secondary" href="/admin/login">Wróć do logowania</a></p>',
+            $this->views->render('password-reset/message', ['type' => 'success', 'message' => 'Jeśli konto istnieje, wysłaliśmy wiadomość z dalszymi instrukcjami.', 'url' => '/admin/login', 'label' => 'Wróć do logowania']),
             202,
         );
     }
@@ -61,13 +59,12 @@ final readonly class PasswordResetController
         if (!$this->passwords->isValid($token)) {
             return $this->layout->render(
                 'Link wygasł',
-                '<p class="error">Link resetujący jest nieprawidłowy, wygasł albo został już użyty.</p>'
-                    . '<p><a class="button secondary" href="/admin/password/forgot">Wygeneruj nowy link</a></p>',
+                $this->views->render('password-reset/message', ['type' => 'error', 'message' => 'Link resetujący jest nieprawidłowy, wygasł albo został już użyty.', 'url' => '/admin/password/forgot', 'label' => 'Wygeneruj nowy link']),
                 410,
             );
         }
 
-        return $this->layout->render('Ustaw nowe hasło', $this->resetFormHtml($token));
+        return $this->layout->render('Ustaw nowe hasło', $this->resetFormContent($token));
     }
 
     public function reset(Request $request): Response
@@ -85,7 +82,7 @@ final readonly class PasswordResetController
         } catch (AuthenticationException | InvalidArgumentException $exception) {
             return $this->layout->render(
                 'Ustaw nowe hasło',
-                '<p class="error">' . self::escape($exception->getMessage()) . '</p>' . $this->resetFormHtml($token),
+                $this->resetFormContent($token, $exception->getMessage()),
                 422,
             );
         }
@@ -93,24 +90,18 @@ final readonly class PasswordResetController
         return Response::redirect('/admin/login?password_reset=1', 303);
     }
 
-    private function resetFormHtml(string $token): string
+    private function resetFormContent(string $token, string $error = ''): string
     {
-        return '<form method="post" action="/admin/password/reset" class="stack">' . $this->csrfField()
-            . '<input type="hidden" name="token" value="' . self::escape($token) . '">'
-            . '<label>Nowe hasło<input type="password" name="password" required autocomplete="new-password" minlength="8"></label>'
-            . '<label>Powtórz hasło<input type="password" name="password_confirmation" required autocomplete="new-password" minlength="8"></label>'
-            . '<p class="hint">Minimum 8 znaków, mała i wielka litera, cyfra oraz znak specjalny.</p>'
-            . '<button type="submit">Zapisz nowe hasło</button></form>';
+        return $this->views->render('password-reset/reset', [
+            'token' => $token,
+            'csrfToken' => $this->csrf->token(),
+            'error' => $error,
+        ]);
     }
 
     private function token(mixed $token): string
     {
         return \is_string($token) ? $token : '';
-    }
-
-    private function csrfField(): string
-    {
-        return '<input type="hidden" name="_csrf" value="' . self::escape($this->csrf->token()) . '">';
     }
 
     private function validateCsrf(Request $request): void
@@ -122,8 +113,4 @@ final readonly class PasswordResetController
         }
     }
 
-    private static function escape(string $value): string
-    {
-        return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-    }
 }

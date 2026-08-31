@@ -6,8 +6,8 @@ namespace FlatFileCms\Auth;
 
 use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Config\ConfigurationRepository;
-use FlatFileCms\Mail\Mailer;
 use FlatFileCms\Mail\MailException;
+use FlatFileCms\Mail\Mailer;
 use FlatFileCms\Support\ContentData;
 use InvalidArgumentException;
 
@@ -27,7 +27,7 @@ final readonly class PasswordResetService
 
     public function request(string $email, string $ip): void
     {
-        $identifier = mb_strtolower(trim($email));
+        $identifier = \mb_strtolower(\trim($email));
         $this->limiter->assertAllowed('password_reset_ip', $ip);
         $this->limiter->assertAllowed('password_reset_email', $identifier);
         $this->limiter->hit('password_reset_ip', $ip);
@@ -45,7 +45,7 @@ final readonly class PasswordResetService
         }
 
         $token = $this->token();
-        $this->tokens->issue($user, $this->hash($token), time() + $this->ttl);
+        $this->tokens->issue($user, $this->hash($token), \time() + $this->ttl);
         $url = $this->resetUrl($token);
         $delivered = true;
         try {
@@ -72,7 +72,7 @@ final readonly class PasswordResetService
 
     public function isValid(string $token): bool
     {
-        return $this->validTokenFormat($token) && $this->tokens->valid($this->hash($token), time());
+        return $this->validTokenFormat($token) && $this->tokens->valid($this->hash($token), \time());
     }
 
     public function reset(string $token, string $password, string $confirmation, string $ip): void
@@ -80,11 +80,11 @@ final readonly class PasswordResetService
         if (!$this->validTokenFormat($token)) {
             throw new AuthenticationException('Password reset link is invalid or expired.');
         }
-        if (!hash_equals($password, $confirmation)) {
+        if (!\hash_equals($password, $confirmation)) {
             throw new InvalidArgumentException('New password confirmation does not match.');
         }
         $this->policy->validate($password);
-        $user = $this->tokens->claim($this->hash($token), time());
+        $user = $this->tokens->claim($this->hash($token), \time());
         $this->users->updatePassword($user, $this->hasher->hash($password));
         $this->tokens->revokeForUser($user->id());
         $this->audit->log('auth.password_reset', $user->id(), "users/{$user->id()}", $ip);
@@ -94,28 +94,28 @@ final readonly class PasswordResetService
     {
         $configuration = $this->configuration->get()->data();
         $site = ContentData::map($configuration['site'] ?? null, 'site');
-        $baseUrl = rtrim(ContentData::string($site['url'] ?? null, 'site.url'), '/');
+        $baseUrl = \rtrim(ContentData::string($site['url'] ?? null, 'site.url'), '/');
 
-        return "{$baseUrl}/admin/password/reset?token=" . rawurlencode($token);
+        return "{$baseUrl}/admin/password/reset?token=" . \rawurlencode($token);
     }
 
     private function token(): string
     {
-        return rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
+        return \rtrim(\strtr(\base64_encode(\random_bytes(32)), '+/', '-_'), '=');
     }
 
     private function hash(string $token): string
     {
-        return hash('sha256', $token);
+        return \hash('sha256', $token);
     }
 
     private function validTokenFormat(string $token): bool
     {
-        return preg_match('/^[A-Za-z0-9_-]{43}$/D', $token) === 1;
+        return \preg_match('/^[A-Za-z0-9_-]{43}$/D', $token) === 1;
     }
 
     private static function escape(string $value): string
     {
-        return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        return \htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 }

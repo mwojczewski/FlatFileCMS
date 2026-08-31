@@ -85,11 +85,11 @@ final readonly class BlockValidator
                 $normalizedLocales = [];
                 foreach ($context->languages()->codes() as $locale) {
                     if (!\array_key_exists($locale, $localized)) {
-                        if ($definition->required()) {
+                        if ($definition->required() && $locale === $context->languages()->default()) {
                             $errors[] = new ValidationError(
                                 $fieldPath . '.' . $locale,
                                 'REQUIRED_TRANSLATION',
-                                'Translation is required.',
+                                'Default translation is required.',
                             );
                         }
 

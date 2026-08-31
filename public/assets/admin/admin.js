@@ -22,3 +22,25 @@ const firstInvalid = document.querySelector('[aria-invalid="true"], .error + for
 if (firstInvalid instanceof HTMLElement) {
     firstInvalid.focus({preventScroll: true});
 }
+
+const lightbox = document.querySelector('[data-media-lightbox]');
+document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element) || !(lightbox instanceof HTMLDialogElement)) {
+        return;
+    }
+    const preview = event.target.closest('[data-media-preview]');
+    if (preview instanceof HTMLButtonElement) {
+        const image = lightbox.querySelector('[data-media-lightbox-image]');
+        const caption = lightbox.querySelector('[data-media-lightbox-caption]');
+        if (image instanceof HTMLImageElement && caption instanceof HTMLElement) {
+            image.src = preview.dataset.mediaPreview ?? '';
+            image.alt = preview.dataset.mediaPreviewName ?? '';
+            caption.textContent = preview.dataset.mediaPreviewName ?? '';
+            lightbox.showModal();
+        }
+        return;
+    }
+    if (event.target.closest('[data-media-lightbox-close]') || event.target === lightbox) {
+        lightbox.close();
+    }
+});

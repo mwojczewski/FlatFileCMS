@@ -8,8 +8,27 @@ seo:
   description: ''
   ogImage: null
 media:
+  maxUploadBytes: 26214400
+  allowedMimeTypes:
+    - application/pdf
+    - audio/mpeg
+    - audio/ogg
+    - audio/wav
+    - image/avif
+    - image/gif
+    - image/jpeg
+    - image/png
+    - image/svg+xml
+    - image/webp
+    - video/mp4
+    - video/webm
+  stripMetadata: true
   transformations:
     enabled: true
+    quality: 82
+    maxWidth: 4096
+    maxHeight: 4096
+    maxPixels: 40000000
   cache:
     enabled: true
   formats:

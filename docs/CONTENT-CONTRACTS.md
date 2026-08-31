@@ -16,6 +16,11 @@ languages:
 ```
 
 One enabled language produces unprefixed routes. More than one enabled language requires a locale prefix.
+The default language is the required source of truth for localized content.
+Translations for other enabled languages are optional: when they are absent,
+the repository resolves the default-language title, slug, SEO value or block
+field. This allows another language to be enabled without migrating every
+existing content file first.
 
 ## `pages/<identity>/content.yml`
 
@@ -74,7 +79,9 @@ fields:
 
 `block.yml` and `render.php` are required. `style.css`, `script.js` and `preview.webp` are optional developer assets.
 Block data may contain only fields declared by the definition. Required
-translatable fields require a value for every enabled site language. Field
+translatable fields require a value in the default site language. Other
+enabled languages fall back to that value until an explicit translation is
+saved. Field
 definitions and supported validation rules are documented in
 [BLOCKS.md](BLOCKS.md).
 
@@ -121,8 +128,20 @@ seo:
   description: ''
   ogImage: null
 media:
+  maxUploadBytes: 26214400
+  allowedMimeTypes:
+    - application/pdf
+    - image/jpeg
+    - image/png
+    - image/svg+xml
+    - image/webp
+  stripMetadata: true
   transformations:
     enabled: true
+    quality: 82
+    maxWidth: 4096
+    maxHeight: 4096
+    maxPixels: 40000000
   cache:
     enabled: true
   formats:

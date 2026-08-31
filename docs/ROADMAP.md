@@ -90,14 +90,35 @@
 - daily locked JSONL audit trail for authentication and content mutations;
 - additive `database:migrate` command for existing installations.
 
-## Stage 11 — media
+## Stage 11 — media (complete)
 
 - page-local media browsing, upload, selection and deletion;
 - MIME verification, SVG sanitization and image metadata policy;
-- image variants, fingerprints and independently switchable transformations.
+- image variants, fingerprints and independently switchable transformations;
+- immutable public delivery with ETag, byte ranges and cache headers;
+- schema-aware media URLs and metadata shared by API and HTML rendering.
 
-## Stage 12 — configuration and release hardening
+## Stage 12 — configuration and release hardening (complete)
 
 - navigation and safe global-configuration editors;
 - authorization and deployment hardening;
-- production release checklist and complete operator documentation.
+- production release checklist and complete operator documentation;
+- trusted-proxy address resolution and fail-closed production settings;
+- executable `release:check` validation for the target server.
+
+### Stage 12 follow-up (complete)
+
+- isolated `templates/admin/` view layer;
+- automatic canonical suggestion during page creation;
+- collection settings editor;
+- administrator CRUD and separate WebAuthn/U2F management screen;
+- split public typography/frontend CSS and unified form controls.
+
+## Stage 13 — delivery, diagnostics and media ergonomics (complete)
+
+- HTML authentication failures redirect to the admin login screen;
+- Monolog rotating JSON diagnostics and PHP runtime warning capture;
+- developer-controlled contain/cover image variants and responsive pictures;
+- generated multilingual sitemap and editable public text files;
+- filesystem-backed redirect CRUD with status and cycle validation;
+- componentized settings screen, EasyMDE media picker and fullscreen previews.

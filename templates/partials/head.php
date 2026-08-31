@@ -28,6 +28,7 @@ $twitter = $seo['twitter'];
 <?php if ($seo['jsonLd'] !== []): ?>
     <script type="application/ld+json"><?= json_encode($seo['jsonLd'], JSON_THROW_ON_ERROR | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?></script>
 <?php endif; ?>
+<link rel="stylesheet" href="/assets/css/typography.css">
 <link rel="stylesheet" href="/assets/css/site.css">
 <?php foreach ($assets->styles() as $style): ?>
     <link rel="stylesheet" href="<?= $context->asset($style) ?>">

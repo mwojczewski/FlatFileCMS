@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Admin;
 
-use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Auth\AuthenticationException;
 use FlatFileCms\Auth\Authenticator;
 use FlatFileCms\Auth\CsrfTokenManager;
@@ -12,6 +11,7 @@ use FlatFileCms\Auth\PasswordChanger;
 use FlatFileCms\Auth\PasswordHasher;
 use FlatFileCms\Auth\WebAuthnCredentialRepository;
 use FlatFileCms\Auth\WebAuthnService;
+use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Http\HttpException;
 use FlatFileCms\Http\Request;
 use FlatFileCms\Http\Response;
@@ -27,6 +27,7 @@ final readonly class AdminAuthController
         private PasswordHasher $passwords,
         private WebAuthnCredentialRepository $credentials,
         private WebAuthnService $webAuthn,
+        private AdminView $views,
         private AdminLayout $layout,
         private AuditLogger $audit,
     ) {}
@@ -37,14 +38,11 @@ final readonly class AdminAuthController
             return Response::redirect('/admin');
         }
 
-        $message = ($request->query()['password_reset'] ?? null) === '1'
-            ? '<p class="success">Hasło zostało zmienione. Możesz się zalogować.</p>'
-            : '';
-
-        return $this->page('Logowanie', $message . '<form method="post" action="/admin/login">'
-            . $this->csrfField() . '<label>Email<input type="email" name="email" required autocomplete="username"></label>'
-            . '<label>Hasło<input type="password" name="password" required autocomplete="current-password"></label>'
-            . '<button type="submit">Zaloguj się</button></form><p class="hint"><a href="/admin/password/forgot">Nie pamiętasz hasła?</a></p>');
+        return $this->page('Logowanie', $this->views->render('auth/login', [
+            'csrfToken' => $this->csrf->token(),
+            'passwordReset' => ($request->query()['password_reset'] ?? null) === '1',
+            'error' => '',
+        ]));
     }
 
     public function login(Request $request): Response
@@ -69,8 +67,11 @@ final readonly class AdminAuthController
             return Response::redirect($requiresSecondFactor ? '/admin/2fa' : '/admin', 303);
         } catch (AuthenticationException $exception) {
             $this->audit->log('auth.login_failed', null, 'auth/session', $request->clientIp());
-            return $this->page('Logowanie', '<p class="error">' . self::escape($exception->getMessage()) . '</p>'
-                . '<p><a href="/admin/login">Spróbuj ponownie</a></p>', 401);
+            return $this->page('Logowanie', $this->views->render('auth/login', [
+                'csrfToken' => $this->csrf->token(),
+                'passwordReset' => false,
+                'error' => $exception->getMessage(),
+            ]), 401);
         }
     }
 
@@ -84,8 +85,7 @@ final readonly class AdminAuthController
 
         return $this->page(
             'Klucz bezpieczeństwa',
-            '<p>Podłącz YubiKey i dotknij go po wyświetleniu komunikatu przeglądarki.</p>'
-            . '<button type="button" data-webauthn-login>Użyj klucza</button><p class="error" data-auth-error></p>',
+            $this->views->render('auth/second-factor'),
             scripts: true,
         );
     }
@@ -123,39 +123,50 @@ final readonly class AdminAuthController
             return Response::redirect('/admin/login');
         }
 
-        return $this->page('Panel', '<p class="eyebrow">Pulpit</p><p class="lead">Zalogowano jako <strong>'
-            . self::escape($user->email()) . '</strong>.</p><div class="dashboard-links">'
-            . '<a href="/admin/pages"><span>Zarządzaj stronami</span><small>Treść, struktura i podstrony</small></a>'
-            . '<a href="/admin/security"><span>Ustawienia konta</span><small>Hasło i klucze bezpieczeństwa</small></a></div>');
+        return $this->page('Panel', $this->views->render('dashboard', ['user' => $user]));
     }
 
     public function security(Request $request): Response
     {
         $user = $this->requireUser();
-        $message = ($request->query()['password_changed'] ?? null) === '1'
-            ? '<p class="success">Hasło zostało zmienione.</p>'
-            : '';
-        $items = '';
-        foreach ($this->credentials->forUser($user->id()) as $credential) {
-            $items .= '<li>' . self::escape($credential->name()) . '</li>';
-        }
-        if ($items === '') {
-            $items = '<li>Brak zarejestrowanych kluczy — logowanie wymaga tylko hasła.</li>';
-        }
+        return $this->page('Konto', $this->views->render('account/index', [
+            'passwordChanged' => ($request->query()['password_changed'] ?? null) === '1',
+            'credentialCount' => count($this->credentials->forUser($user->id())),
+        ]));
+    }
 
-        return $this->page('Konto', $message . '<div class="toolbar"><div><h2>Hasło</h2><p>Zmień hasło używane do logowania.</p></div>'
-            . '<a class="button secondary" href="/admin/account/password">Zmień hasło</a></div>'
-            . '<hr><h2>Klucze bezpieczeństwa</h2><ul>' . $items . '</ul>'
-            . '<form data-webauthn-register><label>Nazwa klucza<input name="key_name" maxlength="80" required value="YubiKey"></label>'
-            . '<label>Aktualne hasło<input type="password" name="current_password" required autocomplete="current-password"></label>'
-            . '<button type="submit">Dodaj klucz</button></form><p class="error" data-auth-error></p>', scripts: true);
+    public function securityKeys(Request $request): Response
+    {
+        $user = $this->requireUser();
+
+        return $this->page('Klucze bezpieczeństwa', $this->views->render('account/security-keys', [
+            'credentials' => $this->credentials->forUser($user->id()),
+            'csrfToken' => $this->csrf->token(),
+        ]), scripts: true);
+    }
+
+    public function deleteSecurityKey(Request $request): Response
+    {
+        $user = $this->requireUser();
+        $this->validateFormCsrf($request);
+        $id = $request->parsedBody()['id'] ?? null;
+        if (!is_string($id) || preg_match('/^[1-9][0-9]*$/D', $id) !== 1) {
+            throw new HttpException(400, 'WEBAUTHN_CREDENTIAL_INVALID', 'Security key identifier is invalid.');
+        }
+        $this->credentials->deleteForUser((int) $id, $user->id());
+        $this->audit->log('auth.security_key_deleted', $user->id(), "users/{$user->id()}/credentials/{$id}", $request->clientIp());
+
+        return Response::redirect('/admin/account/security-keys?deleted=1', 303);
     }
 
     public function passwordForm(Request $request): Response
     {
         $this->requireUser();
 
-        return $this->page('Zmiana hasła', $this->passwordFormHtml());
+        return $this->page('Zmiana hasła', $this->views->render('account/password', [
+            'csrfToken' => $this->csrf->token(),
+            'error' => '',
+        ]));
     }
 
     public function changePassword(Request $request): Response
@@ -177,7 +188,10 @@ final readonly class AdminAuthController
         } catch (AuthenticationException | InvalidArgumentException $exception) {
             return $this->page(
                 'Zmiana hasła',
-                '<p class="error">' . self::escape($exception->getMessage()) . '</p>' . $this->passwordFormHtml(),
+                $this->views->render('account/password', [
+                    'csrfToken' => $this->csrf->token(),
+                    'error' => $exception->getMessage(),
+                ]),
                 422,
             );
         }
@@ -215,7 +229,7 @@ final readonly class AdminAuthController
         }
         $this->webAuthn->register($user, $name, $normalizedCredential);
 
-        return $this->jsonResponse(['success' => true, 'redirect' => '/admin/security']);
+        return $this->jsonResponse(['success' => true, 'redirect' => '/admin/account/security-keys']);
     }
 
     public function logout(Request $request): Response
@@ -278,22 +292,6 @@ final readonly class AdminAuthController
         return $normalized;
     }
 
-    private function csrfField(): string
-    {
-        return '<input type="hidden" name="_csrf" value="' . self::escape($this->csrf->token()) . '">';
-    }
-
-    private function passwordFormHtml(): string
-    {
-        return '<form method="post" action="/admin/account/password" class="stack">' . $this->csrfField()
-            . '<label>Aktualne hasło<input type="password" name="current_password" required autocomplete="current-password"></label>'
-            . '<label>Nowe hasło<input type="password" name="new_password" required autocomplete="new-password" minlength="8"></label>'
-            . '<label>Powtórz nowe hasło<input type="password" name="new_password_confirmation" required autocomplete="new-password" minlength="8"></label>'
-            . '<p class="hint">Minimum 8 znaków, mała i wielka litera, cyfra oraz znak specjalny.</p>'
-            . '<div class="actions"><button type="submit">Zmień hasło</button>'
-            . '<a class="button secondary" href="/admin/security">Anuluj</a></div></form>';
-    }
-
     /** @param array<string, mixed> $data */
     private function jsonResponse(array $data): Response
     {
@@ -308,15 +306,11 @@ final readonly class AdminAuthController
     {
         $active = match ($title) {
             'Panel' => 'dashboard',
-            'Konto', 'Zmiana hasła' => 'account',
+            'Konto', 'Zmiana hasła', 'Klucze bezpieczeństwa' => 'account',
             default => '',
         };
 
         return $this->layout->render($title, $content, $status, $active, authScript: $scripts);
     }
 
-    private static function escape(string $value): string
-    {
-        return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-    }
 }

@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Admin;
 
-use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Auth\AuthenticationException;
 use FlatFileCms\Auth\Authenticator;
 use FlatFileCms\Auth\CsrfTokenManager;
 use FlatFileCms\Auth\User;
+use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Collections\CollectionRepository;
+use FlatFileCms\Config\ConfigurationRepository;
 use FlatFileCms\Config\LanguageRepository;
 use FlatFileCms\Content\EditablePage;
 use FlatFileCms\Content\InvalidContentException;
 use FlatFileCms\Content\PageManager;
 use FlatFileCms\Content\PageMetadata;
 use FlatFileCms\Content\PageRepository;
+use FlatFileCms\Content\PageRouteIndex;
 use FlatFileCms\Domain\Content\PageIdentity;
 use FlatFileCms\Domain\Localization\LanguageConfig;
 use FlatFileCms\Http\HttpException;
@@ -37,10 +39,11 @@ final readonly class AdminPageController
         private CollectionRepository $collections,
         private PageManager $manager,
         private LayoutRegistry $layouts,
+        private ConfigurationRepository $configuration,
+        private AdminView $views,
         private AdminLayout $layout,
         private AuditLogger $audit,
-    ) {
-    }
+    ) {}
 
     public function index(Request $request): Response
     {
@@ -74,32 +77,7 @@ final readonly class AdminPageController
 
             return $left <=> $right;
         });
-        $items = '';
-        foreach ($entries as $entry) {
-            $identity = $entry['identity']->value();
-            $depth = \count($entry['identity']->segments()) - 1;
-            $childAction = $entry['identity']->isHomepage() ? ''
-                : '<a class="button compact child" href="/admin/pages/create?parent=' . rawurlencode($identity)
-                . '">Dodaj podstronę</a>';
-            $editAction = $entry['collection'] ? '<span class="muted">Edycja kolekcji w kolejnym etapie</span>'
-                : '<a class="button compact secondary" href="/admin/pages/edit?path=' . rawurlencode($identity)
-                . '">Edytuj</a>';
-            $items .= '<tr><td class="page-cell"><span class="tree" style="--depth:' . $depth . '">'
-                . self::escape($entry['title']) . '</span>'
-                . '<small>' . self::escape($identity) . '</small></td><td>'
-                . ($entry['collection'] ? '<span class="status collection">Kolekcja</span>'
-                    : ($entry['enabled'] ? '<span class="status on">Aktywna</span>' : '<span class="status">Wyłączona</span>'))
-                . '</td><td><div class="row-actions">' . $childAction . $editAction . '</div></td></tr>';
-        }
-        if ($items === '') {
-            $items = '<tr><td class="table-empty" colspan="3">Brak stron. Dodaj pierwszą stronę, aby rozpocząć.</td></tr>';
-        }
-
-        return $this->page('Strony', '<div class="toolbar crud-toolbar"><div><p class="eyebrow">Zawartość</p>'
-            . '<p class="lead">Zarządzaj fizycznym drzewem katalogu <code>pages/</code>.</p></div>'
-            . '<a class="button" href="/admin/pages/create">Dodaj stronę</a></div><div class="table-wrap crud-table"><table>'
-            . '<thead><tr><th>Strona</th><th>Stan</th><th></th></tr></thead><tbody>' . $items
-            . '</tbody></table></div>');
+        return $this->page('Strony', $this->views->render('pages/index', ['entries' => array_values($entries)]));
     }
 
     public function createForm(Request $request): Response
@@ -111,13 +89,15 @@ final readonly class AdminPageController
             $parent = '';
         }
 
-        return $this->page('Nowa strona', $this->form(
+        $identityPrefix = $parent === '' ? '' : trim($parent, '/') . '/';
+
+        return $this->page('Nowa strona', $this->views->render('pages/form', $this->formData(
             '/admin/pages/create',
             $languages,
             null,
             null,
-            $parent === '' ? '' : trim($parent, '/') . '/',
-        ));
+            $identityPrefix,
+        )), pageFormScript: true);
     }
 
     public function create(Request $request): Response
@@ -133,7 +113,7 @@ final readonly class AdminPageController
             return Response::redirect('/admin/pages?created=1', 303);
         } catch (RevisionConflictException $exception) {
             throw new HttpException(409, 'PAGE_REVISION_CONFLICT', 'Page changed in another session.', previous: $exception);
-        } catch (InvalidArgumentException | InvalidContentException | FilesystemException $exception) {
+        } catch (InvalidArgumentException|InvalidContentException|FilesystemException $exception) {
             throw new HttpException(422, 'PAGE_CREATE_INVALID', $exception->getMessage(), previous: $exception);
         }
     }
@@ -148,13 +128,17 @@ final readonly class AdminPageController
             throw new HttpException(404, 'PAGE_NOT_FOUND', 'Page not found.', previous: $exception);
         }
 
-        return $this->page(
-            'Edycja strony',
-            '<div class="toolbar crud-intro"><p>Zarządzaj metadanymi albo przejdź do układu bloków tej strony.</p>'
-            . '<a class="button child" href="/admin/pages/builder?path=' . rawurlencode($identity->value())
-            . '">Otwórz page builder</a></div>'
-            . $this->form('/admin/pages/update', $this->languages->get(), $editable, $identity),
-        );
+        $languages = $this->languages->get();
+
+        return $this->page('Edycja strony', $this->views->render('pages/edit', [
+            'identity' => $identity,
+            'form' => $this->views->render('pages/form', $this->formData(
+                '/admin/pages/update',
+                $languages,
+                $editable,
+                $identity,
+            )),
+        ]));
     }
 
     public function update(Request $request): Response
@@ -176,7 +160,7 @@ final readonly class AdminPageController
             return Response::redirect('/admin/pages/edit?path=' . rawurlencode($identity->value()) . '&saved=1', 303);
         } catch (RevisionConflictException $exception) {
             throw new HttpException(409, 'PAGE_REVISION_CONFLICT', 'Page changed in another session.', previous: $exception);
-        } catch (InvalidArgumentException | InvalidContentException | FilesystemException $exception) {
+        } catch (InvalidArgumentException|InvalidContentException|FilesystemException $exception) {
             throw new HttpException(422, 'PAGE_UPDATE_INVALID', $exception->getMessage(), previous: $exception);
         }
     }
@@ -205,7 +189,7 @@ final readonly class AdminPageController
             return Response::redirect('/admin/pages/edit?path=' . rawurlencode($destination->value()) . '&moved=1', 303);
         } catch (RevisionConflictException $exception) {
             throw new HttpException(409, 'PAGE_REVISION_CONFLICT', 'Page changed in another session.', previous: $exception);
-        } catch (InvalidArgumentException | InvalidContentException | FilesystemException $exception) {
+        } catch (InvalidArgumentException|InvalidContentException|FilesystemException $exception) {
             throw new HttpException(422, 'PAGE_MOVE_INVALID', $exception->getMessage(), previous: $exception);
         }
     }
@@ -228,7 +212,7 @@ final readonly class AdminPageController
             return Response::redirect('/admin/pages?deleted=1', 303);
         } catch (RevisionConflictException $exception) {
             throw new HttpException(409, 'PAGE_REVISION_CONFLICT', 'Page changed in another session.', previous: $exception);
-        } catch (InvalidArgumentException | InvalidContentException | FilesystemException $exception) {
+        } catch (InvalidArgumentException|InvalidContentException|FilesystemException $exception) {
             throw new HttpException(422, 'PAGE_DELETE_INVALID', $exception->getMessage(), previous: $exception);
         }
     }
@@ -299,8 +283,11 @@ final readonly class AdminPageController
                 throw new InvalidArgumentException('Localized form value is missing.');
             }
             $localized = trim($localized);
-            if ($required && $localized === '') {
+            if ($required && $locale === $languages->default() && $localized === '') {
                 throw new InvalidArgumentException(\sprintf('Value for locale "%s" is required.', $locale));
+            }
+            if ($localized === '' && $locale !== $languages->default()) {
+                continue;
             }
             $result[$locale] = $localized;
         }
@@ -326,103 +313,52 @@ final readonly class AdminPageController
         }
     }
 
-    private function form(
+    /** @return array<string, mixed> */
+    private function formData(
         string $action,
         LanguageConfig $languages,
         ?EditablePage $editable,
         ?PageIdentity $identity,
         string $identityPrefix = '',
-    ): string {
-        $data = $editable?->data() ?? [];
-        $homepage = $identity?->isHomepage() ?? false;
-        $currentIdentity = $identity?->value() ?? $identityPrefix;
-        $enabled = ($data['enabled'] ?? true) === true;
-        $layout = \is_string($data['layout'] ?? null) ? $data['layout'] : '';
-        $title = $this->stringMapping($data['title'] ?? []);
-        $slug = $this->stringMapping($data['slug'] ?? []);
-        $seo = $this->mapping($data['seo'] ?? []);
-        $seoTitle = $this->stringMapping($seo['title'] ?? []);
-        $seoDescription = $this->stringMapping($seo['description'] ?? []);
-        $robots = $this->mapping($seo['robots'] ?? []);
-        $canonical = \is_string($seo['canonical'] ?? null) ? $seo['canonical'] : '';
-        $fields = '';
-        foreach ($languages->languages() as $locale => $name) {
-            $fields .= '<fieldset class="form-card locale-card"><legend>' . self::escape($name) . ' <code>'
-                . self::escape($locale) . '</code></legend>'
-                . $this->input('Tytuł strony', 'title[' . $locale . ']', $title[$locale] ?? '', true)
-                . ($homepage ? '' : $this->input('Publiczny slug', 'slug[' . $locale . ']', $slug[$locale] ?? '', true))
-                . $this->input('Tytuł SEO', 'seo_title[' . $locale . ']', $seoTitle[$locale] ?? '')
-                . '<label>Opis SEO<textarea name="seo_description[' . self::escape($locale) . ']" maxlength="500">'
-                . self::escape($seoDescription[$locale] ?? '') . '</textarea></label></fieldset>';
-        }
-        $layoutOptions = '<option value="">Domyślny z setup.yml</option>';
-        foreach (array_keys($this->layouts->all()) as $name) {
-            $layoutOptions .= '<option value="' . self::escape($name) . '"'
-                . ($name === $layout ? ' selected' : '') . '>' . self::escape($name) . '</option>';
-        }
-        $revision = $editable?->revision()->value();
-        $identityField = $editable === null
-            ? $this->input('Ścieżka techniczna', 'identity', $currentIdentity, true, 'np. blog/nowy-wpis')
-            : '<input type="hidden" name="identity" value="' . self::escape($currentIdentity) . '">'
-            . '<div class="technical-path"><span>Ścieżka techniczna</span><code>'
-            . self::escape($currentIdentity) . '</code></div>';
-        $content = '<form class="stack crud-form" method="post" action="' . self::escape($action) . '">'
-            . $this->csrfField() . ($revision === null ? '' : '<input type="hidden" name="revision" value="'
-            . self::escape($revision) . '">')
-            . '<section class="form-section"><div class="section-heading"><div><p class="eyebrow">Podstawowe</p>'
-            . '<h2>Ustawienia strony</h2></div><p>Widoczność, położenie i szablon dokumentu.</p></div>'
-            . '<div class="settings-grid"><div>' . $identityField . '</div>'
-            . '<div><label>Layout<select name="layout">' . $layoutOptions . '</select></label></div>'
-            . '<label class="check toggle-card"><input type="checkbox" name="enabled" value="1"'
-            . ($enabled ? ' checked' : '') . '><span><strong>Strona dostępna publicznie</strong>'
-            . '<small>Wyłączenie ukrywa stronę w publicznym API i renderowaniu HTML.</small></span></label></div></section>'
-            . '<section class="form-section"><div class="section-heading"><div><p class="eyebrow">Języki</p>'
-            . '<h2>Treść i adresy</h2></div><p>Uzupełnij dane niezależnie dla każdej aktywnej wersji językowej.</p></div>'
-            . '<div class="locale-grid">' . $fields . '</div></section>'
-            . '<section class="form-section"><div class="section-heading"><div><p class="eyebrow">Wyszukiwarki</p>'
-            . '<h2>Ustawienia SEO</h2></div><p>Wartości wspólne dla wszystkich wersji językowych.</p></div>'
-            . '<fieldset class="form-card seo-card"><legend>SEO wspólne</legend>'
-            . $this->input('Canonical URL', 'canonical', $canonical, false, '/ścieżka lub https://example.com/ścieżka')
-            . '<div class="robots-grid"><label class="check"><input type="checkbox" name="robots_index" value="1"'
-            . (($robots['index'] ?? true) === true ? ' checked' : '') . '><span><strong>Pozwól indeksować</strong>'
-            . '<small>Wyszukiwarki mogą umieścić stronę w wynikach.</small></span></label>'
-            . '<label class="check"><input type="checkbox" name="robots_follow" value="1"'
-            . (($robots['follow'] ?? true) === true ? ' checked' : '') . '><span><strong>Pozwól śledzić linki</strong>'
-            . '<small>Roboty mogą przechodzić do odnośników na stronie.</small></span></label></div></fieldset></section>'
-            . '<div class="actions form-actions"><a class="button secondary" href="/admin/pages">Anuluj</a>'
-            . '<button type="submit">Zapisz zmiany</button></div></form>';
+    ): array {
+        $configuration = $this->configuration->get()->data();
+        $site = $this->mapping($configuration['site'] ?? []);
 
-        if ($editable === null || $homepage || $revision === null) {
-            return $content;
-        }
-
-        return $content . '<section class="danger-zone"><div class="section-heading"><div><p class="eyebrow">Zaawansowane</p>'
-            . '<h2>Operacje na katalogu</h2></div><p>Te działania zmieniają fizyczną strukturę plików strony.</p></div>'
-            . '<div class="danger-grid"><form class="danger-action" method="post" action="/admin/pages/move">'
-            . $this->csrfField() . '<input type="hidden" name="identity" value="' . self::escape($currentIdentity)
-            . '"><input type="hidden" name="revision" value="' . self::escape($revision) . '">'
-            . '<h3>Przenieś stronę</h3><p>Zmień ścieżkę techniczną bez utraty zawartości.</p>'
-            . $this->input('Nowa ścieżka techniczna', 'destination', $currentIdentity, true)
-            . '<button type="submit" class="warning">Przenieś katalog</button></form>'
-            . '<form class="danger-action delete-action" method="post" action="/admin/pages/delete">' . $this->csrfField()
-            . '<input type="hidden" name="identity" value="' . self::escape($currentIdentity) . '">'
-            . '<input type="hidden" name="revision" value="' . self::escape($revision) . '">'
-            . '<h3>Usuń stronę</h3><p>Usunięty zostanie cały katalog wraz z podstronami i multimediami.</p>'
-            . '<label>Wpisz <code>delete</code>, aby usunąć stronę, jej podstrony i multimedia'
-            . '<input name="confirmation" required autocomplete="off"></label>'
-            . '<button type="submit" class="danger">Usuń katalog bezpowrotnie</button></form></div></section>';
+        return [
+            'action' => $action,
+            'languages' => $languages,
+            'editable' => $editable,
+            'identity' => $identity,
+            'identityPrefix' => $identityPrefix,
+            'layouts' => array_keys($this->layouts->all()),
+            'csrfToken' => $this->csrf->token(),
+            'siteUrl' => is_string($site['url'] ?? null) ? rtrim($site['url'], '/') : '',
+            'canonicalBasePath' => $this->canonicalBasePath($identityPrefix, $languages),
+        ];
     }
 
-    private function input(
-        string $label,
-        string $name,
-        string $value,
-        bool $required = false,
-        string $placeholder = '',
-    ): string {
-        return '<label>' . self::escape($label) . '<input name="' . self::escape($name) . '" value="'
-            . self::escape($value) . '"' . ($required ? ' required' : '') . ($placeholder === '' ? '' : ' placeholder="'
-            . self::escape($placeholder) . '"') . '></label>';
+    private function canonicalBasePath(string $identityPrefix, LanguageConfig $languages): string
+    {
+        $prefix = $languages->isMultilingual() ? "/{$languages->default()}" : '';
+        if ($identityPrefix === '') {
+            return $prefix;
+        }
+        $parent = PageIdentity::fromString(trim($identityPrefix, '/'));
+        $pages = $this->pages->all($languages);
+        $collections = $this->collections->all($languages);
+        $routes = PageRouteIndex::build($pages, $languages, $collections);
+        foreach ($pages as $page) {
+            if ($page->identity()->value() === $parent->value()) {
+                return $prefix . '/' . $routes->pathFor($parent, $languages->default());
+            }
+        }
+        foreach ($collections as $collection) {
+            if ($collection->identity()->value() === $parent->value()) {
+                return $prefix . '/' . $routes->collectionPathFor($parent, $languages->default());
+            }
+        }
+
+        throw new HttpException(404, 'PARENT_NOT_FOUND', 'Parent page or collection not found.');
     }
 
     /** @return array<string, mixed> */
@@ -441,31 +377,8 @@ final readonly class AdminPageController
         return $result;
     }
 
-    /** @return array<string, string> */
-    private function stringMapping(mixed $value): array
+    private function page(string $title, string $content, bool $pageFormScript = false): Response
     {
-        $result = [];
-        foreach ($this->mapping($value) as $key => $item) {
-            if (\is_string($item)) {
-                $result[$key] = $item;
-            }
-        }
-
-        return $result;
-    }
-
-    private function csrfField(): string
-    {
-        return '<input type="hidden" name="_csrf" value="' . self::escape($this->csrf->token()) . '">';
-    }
-
-    private function page(string $title, string $content): Response
-    {
-        return $this->layout->render($title, $content, active: 'pages');
-    }
-
-    private static function escape(string $value): string
-    {
-        return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        return $this->layout->render($title, $content, active: 'pages', pageFormScript: $pageFormScript);
     }
 }

@@ -51,6 +51,11 @@ data is validated, normalized and localized according to the developer-owned
 `block.yml` definition. Unknown block types, unknown fields, invalid UUIDs and
 missing translations make the page invalid instead of leaking unchecked data.
 
+Schema-defined `image` and `file` fields retain their page-local `src` and also
+receive an immutable `url`, `mimeType`, byte `size` and `fingerprint`. Images
+add `width` and `height`. A headless client uses `url` directly and never needs
+to derive a filesystem path or content hash. See [MEDIA.md](MEDIA.md).
+
 ## Collection response
 
 ```json

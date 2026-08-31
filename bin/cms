@@ -3,25 +3,45 @@
 
 declare(strict_types=1);
 
-use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Auth\PasswordHasher;
 use FlatFileCms\Auth\PasswordPolicy;
 use FlatFileCms\Auth\UserRepository;
 use FlatFileCms\Auth\WebAuthnCredentialRepository;
+use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Cli\BlockScaffolder;
 use FlatFileCms\Cli\CacheClearer;
 use FlatFileCms\Cli\ConsoleApplication;
 use FlatFileCms\Cli\PasswordReader;
+use FlatFileCms\Cli\ReleaseChecker;
 use FlatFileCms\Cli\UserCommandService;
+use FlatFileCms\Blocks\BlockProcessor;
+use FlatFileCms\Blocks\BlockRegistry;
+use FlatFileCms\Blocks\BlockValidator;
+use FlatFileCms\Blocks\BuiltinFieldTypes;
+use FlatFileCms\Collections\CollectionRepository;
+use FlatFileCms\Config\ConfigurationRepository;
+use FlatFileCms\Config\LanguageRepository;
+use FlatFileCms\Content\PageRepository;
+use FlatFileCms\Core\Environment;
+use FlatFileCms\Domain\Localization\LocalizedDataResolver;
 use FlatFileCms\Infrastructure\Database\Database;
 use FlatFileCms\Infrastructure\Database\SchemaInstaller;
 use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
+use FlatFileCms\Infrastructure\Filesystem\AtomicFileWriter;
+use FlatFileCms\Infrastructure\Filesystem\FileLockManager;
+use FlatFileCms\Infrastructure\Yaml\YamlFileCache;
+use FlatFileCms\Infrastructure\Yaml\YamlFileRepository;
+use FlatFileCms\Infrastructure\Yaml\YamlParser;
+use FlatFileCms\Navigation\NavigationRepository;
+use FlatFileCms\Rendering\LayoutRegistry;
+use FlatFileCms\Redirects\RedirectRepository;
 
 $projectRoot = dirname(__DIR__);
 require "{$projectRoot}/vendor/autoload.php";
 
 $paths = new SafePathResolver($projectRoot);
 $audit = new AuditLogger($paths);
+$environment = Environment::load($projectRoot);
 
 $users = static function () use ($projectRoot, $audit): UserCommandService {
     $database = new Database("{$projectRoot}/storage/database/cms.sqlite");
@@ -36,11 +56,50 @@ $users = static function () use ($projectRoot, $audit): UserCommandService {
         $audit,
     );
 };
+$release = static function () use ($projectRoot, $paths, $environment): ReleaseChecker {
+    $writer = new AtomicFileWriter($paths, new FileLockManager($paths));
+    $parser = new YamlParser();
+    $yaml = new YamlFileRepository(
+        $paths,
+        $parser,
+        new YamlFileCache(
+            $environment->boolean('YAML_CACHE_JSON_ENABLED', true),
+            $paths,
+            $writer,
+            $environment->boolean('YAML_CACHE_SERIALIZE_ENABLED', false),
+        ),
+        $writer,
+    );
+    $languages = new LanguageRepository($yaml, $paths);
+    $configuration = new ConfigurationRepository($yaml, $paths);
+    $pages = new PageRepository($yaml, $paths);
+    $collections = new CollectionRepository($yaml, $paths);
+    $fieldTypes = BuiltinFieldTypes::create($paths);
+    $blocks = new BlockRegistry($projectRoot, $parser, $fieldTypes);
+    $blockProcessor = new BlockProcessor($blocks, new BlockValidator($fieldTypes));
+    $database = new Database("{$projectRoot}/storage/database/cms.sqlite");
+
+    return new ReleaseChecker(
+        $projectRoot,
+        $environment,
+        $configuration,
+        $languages,
+        $pages,
+        $collections,
+        new NavigationRepository($yaml, $paths, new LocalizedDataResolver()),
+        new RedirectRepository($yaml),
+        $blocks,
+        $blockProcessor,
+        new LayoutRegistry($projectRoot),
+        $database->connection(),
+    );
+};
 $console = new ConsoleApplication(
     new BlockScaffolder($projectRoot),
     $users,
     new PasswordReader(),
     new CacheClearer($paths),
+    $release,
 );
 
 /** @var list<string> $argv */

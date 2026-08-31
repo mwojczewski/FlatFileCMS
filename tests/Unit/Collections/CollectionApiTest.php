@@ -82,6 +82,29 @@ final class CollectionApiTest extends TestCase
         ));
     }
 
+    public function testLanguageAddedAfterContentCreationUsesDefaultCollectionAndPageData(): void
+    {
+        $this->project->write('config/languages.yml', <<<'YAML'
+default: pl
+languages:
+  pl: { name: Polski, enabled: true }
+  en: { name: English, enabled: true }
+  de: { name: Deutsch, enabled: true }
+YAML);
+
+        $response = $this->controller->page(new Request(
+            'GET',
+            '/api/v1/pages/aktualnosci/najnowszy',
+            query: ['lang' => 'de'],
+            attributes: ['path' => 'aktualnosci/najnowszy'],
+        ));
+        $data = $this->decode($response);
+
+        self::assertSame(200, $response->status());
+        self::assertSame('Wpis third', $data['title']);
+        self::assertSame('/de/aktualnosci/najnowszy', $data['url']);
+    }
+
     private function writeFixtures(): void
     {
         $this->project->write('config/languages.yml', <<<'YAML'

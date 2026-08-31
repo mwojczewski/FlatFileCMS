@@ -84,6 +84,28 @@ const button = (name, text, action, title, noDisable = false) => ({
   noDisable,
 });
 
+const insertMediaImage = (editor) => {
+  const textarea = editor.element;
+  const form = textarea?.closest("form[data-page-identity]");
+  const identity = form?.getAttribute("data-page-identity");
+  if (!identity || typeof window.CmsMediaPicker?.open !== "function") {
+    return;
+  }
+
+  window.CmsMediaPicker.open(identity, "image", (item) => {
+    if (!item || typeof item.url !== "string" || item.url === "") {
+      return;
+    }
+    const selection = editor.codemirror.getSelection().trim();
+    const alt =
+      selection === ""
+        ? "Opis obrazu"
+        : selection.replaceAll("[", "").replaceAll("]", "");
+    editor.codemirror.replaceSelection(`![${alt}](${item.url})`);
+    editor.codemirror.focus();
+  });
+};
+
 const mount = (root = document) => {
   if (typeof window.EasyMDE !== "function") {
     return;
@@ -98,7 +120,7 @@ const mount = (root = document) => {
 
       const editor = new window.EasyMDE({
         element: textarea,
-        autoDownloadFontAwesome: true,
+        autoDownloadFontAwesome: false,
         autofocus: false,
         forceSync: true,
         indentWithTabs: false,
@@ -110,72 +132,49 @@ const mount = (root = document) => {
         sideBySideFullscreen: false,
         spellChecker: false,
         status: ["lines", "words"],
-        // toolbar: [
-        //   button("bold", "B", window.EasyMDE.toggleBold, "Pogrubienie"),
-        //   button("italic", "I", window.EasyMDE.toggleItalic, "Kursywa"),
-        //   button(
-        //     "heading-1",
-        //     "H1",
-        //     window.EasyMDE.toggleHeading1,
-        //     "Nagłówek pierwszego poziomu",
-        //   ),
-        //   button(
-        //     "heading-2",
-        //     "H2",
-        //     window.EasyMDE.toggleHeading2,
-        //     "Nagłówek drugiego poziomu",
-        //   ),
-        //   button(
-        //     "heading-3",
-        //     "H3",
-        //     window.EasyMDE.toggleHeading3,
-        //     "Nagłówek trzeciego poziomu",
-        //   ),
-        //   "|",
-        //   button("quote", "❞", window.EasyMDE.toggleBlockquote, "Cytat"),
-        //   button(
-        //     "unordered-list",
-        //     "•",
-        //     window.EasyMDE.toggleUnorderedList,
-        //     "Lista punktowana",
-        //   ),
-        //   button(
-        //     "ordered-list",
-        //     "1.",
-        //     window.EasyMDE.toggleOrderedList,
-        //     "Lista numerowana",
-        //   ),
-        //   button(
-        //     "check-list",
-        //     "☑",
-        //     window.EasyMDE.toggleCheckList,
-        //     "Lista zadań",
-        //   ),
-        //   "|",
-        //   button("link", "", window.EasyMDE.drawLink, "Link"),
-        //   button("image", "", window.EasyMDE.drawImage, "Obraz"),
-        //   button("table", "", window.EasyMDE.drawTable, "Tabela"),
-        //   "|",
-        //   button(
-        //     "preview",
-        //     "Podgląd",
-        //     window.EasyMDE.togglePreview,
-        //     "Podgląd Markdown",
-        //     true,
-        //   ),
-        //   button(
-        //     "side-by-side",
-        //     "Obok",
-        //     window.EasyMDE.toggleSideBySide,
-        //     "Edytor i podgląd",
-        //   ),
-        //   button(
-        //     "fullscreen",
-        //     "Pełny",
-        //     window.EasyMDE.toggleFullScreen,
-        //     "Pełny ekran",
-        //   ),
-        // ],
+        toolbar: [
+          "bold",
+          "italic",
+          "heading-smaller",
+          "heading-bigger",
+          "|",
+          "quote",
+          "horizontal-rule",
+          "unordered-list",
+          "ordered-list",
+          "check-list",
+          "|",
+          "link",
+          "image",
+          button(
+            "media-library",
+            "Media",
+            insertMediaImage,
+            "Wybierz obraz z biblioteki strony",
+            true,
+          ),
+          "table",
+          "|",
+          button(
+            "preview",
+            "Podgląd",
+            window.EasyMDE.togglePreview,
+            "Podgląd Markdown",
+            true,
+          ),
+          button(
+            "side-by-side",
+            "Obok",
+            window.EasyMDE.toggleSideBySide,
+            "Edytor i podgląd",
+          ),
+          button(
+            "fullscreen",
+            "Pełny",
+            window.EasyMDE.toggleFullScreen,
+            "Pełny ekran",
+          ),
+        ],
       });
 
       editors.set(textarea, editor);

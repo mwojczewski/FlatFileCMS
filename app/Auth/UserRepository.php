@@ -6,6 +6,7 @@ namespace FlatFileCms\Auth;
 
 use DateTimeImmutable;
 use PDO;
+use PDOException;
 
 final readonly class UserRepository
 {
@@ -27,7 +28,11 @@ SQL);
         $statement->bindValue(':created_at', $now);
         $statement->bindValue(':updated_at', $now);
         $statement->bindValue(':password_changed_at', $now);
-        $statement->execute();
+        try {
+            $statement->execute();
+        } catch (PDOException $exception) {
+            throw new AuthenticationException('An account with this email already exists.', previous: $exception);
+        }
 
         return $this->get((int) $this->database->lastInsertId());
     }
@@ -101,6 +106,33 @@ SQL);
 UPDATE users SET password_hash = :hash, password_changed_at = :changed, updated_at = :updated WHERE id = :id
 SQL);
         $statement->execute(['hash' => $passwordHash, 'changed' => $now, 'updated' => $now, 'id' => $user->id()]);
+    }
+
+    public function update(User $user, string $email, bool $enabled): void
+    {
+        $email = $this->normalizeEmail($email);
+        $statement = $this->database->prepare(<<<'SQL'
+UPDATE users SET email = :email, enabled = :enabled, updated_at = :updated WHERE id = :id
+SQL);
+        try {
+            $statement->execute([
+                'email' => $email,
+                'enabled' => $enabled ? 1 : 0,
+                'updated' => (new DateTimeImmutable())->format(DATE_ATOM),
+                'id' => $user->id(),
+            ]);
+        } catch (PDOException $exception) {
+            throw new AuthenticationException('An account with this email already exists.', previous: $exception);
+        }
+    }
+
+    public function delete(User $user): void
+    {
+        if ($user->role() === Role::Superadmin) {
+            throw new AuthenticationException('Superadmin accounts cannot be deleted from the admin panel.');
+        }
+        $statement = $this->database->prepare('DELETE FROM users WHERE id = :id');
+        $statement->execute(['id' => $user->id()]);
     }
 
     /** @param array<mixed> $row */

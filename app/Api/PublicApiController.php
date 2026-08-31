@@ -139,6 +139,7 @@ final readonly class PublicApiController
             max(
                 $page->modifiedAt(),
                 $this->pageSerializer->blockDefinitionsModifiedAt($page),
+                $this->pageSerializer->mediaModifiedAt($page),
                 $routes->modifiedAt(),
                 $languageDocument->modifiedAt(),
                 $configuration->modifiedAt(),
