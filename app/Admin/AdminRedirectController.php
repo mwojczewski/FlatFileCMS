@@ -29,8 +29,7 @@ final readonly class AdminRedirectController
         private AdminView $views,
         private AdminLayout $layout,
         private AuditLogger $audit,
-    ) {
-    }
+    ) {}
 
     public function index(Request $request): Response
     {

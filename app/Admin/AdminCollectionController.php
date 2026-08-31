@@ -36,8 +36,7 @@ final readonly class AdminCollectionController
         private AdminView $views,
         private AdminLayout $layout,
         private AuditLogger $audit,
-    ) {
-    }
+    ) {}
 
     public function edit(Request $request): Response
     {

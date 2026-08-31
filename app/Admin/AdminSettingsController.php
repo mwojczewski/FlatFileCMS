@@ -44,8 +44,7 @@ final readonly class AdminSettingsController
         private AdminView $views,
         private AdminLayout $layout,
         private AuditLogger $audit,
-    ) {
-    }
+    ) {}
 
     public function navigation(Request $request): Response
     {

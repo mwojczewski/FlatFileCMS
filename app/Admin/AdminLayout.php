@@ -16,8 +16,7 @@ final readonly class AdminLayout
         private Authenticator $authenticator,
         private CsrfTokenManager $csrf,
         private AdminView $views,
-    ) {
-    }
+    ) {}
 
     public function render(
         string $title,

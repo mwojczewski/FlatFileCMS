@@ -54,12 +54,12 @@ $queryUrl = static function (int $page) use ($collection, $filters): string {
         }
 
         .insights__list article>span {
-            color: #83958e;
+            color: #4A5450;
             font: 600 .7rem ui-monospace, monospace
         }
 
         .insights__list article p {
-            color: #188662;
+            color: #0E5D44;
             font: 650 .64rem ui-monospace, monospace;
             letter-spacing: .12em
         }

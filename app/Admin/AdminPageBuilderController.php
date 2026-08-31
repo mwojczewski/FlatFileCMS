@@ -41,8 +41,7 @@ final readonly class AdminPageBuilderController
         private AdminView $views,
         private AdminLayout $layout,
         private AuditLogger $audit,
-    ) {
-    }
+    ) {}
 
     public function index(Request $request): Response
     {

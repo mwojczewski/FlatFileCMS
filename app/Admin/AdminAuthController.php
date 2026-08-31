@@ -30,8 +30,7 @@ final readonly class AdminAuthController
         private AdminView $views,
         private AdminLayout $layout,
         private AuditLogger $audit,
-    ) {
-    }
+    ) {}
 
     public function loginForm(Request $request): Response
     {
