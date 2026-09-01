@@ -34,6 +34,9 @@
 .article-gallery figure:only-child {
   grid-column: 1/-1;
 }
+.article-gallery picture {
+  display: block;
+}
 .article-gallery img {
   display: block;
   width: 100%;

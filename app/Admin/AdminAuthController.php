@@ -54,7 +54,7 @@ final readonly class AdminAuthController
             if (!\is_string($email) || !\is_string($password)) {
                 throw new AuthenticationException('Email and password are required.');
             }
-            $requiresSecondFactor = $this->authenticator->passwordLogin($email, $password);
+            $requiresSecondFactor = $this->authenticator->passwordLogin($email, $password, $request->clientIp());
             if (!$requiresSecondFactor) {
                 $this->audit->log(
                     'auth.login',

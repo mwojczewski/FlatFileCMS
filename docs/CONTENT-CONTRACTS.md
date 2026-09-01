@@ -144,6 +144,7 @@ media:
     maxPixels: 40000000
   cache:
     enabled: true
+    maxVariantsPerMedia: 64
   formats:
     - webp
     - avif

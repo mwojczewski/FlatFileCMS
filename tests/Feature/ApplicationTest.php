@@ -46,4 +46,16 @@ final class ApplicationTest extends TestCase
         self::assertSame(404, $response->status());
         self::assertStringContainsString('ROUTE_NOT_FOUND', $response->body());
     }
+
+    public function testOversizedRequestBodyIsRejectedBeforeRouting(): void
+    {
+        $response = $this->application->handle(new Request(
+            'POST',
+            '/api/v1/health',
+            bodyTooLarge: true,
+        ));
+
+        self::assertSame(413, $response->status());
+        self::assertStringContainsString('REQUEST_BODY_TOO_LARGE', $response->body());
+    }
 }

@@ -34,7 +34,7 @@ final readonly class PublicMediaController
             );
         } catch (HttpException $exception) {
             throw $exception;
-        } catch (InvalidArgumentException|MediaException $exception) {
+        } catch (InvalidArgumentException | MediaException $exception) {
             throw new HttpException(404, 'MEDIA_NOT_FOUND', 'Media not found.', previous: $exception);
         }
 
@@ -77,7 +77,10 @@ final readonly class PublicMediaController
         }
         $filename = array_pop($segments);
         $fingerprint = array_pop($segments);
-        if (preg_match('/^[a-f0-9]{16}$/D', $fingerprint) !== 1) {
+        if (
+            $filename === ''
+            || preg_match('/^[a-f0-9]{16}$/D', $fingerprint) !== 1
+        ) {
             throw new InvalidArgumentException('Media fingerprint is invalid.');
         }
 

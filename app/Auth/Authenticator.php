@@ -9,6 +9,8 @@ final readonly class Authenticator
     private const string AUTHENTICATED_USER = 'authenticated_user_id';
     private const string PENDING_USER = 'pending_2fa_user_id';
     private const string PENDING_SINCE = 'pending_2fa_since';
+    private const string AUTHENTICATED_SINCE = 'authenticated_since';
+    private const string LAST_ACTIVITY = 'last_activity';
 
     public function __construct(
         private UserRepository $users,
@@ -16,21 +18,29 @@ final readonly class Authenticator
         private PasswordHasher $passwords,
         private SessionStore $session,
         private RateLimiter $limiter,
+        private int $absoluteLifetime = 28_800,
+        private int $idleLifetime = 7_200,
     ) {}
 
-    public function passwordLogin(string $email, string $password): bool
+    public function passwordLogin(string $email, string $password, string $ip = 'unknown'): bool
     {
         $identifier = mb_strtolower(trim($email));
-        $this->limiter->assertAllowed('login', $identifier);
+        $pair = $ip . "\0" . $identifier;
+        $this->limiter->assertAllowed('login_account', $identifier);
+        $this->limiter->assertAllowed('login_ip', $ip);
+        $this->limiter->assertAllowed('login_pair', $pair);
         $user = $this->users->findByEmail($identifier);
         $verificationHash = $user?->passwordHash()
             ?? '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi';
         $validPassword = $this->passwords->verify($password, $verificationHash);
         if ($user === null || !$user->enabled() || !$validPassword) {
-            $this->limiter->hit('login', $identifier);
+            $this->limiter->hit('login_account', $identifier);
+            $this->limiter->hit('login_ip', $ip);
+            $this->limiter->hit('login_pair', $pair);
             throw new AuthenticationException('Invalid email or password.');
         }
-        $this->limiter->clear('login', $identifier);
+        $this->limiter->clear('login_account', $identifier);
+        $this->limiter->clear('login_pair', $pair);
 
         if ($this->credentials->forUser($user->id()) !== []) {
             $this->session->set(self::PENDING_USER, $user->id());
@@ -62,6 +72,8 @@ final readonly class Authenticator
     {
         $this->session->regenerate();
         $this->session->set(self::AUTHENTICATED_USER, $user->id());
+        $this->session->set(self::AUTHENTICATED_SINCE, time());
+        $this->session->set(self::LAST_ACTIVITY, time());
         $this->session->remove(self::PENDING_USER);
         $this->session->remove(self::PENDING_SINCE);
     }
@@ -69,8 +81,19 @@ final readonly class Authenticator
     public function user(): ?User
     {
         $id = $this->session->get(self::AUTHENTICATED_USER);
-        if (!\is_int($id)) {
+        $authenticatedSince = $this->session->get(self::AUTHENTICATED_SINCE);
+        $lastActivity = $this->session->get(self::LAST_ACTIVITY);
+        $now = time();
+        if (!\is_int($id) || !\is_int($authenticatedSince) || !\is_int($lastActivity)) {
             return null;
+        }
+        if ($authenticatedSince + $this->absoluteLifetime < $now || $lastActivity + $this->idleLifetime < $now) {
+            $this->session->invalidate();
+
+            return null;
+        }
+        if ($lastActivity + 60 <= $now) {
+            $this->session->set(self::LAST_ACTIVITY, $now);
         }
         $user = $this->users->get($id);
 

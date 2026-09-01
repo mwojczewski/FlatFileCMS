@@ -33,6 +33,7 @@ final readonly class PageManager
         private LayoutRegistry $layouts,
         private DirectoryOperator $directories,
         private FileLockManager $locks,
+        private ?ContentFileIndex $fileIndex = null,
     ) {}
 
     public function editable(PageIdentity $identity): EditablePage
@@ -56,6 +57,7 @@ final readonly class PageManager
         return $this->locks->exclusive(self::TREE_LOCK, function () use ($identity, $data, $languages): Page {
             $directory = RelativePath::fromString($identity->value());
             $this->directories->create(FilesystemRoot::Pages, $directory);
+            $this->fileIndex?->invalidate();
             try {
                 $document = $this->yaml->write(
                     FilesystemRoot::Pages,
@@ -67,6 +69,7 @@ final readonly class PageManager
                 return $this->pages->fromData($identity, $document->data(), $languages, $document->revision(), time());
             } catch (Throwable $exception) {
                 $this->directories->delete(FilesystemRoot::Pages, $directory);
+                $this->fileIndex?->invalidate();
                 throw $exception;
             }
         });
@@ -115,10 +118,12 @@ final readonly class PageManager
             $sourcePath = RelativePath::fromString($source->value());
             $destinationPath = RelativePath::fromString($destination->value());
             $this->directories->move(FilesystemRoot::Pages, $sourcePath, $destinationPath);
+            $this->fileIndex?->invalidate();
             try {
                 $this->validateTree($languages);
             } catch (Throwable $exception) {
                 $this->directories->move(FilesystemRoot::Pages, $destinationPath, $sourcePath);
+                $this->fileIndex?->invalidate();
                 throw $exception;
             }
         });
@@ -136,6 +141,7 @@ final readonly class PageManager
                 FilesystemRoot::Pages,
                 RelativePath::fromString($identity->value()),
             );
+            $this->fileIndex?->invalidate();
         });
     }
 

@@ -49,7 +49,13 @@
   overflow: hidden;
   border-radius: 1rem 1rem 0 0;
 }
+.article-hero__image picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 .article-hero__image img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;

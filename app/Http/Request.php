@@ -6,6 +6,7 @@ namespace FlatFileCms\Http;
 
 final readonly class Request
 {
+    private const int MAX_RAW_BODY_BYTES = 1_048_576;
     /**
      * @param array<string, string> $headers
      * @param array<string, mixed> $query
@@ -23,6 +24,7 @@ final readonly class Request
         private array $attributes = [],
         private string $clientIp = 'unknown',
         private array $files = [],
+        private bool $bodyTooLarge = false,
     ) {}
 
     public static function fromGlobals(): self
@@ -51,7 +53,12 @@ final readonly class Request
             }
         }
 
-        $rawBody = file_get_contents('php://input');
+        $declaredLength = isset($headers['content-length'])
+            ? filter_var($headers['content-length'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]])
+            : null;
+        $rawBody = file_get_contents('php://input', false, null, 0, self::MAX_RAW_BODY_BYTES + 1);
+        $bodyTooLarge = (\is_int($declaredLength) && $declaredLength > self::MAX_RAW_BODY_BYTES)
+            || (\is_string($rawBody) && \strlen($rawBody) > self::MAX_RAW_BODY_BYTES);
         $remoteAddress = $_SERVER['REMOTE_ADDR'] ?? null;
 
         return new self(
@@ -60,9 +67,10 @@ final readonly class Request
             headers: $headers,
             query: self::stringKeyedArray($_GET),
             parsedBody: self::stringKeyedArray($_POST),
-            rawBody: \is_string($rawBody) ? $rawBody : '',
+            rawBody: \is_string($rawBody) ? substr($rawBody, 0, self::MAX_RAW_BODY_BYTES) : '',
             clientIp: \is_string($remoteAddress) && $remoteAddress !== '' ? $remoteAddress : 'unknown',
             files: self::uploadedFiles($_FILES),
+            bodyTooLarge: $bodyTooLarge,
         );
     }
 
@@ -96,6 +104,11 @@ final readonly class Request
     public function rawBody(): string
     {
         return $this->rawBody;
+    }
+
+    public function bodyTooLarge(): bool
+    {
+        return $this->bodyTooLarge;
     }
 
     public function clientIp(): string
@@ -132,6 +145,7 @@ final readonly class Request
             attributes: [...$this->attributes, ...$attributes],
             clientIp: $this->clientIp,
             files: $this->files,
+            bodyTooLarge: $this->bodyTooLarge,
         );
     }
 
@@ -147,6 +161,7 @@ final readonly class Request
             attributes: $this->attributes,
             clientIp: $clientIp,
             files: $this->files,
+            bodyTooLarge: $this->bodyTooLarge,
         );
     }
 

@@ -19,7 +19,8 @@ $localizedUrl = static function (string $url) use ($locale): string {
         <a class="site-brand" href="/<?= $context->escape($locale) ?>/"><span class="site-brand__mark"
                 aria-hidden="true"><i></i><i></i><i></i><i></i></span>FlatFile CMS</a>
         <?php if ($main !== []): ?>
-            <nav class="site-nav" id="site-navigation" aria-label="<?= $locale === 'pl' ? 'Główna nawigacja' : 'Main navigation' ?>">
+            <nav class="site-nav" id="site-navigation"
+                aria-label="<?= $locale === 'pl' ? 'Główna nawigacja' : 'Main navigation' ?>">
                 <ul><?php foreach ($main as $item): ?><?php $target = $item['target'] === '_blank' ? ' target="_blank" rel="noopener noreferrer"' : ''; ?>
                         <li><a href="<?= $context->escape($localizedUrl($item['url'])) ?>" <?= $target ?>><?= $context->escape($item['label']) ?></a></li><?php endforeach; ?>
                 </ul>
@@ -28,7 +29,8 @@ $localizedUrl = static function (string $url) use ($locale): string {
         <div class="site-header__tools"><button class="menu-toggle" type="button" aria-controls="site-navigation"
                 aria-expanded="false" aria-label="<?= $locale === 'pl' ? 'Otwórz menu' : 'Open menu' ?>"
                 data-open-label="<?= $locale === 'pl' ? 'Otwórz menu' : 'Open menu' ?>"
-                data-close-label="<?= $locale === 'pl' ? 'Zamknij menu' : 'Close menu' ?>"><span></span><span></span></button><a class="language-switch" href="/<?= $context->escape($otherLocale) ?>/"
+                data-close-label="<?= $locale === 'pl' ? 'Zamknij menu' : 'Close menu' ?>"><span></span><span></span></button><a
+                class="language-switch" href="/<?= $context->escape($otherLocale) ?>/"
                 hreflang="<?= $context->escape($otherLocale) ?>" lang="<?= $context->escape($otherLocale) ?>"
                 aria-label="<?= $locale === 'pl' ? 'Switch to English' : 'Przełącz na język polski' ?>"><span
                     class="<?= $locale === 'pl' ? 'is-active' : '' ?>">PL</span><i>/</i><span
@@ -62,6 +64,7 @@ $localizedUrl = static function (string $url) use ($locale): string {
     }
 
     .menu-toggle {
+        position: relative;
         display: none;
         width: 2.75rem;
         height: 2.75rem;
@@ -70,31 +73,34 @@ $localizedUrl = static function (string $url) use ($locale): string {
         border-radius: .2rem;
         background: transparent;
         color: inherit;
-        cursor: pointer
+        cursor: pointer;
     }
 
     .menu-toggle span {
         position: absolute;
+        top: 50%;
+        left: 50%;
         width: 1rem;
         height: 1px;
         background: currentColor;
-        transition: transform .2s ease
+        transform-origin: center;
+        transition: transform .2s ease;
     }
 
     .menu-toggle span:first-child {
-        transform: translateY(-.22rem)
+        transform: translate(-50%, -50%) translateY(-.22rem);
     }
 
     .menu-toggle span:last-child {
-        transform: translateY(.22rem)
+        transform: translate(-50%, -50%) translateY(.22rem);
     }
 
     .menu-toggle[aria-expanded="true"] span:first-child {
-        transform: rotate(45deg)
+        transform: translate(-50%, -50%) rotate(45deg);
     }
 
     .menu-toggle[aria-expanded="true"] span:last-child {
-        transform: rotate(-45deg)
+        transform: translate(-50%, -50%) rotate(-45deg);
     }
 
     @media(max-width:760px) {

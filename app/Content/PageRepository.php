@@ -25,32 +25,37 @@ final readonly class PageRepository
     public function __construct(
         private YamlFileRepository $yaml,
         private SafePathResolver $paths,
+        private ?ContentFileIndex $index = null,
     ) {}
 
     /** @return list<Page> */
     public function all(LanguageConfig $languages): array
     {
-        $root = $this->paths->rootPath(FilesystemRoot::Pages);
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS),
-        );
-        $identities = [];
+        if ($this->index !== null) {
+            $identities = array_map(PageIdentity::fromString(...), $this->index->pages());
+        } else {
+            $root = $this->paths->rootPath(FilesystemRoot::Pages);
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS),
+            );
+            $identities = [];
 
-        /** @var SplFileInfo $item */
-        foreach ($iterator as $item) {
-            if (!$item->isFile() || $item->getFilename() !== 'content.yml') {
-                continue;
+            /** @var SplFileInfo $item */
+            foreach ($iterator as $item) {
+                if (!$item->isFile() || $item->getFilename() !== 'content.yml') {
+                    continue;
+                }
+
+                $directory = \dirname($item->getPathname());
+                $relative = str_replace(DIRECTORY_SEPARATOR, '/', substr($directory, \strlen($root) + 1));
+                $identities[] = PageIdentity::fromString($relative);
             }
 
-            $directory = \dirname($item->getPathname());
-            $relative = str_replace(DIRECTORY_SEPARATOR, '/', substr($directory, \strlen($root) + 1));
-            $identities[] = PageIdentity::fromString($relative);
+            usort(
+                $identities,
+                static fn(PageIdentity $left, PageIdentity $right): int => $left->value() <=> $right->value(),
+            );
         }
-
-        usort(
-            $identities,
-            static fn(PageIdentity $left, PageIdentity $right): int => $left->value() <=> $right->value(),
-        );
 
         return array_map(
             fn(PageIdentity $identity): Page => $this->get($identity, $languages),

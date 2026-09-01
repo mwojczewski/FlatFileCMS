@@ -46,6 +46,7 @@ use FlatFileCms\Config\ConfigurationManager;
 use FlatFileCms\Config\ConfigurationRepository;
 use FlatFileCms\Config\LanguageRepository;
 use FlatFileCms\Config\SiteTextRepository;
+use FlatFileCms\Content\ContentFileIndex;
 use FlatFileCms\Content\PageBlockManager;
 use FlatFileCms\Content\PageManager;
 use FlatFileCms\Content\PageRepository;
@@ -180,6 +181,8 @@ $container->set(
         $container->get(PasswordHasher::class),
         $container->get(SessionStore::class),
         $container->get(RateLimiter::class),
+        $container->get(Environment::class)->integer('SESSION_ABSOLUTE_LIFETIME', 28_800),
+        $container->get(Environment::class)->integer('SESSION_IDLE_LIFETIME', 7_200),
     ),
 );
 $container->set(
@@ -325,6 +328,7 @@ $container->set(
         $container->get(RasterImageProcessor::class),
         $container->get(SafePathResolver::class),
         $container->get(AtomicFileWriter::class),
+        $container->get(FileLockManager::class),
     ),
 );
 $container->set(
@@ -389,10 +393,15 @@ $container->set(
     ),
 );
 $container->set(
+    ContentFileIndex::class,
+    static fn(Container $container): ContentFileIndex => new ContentFileIndex($container->get(SafePathResolver::class)),
+);
+$container->set(
     PageRepository::class,
     static fn(Container $container): PageRepository => new PageRepository(
         $container->get(YamlFileRepository::class),
         $container->get(SafePathResolver::class),
+        $container->get(ContentFileIndex::class),
     ),
 );
 $container->set(
@@ -407,6 +416,7 @@ $container->set(
     static fn(Container $container): CollectionRepository => new CollectionRepository(
         $container->get(YamlFileRepository::class),
         $container->get(SafePathResolver::class),
+        $container->get(ContentFileIndex::class),
     ),
 );
 $container->set(
@@ -489,6 +499,7 @@ $container->set(
         $container->get(LayoutRegistry::class),
         $container->get(DirectoryOperator::class),
         $container->get(FileLockManager::class),
+        $container->get(ContentFileIndex::class),
     ),
 );
 $container->set(

@@ -24,6 +24,7 @@ final readonly class MediaConfig
         private int $maximumWidth,
         private int $maximumHeight,
         private int $maximumPixels,
+        private int $maximumCachedVariants,
     ) {}
 
     public static function fromDocument(ConfigurationDocument $document): self
@@ -43,6 +44,7 @@ final readonly class MediaConfig
             self::integer($transformations['maxWidth'] ?? 4096, 'media.transformations.maxWidth', 1, 8192),
             self::integer($transformations['maxHeight'] ?? 4096, 'media.transformations.maxHeight', 1, 8192),
             self::integer($transformations['maxPixels'] ?? 40_000_000, 'media.transformations.maxPixels', 1, 100_000_000),
+            self::integer($cache['maxVariantsPerMedia'] ?? 64, 'media.cache.maxVariantsPerMedia', 1, 256),
         );
     }
 
@@ -100,6 +102,11 @@ final readonly class MediaConfig
     public function maximumPixels(): int
     {
         return $this->maximumPixels;
+    }
+
+    public function maximumCachedVariants(): int
+    {
+        return $this->maximumCachedVariants;
     }
 
     /** @return array<string, mixed> */

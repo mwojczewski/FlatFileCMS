@@ -149,11 +149,11 @@ final class MediaManagerTest extends TestCase
     {
         $item = $this->manager->upload($this->identity, $this->imageUpload('photo.png'));
         $file = $this->repository->get($this->identity, $item->name());
-        $variant = $this->variants->create($file, 1, 1, 'webp');
+        $variant = $this->variants->create($file, 1, null, 'webp');
 
         self::assertSame('image/webp', $variant->mimeType());
         self::assertNotSame('', $variant->contents());
-        self::assertNotEmpty(glob($this->project->path('storage/cache/media/*/*.webp')) ?: []);
+        self::assertNotEmpty(glob($this->project->path('storage/cache/media/*/*/*.webp')) ?: []);
 
         $controller = new PublicMediaController($this->repository, $this->variants);
         $path = "offer/{$item->fingerprint()}/{$item->name()->value()}";
@@ -180,6 +180,17 @@ final class MediaManagerTest extends TestCase
         self::assertSame(206, $range->status());
         self::assertSame(1, \strlen($range->body()));
         self::assertStringStartsWith('bytes 0-0/', $range->headers()['Content-Range']);
+    }
+
+    public function testItLimitsCachedVariantsForOneSourceFile(): void
+    {
+        $item = $this->manager->upload($this->identity, $this->imageUpload('photo.png'));
+        $file = $this->repository->get($this->identity, $item->name());
+        $this->variants->create($file, 1, 1, 'webp');
+
+        $this->expectException(MediaException::class);
+        $this->expectExceptionMessage('variant limit');
+        $this->variants->create($file, 2, 2, 'webp');
     }
 
     public function testItCreatesAnExactCoverCropForDeveloperControlledLayout(): void
@@ -255,6 +266,7 @@ media:
     maxPixels: 40000000
   cache:
     enabled: true
+    maxVariantsPerMedia: 1
   formats: [webp, avif]
 YAML;
     }

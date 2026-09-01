@@ -25,7 +25,7 @@
   line-height: 1.75;
 }
 .section-kicker--dark {
-  color: #168b66;
+  color: #0c5f45;
 }
 .feature-grid__items {
   display: grid;
@@ -51,7 +51,7 @@
   box-shadow: 0 1.5rem 4rem rgba(20, 54, 43, 0.11);
 }
 .feature-card__number {
-  color: #90a099;
+  color: #4a544f;
   font:
     600 0.68rem ui-monospace,
     monospace;

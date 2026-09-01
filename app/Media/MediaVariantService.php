@@ -6,6 +6,7 @@ namespace FlatFileCms\Media;
 
 use FlatFileCms\Config\ConfigurationRepository;
 use FlatFileCms\Infrastructure\Filesystem\AtomicFileWriter;
+use FlatFileCms\Infrastructure\Filesystem\FileLockManager;
 use FlatFileCms\Infrastructure\Filesystem\FilesystemRoot;
 use FlatFileCms\Infrastructure\Filesystem\RelativePath;
 use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
@@ -17,6 +18,7 @@ final readonly class MediaVariantService
         private RasterImageProcessor $images,
         private SafePathResolver $paths,
         private AtomicFileWriter $writer,
+        private ?FileLockManager $locks = null,
     ) {}
 
     public function create(
@@ -51,7 +53,9 @@ final readonly class MediaVariantService
             $fit,
             (string) $config->quality(),
         ]));
-        $cachePath = RelativePath::fromString('cache/media/' . substr($key, 0, 2) . "/{$key}.{$outputFormat}");
+        $sourceHash = $item->hash();
+        $cacheDirectory = 'cache/media/' . substr($sourceHash, 0, 2) . "/{$sourceHash}";
+        $cachePath = RelativePath::fromString("{$cacheDirectory}/{$key}.{$outputFormat}");
         if ($config->cacheEnabled()) {
             $cached = $this->paths->resolve(FilesystemRoot::Storage, $cachePath);
             if (is_file($cached) && !is_link($cached)) {
@@ -62,26 +66,45 @@ final readonly class MediaVariantService
             }
         }
 
-        $transformed = $this->images->transform(
-            $file->contents(),
-            $item->mimeType(),
-            $width,
-            $height,
-            $outputFormat,
-            $config->quality(),
-            $config->maximumPixels(),
-            $fit,
-        );
-        if ($config->cacheEnabled()) {
-            $this->writer->write(FilesystemRoot::Storage, $cachePath, $transformed['contents']);
-        }
+        $generate = function () use ($file, $item, $width, $height, $outputFormat, $config, $fit, $cachePath, $cacheDirectory, $key): MediaVariant {
+            if ($config->cacheEnabled()) {
+                $cached = $this->paths->resolve(FilesystemRoot::Storage, $cachePath);
+                if (is_file($cached) && !is_link($cached)) {
+                    $contents = file_get_contents($cached);
+                    if ($contents !== false) {
+                        return $this->variant($contents, $outputFormat, $key, $item);
+                    }
+                }
+                $directory = $this->paths->resolve(FilesystemRoot::Storage, RelativePath::fromString($cacheDirectory));
+                $files = is_dir($directory) ? glob($directory . '/*') : [];
+                if ($files === false || \count($files) >= $config->maximumCachedVariants()) {
+                    throw new MediaException('Media variant limit has been reached.');
+                }
+            }
 
-        return new MediaVariant(
-            $transformed['contents'],
-            $transformed['mimeType'],
-            $key,
-            $this->variantFilename($item, $key, $transformed['extension']),
-        );
+            $transformed = $this->images->transform(
+                $file->contents(),
+                $item->mimeType(),
+                $width,
+                $height,
+                $outputFormat,
+                $config->quality(),
+                $config->maximumPixels(),
+                $fit,
+            );
+            if ($config->cacheEnabled()) {
+                $this->writer->write(FilesystemRoot::Storage, $cachePath, $transformed['contents']);
+            }
+
+            return new MediaVariant(
+                $transformed['contents'],
+                $transformed['mimeType'],
+                $key,
+                $this->variantFilename($item, $key, $transformed['extension']),
+            );
+        };
+
+        return $this->locks === null ? $generate() : $this->locks->exclusive('media-variants:' . $sourceHash, $generate);
     }
 
     private function original(MediaFile $file): MediaVariant

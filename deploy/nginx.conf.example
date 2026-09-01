@@ -38,6 +38,12 @@ server {
         fastcgi_pass unix:/run/php/php8.5-fpm.sock;
     }
 
+    # JSON administration requests never need the media-upload allowance.
+    location ~ ^/admin/(?:login|password|webauthn|security|pages|collections|navigation|settings|redirects|users) {
+        client_max_body_size 1m;
+        try_files $uri /index.php?$query_string;
+    }
+
     # Only the front controller may execute. Uploaded page media and assets
     # can never be interpreted as PHP, even after a server misconfiguration.
     location ~ \.php(?:/|$) {

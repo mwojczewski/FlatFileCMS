@@ -127,7 +127,8 @@ final readonly class AdminPageBuilderController
 
         return new Response($contents, headers: [
             'Content-Type' => 'image/webp',
-            'Cache-Control' => 'private, max-age=3600',
+            'Cache-Control' => 'no-store',
+            'Pragma' => 'no-cache',
             'X-Content-Type-Options' => 'nosniff',
         ]);
     }

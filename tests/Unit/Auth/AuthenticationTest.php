@@ -76,6 +76,28 @@ final class AuthenticationTest extends TestCase
         self::assertSame($user->id(), $authenticator->requireUser()->id());
     }
 
+    public function testExpiredAuthenticatedSessionIsInvalidatedServerSide(): void
+    {
+        [$users, $credentials, $database] = $this->repositories();
+        $hasher = new PasswordHasher();
+        $user = $users->create('admin@example.test', $hasher->hash('Valid!Password1'), Role::Admin);
+        $session = new ArraySessionStore();
+        $authenticator = new Authenticator(
+            $users,
+            $credentials,
+            $hasher,
+            $session,
+            new RateLimiter($database, 'test-secret', 5, 900),
+            absoluteLifetime: 1,
+            idleLifetime: 1,
+        );
+        $authenticator->complete($user);
+        $session->set('authenticated_since', time() - 2);
+
+        self::assertNull($authenticator->user());
+        self::assertNull($session->get('authenticated_user_id'));
+    }
+
     public function testPasswordPolicyRequiresAllConfiguredCharacterClasses(): void
     {
         $this->expectException(\InvalidArgumentException::class);

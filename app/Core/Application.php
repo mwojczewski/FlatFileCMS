@@ -22,6 +22,9 @@ final readonly class Application
     public function handle(Request $request): Response
     {
         try {
+            if ($request->bodyTooLarge()) {
+                throw new \FlatFileCms\Http\HttpException(413, 'REQUEST_BODY_TOO_LARGE', 'Request body is too large');
+            }
             if ($this->trustedProxies !== null) {
                 $request = $request->withClientIp($this->trustedProxies->resolve(
                     $request->clientIp(),
