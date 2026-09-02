@@ -22,7 +22,7 @@ revision-safe configuration editors and production release hardening.
 - production-safe internal errors;
 - health endpoint;
 - PHPUnit, PHPStan and PHP-CS-Fixer configuration;
-- Apache and Nginx front-controller configuration examples;
+- Apache, Nginx and Caddy front-controller configuration examples;
 - portable relative-path and page-identity value objects;
 - root-bound filesystem resolution with symlink-escape protection;
 - exclusive file locking and atomic replacement;
@@ -126,6 +126,10 @@ Create a developer block package with:
 php bin/cms block:create image-with-text
 php bin/cms block:create gallery-slider --with-assets
 php bin/cms cache:clear
+php bin/cms cache:prune --dry-run
+php bin/cms cache:prune
+php bin/cms runtime:prune --dry-run
+php bin/cms runtime:prune
 ```
 
 The first form creates the required `block.yml` and `render.php`. The optional
@@ -237,11 +241,19 @@ Production preflight, permissions, proxy handling, backup and rollback are docum
 
 ### Apache
 
-Point the virtual-host document root at `public/` and allow overrides for its `.htaccess`. If a hosting provider forces the project into the web root, explicitly deny HTTP access to every directory except `public/`; using a real `public/` document root remains strongly preferred.
+Adapt `deploy/apache2-vhost.conf.example`, especially the domain, project path,
+certificate paths and PHP-FPM socket. Shared hosting can instead use
+`public/.htaccess`, but a real `public/` document root remains strongly preferred.
 
 ### Nginx
 
 Adapt `deploy/nginx.conf.example`, especially the project path and PHP-FPM socket.
+
+### Caddy
+
+Adapt `deploy/Caddyfile.example`, especially the domain, project path and
+PHP-FPM socket. Caddy provisions HTTPS automatically and the example enables
+negotiated Zstandard/gzip compression.
 
 ## Quality commands
 

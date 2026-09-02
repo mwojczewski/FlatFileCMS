@@ -71,10 +71,21 @@ also accepts direct-client behavior safely.
 
 ## Web server and PHP
 
-The hardened Nginx example redirects HTTP to HTTPS, executes only
-`public/index.php`, denies all other PHP paths and sets baseline security
-headers. Apache uses `public/.htaccess`; the virtual host still needs TLS and
-must allow the required rewrite/header directives.
+Hardened examples for Nginx, Apache 2 and Caddy live in `deploy/`. They execute
+only `public/index.php`, deny all other PHP paths, set baseline security headers
+and enable negotiated compression for HTML and text assets. Adapt the domain,
+project path, certificate paths and PHP-FPM socket before enabling a file.
+
+The Nginx example enables gzip by default. Its optional Brotli directives need
+the third-party `ngx_brotli` module. The Apache example uses `mod_deflate` and
+documents how to switch to `mod_brotli`; enable the SSL, rewrite, headers,
+proxy_fcgi, filter and compression modules used by the configuration. Caddy uses its
+built-in Zstandard and gzip encoders and manages HTTPS certificates
+automatically unless explicit certificate settings are added.
+
+Apache deployments may alternatively use `public/.htaccess`, but the complete
+virtual-host example is preferred because it does not depend on per-directory
+overrides.
 
 Set PHP `upload_max_filesize` and `post_max_size` at least as high as
 `media.maxUploadBytes`, while retaining a server-level request limit. Disable
