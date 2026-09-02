@@ -246,4 +246,6 @@ blocks:
       button_label:
         pl: Otwórz panel CMS
         en: Open the CMS panel
-      button_url: /admin
+      button_url:
+        pl: /admin
+        en: /admin

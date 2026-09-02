@@ -29,8 +29,8 @@ blocks:
     enabled: true
     data:
       breadcrumb:
-        pl: Dokumentacja / Możliwości
-        en: Documentation / Features
+        pl: Dokumentacja / 01 /Możliwości
+        en: Documentation / 01 / Features
       title:
         pl: Możliwości FlatFile CMS
         en: FlatFile CMS features
@@ -50,7 +50,7 @@ blocks:
         - label: { pl: Media, en: Media }
         - label: { pl: Bezpieczeństwo, en: Security }
   - id: 01a05e10-1001-7402-8402-000000000002
-    type: docs-navigation
+    type: docs-toc
     enabled: true
     data:
       title:
@@ -126,44 +126,47 @@ blocks:
               pl: /pl/mozliwosci#security-tests,
               en: /en/features#security-tests,
             }
-      matrix:
-        - layer: { pl: Content, en: Content }
-          input: { pl: YAML, en: YAML }
-          responsibility:
-            {
-              pl: "Odczyt, rewizje i stabilna tożsamość",
-              en: "Reads, revisions and stable identity",
-            }
-          output: { pl: Model domenowy, en: Domain model }
-        - layer: { pl: Blocks, en: Blocks }
-          input: { pl: Dane bloku, en: Block data }
-          responsibility:
-            {
-              pl: "Walidacja, normalizacja i lokalizacja",
-              en: "Validation, normalization and localization",
-            }
-          output: { pl: Normalized data, en: Normalized data }
-        - layer: { pl: ViewModel, en: ViewModel }
-          input: { pl: Strona i konfiguracja, en: Page and configuration }
-          responsibility:
-            {
-              pl: "SEO, nawigacja, media i aktywne bloki",
-              en: "SEO, navigation, media and enabled blocks",
-            }
-          output: { pl: Publiczny model, en: Public model }
-        - layer: { pl: Rendering, en: Rendering }
-          input: { pl: Publiczny model, en: Public model }
-          responsibility:
-            {
-              pl: Renderery bloków i layout PHP,
-              en: Block renderers and PHP layout,
-            }
-          output: { pl: HTML, en: HTML }
-        - layer: { pl: API, en: API }
-          input: { pl: Publiczny model, en: Public model }
-          responsibility:
-            { pl: Kontrolowana serializacja, en: Controlled serialization }
-          output: { pl: JSON, en: JSON }
+  - id: 01a05e10-1001-7412-8412-000000000012
+    type: technical-table
+    enabled: true
+    data:
+      eyebrow:
+        pl: 00 / Mapa odpowiedzialności
+        en: 00 / Responsibility map
+      title:
+        pl: Od treści do publicznej odpowiedzi.
+        en: From content to a public response.
+      intro:
+        pl: Każda warstwa otrzymuje kontrolowane wejście, realizuje jedną odpowiedzialność i przekazuje wynik do kolejnego elementu pipeline’u. Na wąskich ekranach każdy wiersz staje się osobną kartą.
+        en: Each layer receives controlled input, performs one responsibility and passes its result to the next pipeline element. On narrow screens, every row becomes a separate card.
+      column_1: { pl: Warstwa, en: Layer }
+      column_2: { pl: Wejście, en: Input }
+      column_3: { pl: Odpowiedzialność, en: Responsibility }
+      column_4: { pl: Wyjście, en: Output }
+      rows:
+        - cell_1: { pl: Content, en: Content }
+          cell_2: { pl: YAML, en: YAML }
+          cell_3:
+            { pl: "Odczyt, rewizje i stabilna tożsamość", en: "Reads, revisions and stable identity" }
+          cell_4: { pl: Model domenowy, en: Domain model }
+        - cell_1: { pl: Blocks, en: Blocks }
+          cell_2: { pl: Dane bloku, en: Block data }
+          cell_3:
+            { pl: "Walidacja, normalizacja i lokalizacja", en: "Validation, normalization and localization" }
+          cell_4: { pl: Normalized data, en: Normalized data }
+        - cell_1: { pl: ViewModel, en: ViewModel }
+          cell_2: { pl: Strona i konfiguracja, en: Page and configuration }
+          cell_3:
+            { pl: "SEO, nawigacja, media i aktywne bloki", en: "SEO, navigation, media and enabled blocks" }
+          cell_4: { pl: Publiczny model, en: Public model }
+        - cell_1: { pl: Rendering, en: Rendering }
+          cell_2: { pl: Publiczny model, en: Public model }
+          cell_3: { pl: Renderery bloków i layout PHP, en: Block renderers and PHP layout }
+          cell_4: { pl: HTML, en: HTML }
+        - cell_1: { pl: API, en: API }
+          cell_2: { pl: Publiczny model, en: Public model }
+          cell_3: { pl: Kontrolowana serializacja, en: Controlled serialization }
+          cell_4: { pl: JSON, en: JSON }
   - id: 01a05e10-1001-7404-8404-000000000004
     type: architecture
     enabled: true
@@ -561,7 +564,7 @@ blocks:
 
           ## Co dalej
 
-          Ta strona jest mapą systemu. Kolejny tutorial — **Getting Started** — przeprowadzi przez wymagania, instalację, konfigurację środowiska, utworzenie administratora i publikację pierwszej strony.
+          Ta strona jest mapą systemu. Kolejny tutorial — **Pierwsze uruchomienie** — przeprowadzi przez wymagania, instalację, konfigurację środowiska, utworzenie administratora i publikację pierwszej strony.
         en: |-
           ## 7. Write atomically and detect conflicts
 
@@ -597,7 +600,7 @@ blocks:
 
           ## What comes next
 
-          This page is a map of the system. The next tutorial — **Getting Started** — will cover requirements, installation, environment configuration, administrator creation and publishing the first page.
+          This page is a map of the system. The next tutorial — **Pierwsze uruchomienie** — will cover requirements, installation, environment configuration, administrator creation and publishing the first page.
       note:
         pl: Dobra funkcja frameworka kończy się testowalnym kontraktem, a nie tylko działającym ekranem panelu.
         en: A good framework feature ends with a testable contract, not merely a working admin screen.
@@ -612,9 +615,11 @@ blocks:
         pl: Uruchom framework od zera.
         en: Start the framework from scratch.
       description:
-        pl: Getting Started pokaże kompletny proces od wymagań PHP i konfiguracji środowiska do pierwszego zalogowania i opublikowanej strony.
+        pl: Pierwsze uruchomienie pokaże kompletny proces od wymagań PHP i konfiguracji środowiska do pierwszego zalogowania i opublikowanej strony.
         en: Getting Started will cover the complete process from PHP requirements and environment configuration to the first login and published page.
       button_label:
-        pl: Otwórz panel CMS
-        en: Open the CMS panel
-      button_url: /admin
+        pl: Otwórz Dokumentację
+        en: Open the Docs
+      button_url:
+        pl: /pl/dokumentacja
+        en: /en/documentation

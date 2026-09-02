@@ -1,0 +1,71 @@
+schemaVersion: 1
+name:
+  pl: Tabela diagnostyczna
+  en: Diagnostic table
+description:
+  pl: Responsywna tabela łącząca objaw, przyczynę i czynności kontrolne.
+  en: A responsive table connecting a symptom, its cause and verification steps.
+icon: table
+fields:
+  anchor:
+    type: text
+    required: false
+    translatable: false
+    maxLength: 80
+    label: { pl: Kotwica sekcji, en: Section anchor }
+  eyebrow:
+    type: text
+    required: true
+    translatable: true
+    maxLength: 80
+    label: { pl: Etykieta, en: Eyebrow }
+  title:
+    type: text
+    required: true
+    translatable: true
+    maxLength: 180
+    label: { pl: Tytuł, en: Title }
+  intro:
+    type: textarea
+    required: true
+    translatable: true
+    maxLength: 600
+    label: { pl: Wprowadzenie, en: Introduction }
+  rows:
+    type: repeater
+    required: true
+    translatable: false
+    minItems: 2
+    maxItems: 12
+    label: { pl: Problemy, en: Problems }
+    fields:
+      layer:
+        type: text
+        required: true
+        translatable: true
+        maxLength: 40
+        label: { pl: Warstwa, en: Layer }
+      problem:
+        type: text
+        required: true
+        translatable: true
+        maxLength: 180
+        label: { pl: Problem lub objaw, en: Problem or symptom }
+      cause:
+        type: textarea
+        required: true
+        translatable: true
+        maxLength: 400
+        label: { pl: Prawdopodobna przyczyna, en: Likely cause }
+      check:
+        type: markdown
+        required: true
+        translatable: true
+        maxLength: 800
+        label: { pl: Co sprawdzić, en: What to check }
+  note:
+    type: textarea
+    required: false
+    translatable: true
+    maxLength: 500
+    label: { pl: Notatka, en: Note }

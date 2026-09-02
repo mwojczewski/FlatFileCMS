@@ -1,0 +1,79 @@
+schemaVersion: 1
+name: { pl: Tabela techniczna, en: Technical table }
+description: { pl: Czterokolumnowa tabela zmieniająca się w karty mobilne., en: A four-column table that becomes mobile cards. }
+icon: table
+fields:
+  eyebrow:
+    type: text
+    required: true
+    translatable: true
+    maxLength: 80
+    label: { pl: Etykieta, en: Eyebrow }
+  title:
+    type: text
+    required: true
+    translatable: true
+    maxLength: 180
+    label: { pl: Tytuł, en: Title }
+  intro:
+    type: textarea
+    required: true
+    translatable: true
+    maxLength: 500
+    label: { pl: Wprowadzenie, en: Introduction }
+  column_1:
+    type: text
+    required: true
+    translatable: true
+    maxLength: 50
+    label: { pl: Nagłówek kolumny 1, en: Column 1 heading }
+  column_2:
+    type: text
+    required: true
+    translatable: true
+    maxLength: 50
+    label: { pl: Nagłówek kolumny 2, en: Column 2 heading }
+  column_3:
+    type: text
+    required: true
+    translatable: true
+    maxLength: 50
+    label: { pl: Nagłówek kolumny 3, en: Column 3 heading }
+  column_4:
+    type: text
+    required: true
+    translatable: true
+    maxLength: 50
+    label: { pl: Nagłówek kolumny 4, en: Column 4 heading }
+  rows:
+    type: repeater
+    required: true
+    translatable: false
+    minItems: 2
+    maxItems: 16
+    label: { pl: Wiersze, en: Rows }
+    fields:
+      cell_1:
+        type: text
+        required: true
+        translatable: true
+        maxLength: 100
+        label: { pl: Komórka 1, en: Cell 1 }
+      cell_2:
+        type: text
+        required: true
+        translatable: true
+        maxLength: 160
+        label: { pl: Komórka 2, en: Cell 2 }
+      cell_3:
+        type: textarea
+        required: true
+        translatable: true
+        maxLength: 400
+        label: { pl: Komórka 3, en: Cell 3 }
+      cell_4:
+        type: text
+        required: true
+        translatable: true
+        maxLength: 160
+        label: { pl: Komórka 4, en: Cell 4 }

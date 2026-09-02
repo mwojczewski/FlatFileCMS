@@ -84,6 +84,7 @@ $localizedUrl = static function (string $url) use ($locale): string {
     }
 
     .menu-toggle {
+        position: relative;
         display: none;
         width: 2.75rem;
         height: 2.75rem;
@@ -92,31 +93,34 @@ $localizedUrl = static function (string $url) use ($locale): string {
         border-radius: .2rem;
         background: transparent;
         color: inherit;
-        cursor: pointer
+        cursor: pointer;
     }
 
     .menu-toggle span {
         position: absolute;
+        top: 50%;
+        left: 50%;
         width: 1rem;
         height: 1px;
         background: currentColor;
-        transition: transform .2s ease
+        transform-origin: center;
+        transition: transform .2s ease;
     }
 
     .menu-toggle span:first-child {
-        transform: translateY(-.22rem)
+        transform: translate(-50%, -50%) translateY(-.22rem);
     }
 
     .menu-toggle span:last-child {
-        transform: translateY(.22rem)
+        transform: translate(-50%, -50%) translateY(.22rem);
     }
 
     .menu-toggle[aria-expanded="true"] span:first-child {
-        transform: rotate(45deg)
+        transform: translate(-50%, -50%) rotate(45deg);
     }
 
     .menu-toggle[aria-expanded="true"] span:last-child {
-        transform: rotate(-45deg)
+        transform: translate(-50%, -50%) rotate(-45deg);
     }
 
     @media(max-width:760px) {

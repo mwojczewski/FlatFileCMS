@@ -42,7 +42,7 @@ final class AssetPublisher
         }
 
         $directory = "{$this->publicRoot}/assets/blocks/{$type}";
-        if (!is_dir($directory) && !mkdir($directory, 0o750, true) && !is_dir($directory)) {
+        if (!is_dir($directory) && !mkdir($directory, 0o755, true) && !is_dir($directory)) {
             throw new RenderingException('Block asset directory cannot be created.');
         }
 

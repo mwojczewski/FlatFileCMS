@@ -1,0 +1,133 @@
+.diagnostic-table {
+  padding: clamp(4rem, 8vw, 8rem) 0;
+  background: #fff;
+  color: #0b1713;
+}
+.diagnostic-table__heading {
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 44rem);
+  gap: 3rem;
+  margin-bottom: 3rem;
+}
+.diagnostic-table__heading > p {
+  margin: 0;
+  color: #0d6348;
+  font: 700 0.65rem ui-monospace, monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.diagnostic-table__heading h2 {
+  max-width: 15ch;
+  margin: 0;
+  font-size: clamp(2.3rem, 4vw, 4.2rem);
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+.diagnostic-table__heading div p {
+  max-width: 44rem;
+  margin: 1.2rem 0 0;
+  color: #52645d;
+  line-height: 1.7;
+}
+.diagnostic-table__grid {
+  border-top: 1px solid #bac9c3;
+  border-left: 1px solid #d7e0dc;
+}
+.diagnostic-table__row {
+  display: grid;
+  grid-template-columns: 0.65fr 1.15fr 1.35fr 1.65fr;
+}
+.diagnostic-table__row > * {
+  min-width: 0;
+  margin: 0;
+  padding: 1.25rem;
+  border-right: 1px solid #d7e0dc;
+  border-bottom: 1px solid #d7e0dc;
+  color: #40514a;
+  font-size: 0.78rem;
+  line-height: 1.65;
+}
+.diagnostic-table__row strong {
+  color: #0d6348;
+  font: 700 0.68rem ui-monospace, monospace;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.diagnostic-table__row div p {
+  margin: 0;
+}
+.diagnostic-table__row code {
+  padding: 0.1rem 0.28rem;
+  border-radius: 0.2rem;
+  background: #dfe8e4;
+  color: #085e40;
+  font: 500 0.86em ui-monospace, monospace;
+}
+.diagnostic-table__row--head {
+  background: #0c1914;
+}
+.diagnostic-table__row--head span {
+  color: #c7d5d0;
+  font: 650 0.62rem ui-monospace, monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.diagnostic-table__note {
+  max-width: 56rem;
+  margin: 2.5rem 0 0 auto;
+  padding: 1.5rem 1.8rem;
+  border-left: 3px solid #36ca94;
+  background: #e3eee9;
+}
+.diagnostic-table__note strong {
+  color: #126b4e;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.diagnostic-table__note p {
+  margin: 0.55rem 0 0;
+  color: #33443e;
+  line-height: 1.65;
+}
+@media (max-width: 800px) {
+  .diagnostic-table__heading {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .diagnostic-table__grid {
+    border: 0;
+  }
+  .diagnostic-table__row {
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid #cbd8d2;
+    background: #f4f7f5;
+  }
+  .diagnostic-table__row.diagnostic-table__row--head {
+    display: none;
+  }
+  .diagnostic-table__row > * {
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    gap: 1rem;
+    border: 0;
+    border-bottom: 1px solid #d7e0dc;
+  }
+  .diagnostic-table__row > *::before {
+    content: attr(data-label);
+    color: #0d6348;
+    font: 700 0.6rem ui-monospace, monospace;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .diagnostic-table__row > *:last-child {
+    border-bottom: 0;
+  }
+}
+@media (max-width: 520px) {
+  .diagnostic-table__row > * {
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+  }
+}

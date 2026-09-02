@@ -1,0 +1,735 @@
+schemaVersion: 1
+enabled: true
+layout: default
+slug:
+  pl: pierwsze-uruchomienie
+  en: getting-started
+title:
+  pl: Pierwsze uruchomienie FlatFile CMS
+  en: Getting started with FlatFile CMS
+date: "2026-09-02"
+order: 2
+category: getting-started
+excerpt:
+  pl: Instalacja, konfiguracja środowiska, pierwsze konto administratora i kontrola działania — od pustego katalogu do lokalnego CMS-a.
+  en: Installation, environment configuration, the first administrator account and verification — from an empty directory to a working local CMS.
+seo:
+  title:
+    pl: Pierwsze uruchomienie FlatFile CMS — kompletny tutorial
+    en: Getting started with FlatFile CMS — complete tutorial
+  description:
+    pl: Krok po kroku zainstaluj FlatFile CMS na PHP 8.5, skonfiguruj środowisko, utwórz superadministratora i zweryfikuj aplikację.
+    en: Install FlatFile CMS on PHP 8.5, configure the environment, create a superadmin and verify the application step by step.
+  robots:
+    index: true
+    follow: true
+  openGraph: {}
+  twitter: {}
+  jsonLd:
+    "@context": https://schema.org
+    "@type": TechArticle
+    headline: Getting started with FlatFile CMS
+    dateModified: "2026-09-02"
+blocks:
+  - id: 01a05ef2-2002-7401-8401-000000000001
+    type: docs-hero
+    enabled: true
+    data:
+      breadcrumb:
+        pl: Dokumentacja / 02 / Pierwsze uruchomienie
+        en: Documentation / 02 / Getting started
+      title:
+        pl: Od repozytorium do działającego CMS-a
+        en: From repository to a running CMS
+      lead:
+        pl: Kompletny tutorial instalacji FlatFile CMS — wymagania PHP, zależności Composera, konfiguracja środowiska, baza SQLite, pierwsze konto i kontrola całego przepływu HTTP.
+        en: A complete FlatFile CMS installation tutorial covering PHP requirements, Composer dependencies, environment configuration, SQLite, the first account and verification of the complete HTTP flow.
+      level: podstawowy
+      reading_time:
+        pl: około 30 minut
+        en: about 30 minutes
+      updated: "2026-09-02"
+      topics:
+        - label: { pl: PHP 8.5, en: PHP 8.5 }
+        - label: { pl: Composer, en: Composer }
+        - label: { pl: SQLite, en: SQLite }
+        - label: { pl: Konfiguracja, en: Configuration }
+        - label: { pl: CLI, en: CLI }
+        - label: { pl: Diagnostyka, en: Diagnostics }
+  - id: 01a05ef2-2002-7402-8402-000000000002
+    type: docs-toc
+    enabled: true
+    data:
+      title:
+        pl: Plan pierwszego uruchomienia
+        en: First-run plan
+      intro:
+        pl: Przechodzimy kolejno przez środowisko wykonawcze, pobranie zależności, podział konfiguracji, instalację konta i test aplikacji. Nie pomijaj kontroli wymagań — większość problemów instalacyjnych powstaje przed uruchomieniem kodu CMS-a.
+        en: "We move through the runtime, dependency installation, configuration boundaries, account setup and application verification. Do not skip the requirements check: most installation failures occur before CMS code starts."
+      items:
+        - number: "01"
+          title: { pl: Wymagania, en: Requirements }
+          description:
+            {
+              pl: "PHP 8.5, rozszerzenia, Composer i prawa zapisu.",
+              en: "PHP 8.5, extensions, Composer and write permissions.",
+            }
+          url:
+            {
+              pl: /pl/dokumentacja/pierwsze-uruchomienie#wymagania,
+              en: /en/documentation/getting-started#wymagania,
+            }
+        - number: "02"
+          title: { pl: Instalacja kodu, en: Code installation }
+          description:
+            {
+              pl: "Checkout repozytorium i zależności z composer.lock.",
+              en: "Repository checkout and dependencies from composer.lock.",
+            }
+          url:
+            {
+              pl: /pl/dokumentacja/pierwsze-uruchomienie#instalacja,
+              en: /en/documentation/getting-started#instalacja,
+            }
+        - number: "03"
+          title: { pl: Środowisko, en: Environment }
+          description:
+            {
+              pl: "Sekrety, sesje, cache, poczta i WebAuthn.",
+              en: "Secrets, sessions, caches, mail and WebAuthn.",
+            }
+          url:
+            {
+              pl: /pl/dokumentacja/pierwsze-uruchomienie#srodowisko,
+              en: /en/documentation/getting-started#srodowisko,
+            }
+        - number: "04"
+          title: { pl: Instalacja CMS-a, en: CMS installation }
+          description:
+            {
+              pl: "Schemat SQLite i pierwszy superadministrator.",
+              en: "SQLite schema and the first superadmin.",
+            }
+          url:
+            {
+              pl: /pl/dokumentacja/pierwsze-uruchomienie#konto,
+              en: /en/documentation/getting-started#konto,
+            }
+        - number: "05"
+          title: { pl: Serwer lokalny, en: Local server }
+          description:
+            {
+              pl: "Front controller, router deweloperski i test tras.",
+              en: "Front controller, development router and route tests.",
+            }
+          url:
+            {
+              pl: /pl/dokumentacja/pierwsze-uruchomienie#uruchomienie,
+              en: /en/documentation/getting-started#uruchomienie,
+            }
+        - number: "06"
+          title: { pl: Diagnostyka, en: Troubleshooting }
+          description:
+            {
+              pl: "Typowe błędy i sposób izolowania ich przyczyn.",
+              en: "Common failures and how to isolate their causes.",
+            }
+          url:
+            {
+              pl: /pl/dokumentacja/pierwsze-uruchomienie#diagnostyka,
+              en: /en/documentation/getting-started#diagnostyka,
+            }
+  - id: 01a05ef2-2002-7412-8412-000000000012
+    type: technical-table
+    enabled: true
+    data:
+      eyebrow:
+        pl: Mapa odpowiedzialności
+        en: Responsibility map
+      title:
+        pl: Cztery granice pierwszego uruchomienia.
+        en: Four boundaries of the first run.
+      intro:
+        pl: Każda warstwa przyjmuje inne dane wejściowe i odpowiada za inny fragment startu aplikacji. Na telefonie każdy wiersz staje się samodzielną kartą z własnymi etykietami.
+        en: Each layer accepts different input and owns a different part of application startup. On mobile, every row becomes a self-contained card with its own labels.
+      column_1: { pl: Warstwa, en: Layer }
+      column_2: { pl: Wejście, en: Input }
+      column_3: { pl: Odpowiedzialność, en: Responsibility }
+      column_4: { pl: Wyjście, en: Output }
+      rows:
+        - cell_1: { pl: System, en: System }
+          cell_2: { pl: PHP i rozszerzenia, en: PHP and extensions }
+          cell_3:
+            {
+              pl: Wykonuje aplikację i operacje na obrazach.,
+              en: Runs the application and image operations.,
+            }
+          cell_4: { pl: Runtime PHP 8.5+, en: PHP 8.5+ runtime }
+        - cell_1: { pl: Composer, en: Composer }
+          cell_2: { pl: composer.lock, en: composer.lock }
+          cell_3:
+            {
+              pl: Instaluje dokładne wersje bibliotek.,
+              en: Installs exact library versions.,
+            }
+          cell_4: { pl: vendor/autoload.php, en: vendor/autoload.php }
+        - cell_1: { pl: Środowisko, en: Environment }
+          cell_2: { pl: .env.local, en: .env.local }
+          cell_3:
+            {
+              pl: Przechowuje sekrety i ustawienia serwera.,
+              en: Stores secrets and server-specific settings.,
+            }
+          cell_4: { pl: Konfiguracja runtime, en: Runtime configuration }
+        - cell_1: { pl: Konfiguracja witryny, en: Site configuration }
+          cell_2: { pl: config/*.yml, en: config/*.yml }
+          cell_3:
+            {
+              pl: Definiuje publiczne zachowanie witryny.,
+              en: Defines public site behaviour.,
+            }
+          cell_4: { pl: Model konfiguracji, en: Configuration model }
+        - cell_1: { pl: Uwierzytelnianie, en: Authentication }
+          cell_2: { pl: Polecenie install, en: install command }
+          cell_3:
+            {
+              pl: Tworzy schemat i konto techniczne.,
+              en: Creates the schema and technical account.,
+            }
+          cell_4: { pl: cms.sqlite, en: cms.sqlite }
+  - id: 01a05ef2-2002-7403-8403-000000000003
+    type: article-content
+    enabled: true
+    data:
+      anchor: wymagania
+      content:
+        pl: |-
+          ## 1. Zrozum, co będziemy instalować
+
+          FlatFile CMS rozdziela trzy rodzaje danych. Kod aplikacji oraz schematy bloków są wersjonowane w Git. Treść i publiczna konfiguracja znajdują się w plikach YAML. SQLite przechowuje wyłącznie administratorów, dane uwierzytelniania i mechanizmy bezpieczeństwa kont. To ważne: polecenie instalacyjne nie „importuje strony do bazy”, lecz przygotowuje techniczną część panelu administracyjnego.
+
+          Publicznym punktem wejścia jest katalog `public/`. Katalogi `pages/`, `config/`, `blocks/`, `storage/` oraz plik `.env.local` nie mogą być wystawione przez serwer WWW. Lokalny router dołączony do projektu zachowuje tę granicę; w produkcji musi ją zachować konfiguracja Nginx, Apache albo Caddy.
+
+          ## 2. Sprawdź PHP i Composera
+
+          Projekt wymaga PHP **8.5 lub nowszego** oraz rozszerzeń: `ctype`, `dom`, `fileinfo`, `filter`, `gd`, `json`, `mbstring`, `openssl`, `pdo` i `pdo_sqlite`. W terminalu uruchom:
+
+          ```bash
+          php -v
+          composer --version
+          php -m
+          ```
+
+          Pierwsze polecenie musi pokazać wersję co najmniej `8.5.x`. Drugie potwierdza dostępność Composera. W wyniku `php -m` odszukaj każdą wymaganą nazwę. Wielkość liter nie ma znaczenia, ale `PDO` i `pdo_sqlite` to dwa osobne wpisy: pierwszy udostępnia abstrakcję bazy, drugi sterownik SQLite.
+
+          Nie zakładaj, że PHP używane przez terminal jest tym samym PHP, które obsługuje serwer. Na hostingu sprawdź wersję CLI i PHP-FPM osobno. Różne pliki `php.ini` są częstą przyczyną sytuacji, w której instalacja z terminala działa, lecz żądanie HTTP kończy się błędem brakującego rozszerzenia.
+
+          ## 3. Zaplanuj prawa dostępu
+
+          Podczas pracy CMS musi zapisywać do `pages/` i `config/`, gdy administrator edytuje treść, oraz do katalogów `storage/audit`, `storage/cache`, `storage/database`, `storage/logs`, `storage/sessions` i `storage/tmp`. Publikowanie fingerprintowanych zasobów bloków wymaga także zapisu do `public/assets/blocks/`.
+
+          Nie rozwiązuj problemów uprawnień przez `chmod -R 777`. Użytkownik PHP powinien mieć zapis tylko tam, gdzie jest to wymagane. Katalogi runtime i dozwolone korzenie nie mogą być dowiązaniami symbolicznymi — resolver ścieżek odrzuca konfigurację, która mogłaby umożliwić wyjście poza kontrolowany katalog.
+        en: |-
+          ## 1. Understand what you are installing
+
+          FlatFile CMS separates three kinds of data. Application code and block schemas are versioned in Git. Content and public configuration live in YAML files. SQLite stores only administrators, authentication data and account-security mechanisms. This distinction matters: the installation command does not “import the site into a database”; it prepares the technical part of the administration panel.
+
+          The public entry point is the `public/` directory. The `pages/`, `config/`, `blocks/`, `storage/` directories and `.env.local` must never be exposed by the web server. The bundled local router preserves this boundary; in production, the Nginx, Apache or Caddy configuration must preserve it too.
+
+          ## 2. Check PHP and Composer
+
+          The project requires **PHP 8.5 or newer** and these extensions: `ctype`, `dom`, `fileinfo`, `filter`, `gd`, `json`, `mbstring`, `openssl`, `pdo` and `pdo_sqlite`. Run:
+
+          ```bash
+          php -v
+          composer --version
+          php -m
+          ```
+
+          The first command must report at least `8.5.x`. The second confirms that Composer is available. Find every required name in the `php -m` output. Letter case is irrelevant, but `PDO` and `pdo_sqlite` are separate entries: the former supplies the database abstraction and the latter the SQLite driver.
+
+          Do not assume that terminal PHP is the same PHP used by the web server. On hosting infrastructure, check CLI and PHP-FPM separately. Different `php.ini` files commonly explain why installation works in the terminal while an HTTP request fails because an extension is missing.
+
+          ## 3. Plan filesystem permissions
+
+          At runtime, the CMS needs write access to `pages/` and `config/` when administrators edit content, and to `storage/audit`, `storage/cache`, `storage/database`, `storage/logs`, `storage/sessions` and `storage/tmp`. Publishing fingerprinted block assets also requires write access to `public/assets/blocks/`.
+
+          Do not solve permission errors with `chmod -R 777`. The PHP user should write only where required. Runtime directories and allowed roots must not be symbolic links: the path resolver rejects arrangements that could allow an escape from a controlled directory.
+      note:
+        pl: Jeśli brakuje rozszerzenia, doinstaluj je dla dokładnie tej wersji PHP, której używa CLI i serwer, a następnie ponownie uruchom proces PHP-FPM.
+        en: If an extension is missing, install it for the exact PHP version used by the CLI and web server, then restart the PHP-FPM process.
+  - id: 01a05ef2-2002-7404-8404-000000000004
+    type: article-content
+    enabled: true
+    data:
+      anchor: instalacja
+      content:
+        pl: |-
+          ## 4. Pobierz kod i zainstaluj zależności
+
+          Pracuj w katalogu, który nie jest publicznym katalogiem serwera. Po sklonowaniu repozytorium przejdź do jego katalogu głównego — tego, w którym znajdują się `composer.json`, `composer.lock`, `bin/`, `app/` i `public/`:
+
+          ```bash
+          git clone https://github.com/mwojczewski/FlatFileCMS.git
+          cd FlatFileCMS
+          composer install
+          ```
+
+          `composer install` czyta `composer.lock` i odtwarza sprawdzony zestaw zależności. Nie zastępuj go poleceniem `composer update` podczas zwykłego wdrożenia: `update` rozwiązuje wersje ponownie i modyfikuje plik blokady. Efektem instalacji jest między innymi `vendor/autoload.php`, ładowany przez wejścia HTTP i `bin/cms`.
+
+          W środowisku deweloperskim zainstalowane zostają również narzędzia testowe. Uruchom pełną kontrolę projektu:
+
+          ```bash
+          composer check
+          ```
+
+          Skrypt powinien zakończyć się kodem `0`. Obejmuje kontrolę stylu PHP, analizę statyczną i testy PHPUnit. Błąd w tej fazie oznacza, że nie warto jeszcze diagnozować routingu lub panelu — najpierw napraw środowisko albo niespójność checkoutu.
+
+          ## 5. Poznaj granicę konfiguracji
+
+          FlatFile CMS celowo nie pozwala, aby kilka źródeł nadpisywało tę samą wartość. Konfiguracja dzieli się na:
+
+          - `.env.local` — sekrety i parametry zależne od serwera;
+          - `config/setup.yml` — publiczna tożsamość witryny, domyślny layout, SEO oraz polityka mediów;
+          - `config/languages.yml` — aktywne języki i język domyślny;
+          - `config/navigation.yml` — menu;
+          - `pages/**/content.yml` — treść, slugi, SEO i instancje bloków.
+
+          Zmienna środowiskowa nie nadpisuje `site.url`, a YAML nie powinien zawierać `APP_SECRET`, hasła SMTP ani innych danych uwierzytelniających. Dzięki temu skopiowany katalog treści zachowuje publiczny kontrakt witryny, ale nie przenosi sekretów serwera.
+        en: |-
+          ## 4. Fetch the code and install dependencies
+
+          Work in a directory that is not the web server's public root. After cloning the repository, enter its project root — the directory containing `composer.json`, `composer.lock`, `bin/`, `app/` and `public/`:
+
+          ```bash
+          git clone https://github.com/mwojczewski/FlatFileCMS.git
+          cd FlatFileCMS
+          composer install
+          ```
+
+          `composer install` reads `composer.lock` and reproduces the tested dependency set. Do not replace it with `composer update` during a normal deployment: `update` resolves versions again and changes the lock file. Installation creates, among other files, `vendor/autoload.php`, which is loaded by the HTTP entry points and `bin/cms`.
+
+          Development installation also includes the testing tools. Run the full project check:
+
+          ```bash
+          composer check
+          ```
+
+          The script should exit with code `0`. It covers PHP style, static analysis and PHPUnit tests. A failure at this stage means it is too early to troubleshoot routing or the admin panel: fix the runtime or checkout inconsistency first.
+
+          ## 5. Learn the configuration boundary
+
+          FlatFile CMS deliberately prevents several sources from overriding the same value. Configuration is divided into:
+
+          - `.env.local` — secrets and server-specific parameters;
+          - `config/setup.yml` — public site identity, default layout, SEO and media policy;
+          - `config/languages.yml` — enabled and default languages;
+          - `config/navigation.yml` — menus;
+          - `pages/**/content.yml` — content, slugs, SEO and block instances.
+
+          An environment variable does not override `site.url`, and YAML must not contain `APP_SECRET`, an SMTP password or other credentials. As a result, a copied content tree retains the site's public contract without carrying server secrets.
+      note:
+        pl: "`composer.lock` jest częścią artefaktu wydania. Commituj go i instaluj dokładnie z niego zarówno lokalnie, jak i na serwerze."
+        en: "`composer.lock` is part of the release artifact. Commit it and install from it exactly, both locally and on the server."
+  - id: 01a05ef2-2002-7405-8405-000000000005
+    type: code-showcase
+    enabled: true
+    data:
+      eyebrow:
+        pl: Minimalne środowisko lokalne
+        en: Minimal local environment
+      title:
+        pl: Zacznij od jawnej, bezpiecznej konfiguracji.
+        en: Start with explicit, safe configuration.
+      description:
+        pl: Skopiuj wzorzec do `.env.local`, wygeneruj własny sekret i pozostaw plik poza repozytorium. Wartości poniżej służą do pracy lokalnej; produkcja wymaga HTTPS, bezpiecznego cookie i wyłączonego debugowania.
+        en: Copy the template to `.env.local`, generate your own secret and keep the file out of the repository. These values are intended for local development; production requires HTTPS, a secure cookie and disabled debugging.
+      filename: .env.local
+      code: |-
+        APP_ENV=development
+        APP_DEBUG=1
+        APP_SECRET=replace-with-at-least-32-random-bytes
+        APP_TIMEZONE=Europe/Warsaw
+
+        LOG_LEVEL=debug
+        YAML_CACHE_JSON_ENABLED=1
+        YAML_CACHE_SERIALIZE_ENABLED=0
+
+        SESSION_NAME=flatfile_cms_admin
+        SESSION_COOKIE_SECURE=0
+        SESSION_COOKIE_SAME_SITE=Lax
+
+        WEBAUTHN_RP_ID=localhost
+        WEBAUTHN_RP_NAME="FlatFile CMS local"
+      bullets:
+        - text:
+            {
+              pl: APP_SECRET podpisuje dane bezpieczeństwa i musi być unikalny.,
+              en: APP_SECRET signs security data and must be unique.,
+            }
+        - text:
+            {
+              pl: "Debug jest pomocny lokalnie, lecz zabroniony w produkcji.",
+              en: "Debugging helps locally but is forbidden in production.",
+            }
+        - text:
+            {
+              pl: Cache JSON i serializowany można włączać niezależnie.,
+              en: JSON and serialized caches can be enabled independently.,
+            }
+        - text:
+            {
+              pl: "RP ID to hostname bez protokołu, portu i ścieżki.",
+              en: "The RP ID is a hostname without scheme, port or path.",
+            }
+  - id: 01a05ef2-2002-7406-8406-000000000006
+    type: article-content
+    enabled: true
+    data:
+      anchor: srodowisko
+      content:
+        pl: |-
+          ## 6. Utwórz `.env.local`
+
+          Zacznij od pliku przykładowego:
+
+          ```bash
+          cp .env.example .env.local
+          ```
+
+          Następnie zmień co najmniej `APP_SECRET`. Powinien zawierać co najmniej 32 losowe bajty i nie może być przykładową wartością z repozytorium. Nie przekazuj sekretu w zgłoszeniach błędów i nie commituj `.env.local`.
+
+          `APP_ENV=development` i `APP_DEBUG=1` są właściwe na komputerze programisty. Produkcja wymusza `APP_ENV=production`, `APP_DEBUG=0` i `SESSION_COOKIE_SECURE=1`; kod odmawia startu, gdy sekret jest zbyt krótki, cookie administratora jest niezabezpieczone albo debug pozostaje włączony.
+
+          `YAML_CACHE_JSON_ENABLED` oraz `YAML_CACHE_SERIALIZE_ENABLED` sterują dwiema niezależnymi reprezentacjami cache sparsowanych dokumentów. Przy obu aktywnych zapis aktualizuje oba formaty, odczyt preferuje serializację PHP, a JSON jest fallbackiem sprawdzanym względem rewizji SHA-256 źródła. Te przełączniki nie sterują wariantami obrazów — ich ustawienia należą do `config/setup.yml`.
+
+          `WEBAUTHN_RP_ID` wpisz jako sam hostname, na przykład `localhost` albo `cms.example.com`: bez `https://`, portu i ścieżki. Klucze bezpieczeństwa są kryptograficznie związane z tą wartością, więc jej późniejsza zmiana unieważni możliwość użycia już zarejestrowanych poświadczeń.
+
+          ## 7. Ustaw publiczny adres witryny
+
+          Otwórz `config/setup.yml` i ustaw `site.url`. To jedyne kanoniczne źródło bazowego URL-a. Lokalnie może to być:
+
+          ```yaml
+          site:
+            name: FlatFile CMS
+            url: http://localhost:8080
+            defaultLayout: default
+          ```
+
+          Nie dodawaj końcowego ukośnika. Gdy adres produkcyjny się zmieni, aktualizujesz `site.url`, a nie nieistniejące `APP_URL`. Ten adres jest wykorzystywany między innymi w metadanych kanonicznych i linkach wiadomości odzyskiwania hasła.
+        en: |-
+          ## 6. Create `.env.local`
+
+          Begin with the example file:
+
+          ```bash
+          cp .env.example .env.local
+          ```
+
+          Then change at least `APP_SECRET`. It should contain at least 32 random bytes and must not be the example value from the repository. Never share the secret in bug reports and never commit `.env.local`.
+
+          `APP_ENV=development` and `APP_DEBUG=1` are appropriate on a developer machine. Production requires `APP_ENV=production`, `APP_DEBUG=0` and `SESSION_COOKIE_SECURE=1`; the code refuses to start when the secret is too short, the administrator cookie is insecure or debugging remains enabled.
+
+          `YAML_CACHE_JSON_ENABLED` and `YAML_CACHE_SERIALIZE_ENABLED` control two independent representations of the parsed-document cache. With both enabled, writes update both formats, reads prefer PHP serialization and JSON acts as a fallback checked against the source SHA-256 revision. These switches do not control image variants — their settings belong in `config/setup.yml`.
+
+          Set `WEBAUTHN_RP_ID` to the hostname alone, for example `localhost` or `cms.example.com`: no `https://`, port or path. Security keys are cryptographically bound to this value, so changing it later prevents already registered credentials from being used.
+
+          ## 7. Set the public site URL
+
+          Open `config/setup.yml` and set `site.url`. This is the single canonical source of the base URL. Locally it can be:
+
+          ```yaml
+          site:
+            name: FlatFile CMS
+            url: http://localhost:8080
+            defaultLayout: default
+          ```
+
+          Do not add a trailing slash. When the production address changes, update `site.url`, not a nonexistent `APP_URL`. This address is used by canonical metadata and password-recovery email links, among other features.
+      note:
+        pl: YAML opisuje publiczny kontrakt witryny. Sekrety i dane dostępowe pozostają wyłącznie w środowisku wykonawczym.
+        en: YAML describes the site's public contract. Secrets and credentials remain exclusively in the runtime environment.
+  - id: 01a05ef2-2002-7407-8407-000000000007
+    type: article-content
+    enabled: true
+    data:
+      anchor: konto
+      content:
+        pl: |-
+          ## 8. Utwórz bazę i pierwszego superadministratora
+
+          Z katalogu głównego projektu wykonaj:
+
+          ```bash
+          php bin/cms install root@example.com
+          ```
+
+          Adres zastąp rzeczywistym adresem operatora technicznego. Polecenie utworzy lub przygotuje `storage/database/cms.sqlite`, zastosuje schemat i zapisze pierwsze konto z rolą superadministratora. Hasło jest pobierane interaktywnie, dlatego nie trafia do historii powłoki ani listy argumentów procesu.
+
+          Superadministrator jest kontem technicznym: panel HTTP nie tworzy ani nie modyfikuje takich kont. Kolejnych zwykłych administratorów dodasz później w panelu `/admin/users` albo poleceniem:
+
+          ```bash
+          php bin/cms user:create editor@example.com
+          ```
+
+          Dodatkowego superadministratora może utworzyć wyłącznie CLI przez `user:create-superadmin`. Po aktualizacji istniejącej instalacji uruchamiaj `php bin/cms database:migrate`; migracje są idempotentne, więc aktualny schemat zakończy operację komunikatem o braku zaległych zmian.
+
+          Opcja `CMS_PASSWORD` istnieje dla kontrolowanej instalacji bez interakcji, ale ustawiaj ją tylko dla pojedynczego procesu w bezpiecznym mechanizmie wdrożeniowym. Argument `php bin/cms install adres hasło` nie jest obsługiwany celowo, ponieważ hasło mogłoby pojawić się w historii i liście procesów.
+
+          ## 9. Poznaj granice konta
+
+          Po zalogowaniu możesz zmienić hasło i zarejestrować roamingowy klucz WebAuthn, np. YubiKey. Dodanie pierwszego klucza włącza obowiązkowy drugi składnik dla tego konta. Jeśli wszystkie klucze zostaną utracone, operator serwera może przywrócić logowanie samym hasłem:
+
+          ```bash
+          php bin/cms user:security-keys:clear root@example.com
+          ```
+
+          Ta komenda usuwa poświadczenia WebAuthn wskazanego użytkownika, ale nie zmienia jego hasła. Używaj jej jako procedury odzyskiwania dostępu, a nie jako zwykłego przełącznika konfiguracji.
+        en: |-
+          ## 8. Create the database and first superadmin
+
+          From the project root, run:
+
+          ```bash
+          php bin/cms install root@example.com
+          ```
+
+          Replace the address with the actual technical operator's address. The command creates or prepares `storage/database/cms.sqlite`, applies the schema and saves the first superadmin account. The password is read interactively, so it does not enter shell history or the process argument list.
+
+          A superadmin is a technical account: the HTTP panel neither creates nor modifies such accounts. Add ordinary administrators later at `/admin/users` or with:
+
+          ```bash
+          php bin/cms user:create editor@example.com
+          ```
+
+          Only the CLI can create another superadmin, through `user:create-superadmin`. After updating an existing installation, run `php bin/cms database:migrate`; migrations are idempotent, so an up-to-date schema simply completes without pending changes.
+
+          `CMS_PASSWORD` exists for controlled non-interactive installation, but expose it only to one process through a secure deployment mechanism. `php bin/cms install address password` is intentionally unsupported because the password could appear in shell history and process listings.
+
+          ## 9. Understand account boundaries
+
+          After signing in, you can change the password and register a roaming WebAuthn key such as a YubiKey. Adding the first key makes the second factor mandatory for that account. If all keys are lost, a server operator can restore password-only access:
+
+          ```bash
+          php bin/cms user:security-keys:clear root@example.com
+          ```
+
+          This command removes the selected user's WebAuthn credentials but does not change their password. Treat it as an account-recovery procedure, not a routine configuration switch.
+      note:
+        pl: Treść pozostaje w YAML. SQLite jest celowo ograniczony do administratorów i mechanizmów uwierzytelniania.
+        en: Content stays in YAML. SQLite is deliberately limited to administrators and authentication mechanisms.
+  - id: 01a05ef2-2002-7408-8408-000000000008
+    type: article-content
+    enabled: true
+    data:
+      anchor: uruchomienie
+      content:
+        pl: |-
+          ## 10. Uruchom serwer deweloperski
+
+          W katalogu projektu wykonaj:
+
+          ```bash
+          php -S localhost:8080 -t public public/router.php
+          ```
+
+          Opcja `-t public` ustawia dokument root dokładnie na bezpieczny katalog publiczny. `public/router.php` emuluje reguły przepisywania adresów: istniejące zasoby statyczne obsługuje wbudowany serwer, a pozostałe żądania przekazuje do front controllera `public/index.php`.
+
+          Otwórz po kolei:
+
+          - `http://localhost:8080/` — dla konfiguracji z jednym językiem albo właściwy prefiks locale przy wielu językach;
+          - `http://localhost:8080/api/v1/health` — kontrola zdrowia publicznego API;
+          - `http://localhost:8080/admin/login` — formularz logowania administratora.
+
+          Przy włączonych polskim i angielskim publiczne strony mają obowiązkowy prefiks, np. `/pl/` i `/en/`. Brak prefiksu nie powinien być używany jako stabilny link do treści wielojęzycznej. Po zalogowaniu odwiedź `/admin/pages`: drzewo pokazuje strony, a katalogi kolekcji są w nim węzłami tylko do odczytu, pod którymi można tworzyć wpisy.
+
+          ## 11. Sprawdź pełny przepływ
+
+          Sukces oznacza więcej niż widoczną stronę główną. Zweryfikuj kolejno: odpowiedź HTML, health endpoint, logowanie, odczyt listy stron, otwarcie buildera istniejącej strony oraz zapis testowej zmiany. Zapis treści korzysta z rewizji SHA-256, blokady i atomowej zamiany pliku; nieaktualny formularz powinien otrzymać HTTP 409 zamiast nadpisać nowszą wersję.
+
+          Na środowisku produkcyjnym ostatnim testem przed przełączeniem ruchu jest:
+
+          ```bash
+          php bin/cms release:check
+          ```
+
+          Kontrola obejmuje runtime i rozszerzenia, production guard, prawa zapisu, konfigurację, zlokalizowaną nawigację, wszystkie bloki stron, layouty, schemat SQLite i wymagane pliki wdrożeniowe. Każdy wpis `[FAIL]` blokuje wydanie; nie traktuj tej komendy jako raportu informacyjnego.
+        en: |-
+          ## 10. Start the development server
+
+          Run this from the project root:
+
+          ```bash
+          php -S localhost:8080 -t public public/router.php
+          ```
+
+          `-t public` sets the document root to the safe public directory. `public/router.php` emulates rewrite rules: the built-in server handles existing static assets, while all other requests are delegated to the `public/index.php` front controller.
+
+          Open these URLs in order:
+
+          - `http://localhost:8080/` for a single-language setup, or the correct locale prefix with several languages;
+          - `http://localhost:8080/api/v1/health` to check the public API health endpoint;
+          - `http://localhost:8080/admin/login` for the administrator login form.
+
+          With Polish and English enabled, public pages require a prefix such as `/pl/` or `/en/`. An unprefixed URL should not be treated as a stable multilingual content link. After signing in, visit `/admin/pages`: the tree shows pages, while collection directories appear as read-only nodes under which entries can be created.
+
+          ## 11. Verify the complete flow
+
+          Success means more than a visible homepage. Check HTML output, the health endpoint, login, the page list, the builder for an existing page and a test save. Content writes use a SHA-256 revision, a lock and atomic file replacement; a stale form should receive HTTP 409 rather than overwrite a newer version.
+
+          In production, the final test before switching traffic is:
+
+          ```bash
+          php bin/cms release:check
+          ```
+
+          This checks the runtime and extensions, production guard, write permissions, configuration, all localized navigation, every page block, layouts, the SQLite schema and required deployment files. Every `[FAIL]` blocks the release; do not treat this command as an informational report.
+      note:
+        pl: Lokalny serwer PHP służy do developmentu. Produkcja powinna używać konfiguracji z `deploy/` i wskazywać dokument root wyłącznie na `public/`.
+        en: PHP's built-in server is for development. Production should use a configuration from `deploy/` and point its document root exclusively at `public/`.
+  - id: 01a05ef2-2002-7409-8409-000000000009
+    type: diagnostic-table
+    enabled: true
+    data:
+      anchor: diagnostyka
+      eyebrow:
+        pl: 12 / Diagnostyka
+        en: 12 / Troubleshooting
+      title:
+        pl: Diagnozuj od najniższej warstwy.
+        en: Troubleshoot from the lowest layer.
+      intro:
+        pl: Zacznij od warstwy wykonawczej i przechodź wyżej dopiero po jej potwierdzeniu. Objaw widoczny w przeglądarce często ma źródło w PHP, rozszerzeniu albo prawach systemu plików, zanim żądanie dotrze do routera CMS-a.
+        en: Start at the runtime layer and move upward only after confirming it. A browser-visible symptom often originates in PHP, an extension or filesystem permissions before the request reaches the CMS router.
+      rows:
+        - layer: { pl: Composer, en: Composer }
+          problem:
+            pl: Brak pliku vendor/autoload.php
+            en: vendor/autoload.php is missing
+          cause:
+            pl: Nie wykonano instalacji zależności albo polecenie uruchomiono poza katalogiem głównym projektu.
+            en: Dependencies were not installed, or the command was run outside the project root.
+          check:
+            pl: Przejdź do katalogu zawierającego `composer.lock`, wykonaj `composer install` i sprawdź, czy powstał plik `vendor/autoload.php`.
+            en: Enter the directory containing `composer.lock`, run `composer install` and confirm that `vendor/autoload.php` was created.
+        - layer: { pl: PHP, en: PHP }
+          problem:
+            pl: Brak klasy albo błąd składni po wdrożeniu
+            en: Missing class or syntax error after deployment
+          cause:
+            pl: Serwer korzysta z nieobsługiwanej wersji PHP albo checkout i katalog vendor pochodzą z różnych wydań.
+            en: The server uses an unsupported PHP version, or the checkout and vendor directory come from different releases.
+          check:
+            pl: Porównaj `php -v` dla CLI z wersją PHP-FPM. Następnie wykonaj `composer install` z aktualnego lockfile i uruchom `composer check`.
+            en: Compare CLI `php -v` with the PHP-FPM version. Then run `composer install` from the current lockfile and execute `composer check`.
+        - layer: { pl: SQLite, en: SQLite }
+          problem:
+            pl: Komunikat „could not find driver”
+            en: “could not find driver” message
+          cause:
+            pl: PDO jest dostępne, ale bieżący runtime nie ma załadowanego sterownika pdo_sqlite.
+            en: PDO is available, but the current runtime has not loaded the pdo_sqlite driver.
+          check:
+            pl: Wykonaj `php --ini` i `php -m`. Sprawdź osobno plik konfiguracyjny procesu PHP-FPM, ponieważ CLI może używać innego `php.ini`.
+            en: Run `php --ini` and `php -m`. Inspect the PHP-FPM configuration separately because the CLI may use a different `php.ini`.
+        - layer: { pl: Filesystem, en: Filesystem }
+          problem:
+            pl: Nie można utworzyć SQLite, sesji lub cache
+            en: SQLite, a session or cache cannot be created
+          cause:
+            pl: Proces PHP nie ma prawa zapisu, katalog ma niewłaściwego właściciela albo jest niedozwolonym dowiązaniem symbolicznym.
+            en: The PHP process lacks write permission, the directory has the wrong owner or it is a forbidden symbolic link.
+          check:
+            pl: Sprawdź wyłącznie właściwy podkatalog `storage/`, jego właściciela i ścieżkę rzeczywistą. Nie ustawiaj rekursywnie uprawnień `777` dla projektu.
+            en: Check only the relevant `storage/` subdirectory, its owner and real path. Do not recursively assign `777` permissions to the project.
+        - layer: { pl: Environment, en: Environment }
+          problem:
+            pl: Aplikacja produkcyjna odmawia startu
+            en: The production application refuses to start
+          cause:
+            pl: ProductionGuard wykrył debugowanie, słaby lub przykładowy sekret albo niezabezpieczone cookie administratora.
+            en: ProductionGuard detected debugging, a weak or example secret, or an insecure administrator cookie.
+          check:
+            pl: Ustaw `APP_DEBUG=0`, silny `APP_SECRET` i `SESSION_COOKIE_SECURE=1`. Napraw konfigurację środowiska zamiast omijać strażnika w kodzie.
+            en: Set `APP_DEBUG=0`, a strong `APP_SECRET` and `SESSION_COOKIE_SECURE=1`. Fix the environment instead of bypassing the guard in code.
+        - layer: { pl: Routing, en: Routing }
+          problem:
+            pl: Istniejąca strona zwraca HTTP 404
+            en: An existing page returns HTTP 404
+          cause:
+            pl: Strona jest wyłączona, slug nie odpowiada locale, brakuje prefiksu języka albo publiczny URL pomylono z tożsamością katalogu.
+            en: The page is disabled, its slug does not match the locale, the language prefix is missing or the public URL was confused with directory identity.
+          check:
+            pl: Sprawdź `enabled`, lokalizowany `slug`, `config/languages.yml` i adres z `/pl/` albo `/en/`. W razie potrzeby wykonaj `php bin/cms cache:clear`.
+            en: Check `enabled`, the localized `slug`, `config/languages.yml` and the `/pl/` or `/en/` URL. Run `php bin/cms cache:clear` if necessary.
+        - layer: { pl: Współbieżność, en: Concurrency }
+          problem:
+            pl: Formularz zapisu zwraca HTTP 409
+            en: A save form returns HTTP 409
+          cause:
+            pl: Od otwarcia formularza inny zapis utworzył nowszą rewizję SHA-256 dokumentu YAML.
+            en: Another write created a newer SHA-256 revision of the YAML document after the form was opened.
+          check:
+            pl: Odśwież edytor, przenieś własne zmiany na aktualną treść i zapisz ponownie. Konflikt chroni nowszą wersję przed nadpisaniem.
+            en: Refresh the editor, reapply your changes to the current content and save again. The conflict protects the newer version from being overwritten.
+      note:
+        pl: Najpierw runtime, potem zależności, konfiguracja, baza i dopiero routing. Taka kolejność zwykle wskazuje rzeczywistą przyczynę bez zgadywania.
+        en: Check the runtime first, then dependencies, configuration, database and finally routing. This order usually reveals the real cause without guesswork.
+  - id: 01a05ef2-2002-7411-8411-000000000011
+    type: article-content
+    enabled: true
+    data:
+      anchor: checklista
+      content:
+        pl: |-
+          ## 13. Checklista gotowości
+
+          Instalację można uznać za zakończoną, gdy:
+
+          1. `php -v`, `php -m` i Composer spełniają wymagania;
+          2. `composer install` odtworzył zależności z lockfile;
+          3. `composer check` przechodzi bez błędów;
+          4. `.env.local` zawiera unikalny sekret i nie jest commitowany;
+          5. `config/setup.yml` ma właściwy `site.url`;
+          6. `php bin/cms install` utworzył pierwsze konto;
+          7. strona, health endpoint i logowanie odpowiadają;
+          8. katalog publiczny serwera wskazuje wyłącznie `public/`.
+
+          Następny tutorial przejdzie od używania gotowych komponentów do stworzenia własnego bloku: schematu `block.yml`, renderera PHP, pól tłumaczalnych, repeaterów, walidacji i zasobów ładowanych tylko wtedy, gdy blok występuje na stronie.
+        en: |-
+          ## 13. Readiness checklist
+
+          Installation is complete when:
+
+          1. `php -v`, `php -m` and Composer satisfy the requirements;
+          2. `composer install` has reproduced dependencies from the lockfile;
+          3. `composer check` passes without errors;
+          4. `.env.local` contains a unique secret and is not committed;
+          5. `config/setup.yml` has the correct `site.url`;
+          6. `php bin/cms install` has created the first account;
+          7. the site, health endpoint and login respond;
+          8. the server's document root points exclusively at `public/`.
+
+          The next tutorial moves from using ready-made components to creating a custom block: its `block.yml` schema, PHP renderer, translatable fields, repeaters, validation and assets loaded only when the block appears on a page.
+      note:
+        pl: Traktuj tę listę jako warunek zakończenia instalacji, a nie tylko zestaw opcjonalnych testów.
+        en: Treat this list as the installation completion condition, not merely a set of optional tests.
+  - id: 01a05ef2-2002-7410-8410-000000000010
+    type: call-to-action
+    enabled: true
+    data:
+      eyebrow:
+        pl: Kod źródłowy
+        en: Source code
+      title:
+        pl: Masz działające środowisko. Teraz poznaj jego kontrakty.
+        en: Your environment works. Now learn its contracts.
+      description:
+        pl: Zachowaj ten tutorial jako checklistę instalacji, a następnie przejdź do repozytorium i porównuj każdy kolejny rozdział z rzeczywistym kodem frameworka.
+        en: Keep this tutorial as your installation checklist, then open the repository and compare every following chapter with the framework's actual code.
+      button_label:
+        pl: Otwórz repozytorium
+        en: Open the repository
+      button_url:
+        pl: https://github.com/mwojczewski/FlatFileCMS
+        en: https://github.com/mwojczewski/FlatFileCMS

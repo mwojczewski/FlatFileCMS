@@ -1,0 +1,100 @@
+.technical-table {
+  padding: 0 0 clamp(4rem, 8vw, 7rem);
+  background: #fff;
+  color: #0b1713;
+}
+.technical-table__heading {
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 44rem);
+  gap: 3rem;
+  margin-bottom: 2.5rem;
+}
+.technical-table__heading > p {
+  margin: 0;
+  color: #0d6348;
+  font: 700 0.65rem ui-monospace, monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.technical-table__heading h2 {
+  margin: 0;
+  font-size: clamp(1.9rem, 3vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+.technical-table__heading div p {
+  max-width: 42rem;
+  margin: 1rem 0 0;
+  color: #52645d;
+  line-height: 1.7;
+}
+.technical-table__grid {
+  border-top: 1px solid #bac9c3;
+  border-left: 1px solid #d7e0dc;
+}
+.technical-table__row {
+  display: grid;
+  grid-template-columns: 0.8fr 0.9fr 1.6fr 0.9fr;
+}
+.technical-table__row > * {
+  min-width: 0;
+  padding: 1rem;
+  border-right: 1px solid #d7e0dc;
+  border-bottom: 1px solid #d7e0dc;
+  color: #52645d;
+  font-size: 0.77rem;
+  line-height: 1.6;
+}
+.technical-table__row strong {
+  color: #0d6348;
+}
+.technical-table__row--head {
+  background: #0c1914;
+}
+.technical-table__row--head span {
+  color: #c7d5d0;
+  font: 650 0.62rem ui-monospace, monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+@media (max-width: 800px) {
+  .technical-table__heading {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .technical-table__grid {
+    border: 0;
+  }
+  .technical-table__row {
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid #cbd8d2;
+    background: #f4f7f5;
+  }
+  .technical-table__row > * {
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    gap: 1rem;
+    border: 0;
+    border-bottom: 1px solid #d7e0dc;
+  }
+  .technical-table__row > *::before {
+    content: attr(data-label);
+    color: #0d6348;
+    font: 700 0.6rem ui-monospace, monospace;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .technical-table__row > *:last-child {
+    border-bottom: 0;
+  }
+  .technical-table__row.technical-table__row--head {
+    display: none;
+  }
+}
+@media (max-width: 520px) {
+  .technical-table__row > * {
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+  }
+}

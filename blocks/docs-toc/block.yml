@@ -1,0 +1,48 @@
+schemaVersion: 1
+name: { pl: Spis treści dokumentacji, en: Documentation table of contents }
+description: { pl: Responsywna mapa rozdziałów tutorialu., en: A responsive map of tutorial chapters. }
+icon: list
+fields:
+  title:
+    type: text
+    required: true
+    translatable: true
+    maxLength: 120
+    label: { pl: Tytuł, en: Title }
+  intro:
+    type: textarea
+    required: true
+    translatable: true
+    maxLength: 500
+    label: { pl: Wprowadzenie, en: Introduction }
+  items:
+    type: repeater
+    required: true
+    translatable: false
+    minItems: 2
+    maxItems: 12
+    label: { pl: Rozdziały, en: Chapters }
+    fields:
+      number:
+        type: text
+        required: true
+        translatable: false
+        maxLength: 4
+        label: { pl: Numer, en: Number }
+      title:
+        type: text
+        required: true
+        translatable: true
+        maxLength: 90
+        label: { pl: Tytuł, en: Title }
+      description:
+        type: text
+        required: true
+        translatable: true
+        maxLength: 180
+        label: { pl: Opis, en: Description }
+      url:
+        type: url
+        required: true
+        translatable: true
+        label: { pl: Adres, en: URL }

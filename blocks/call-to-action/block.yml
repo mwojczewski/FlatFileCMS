@@ -40,6 +40,6 @@ fields:
     {
       type: url,
       required: true,
-      translatable: false,
+      translatable: true,
       label: { pl: Adres, en: URL },
     }

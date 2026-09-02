@@ -2,14 +2,14 @@ main:
   - label: { pl: Możliwości, en: Features }
     link: { type: page, page: features }
     target: _self
+  - label: { pl: Dokumentacja, en: Docs }
+    link: { type: collection, collection: documentation }
+    target: _self
   - label: { pl: Architektura, en: Architecture }
     link: { type: url, url: "/#architektura" }
     target: _self
-  - label: { pl: Dla deweloperów, en: Developers }
-    link: { type: url, url: "/#developer-experience" }
-    target: _self
   - label: { pl: API, en: API }
-    link: { type: url, url: /api/v1/pages/homepage }
+    link: { type: url, url: /api/v1/pages }
     target: _blank
   - label: { pl: Insights, en: Insights }
     link: { type: collection, collection: insights }

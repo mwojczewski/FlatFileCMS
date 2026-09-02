@@ -1,0 +1,36 @@
+schemaVersion: 1
+type: collection
+enabled: true
+layout: insights
+slug:
+  pl: dokumentacja
+  en: documentation
+title:
+  pl: Dokumentacja
+  en: Documentation
+seo:
+  title:
+    pl: Dokumentacja FlatFile CMS
+    en: FlatFile CMS documentation
+  description:
+    pl: Techniczne tutoriale prowadzące od instalacji FlatFile CMS przez bloki, model treści, rendering i API aż po bezpieczeństwo oraz wdrożenie.
+    en: Technical tutorials covering FlatFile CMS from installation through blocks, content modelling, rendering and the API to security and deployment.
+source: children
+sort:
+  field: order
+  direction: asc
+pagination:
+  perPage: 12
+filters:
+  - parameter: category
+    field: category
+    allowedValues:
+      [
+        getting-started,
+        blocks,
+        content-structure,
+        rendering,
+        api,
+        security,
+        deployment,
+      ]
