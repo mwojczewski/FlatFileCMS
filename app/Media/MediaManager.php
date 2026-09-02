@@ -12,6 +12,7 @@ use FlatFileCms\Infrastructure\Filesystem\AtomicFileWriter;
 use FlatFileCms\Infrastructure\Filesystem\FileLockManager;
 use FlatFileCms\Infrastructure\Filesystem\FileRevision;
 use FlatFileCms\Infrastructure\Filesystem\FilesystemRoot;
+use FlatFileCms\Infrastructure\Filesystem\RelativePath;
 use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
 use RuntimeException;
 
@@ -76,16 +77,48 @@ final readonly class MediaManager
             if ($this->containsReference($editable->data(), $name->value())) {
                 throw new MediaException('Media file is still referenced by page content.');
             }
-            $this->media->get($identity, $name);
+            $sourceHash = $this->media->get($identity, $name)->item()->hash();
             $path = $this->paths->resolve(
                 FilesystemRoot::Pages,
                 $this->media->relativePath($identity, $name),
                 mustExist: true,
             );
-            if (!is_file($path) || is_link($path) || !unlink($path)) {
-                throw new MediaException('Media file could not be deleted.');
-            }
+            $this->locks->exclusive('media-variants:' . $sourceHash, function () use ($path, $sourceHash): void {
+                $this->removeVariantCache($sourceHash);
+                if (!is_file($path) || is_link($path) || !unlink($path)) {
+                    throw new MediaException('Media file could not be deleted.');
+                }
+            });
         });
+    }
+
+    private function removeVariantCache(string $sourceHash): void
+    {
+        $directory = $this->paths->resolve(
+            FilesystemRoot::Storage,
+            RelativePath::fromString(
+                'cache/media/' . substr($sourceHash, 0, 2) . "/{$sourceHash}",
+            ),
+        );
+        if (!is_dir($directory) || is_link($directory)) {
+            return;
+        }
+        $entries = scandir($directory);
+        if ($entries === false) {
+            throw new MediaException('Media variant cache could not be read.');
+        }
+        foreach ($entries as $entry) {
+            if ($entry === '.' || $entry === '..') {
+                continue;
+            }
+            $candidate = "{$directory}/{$entry}";
+            if (is_link($candidate) || !is_file($candidate) || !unlink($candidate)) {
+                throw new MediaException('Media variant cache could not be removed.');
+            }
+        }
+        if (!rmdir($directory)) {
+            throw new MediaException('Media variant cache directory could not be removed.');
+        }
     }
 
     private function availableName(PageIdentity $identity, MediaName $base): MediaName

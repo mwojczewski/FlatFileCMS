@@ -61,13 +61,20 @@ button:focus-visible {
   outline-offset: 4px;
 }
 .site-header {
-  position: absolute;
-  z-index: 10;
+  position: fixed;
+  z-index: 100;
   top: 0;
   left: 0;
   width: 100%;
-  border-bottom: 1px solid rgba(127, 163, 150, 0.18);
+  border-bottom: 1px solid rgba(127, 163, 150, 0.2);
+  background: rgba(7, 17, 15, 0.94);
+  box-shadow: 0 0.5rem 2rem rgba(3, 11, 8, 0.12);
   color: #f3faf7;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition:
+    background-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
 .site-header__inner {
   display: flex;
@@ -75,6 +82,14 @@ button:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 2rem;
+  transition: min-height 0.25s ease;
+}
+.site-header.is-compact {
+  background: rgba(7, 17, 15, 0.98);
+  box-shadow: 0 0.65rem 2rem rgba(3, 11, 8, 0.24);
+}
+.site-header.is-compact .site-header__inner {
+  min-height: 4rem;
 }
 .site-brand {
   display: flex;
@@ -115,7 +130,7 @@ button:focus-visible {
   display: none;
 }
 .site-nav a {
-  color: #a9bab4;
+  color: #b8c8c2;
   font-size: 0.75rem;
   font-weight: 650;
   text-decoration: none;
@@ -125,7 +140,7 @@ button:focus-visible {
 }
 .site-header__admin {
   padding: 0.65rem 1rem;
-  border: 1px solid #365149;
+  border: 1px solid #416258;
   border-radius: 0.2rem;
   color: #e9f2ee;
   font-size: 0.72rem;
@@ -174,6 +189,9 @@ button:focus-visible {
     monospace;
 }
 @media (max-width: 760px) {
+  .site-header:has(.menu-toggle[aria-expanded="true"]) .site-header__inner {
+    min-height: 5.5rem;
+  }
   .site-nav {
     display: none;
   }

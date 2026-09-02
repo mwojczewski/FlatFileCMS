@@ -14,9 +14,11 @@ use FlatFileCms\Blocks\BlockValidator;
 use FlatFileCms\Blocks\BuiltinFieldTypes;
 use FlatFileCms\Cli\BlockScaffolder;
 use FlatFileCms\Cli\CacheClearer;
+use FlatFileCms\Cli\CachePruner;
 use FlatFileCms\Cli\ConsoleApplication;
 use FlatFileCms\Cli\PasswordReader;
 use FlatFileCms\Cli\ReleaseChecker;
+use FlatFileCms\Cli\RuntimePruner;
 use FlatFileCms\Cli\UserCommandService;
 use FlatFileCms\Collections\CollectionRepository;
 use FlatFileCms\Config\ConfigurationRepository;
@@ -99,6 +101,8 @@ $console = new ConsoleApplication(
     $users,
     new PasswordReader(),
     new CacheClearer($paths),
+    new CachePruner($paths),
+    new RuntimePruner($paths),
     $release,
 );
 

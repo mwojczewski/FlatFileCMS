@@ -1,0 +1,209 @@
+schemaVersion: 1
+enabled: true
+layout: default
+slug:
+  pl: obrazy-w-katalogu-i-kodzie-strony
+  en: images-in-page-directories-and-code
+title:
+  pl: Obrazy w katalogu i kodzie strony — od pliku do responsywnego HTML
+  en: Images in page directories and code — from file to responsive HTML
+date: "2026-09-01"
+category: media
+excerpt:
+  pl: Praktyczny przewodnik po dodawaniu obrazu do katalogu strony, konfiguracji YAML i bezpiecznym renderowaniu w PHP.
+  en: A practical guide to adding an image to a page directory, configuring YAML and rendering it safely in PHP.
+seo:
+  title:
+    pl: Jak dodawać obrazy do stron FlatFile CMS
+    en: How to add images to FlatFile CMS pages
+  description:
+    pl: Dowiedz się, gdzie zapisać plik obrazu, jak odwołać się do niego w YAML i wyrenderować responsywny HTML w bloku PHP.
+    en: Learn where to store an image, how to reference it in YAML and render responsive HTML in a PHP block.
+blocks:
+  - id: 01a05d61-1001-7301-8301-000000000001
+    type: article-hero
+    enabled: true
+    data:
+      category: { pl: Media, en: Media }
+      date: "2026-09-01"
+      title:
+        pl: Obrazy w katalogu i kodzie strony
+        en: Images in page directories and code
+      lead:
+        pl: Plik trafia do katalogu strony, YAML opisuje jego użycie, a bezpieczny renderer PHP zamienia go w gotowy, fingerprintowany HTML. Prześledźmy cały proces.
+        en: The file lives beside the page, YAML describes its use, and a safe PHP renderer turns it into fingerprinted HTML. Let’s follow the complete workflow.
+      image:
+        src: cover.png
+        alt:
+          pl: Ilustracja przepływu obrazu z katalogu przez YAML do gotowej strony
+          en: An illustration of an image flowing from a directory through YAML into a finished page
+  - id: 01a05d61-1001-7302-8302-000000000002
+    type: article-content
+    enabled: true
+    data:
+      content:
+        pl: |-
+          ## Obraz należy do strony, która go używa
+
+          Media używane przez konkretną stronę zapisujemy bezpośrednio w jej stabilnym katalogu. Dla tego artykułu struktura wygląda następująco:
+
+          ```text
+          pages/insights/obrazy-w-tresci/
+          ├── content.yml
+          └── cover.png
+          ```
+
+          Taki układ ma kilka praktycznych zalet. Treść i jej pliki można przenieść razem, historia zmian pozostaje czytelna w Git, a nazwa publicznego slugu nie wpływa na fizyczne położenie obrazu.
+
+          Warto używać krótkich nazw bez spacji, na przykład `cover.webp`, `diagram-pipeline.png` albo `gallery-01.jpg`. Plik musi mieć format dopuszczony w `config/setup.yml` i mieścić się w skonfigurowanym limicie rozmiaru.
+
+          ## Referencja w content.yml
+
+          Pole typu `image` nie przyjmuje dowolnego adresu URL. Wskazuje bezpieczną ścieżkę względną wewnątrz katalogu strony:
+
+          ```yaml
+          image:
+            src: cover.png
+            alt:
+              pl: Obraz przechodzący przez pipeline CMS-a
+              en: An image passing through the CMS pipeline
+          ```
+
+          `src` pozostaje wspólne dla wszystkich języków, natomiast tekst alternatywny opisuje konkretne użycie obrazu i może być tłumaczony. To ważne: ALT nie jest globalną właściwością pliku — ten sam obraz może pełnić inną funkcję w hero i inną w galerii.
+
+          Podczas walidacji CMS sprawdza, czy plik istnieje, czy ścieżka nie wychodzi poza katalog strony oraz czy rozszerzenie odpowiada obsługiwanemu obrazowi. Próby użycia `../`, symlinków albo nieistniejących plików są odrzucane przed zapisem treści.
+
+          ## Pole obrazu w definicji bloku
+
+          Aby edytor mógł wybrać obraz w panelu, schemat bloku deklaruje pole `image`:
+
+          ```yaml
+          fields:
+            image:
+              type: image
+              required: true
+              translatable: false
+              label:
+                pl: Okładka
+                en: Cover
+          ```
+
+          Ta pojedyncza deklaracja zasila formularz administracyjny, walidację danych, lokalizację tekstu ALT oraz publiczne API. Kontroler nie potrzebuje specjalnej obsługi dla konkretnego bloku.
+
+          ## Renderowanie w PHP
+
+          Renderer otrzymuje już znormalizowane i wzbogacone dane. Najbezpieczniejsza forma wyświetlenia obrazu korzysta z kontekstu renderowania:
+
+          ```php
+          <figure class="article-cover">
+              <?= $context->image($data['image']) ?>
+          </figure>
+          ```
+
+          Metoda `image()` generuje adres publiczny z fingerprintem, tekst ALT i — gdy są dostępne — rzeczywiste wymiary pliku. Dzięki temu przeglądarka może zarezerwować miejsce przed pobraniem grafiki i ograniczyć przesunięcia layoutu.
+
+          Dla bardziej rozbudowanego markupu można użyć `picture()` oraz wariantów mediów. Renderer nadal nie buduje ścieżek ręcznie i nie odczytuje plików z dysku.
+
+          ## Oryginał, warianty i cache
+
+          Po pierwszym użyciu warstwa mediów analizuje plik i może wygenerować kontrolowane warianty rastrowe. Konfiguracja określa maksymalne wymiary, jakość, limit pikseli oraz formaty takie jak WebP i AVIF.
+
+          Fingerprint w publicznym adresie zmienia się razem z zawartością obrazu. Można więc ustawić długi cache bez ryzyka, że po podmianie pliku użytkownik nadal zobaczy poprzednią wersję.
+
+          ## Galeria używa tego samego kontraktu
+
+          Repeater nie zmienia zasad. Każdy element galerii zawiera pole `image` i własny, tłumaczony podpis. CMS waliduje ścieżkę każdego pliku, a renderer iteruje wyłącznie po gotowych danych.
+
+          Właśnie w ten sposób zbudowana jest galeria poniżej — wykorzystuje tę samą `cover.png`, ale opisuje jej rolę niezależnym ALT-em i podpisem.
+        en: |-
+          ## An image belongs to the page that uses it
+
+          Media used by one page is stored directly inside that page’s stable directory. For this article, the structure looks like this:
+
+          ```text
+          pages/insights/obrazy-w-tresci/
+          ├── content.yml
+          └── cover.png
+          ```
+
+          This layout keeps content and files portable, makes Git history easy to understand and ensures that changing a public slug never moves the physical image.
+
+          Prefer short filenames without spaces, such as `cover.webp`, `diagram-pipeline.png` or `gallery-01.jpg`. The file format must be allowed by `config/setup.yml` and remain within the configured upload limit.
+
+          ## Referencing the file in content.yml
+
+          An `image` field does not accept an arbitrary URL. It points to a safe path relative to the page directory:
+
+          ```yaml
+          image:
+            src: cover.png
+            alt:
+              pl: Obraz przechodzący przez pipeline CMS-a
+              en: An image passing through the CMS pipeline
+          ```
+
+          `src` is shared by every language, while alternative text describes this particular use and can be translated. ALT is not a global property of the file — one image may play a different role in a hero and in a gallery.
+
+          During validation, the CMS checks that the file exists, that its path stays inside the page directory and that its extension represents a supported image. Attempts to use `../`, symlinks or missing files are rejected before content is written.
+
+          ## Declaring an image in a block
+
+          The block schema declares an `image` field so editors can select the file in the admin panel:
+
+          ```yaml
+          fields:
+            image:
+              type: image
+              required: true
+              translatable: false
+              label:
+                pl: Okładka
+                en: Cover
+          ```
+
+          This single declaration powers the admin form, data validation, ALT localization and the public API. No block-specific controller code is required.
+
+          ## Rendering in PHP
+
+          The renderer receives normalized and enriched data. The safest way to display the image uses the rendering context:
+
+          ```php
+          <figure class="article-cover">
+              <?= $context->image($data['image']) ?>
+          </figure>
+          ```
+
+          `image()` emits a fingerprinted public URL, alternative text and — when available — the image’s intrinsic dimensions. The browser can reserve space before downloading the file, reducing layout shifts.
+
+          More advanced markup can use `picture()` and controlled media variants. The renderer still never assembles filesystem paths or reads files directly.
+
+          ## Originals, variants and caching
+
+          On first use, the media layer inspects the original and can produce controlled raster variants. Configuration defines maximum dimensions, quality, pixel limits and output formats such as WebP and AVIF.
+
+          The fingerprint in the public URL changes with the image content. Long-lived caching is therefore safe: replacing the file automatically produces a new URL.
+
+          ## Galleries use the same contract
+
+          A repeater does not change these rules. Every gallery item contains an `image` field and its own translated caption. The CMS validates every path, while the renderer iterates only over ready-to-use data.
+
+          The gallery below follows exactly this pattern — it uses the same `cover.png`, but describes its role with an independent ALT and caption.
+      note:
+        pl: Nie wpisuj `/pages/...` ani publicznego `/media/...` w polu `src`. Zapisz wyłącznie bezpieczną ścieżkę względną, na przykład `cover.png`.
+        en: Do not put `/pages/...` or a public `/media/...` URL in `src`. Store only a safe relative path such as `cover.png`.
+  - id: 01a05d61-1001-7303-8303-000000000003
+    type: article-gallery
+    enabled: true
+    data:
+      title:
+        pl: Od pliku lokalnego do obrazu gotowego dla przeglądarki
+        en: From a local file to a browser-ready image
+      images:
+        - image:
+            src: cover.png
+            alt:
+              pl: Schemat katalogu, konfiguracji YAML i wyrenderowanej strony
+              en: A diagram of a directory, YAML configuration and a rendered page
+          caption:
+            pl: Jeden plik pozostaje lokalny dla strony, a CMS bezpiecznie wzbogaca go o publiczny URL i metadane.
+            en: One file remains local to the page while the CMS safely enriches it with a public URL and metadata.

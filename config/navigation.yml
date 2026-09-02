@@ -1,6 +1,6 @@
 main:
   - label: { pl: Możliwości, en: Features }
-    link: { type: url, url: "/#mozliwosci" }
+    link: { type: page, page: features }
     target: _self
   - label: { pl: Architektura, en: Architecture }
     link: { type: url, url: "/#architektura" }
@@ -17,7 +17,7 @@ main:
 
 footer:
   - label: { pl: Możliwości, en: Features }
-    link: { type: url, url: "/#mozliwosci" }
+    link: { type: page, page: features }
     target: _self
   - label: { pl: Architektura, en: Architecture }
     link: { type: url, url: "/#architektura" }

@@ -1,0 +1,72 @@
+schemaVersion: 1
+name: { pl: Nagłówek dokumentacji, en: Documentation hero }
+description:
+  {
+    pl: Kompaktowy nagłówek tutorialu technicznego.,
+    en: Compact technical tutorial heading.,
+  }
+icon: book-open
+fields:
+  breadcrumb:
+    {
+      type: text,
+      required: true,
+      translatable: true,
+      maxLength: 100,
+      label: { pl: Breadcrumb, en: Breadcrumb },
+    }
+  title:
+    {
+      type: text,
+      required: true,
+      translatable: true,
+      maxLength: 180,
+      label: { pl: Tytuł, en: Title },
+    }
+  lead:
+    {
+      type: textarea,
+      required: true,
+      translatable: true,
+      maxLength: 700,
+      label: { pl: Wprowadzenie, en: Introduction },
+    }
+  level:
+    {
+      type: select,
+      required: true,
+      translatable: false,
+      options: [podstawowy, średniozaawansowany, zaawansowany],
+      label: { pl: Poziom, en: Level },
+    }
+  reading_time:
+    {
+      type: text,
+      required: true,
+      translatable: true,
+      maxLength: 40,
+      label: { pl: Czas czytania, en: Reading time },
+    }
+  updated:
+    {
+      type: date,
+      required: true,
+      translatable: false,
+      label: { pl: Aktualizacja, en: Updated },
+    }
+  topics:
+    type: repeater
+    required: true
+    translatable: false
+    minItems: 3
+    maxItems: 8
+    label: { pl: Tematy, en: Topics }
+    fields:
+      label:
+        {
+          type: text,
+          required: true,
+          translatable: true,
+          maxLength: 50,
+          label: { pl: Etykieta, en: Label },
+        }

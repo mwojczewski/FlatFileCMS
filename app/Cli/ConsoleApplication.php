@@ -20,6 +20,8 @@ final readonly class ConsoleApplication
         private Closure $users,
         private PasswordReader $passwords,
         private CacheClearer $cache,
+        private CachePruner $cachePruner,
+        private RuntimePruner $runtimePruner,
         private Closure $release,
     ) {}
 
@@ -37,6 +39,8 @@ final readonly class ConsoleApplication
             return match ($command) {
                 'block:create' => $this->createBlock(\array_slice($arguments, 2)),
                 'cache:clear' => $this->clearCache(\array_slice($arguments, 2)),
+                'cache:prune' => $this->pruneCache(\array_slice($arguments, 2)),
+                'runtime:prune' => $this->pruneRuntime(\array_slice($arguments, 2)),
                 'database:migrate' => $this->migrateDatabase(\array_slice($arguments, 2)),
                 'release:check' => $this->releaseCheck(\array_slice($arguments, 2)),
                 'install' => $this->createUser($arguments[2] ?? null, Role::Superadmin, install: true),
@@ -126,6 +130,73 @@ final readonly class ConsoleApplication
     }
 
     /** @param list<string> $arguments */
+    private function pruneCache(array $arguments): int
+    {
+        $options = $this->pruneOptions($arguments, ['assets' => 604800, 'cache' => 2592000]);
+        $result = $this->cachePruner->prune(
+            $options['dryRun'],
+            $options['ages']['assets'],
+            $options['ages']['cache'],
+        );
+        $prefix = $options['dryRun'] ? 'Cache prune dry run' : 'Cache pruned';
+        $this->output(\sprintf("%s. %d file(s), %d byte(s).\n", $prefix, $result->files, $result->bytes));
+
+        return 0;
+    }
+
+    /** @param list<string> $arguments */
+    private function pruneRuntime(array $arguments): int
+    {
+        $options = $this->pruneOptions($arguments, ['sessions' => 86400]);
+        $result = $this->runtimePruner->prune($options['dryRun'], $options['ages']['sessions']);
+        $prefix = $options['dryRun'] ? 'Runtime prune dry run' : 'Runtime pruned';
+        $this->output(\sprintf("%s. %d file(s), %d byte(s).\n", $prefix, $result->files, $result->bytes));
+
+        return 0;
+    }
+
+    /**
+     * @param list<string> $arguments
+     * @param array<string, int> $defaults
+     * @return array{dryRun: bool, ages: array<string, int>}
+     */
+    private function pruneOptions(array $arguments, array $defaults): array
+    {
+        $dryRun = false;
+        foreach ($arguments as $argument) {
+            if ($argument === '--dry-run') {
+                $dryRun = true;
+                continue;
+            }
+            if (preg_match('/^--([a-z]+)-older-than=(.+)$/D', $argument, $matches) !== 1 || !isset($defaults[$matches[1]])) {
+                throw new InvalidArgumentException('Invalid prune option. See php bin/cms help.');
+            }
+            $defaults[$matches[1]] = $this->duration($matches[2]);
+        }
+
+        return ['dryRun' => $dryRun, 'ages' => $defaults];
+    }
+
+    private function duration(string $value): int
+    {
+        if (preg_match('/^([1-9][0-9]*)([smhd])$/D', $value, $matches) !== 1) {
+            throw new InvalidArgumentException('Duration must use a positive integer followed by s, m, h or d.');
+        }
+        $multiplier = match ($matches[2]) {
+            's' => 1,
+            'm' => 60,
+            'h' => 3600,
+            'd' => 86400,
+        };
+        $seconds = (int) $matches[1] * $multiplier;
+        if ($seconds < 1 || $seconds > 31536000) {
+            throw new InvalidArgumentException('Duration must not exceed 365 days.');
+        }
+
+        return $seconds;
+    }
+
+    /** @param list<string> $arguments */
     private function migrateDatabase(array $arguments): int
     {
         if ($arguments !== []) {
@@ -168,7 +239,7 @@ final readonly class ConsoleApplication
 
     private function help(): string
     {
-        return <<<'TEXT'
+        $help = <<<'TEXT'
 FlatFile CMS CLI
 
 Usage:
@@ -182,11 +253,17 @@ Commands:
   user:security-keys:clear <email>         Remove all WebAuthn/YubiKey credentials
   block:create <type> [--with-assets]      Create a developer block package
   cache:clear                              Remove all generated cache entries
+  cache:prune [--dry-run]                  Remove expired block assets and cache files
+    [--assets-older-than=7d] [--cache-older-than=30d]
+  runtime:prune [--dry-run]                Remove expired session files
+    [--sessions-older-than=1d]
   database:migrate                         Apply authentication database schema changes
   release:check                            Validate production runtime, content and deployment
 
 Set CMS_PASSWORD for non-interactive use. Avoid shell history and process arguments.
 TEXT;
+
+        return $help . "\n";
     }
 
     private function output(string $message): void

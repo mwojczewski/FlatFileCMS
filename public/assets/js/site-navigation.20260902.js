@@ -36,7 +36,19 @@ document.querySelectorAll(".site-header").forEach((header) => {
       button.focus();
     }
   });
-  window.matchMedia("(min-width: 761px)").addEventListener("change", close);
+
+  const desktop = window.matchMedia("(min-width: 761px)");
+  const handleDesktop = (event) => {
+    if (event.matches) {
+      close();
+    }
+  };
+
+  if (typeof desktop.addEventListener === "function") {
+    desktop.addEventListener("change", handleDesktop);
+  } else {
+    desktop.addListener(handleDesktop);
+  }
 });
 
 document.querySelectorAll(".site-header").forEach((header) => {

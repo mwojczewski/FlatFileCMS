@@ -1,0 +1,620 @@
+schemaVersion: 1
+enabled: true
+layout: default
+slug:
+  pl: mozliwosci
+  en: features
+title:
+  pl: Możliwości FlatFile CMS
+  en: FlatFile CMS features
+seo:
+  title:
+    pl: Możliwości FlatFile CMS — techniczny przewodnik
+    en: FlatFile CMS features — a technical guide
+  description:
+    pl: Techniczny przewodnik po blokach, SSR, REST API, kolekcjach, lokalizacji, mediach i bezpieczeństwie FlatFile CMS.
+    en: A technical guide to blocks, SSR, the REST API, collections, localization, media and security in FlatFile CMS.
+  robots:
+    index: true
+    follow: true
+  openGraph: {}
+  twitter: {}
+  jsonLd:
+    "@context": https://schema.org
+    "@type": TechArticle
+    headline: FlatFile CMS Features
+blocks:
+  - id: 01a05e10-1001-7401-8401-000000000001
+    type: docs-hero
+    enabled: true
+    data:
+      breadcrumb:
+        pl: Dokumentacja / Możliwości
+        en: Documentation / Features
+      title:
+        pl: Możliwości FlatFile CMS
+        en: FlatFile CMS features
+      lead:
+        pl: Techniczny przewodnik po kontraktach treści, systemie bloków, renderowaniu, kolekcjach, mediach i granicach bezpieczeństwa frameworka.
+        en: A technical guide to the framework’s content contracts, block system, rendering, collections, media and security boundaries.
+      level: średniozaawansowany
+      reading_time:
+        pl: około 18 minut
+        en: about 18 minutes
+      updated: "2026-09-02"
+      topics:
+        - label: { pl: YAML, en: YAML }
+        - label: { pl: Bloki, en: Blocks }
+        - label: { pl: SSR, en: SSR }
+        - label: { pl: REST API, en: REST API }
+        - label: { pl: Media, en: Media }
+        - label: { pl: Bezpieczeństwo, en: Security }
+  - id: 01a05e10-1001-7402-8402-000000000002
+    type: docs-navigation
+    enabled: true
+    data:
+      title:
+        pl: Jak czytać ten przewodnik
+        en: How to read this guide
+      intro:
+        pl: Zacznij od pipeline’u, a następnie przejdź przez kontrakty, adaptery publiczne, kolekcje i bezpieczeństwo. Każdy rozdział łączy decyzję architektoniczną z fragmentem konfiguracji lub kodu.
+        en: Start with the pipeline, then move through contracts, public adapters, collections and security. Every chapter connects an architectural decision with configuration or code.
+      items:
+        - number: "01"
+          title: { pl: Pipeline wykonania, en: Execution pipeline }
+          description:
+            {
+              pl: Droga od repozytorium YAML do odpowiedzi HTTP.,
+              en: The path from a YAML repository to an HTTP response.,
+            }
+          url:
+            { pl: /pl/mozliwosci#architektura, en: /en/features#architektura }
+        - number: "02"
+          title: { pl: Kontrakty i bloki, en: Contracts and blocks }
+          description:
+            {
+              pl: "Tożsamość strony, block.yml i bezpieczny renderer.",
+              en: "Page identity, block.yml and a safe renderer.",
+            }
+          url:
+            { pl: /pl/mozliwosci#content-model, en: /en/features#content-model }
+        - number: "03"
+          title: { pl: HTML i JSON, en: HTML and JSON }
+          description:
+            {
+              pl: Jeden ViewModel i dwa niezależne adaptery.,
+              en: One ViewModel and two independent adapters.,
+            }
+          url:
+            {
+              pl: /pl/mozliwosci#developer-experience,
+              en: /en/features#developer-experience,
+            }
+        - number: "04"
+          title: { pl: Kolekcje i media, en: Collections and media }
+          description:
+            {
+              pl: "Paginacja, allowlisty filtrów i pipeline obrazów.",
+              en: "Pagination, filter allowlists and the image pipeline.",
+            }
+          url:
+            {
+              pl: /pl/mozliwosci#collections-media,
+              en: /en/features#collections-media,
+            }
+        - number: "05"
+          title: { pl: Bezpieczeństwo zapisu, en: Write safety }
+          description:
+            {
+              pl: "Rewizje, blokady, atomowe pliki i audyt.",
+              en: "Revisions, locks, atomic files and audit.",
+            }
+          url:
+            {
+              pl: /pl/mozliwosci#security-tests,
+              en: /en/features#security-tests,
+            }
+        - number: "06"
+          title: { pl: Strategia testów, en: Testing strategy }
+          description:
+            {
+              pl: "Unit, repozytorium, HTTP oraz composer check.",
+              en: "Unit, repository, HTTP and composer check.",
+            }
+          url:
+            {
+              pl: /pl/mozliwosci#security-tests,
+              en: /en/features#security-tests,
+            }
+      matrix:
+        - layer: { pl: Content, en: Content }
+          input: { pl: YAML, en: YAML }
+          responsibility:
+            {
+              pl: "Odczyt, rewizje i stabilna tożsamość",
+              en: "Reads, revisions and stable identity",
+            }
+          output: { pl: Model domenowy, en: Domain model }
+        - layer: { pl: Blocks, en: Blocks }
+          input: { pl: Dane bloku, en: Block data }
+          responsibility:
+            {
+              pl: "Walidacja, normalizacja i lokalizacja",
+              en: "Validation, normalization and localization",
+            }
+          output: { pl: Normalized data, en: Normalized data }
+        - layer: { pl: ViewModel, en: ViewModel }
+          input: { pl: Strona i konfiguracja, en: Page and configuration }
+          responsibility:
+            {
+              pl: "SEO, nawigacja, media i aktywne bloki",
+              en: "SEO, navigation, media and enabled blocks",
+            }
+          output: { pl: Publiczny model, en: Public model }
+        - layer: { pl: Rendering, en: Rendering }
+          input: { pl: Publiczny model, en: Public model }
+          responsibility:
+            {
+              pl: Renderery bloków i layout PHP,
+              en: Block renderers and PHP layout,
+            }
+          output: { pl: HTML, en: HTML }
+        - layer: { pl: API, en: API }
+          input: { pl: Publiczny model, en: Public model }
+          responsibility:
+            { pl: Kontrolowana serializacja, en: Controlled serialization }
+          output: { pl: JSON, en: JSON }
+  - id: 01a05e10-1001-7404-8404-000000000004
+    type: architecture
+    enabled: true
+    data:
+      eyebrow:
+        pl: Pipeline wykonania
+        en: Execution pipeline
+      title:
+        pl: Od pliku do odpowiedzi HTTP.
+        en: From file to HTTP response.
+      intro:
+        pl: Repozytoria odpowiadają za odczyt kontraktów, procesory za poprawność danych, a adaptery renderujące nie powielają logiki domenowej.
+        en: Repositories read contracts, processors guarantee valid data and rendering adapters never duplicate domain logic.
+      steps:
+        - label: { pl: Repozytorium YAML, en: YAML repository }
+          detail:
+            {
+              pl: Bezpieczny odczyt stron i konfiguracji,
+              en: Safe page and configuration reads,
+            }
+        - label: { pl: Model domenowy, en: Domain model }
+          detail:
+            {
+              pl: "Tożsamość, widoczność i metadane",
+              en: "Identity, visibility and metadata",
+            }
+        - label: { pl: BlockProcessor, en: BlockProcessor }
+          detail:
+            {
+              pl: "Walidacja, normalizacja i lokalizacja",
+              en: "Validation, normalization and localization",
+            }
+        - label: { pl: PageViewModel, en: PageViewModel }
+          detail:
+            {
+              pl: "SEO, media, nawigacja i gotowe bloki",
+              en: "SEO, media, navigation and ready blocks",
+            }
+        - label: { pl: Adapter HTML lub JSON, en: HTML or JSON adapter }
+          detail:
+            {
+              pl: SSR albo publiczna projekcja API,
+              en: SSR or a public API projection,
+            }
+        - label: { pl: Cache HTTP, en: HTTP cache }
+          detail:
+            {
+              pl: "ETag, Last-Modified i rewalidacja",
+              en: "ETag, Last-Modified and revalidation",
+            }
+      note:
+        pl: Walidacja odbywa się przed renderowaniem i przed zapisem zmienionej treści.
+        en: Validation runs before rendering and before modified content is written.
+  - id: 01a05e10-1001-7405-8405-000000000005
+    type: article-content
+    enabled: true
+    data:
+      anchor: content-model
+      content:
+        pl: |-
+          ## 1. Zacznij od stabilnej tożsamości strony
+
+          Strona nie jest identyfikowana przez publiczny URL. Katalog `pages/features/` jest jej stabilną tożsamością techniczną, natomiast `slug.pl` i `slug.en` mogą zmieniać się niezależnie:
+
+          ```yaml
+          schemaVersion: 1
+          enabled: true
+          layout: default
+          slug:
+            pl: mozliwosci
+            en: features
+          title:
+            pl: Możliwości FlatFile CMS
+            en: FlatFile CMS features
+          blocks: []
+          ```
+
+          Przy dwóch aktywnych językach router buduje prefiksowane adresy `/pl/mozliwosci` i `/en/features`. Linki wewnętrzne przechowują tożsamość `features`, a `PageRouteIndex` rozwiązuje właściwy URL dla bieżącego locale. Dzięki temu zmiana slugu nie wymaga przepisywania nawigacji.
+
+          Każdy dokument deklaruje `schemaVersion`. Pozwala to ewoluować format jawnie, zamiast rozpoznawać wersję na podstawie przypadkowej obecności pól.
+
+          ## 2. Modeluj komponent w block.yml
+
+          Blok jest pakietem deweloperskim odkrywanym automatycznie z `blocks/<type>/`. Minimalny pakiet zawiera schemat oraz renderer:
+
+          ```text
+          blocks/feature-card/
+          ├── block.yml
+          ├── render.php
+          ├── style.css       # opcjonalny
+          └── script.js       # opcjonalny
+          ```
+
+          Definicja pola jest wspólnym źródłem dla formularza panelu i walidatora:
+
+          ```yaml
+          fields:
+            title:
+              type: text
+              required: true
+              translatable: true
+              minLength: 1
+              maxLength: 120
+            accent:
+              type: select
+              required: true
+              options: [mint, violet, amber]
+          ```
+
+          `translatable: true` oznacza mapę locale, a nie gotowy string. Walidator wymaga wartości języka domyślnego, normalizuje wszystkie obecne tłumaczenia i podczas publikacji wybiera bieżący język z fallbackiem.
+
+          Wbudowane typy pól to `text`, `textarea`, `markdown`, `number`, `boolean`, `select`, `multiselect`, `url`, `email`, `date`, `color`, `image`, `file` oraz `repeater`, który może zawierać zagnieżdżone pola. Nieznane pola danych są odrzucane — schemat jest kontraktem zamkniętym.
+
+          ## 3. Renderuj wyłącznie znormalizowane dane
+
+          `render.php` nie otrzymuje requestu, kontenera usług ani bezpośredniego dostępu do repozytoriów. Korzysta z tablicy `$data` i ograniczonego `RenderContext`:
+
+          ```php
+          <?php
+          declare(strict_types=1);
+          ?>
+          <section class="feature-card">
+              <h2><?= $context->escape($data['title']) ?></h2>
+              <div><?= $context->markdown($data['content']) ?></div>
+          </section>
+          ```
+
+          Tekst trafia do `escape()`, Markdown do skonfigurowanego CommonMark, adresy do `url()`, a obrazy do `image()` lub `picture()`. Ta dyscyplina oddziela zaufany kod szablonu od niezaufanej treści redakcyjnej.
+
+          CSS i JavaScript bloku są zbierane tylko wtedy, gdy aktywny blok danego typu występuje na stronie. `AssetPublisher` ogranicza rozmiar źródła, odrzuca symlinki, wylicza SHA-256 i publikuje fingerprintowany plik pod `public/assets/blocks/`.
+        en: |-
+          ## 1. Start with a stable page identity
+
+          A page is not identified by its public URL. The `pages/features/` directory is its stable technical identity, while `slug.pl` and `slug.en` can evolve independently:
+
+          ```yaml
+          schemaVersion: 1
+          enabled: true
+          layout: default
+          slug:
+            pl: mozliwosci
+            en: features
+          title:
+            pl: Możliwości FlatFile CMS
+            en: FlatFile CMS features
+          blocks: []
+          ```
+
+          With two enabled languages the router creates `/pl/mozliwosci` and `/en/features`. Internal links store the `features` identity and `PageRouteIndex` resolves the correct URL for the active locale. A slug change therefore never requires rewriting navigation.
+
+          Every document declares `schemaVersion`, allowing the format to evolve explicitly instead of guessing its version from incidental fields.
+
+          ## 2. Model a component in block.yml
+
+          A block is a developer-owned package discovered automatically in `blocks/<type>/`. The minimum package contains a schema and renderer:
+
+          ```text
+          blocks/feature-card/
+          ├── block.yml
+          ├── render.php
+          ├── style.css       # optional
+          └── script.js       # optional
+          ```
+
+          The field definition is the shared source for the admin form and validator:
+
+          ```yaml
+          fields:
+            title:
+              type: text
+              required: true
+              translatable: true
+              minLength: 1
+              maxLength: 120
+            accent:
+              type: select
+              required: true
+              options: [mint, violet, amber]
+          ```
+
+          `translatable: true` represents a locale map rather than a final string. The validator requires the default-language value, normalizes every supplied translation and selects the active language with fallback during publication.
+
+          Built-in types cover text, Markdown, numbers, booleans, select, multiselect, URLs, e-mail, dates, colors, images, files and nested repeaters. Unknown data fields are rejected: the schema is a closed contract.
+
+          ## 3. Render normalized data only
+
+          `render.php` receives no request, service container or direct repository access. It works with `$data` and a constrained `RenderContext`:
+
+          ```php
+          <?php
+          declare(strict_types=1);
+          ?>
+          <section class="feature-card">
+              <h2><?= $context->escape($data['title']) ?></h2>
+              <div><?= $context->markdown($data['content']) ?></div>
+          </section>
+          ```
+
+          Plain text goes through `escape()`, Markdown through configured CommonMark, URLs through `url()` and images through `image()` or `picture()`. This discipline separates trusted template code from untrusted editorial content.
+
+          Block CSS and JavaScript are collected only when an enabled block of that type appears on the page. `AssetPublisher` limits source size, rejects symlinks, calculates SHA-256 and publishes a fingerprinted file below `public/assets/blocks/`.
+      note:
+        pl: Treść wybiera wyłącznie nazwę bloku i jego dane. Nigdy nie wskazuje ścieżki do pliku PHP.
+        en: Content selects only a block name and its data. It never supplies a path to a PHP file.
+  - id: 01a05e10-1001-7406-8406-000000000006
+    type: code-showcase
+    enabled: true
+    data:
+      eyebrow:
+        pl: Jeden model, dwa adaptery
+        en: One model, two adapters
+      title:
+        pl: To samo źródło zasila HTML i JSON.
+        en: The same source powers HTML and JSON.
+      description:
+        pl: PageViewModelFactory składa zwalidowane bloki, SEO oraz wzbogacone media. Serializer projektuje model do API, a PageRenderer uruchamia renderery PHP — bez wywoływania jednego adaptera przez drugi.
+        en: PageViewModelFactory assembles validated blocks, SEO and enriched media. The serializer projects the model into the API while PageRenderer runs PHP renderers — neither adapter calls the other.
+      filename: pages/features/content.yml
+      code: |-
+        blocks:
+          - id: 01a05e10-1001-7403-8403-000000000003
+            type: feature-grid
+            enabled: true
+            data:
+              title:
+                pl: Moduły tworzące system
+                en: Modules forming the system
+              items:
+                - number: "01"
+                  title:
+                    pl: Kontrakty treści
+                    en: Content contracts
+                  accent: mint
+      bullets:
+        - text:
+            {
+              pl: "Disabled block jest walidowany, ale nie trafia do publicznego wyjścia.",
+              en: "A disabled block is validated but omitted from public output.",
+            }
+        - text:
+            {
+              pl: API i SSR stosują tę samą lokalizację oraz fallback.,
+              en: The API and SSR apply identical localization and fallback.,
+            }
+        - text:
+            {
+              pl: Media otrzymują te same fingerprintowane URL-e w HTML i JSON.,
+              en: Media receives the same fingerprinted URLs in HTML and JSON.,
+            }
+  - id: 01a05e10-1001-7407-8407-000000000007
+    type: article-content
+    enabled: true
+    data:
+      anchor: collections-media
+      content:
+        pl: |-
+          ## 4. Buduj kolekcje bez osobnego kontrolera
+
+          Katalog z `pagination.yml` staje się kolekcją, a jego bezpośrednie podstrony są źródłem rekordów. Konfiguracja określa sortowanie, paginację i jawnie dozwolone filtry:
+
+          ```yaml
+          schemaVersion: 1
+          type: collection
+          enabled: true
+          layout: insights
+          source: children
+          sort:
+            field: date
+            direction: desc
+          pagination:
+            perPage: 8
+          filters:
+            - parameter: category
+              field: category
+              allowedValues: [architecture, security, media]
+          ```
+
+          `CollectionService` nie wykonuje dowolnych zapytań przekazanych przez użytkownika. Parametr może filtrować tylko wskazane pole i tylko po wartościach z allowlisty. Wynik zawiera stabilne informacje o stronie, liczbie elementów i całkowitej liczbie stron.
+
+          Ten sam wynik trafia do `CollectionRenderer` oraz `CollectionSerializer`. Layout kolekcji odpowiada za HTML listy, natomiast API udostępnia dane integracjom frontendowym.
+
+          ## 5. Lokalizuj na granicy modelu
+
+          `config/languages.yml` wskazuje język domyślny i języki aktywne. Repozytorium przechowuje mapy tłumaczeń, ale renderer bloku otrzymuje już pojedynczą wartość wybraną dla bieżącego locale.
+
+          Gdy tłumaczenie opcjonalne nie istnieje, framework używa wartości języka domyślnego. Required field musi mieć poprawną wartość źródłową. Ten mechanizm pozwala włączyć nowy język bez atomowej migracji wszystkich historycznych dokumentów.
+
+          Slugi są rozwiązywane osobno dla każdego locale, a ich unikalność jest sprawdzana w obrębie rodzeństwa. Przy wielu językach publiczne trasy zawsze mają prefiks, na przykład `/pl/mozliwosci` i `/en/features`.
+
+          ## 6. Traktuj obrazy jako dane strony
+
+          Pole `image` przechowuje bezpieczną ścieżkę względną względem katalogu strony oraz ALT zależny od użycia:
+
+          ```yaml
+          image:
+            src: cover.png
+            alt:
+              pl: Diagram pipeline'u renderowania
+              en: Rendering pipeline diagram
+          ```
+
+          Walidacja odrzuca traversal, symlinki, brak pliku i nieobsługiwane rozszerzenia. `MediaOutputEnricher` dodaje publiczny URL, MIME, rozmiar i wymiary. Renderer może użyć `image()` dla prostego znacznika albo `picture()` dla kontrolowanego source setu.
+
+          SVG przechodzi sanitizację, a raster może otrzymać warianty zależne od konfiguracji jakości, maksymalnych wymiarów i limitu pikseli. Publiczny fingerprint umożliwia długi cache bez ryzyka serwowania starej zawartości po zmianie pliku.
+        en: |-
+          ## 4. Build collections without a dedicated controller
+
+          A directory containing `pagination.yml` becomes a collection and its direct child pages become records. Configuration defines sorting, pagination and explicitly allowed filters:
+
+          ```yaml
+          schemaVersion: 1
+          type: collection
+          enabled: true
+          layout: insights
+          source: children
+          sort:
+            field: date
+            direction: desc
+          pagination:
+            perPage: 8
+          filters:
+            - parameter: category
+              field: category
+              allowedValues: [architecture, security, media]
+          ```
+
+          `CollectionService` never executes arbitrary user-supplied queries. A parameter may filter only the configured field and only by allowlisted values. Results contain stable page, item-count and total-page information.
+
+          The same result reaches `CollectionRenderer` and `CollectionSerializer`. The collection layout owns list HTML while the API exposes data to frontend integrations.
+
+          ## 5. Localize at the model boundary
+
+          `config/languages.yml` defines the default and enabled languages. Repositories store translation maps, but a block renderer receives one value selected for the active locale.
+
+          When an optional translation is missing, the framework uses the default-language value. A required field must have a valid source value. This lets teams enable a new language without atomically migrating every historical document.
+
+          Slugs are resolved independently for each locale and uniqueness is checked among siblings. With multiple languages, public routes always have a prefix such as `/pl/mozliwosci` and `/en/features`.
+
+          ## 6. Treat images as page data
+
+          An `image` field stores a safe path relative to the page directory and usage-specific ALT text:
+
+          ```yaml
+          image:
+            src: cover.png
+            alt:
+              pl: Diagram pipeline'u renderowania
+              en: Rendering pipeline diagram
+          ```
+
+          Validation rejects traversal, symlinks, missing files and unsupported extensions. `MediaOutputEnricher` adds a public URL, MIME type, size and dimensions. Renderers can use `image()` for a simple element or `picture()` for a controlled source set.
+
+          SVG is sanitized while raster files can receive variants based on configured quality, dimensions and pixel limits. A public fingerprint enables long caching without serving stale content after a file changes.
+      note:
+        pl: Kolekcja jest konfiguracją zapytania nad stronami, a nie osobnym typem danych przechowywanym w bazie.
+        en: A collection is a query configuration over pages, not a separate database-backed content type.
+  - id: 01a05e10-1001-7408-8408-000000000008
+    type: article-content
+    enabled: true
+    data:
+      anchor: security-tests
+      content:
+        pl: |-
+          ## 7. Zapisuj atomowo i wykrywaj konflikty
+
+          Panel administracyjny nie nadpisuje YAML-a bezpośrednio. Edytowalny dokument posiada rewizję wyliczoną z aktualnego pliku. Mutacja przyjmuje oczekiwaną rewizję, uzyskuje blokadę zasobu, ponownie odczytuje dokument i odrzuca zapis, jeżeli stan zdążył się zmienić.
+
+          Nowa treść jest walidowana przed publikacją. Zapis trafia najpierw do prywatnego pliku tymczasowego, a następnie jest atomowo podmieniany. Awaria procesu nie pozostawia połowy YAML-a, a nieudana walidacja nie zmienia rewizji dokumentu.
+
+          `SafePathResolver` rozdziela zaufane korzenie (`pages`, `config`, `storage`) od względnych ścieżek danych. Normalizacja i sprawdzenie realpath zapobiegają wyjściu poza katalog, także przez symlink.
+
+          ## 8. Oddziel treść od stanu bezpieczeństwa
+
+          Użytkownicy, sesje, credentiale WebAuthn i tokeny resetu hasła należą do warstwy runtime, a nie do YAML-a treści. SQLite zapewnia transakcje dla danych uwierzytelniania, podczas gdy strony zachowują przenośność i czytelną historię Git.
+
+          Panel stosuje CSRF, bezpieczne flagi cookie, rate limiting oraz role. Operacje administracyjne zapisują zdarzenia audytowe w formacie JSONL z aktorem, typem działania, zasobem i adresem klienta.
+
+          Publiczny endpoint konfiguracji udostępnia wyłącznie świadomie zbudowaną projekcję. Surowy `setup.yml`, ścieżki dyskowe, ustawienia SMTP i inne sekrety nigdy nie są automatycznie serializowane.
+
+          ## 9. Weryfikuj zachowanie na trzech poziomach
+
+          Rozszerzenie frameworka warto testować warstwowo:
+
+          1. test jednostkowy typu pola lub walidatora,
+          2. test repozytorium na tymczasowym projekcie,
+          3. test funkcjonalny publicznej trasy HTML i API.
+
+          Standardowy pipeline projektu uruchamia formatowanie, analizę statyczną i komplet testów:
+
+          ```bash
+          composer check
+          ```
+
+          PHP CS Fixer pilnuje jednolitego kodu, PHPStan sprawdza kontrakty typów, a PHPUnit weryfikuje zachowanie bez zależności od produkcyjnego filesystemu.
+
+          ## Co dalej
+
+          Ta strona jest mapą systemu. Kolejny tutorial — **Getting Started** — przeprowadzi przez wymagania, instalację, konfigurację środowiska, utworzenie administratora i publikację pierwszej strony.
+        en: |-
+          ## 7. Write atomically and detect conflicts
+
+          The administration panel never overwrites YAML directly. An editable document carries a revision calculated from its current file. A mutation accepts the expected revision, obtains a resource lock, rereads the document and rejects the write when state has changed in the meantime.
+
+          New content is validated before publication. Data is first written to a private temporary file and then atomically moved into place. A process failure cannot leave half a YAML document and failed validation never changes the document revision.
+
+          `SafePathResolver` separates trusted roots (`pages`, `config`, `storage`) from relative data paths. Normalization and realpath checks prevent escaping the root, including through symlinks.
+
+          ## 8. Separate content from security state
+
+          Users, sessions, WebAuthn credentials and password-reset tokens belong to the runtime layer rather than content YAML. SQLite provides transactions for authentication data while pages remain portable and retain readable Git history.
+
+          The panel applies CSRF protection, secure cookie flags, rate limiting and roles. Administrative operations record JSONL audit events with the actor, action type, resource and client address.
+
+          The public configuration endpoint exposes only a deliberately constructed projection. Raw `setup.yml`, filesystem paths, SMTP configuration and other secrets are never serialized automatically.
+
+          ## 9. Verify behavior at three levels
+
+          Framework extensions should be tested in layers:
+
+          1. a unit test for the field type or validator,
+          2. a repository test using a temporary project,
+          3. a functional test of the public HTML route and API.
+
+          The standard project pipeline runs formatting, static analysis and the complete test suite:
+
+          ```bash
+          composer check
+          ```
+
+          PHP CS Fixer enforces consistent source, PHPStan checks type contracts and PHPUnit verifies behavior without depending on the production filesystem.
+
+          ## What comes next
+
+          This page is a map of the system. The next tutorial — **Getting Started** — will cover requirements, installation, environment configuration, administrator creation and publishing the first page.
+      note:
+        pl: Dobra funkcja frameworka kończy się testowalnym kontraktem, a nie tylko działającym ekranem panelu.
+        en: A good framework feature ends with a testable contract, not merely a working admin screen.
+  - id: 01a05e10-1001-7409-8409-000000000009
+    type: call-to-action
+    enabled: true
+    data:
+      eyebrow:
+        pl: Następny tutorial
+        en: Next tutorial
+      title:
+        pl: Uruchom framework od zera.
+        en: Start the framework from scratch.
+      description:
+        pl: Getting Started pokaże kompletny proces od wymagań PHP i konfiguracji środowiska do pierwszego zalogowania i opublikowanej strony.
+        en: Getting Started will cover the complete process from PHP requirements and environment configuration to the first login and published page.
+      button_label:
+        pl: Otwórz panel CMS
+        en: Open the CMS panel
+      button_url: /admin

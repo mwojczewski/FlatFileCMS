@@ -1,0 +1,104 @@
+schemaVersion: 1
+name: { pl: Nawigacja dokumentacji, en: Documentation navigation }
+description:
+  {
+    pl: Spis treści i macierz odpowiedzialności.,
+    en: Table of contents and responsibility matrix.,
+  }
+icon: list
+fields:
+  title:
+    {
+      type: text,
+      required: true,
+      translatable: true,
+      maxLength: 120,
+      label: { pl: Tytuł, en: Title },
+    }
+  intro:
+    {
+      type: textarea,
+      required: true,
+      translatable: true,
+      maxLength: 500,
+      label: { pl: Wprowadzenie, en: Introduction },
+    }
+  items:
+    type: repeater
+    required: true
+    translatable: false
+    minItems: 3
+    maxItems: 9
+    label: { pl: Rozdziały, en: Chapters }
+    fields:
+      number:
+        {
+          type: text,
+          required: true,
+          translatable: false,
+          maxLength: 4,
+          label: { pl: Numer, en: Number },
+        }
+      title:
+        {
+          type: text,
+          required: true,
+          translatable: true,
+          maxLength: 90,
+          label: { pl: Tytuł, en: Title },
+        }
+      description:
+        {
+          type: text,
+          required: true,
+          translatable: true,
+          maxLength: 180,
+          label: { pl: Opis, en: Description },
+        }
+      url:
+        {
+          type: url,
+          required: true,
+          translatable: true,
+          label: { pl: Adres, en: URL },
+        }
+  matrix:
+    type: repeater
+    required: true
+    translatable: false
+    minItems: 3
+    maxItems: 8
+    label: { pl: Macierz, en: Matrix }
+    fields:
+      layer:
+        {
+          type: text,
+          required: true,
+          translatable: true,
+          maxLength: 50,
+          label: { pl: Warstwa, en: Layer },
+        }
+      input:
+        {
+          type: text,
+          required: true,
+          translatable: true,
+          maxLength: 70,
+          label: { pl: Wejście, en: Input },
+        }
+      responsibility:
+        {
+          type: text,
+          required: true,
+          translatable: true,
+          maxLength: 120,
+          label: { pl: Odpowiedzialność, en: Responsibility },
+        }
+      output:
+        {
+          type: text,
+          required: true,
+          translatable: true,
+          maxLength: 70,
+          label: { pl: Wyjście, en: Output },
+        }

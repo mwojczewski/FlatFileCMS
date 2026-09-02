@@ -15,7 +15,7 @@
   font-weight: 750;
 }
 .article-content aside span {
-  color: #8b9b95;
+  color: #505a58;
   font:
     550 0.58rem ui-monospace,
     monospace;
@@ -25,6 +25,7 @@
   color: #33443e;
   font-size: 1.04rem;
   line-height: 1.85;
+  min-width: 0;
 }
 .article-content h2 {
   margin: 3.5rem 0 1.2rem;
@@ -55,6 +56,7 @@
   border-radius: 0.5rem;
   background: #0b1713;
   color: #bfe8d9;
+  line-height: 1;
 }
 .article-content pre code {
   padding: 0;
@@ -76,9 +78,14 @@
 .article-content__note p {
   margin: 0.6rem 0 0;
 }
+.article-content img,
+.prose img {
+  max-width: 100%;
+  height: auto;
+}
 @media (max-width: 720px) {
   .article-content__grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .article-content aside {
     display: none;

@@ -51,7 +51,7 @@ final class AssetPublisher
         if (!is_file($target)) {
             $temporary = "{$directory}/.{$filename}." . bin2hex(random_bytes(8)) . '.tmp';
             try {
-                if (file_put_contents($temporary, $contents, LOCK_EX) === false || !chmod($temporary, 0o640)) {
+                if (file_put_contents($temporary, $contents, LOCK_EX) === false || !chmod($temporary, 0o644)) {
                     throw new RenderingException('Block asset cannot be written.');
                 }
                 if (!rename($temporary, $target)) {

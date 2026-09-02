@@ -7,6 +7,14 @@ description:
   }
 icon: align-left
 fields:
+  anchor:
+    {
+      type: text,
+      required: false,
+      translatable: false,
+      maxLength: 80,
+      label: { pl: Kotwica sekcji, en: Section anchor },
+    }
   content:
     {
       type: markdown,

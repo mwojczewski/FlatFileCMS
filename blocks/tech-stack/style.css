@@ -11,7 +11,7 @@
 }
 .tech-stack p {
   margin: 0;
-  color: #4d5653;
+  color: #6e7e78;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -38,7 +38,7 @@
 }
 .tech-stack span {
   margin-top: 0.3rem;
-  color: #4d5652;
+  color: #93a09c;
   font:
     500 0.68rem ui-monospace,
     monospace;
@@ -52,6 +52,8 @@
     grid-template-columns: repeat(2, 1fr);
   }
   .tech-stack li {
-    border-top: 1px solid #d5dedb;
+    border-collapse: collapse;
+    border-left: 0px;
+    border: 1px solid #d5dedb;
   }
 }

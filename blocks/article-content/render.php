@@ -3,8 +3,9 @@
 declare(strict_types=1);
 
 $locale = $context->locale();
+$anchor = $data['anchor'] ?? '';
 ?>
-<section class="article-content">
+<section class="article-content" <?= $anchor !== '' ? ' id="' . $context->escape($anchor) . '"' : '' ?>>
     <div class="container article-content__grid">
         <aside>FlatFile CMS<br><span>ENGINEERING NOTES</span></aside>
         <article><?= $context->markdown($data['content']) ?><?php if (($data['note'] ?? '') !== ''): ?>
