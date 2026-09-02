@@ -1,0 +1,57 @@
+<VirtualHost *:80>
+    ServerName example.com
+    ServerAlias www.example.com
+    Redirect permanent / https://example.com/
+</VirtualHost>
+
+<VirtualHost *:443>
+    ServerName example.com
+    ServerAlias www.example.com
+    DocumentRoot /var/www/flatfile-cms/public
+
+    SSLEngine on
+    SSLCertificateFile /etc/letsencrypt/live/example.com/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/example.com/privkey.pem
+
+    <Directory /var/www/flatfile-cms/public>
+        Options -Indexes
+        AllowOverride None
+        Require all granted
+
+        RewriteEngine On
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteRule ^ index.php [L]
+    </Directory>
+
+    # Only the front controller may be executed by PHP-FPM.
+    <FilesMatch "\.php$">
+        Require all denied
+    </FilesMatch>
+    <Files "index.php">
+        Require all granted
+        SetHandler "proxy:unix:/run/php/php8.5-fpm.sock|fcgi://localhost/"
+    </Files>
+
+    <IfModule mod_headers.c>
+        Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        Header always set X-Content-Type-Options "nosniff"
+        Header always set Referrer-Policy "strict-origin-when-cross-origin"
+        Header always set Permissions-Policy "camera=(), geolocation=(), microphone=()"
+        Header always set X-Frame-Options "DENY"
+    </IfModule>
+
+    # gzip compression (mod_filter and mod_deflate).
+    <IfModule mod_deflate.c>
+        AddOutputFilterByType DEFLATE application/javascript application/json
+        AddOutputFilterByType DEFLATE application/ld+json application/xml image/svg+xml
+        AddOutputFilterByType DEFLATE text/css text/html text/javascript text/plain text/xml
+    </IfModule>
+
+    # To use Brotli instead, replace DEFLATE with BROTLI_COMPRESS above and
+    # enable mod_brotli. BrotliCompressionQuality 5 is a sensible starting point.
+
+    LimitRequestBody 26214400
+    ErrorLog ${APACHE_LOG_DIR}/flatfile-cms-error.log
+    CustomLog ${APACHE_LOG_DIR}/flatfile-cms-access.log combined
+</VirtualHost>

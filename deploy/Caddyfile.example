@@ -1,0 +1,30 @@
+example.com, www.example.com {
+    root * /var/www/flatfile-cms/public
+
+    # Caddy negotiates the best supported encoding and adds Vary automatically.
+    encode zstd gzip
+
+    request_body {
+        max_size 25MB
+    }
+
+    route {
+        # Reject direct requests for PHP files. The later internal rewrite to
+        # index.php bypasses this earlier rule and reaches PHP-FPM safely.
+        @directPhp path_regexp directPhp \.php(?:/|$)
+        respond @directPhp 404
+
+        try_files {path} {path}/ /index.php?{query}
+        php_fastcgi unix//run/php/php8.5-fpm.sock
+        file_server
+    }
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Permissions-Policy "camera=(), geolocation=(), microphone=()"
+        X-Frame-Options "DENY"
+        -Server
+    }
+}
