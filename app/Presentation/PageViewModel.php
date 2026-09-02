@@ -9,6 +9,7 @@ final readonly class PageViewModel
     /**
      * @param array<string, mixed> $seo
      * @param list<array<string, mixed>> $blocks
+     * @param array<string, string> $localizedUrls
      */
     public function __construct(
         private string $id,
@@ -18,6 +19,7 @@ final readonly class PageViewModel
         private string $title,
         private array $seo,
         private array $blocks,
+        private array $localizedUrls,
     ) {}
 
     public function id(): string
@@ -55,6 +57,12 @@ final readonly class PageViewModel
     public function blocks(): array
     {
         return $this->blocks;
+    }
+
+    /** @return array<string, string> */
+    public function localizedUrls(): array
+    {
+        return $this->localizedUrls;
     }
 
     /** @return array<string, mixed> */

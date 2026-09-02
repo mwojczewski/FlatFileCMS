@@ -14,7 +14,7 @@ $queryUrl = static function (int $page) use ($collection, $filters): string {
     <?= $context->partial('head', ['seo' => $seo, 'assets' => $assets]) ?>
 </head>
 <body>
-    <?= $context->partial('navigation', ['menus' => $navigation]) ?>
+    <?= $context->partial('navigation', ['menus' => $navigation, 'localizedUrls' => $localizedUrls]) ?>
     <main id="main-content" class="collection container">
         <h1><?= $context->escape($collection['title']) ?></h1>
         <?php if ($items === []): ?>

@@ -8,6 +8,7 @@
 /.htpasswd
 /auth.json
 /composer-auth.json
+/misc
 
 # Private keys, certificates and keystores
 *.key

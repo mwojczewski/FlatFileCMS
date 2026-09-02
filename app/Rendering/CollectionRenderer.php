@@ -29,6 +29,7 @@ final readonly class CollectionRenderer
         $items = $view->items();
         $pagination = $view->pagination();
         $filters = $view->filters();
+        $localizedUrls = $view->localizedUrls();
         $seo = ContentData::map($collection['seo'] ?? null, 'collection.seo');
         $assets = new AssetCollection([], [], 0);
 
@@ -39,6 +40,7 @@ final readonly class CollectionRenderer
                 $items,
                 $pagination,
                 $filters,
+                $localizedUrls,
                 $seo,
                 $navigation,
                 $assets,

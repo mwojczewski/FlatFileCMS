@@ -10,7 +10,7 @@ declare(strict_types=1);
 </head>
 
 <body>
-    <?= $context->partial('navigation', ['menus' => $navigation]) ?>
+    <?= $context->partial('navigation', ['menus' => $navigation, 'localizedUrls' => $page->localizedUrls()]) ?>
     <main id="main-content">
         <?= $content ?>
     </main>

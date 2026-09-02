@@ -41,7 +41,19 @@ final readonly class PageViewModelFactory
                 $page->identity(),
                 $this->blocks->forPublicPage($page, $locale, $languages),
             ),
+            $this->localizedUrls($page, $languages, $routes),
         );
+    }
+
+    /** @return array<string, string> */
+    private function localizedUrls(Page $page, LanguageConfig $languages, PageRouteIndex $routes): array
+    {
+        $urls = [];
+        foreach ($languages->codes() as $locale) {
+            $urls[$locale] = $routes->urlFor($page->identity(), $locale);
+        }
+
+        return $urls;
     }
 
     public function blockDefinitionsModifiedAt(Page $page): int

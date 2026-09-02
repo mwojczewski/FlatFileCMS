@@ -6,6 +6,7 @@ $menus = $data['menus'];
 $main = $menus['main'] ?? [];
 $locale = $context->locale();
 $otherLocale = $locale === 'pl' ? 'en' : 'pl';
+$languageUrl = $data['localizedUrls'][$otherLocale] ?? "/{$otherLocale}/";
 $localizedUrl = static function (string $url) use ($locale): string {
     if ($url === '/' || str_starts_with($url, '/#')) {
         return "/{$locale}/" . ltrim($url, '/');
@@ -16,25 +17,13 @@ $localizedUrl = static function (string $url) use ($locale): string {
 ?>
 <header class="site-header">
     <div class="container site-header__inner">
-        <a class="site-brand" href="/<?= $context->escape($locale) ?>/">
-            <span class="site-brand__mark" aria-hidden="true">
-                <i></i>
-                <i></i>
-                <i></i>
-                <i></i>
-            </span>FlatFile CMS</a>
+        <a class="site-brand" href="/<?= $context->escape($locale) ?>/"><span class="site-brand__mark"
+                aria-hidden="true"><i></i><i></i><i></i><i></i></span>FlatFile CMS</a>
         <?php if ($main !== []): ?>
             <nav class="site-nav" id="site-navigation"
                 aria-label="<?= $locale === 'pl' ? 'Główna nawigacja' : 'Main navigation' ?>">
-                <ul>
-                    <?php foreach ($main as $item): ?>
-                        <?php $target = $item['target'] === '_blank' ? ' target="_blank" rel="noopener noreferrer"' : ''; ?>
-                        <li>
-                            <a href="<?= $context->escape($localizedUrl($item['url'])) ?>" <?= $target ?>>
-                                <?= $context->escape($item['label']) ?>
-                            </a>
-                        </li>
-                    <?php endforeach; ?>
+                <ul><?php foreach ($main as $item): ?><?php $target = $item['target'] === '_blank' ? ' target="_blank" rel="noopener noreferrer"' : ''; ?>
+                        <li><a href="<?= $context->escape($localizedUrl($item['url'])) ?>" <?= $target ?>><?= $context->escape($item['label']) ?></a></li><?php endforeach; ?>
                 </ul>
             </nav>
         <?php endif; ?>
@@ -46,16 +35,13 @@ $localizedUrl = static function (string $url) use ($locale): string {
                 <span></span>
                 <span></span>
             </button>
-            <a class="language-switch" href="/<?= $context->escape($otherLocale) ?>/"
+            <a class="language-switch" href="<?= $context->escape($languageUrl) ?>"
                 hreflang="<?= $context->escape($otherLocale) ?>" lang="<?= $context->escape($otherLocale) ?>"
                 aria-label="<?= $locale === 'pl' ? 'Switch to English' : 'Przełącz na język polski' ?>">
-                <span class="<?= $locale === 'pl' ? 'is-active' : '' ?>">PL</span>
-                <i>/</i>
-                <span class="<?= $locale === 'en' ? 'is-active' : '' ?>">EN</span>
-            </a>
-            <a class="site-header__admin" href="/admin"><?= $locale === 'pl' ? 'Panel CMS' : 'CMS panel' ?>
-                <span aria-hidden="true">↗</span>
-            </a>
+                <span class="<?= $locale === 'pl' ? 'is-active' : '' ?>">PL</span><i>/</i>
+                <span class="<?= $locale === 'en' ? 'is-active' : '' ?>">EN</span></a>
+            <a class="site-header__admin" href="/admin"><?= $locale === 'pl' ? 'Panel CMS' : 'CMS panel' ?> <span
+                    aria-hidden="true">↗</span></a>
         </div>
     </div>
 </header>
@@ -93,7 +79,7 @@ $localizedUrl = static function (string $url) use ($locale): string {
         border-radius: .2rem;
         background: transparent;
         color: inherit;
-        cursor: pointer;
+        cursor: pointer
     }
 
     .menu-toggle span {
@@ -104,23 +90,23 @@ $localizedUrl = static function (string $url) use ($locale): string {
         height: 1px;
         background: currentColor;
         transform-origin: center;
-        transition: transform .2s ease;
+        transition: transform .2s ease
     }
 
     .menu-toggle span:first-child {
-        transform: translate(-50%, -50%) translateY(-.22rem);
+        transform: translate(-50%, -50%) translateY(-.22rem)
     }
 
     .menu-toggle span:last-child {
-        transform: translate(-50%, -50%) translateY(.22rem);
+        transform: translate(-50%, -50%) translateY(.22rem)
     }
 
     .menu-toggle[aria-expanded="true"] span:first-child {
-        transform: translate(-50%, -50%) rotate(45deg);
+        transform: translate(-50%, -50%) rotate(45deg)
     }
 
     .menu-toggle[aria-expanded="true"] span:last-child {
-        transform: translate(-50%, -50%) rotate(-45deg);
+        transform: translate(-50%, -50%) rotate(-45deg)
     }
 
     @media(max-width:760px) {
@@ -191,4 +177,4 @@ $localizedUrl = static function (string $url) use ($locale): string {
         }
     }
 </style>
-<script src="/assets/js/site-navigation.20260902.js" defer></script>
+<script src="/assets/js/site-navigation.js" defer></script>

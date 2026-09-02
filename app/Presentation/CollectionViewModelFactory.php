@@ -7,6 +7,7 @@ namespace FlatFileCms\Presentation;
 use FlatFileCms\Collections\CollectionResult;
 use FlatFileCms\Config\ConfigurationDocument;
 use FlatFileCms\Content\PageRouteIndex;
+use FlatFileCms\Domain\Content\PageIdentity;
 use FlatFileCms\Domain\Localization\LanguageConfig;
 use FlatFileCms\Domain\Localization\LocalizedDataResolver;
 use FlatFileCms\Seo\SeoResolver;
@@ -61,6 +62,21 @@ final readonly class CollectionViewModelFactory
                 'totalPages' => $result->totalPages(),
             ],
             $result->activeFilters(),
+            $this->localizedUrls($collection->identity(), $languages, $routes),
         );
+    }
+
+    /** @return array<string, string> */
+    private function localizedUrls(
+        PageIdentity $identity,
+        LanguageConfig $languages,
+        PageRouteIndex $routes,
+    ): array {
+        $urls = [];
+        foreach ($languages->codes() as $locale) {
+            $urls[$locale] = $routes->collectionUrlFor($identity, $locale);
+        }
+
+        return $urls;
     }
 }

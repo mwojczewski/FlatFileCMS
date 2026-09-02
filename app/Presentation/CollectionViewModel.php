@@ -11,12 +11,14 @@ final readonly class CollectionViewModel
      * @param list<array<string, mixed>> $items
      * @param array<string, int> $pagination
      * @param array<string, string> $filters
+     * @param array<string, string> $localizedUrls
      */
     public function __construct(
         private array $collection,
         private array $items,
         private array $pagination,
         private array $filters,
+        private array $localizedUrls,
     ) {}
 
     /** @return array<string, mixed> */
@@ -41,6 +43,12 @@ final readonly class CollectionViewModel
     public function filters(): array
     {
         return $this->filters;
+    }
+
+    /** @return array<string, string> */
+    public function localizedUrls(): array
+    {
+        return $this->localizedUrls;
     }
 
     public function locale(): string
