@@ -1,0 +1,913 @@
+schemaVersion: 1
+enabled: true
+layout: default
+slug:
+  pl: tworzenie-wlasnych-blokow
+  en: creating-custom-blocks
+title:
+  pl: Tworzenie własnych bloków w FlatFile CMS
+  en: Creating custom blocks in FlatFile CMS
+date: "2026-09-04"
+order: 3
+category: blocks
+excerpt:
+  pl: Kompletny przewodnik po strukturze pakietu bloku, kontrakcie block.yml, polach, tłumaczeniach, rendererze PHP, mediach, assetach i Page Builderze.
+  en: A complete guide to block package structure, the block.yml contract, fields, translations, the PHP renderer, media, assets and Page Builder.
+seo:
+  title:
+    pl: Tworzenie własnych bloków w FlatFile CMS — tutorial techniczny
+    en: Creating custom blocks in FlatFile CMS — technical tutorial
+  description:
+    pl: Zbuduj własny blok FlatFile CMS od scaffoldu i schematu YAML po bezpieczny renderer PHP, responsywne media, assety i walidację.
+    en: Build a custom FlatFile CMS block from scaffolding and its YAML schema to a safe PHP renderer, responsive media, assets and validation.
+  robots:
+    index: true
+    follow: true
+  openGraph: {}
+  twitter: {}
+  jsonLd:
+    "@context": https://schema.org
+    "@type": TechArticle
+    headline: Creating custom blocks in FlatFile CMS
+    dateModified: "2026-09-04"
+blocks:
+  - id: 01a06830-3003-7401-8401-000000000001
+    type: docs-hero
+    enabled: true
+    data:
+      breadcrumb:
+        pl: Dokumentacja / 03 / System bloków
+        en: Documentation / 03 / Block system
+      title:
+        pl: Tworzenie własnych bloków
+        en: Creating custom blocks
+      lead:
+        pl: Od pustego katalogu do komponentu dostępnego w Page Builderze — z zamkniętym kontraktem danych, tłumaczeniami, bezpiecznym PHP, mediami oraz assetami publikowanymi tylko wtedy, gdy są potrzebne.
+        en: From an empty directory to a component available in Page Builder — with a closed data contract, translations, safe PHP, media and assets published only when needed.
+      level: średniozaawansowany
+      reading_time:
+        pl: około 45 minut
+        en: about 45 minutes
+      updated: "2026-09-04"
+      topics:
+        - label: { pl: block.yml, en: block.yml }
+        - label: { pl: PHP, en: PHP }
+        - label: { pl: Walidacja, en: Validation }
+        - label: { pl: Lokalizacja, en: Localization }
+        - label: { pl: Media, en: Media }
+        - label: { pl: Page Builder, en: Page Builder }
+  - id: 01a06830-3003-7402-8402-000000000002
+    type: docs-toc
+    enabled: true
+    data:
+      title:
+        pl: Plan budowy bloku
+        en: Block-building plan
+      intro:
+        pl: Zaczniemy od granicy między kodem dewelopera a treścią redaktora. Następnie zdefiniujemy schemat, przejdziemy przez typy pól, napiszemy renderer i sprawdzimy cały cykl życia komponentu.
+        en: We begin with the boundary between developer code and editor content. Then we define the schema, examine field types, write the renderer and verify the complete component lifecycle.
+      items:
+        - number: "01"
+          title: { pl: Model bloku, en: Block model }
+          description: { pl: Pakiet deweloperski i automatyczne odkrywanie., en: Developer package and automatic discovery. }
+          url: { pl: /pl/dokumentacja/tworzenie-wlasnych-blokow#model-bloku, en: /en/documentation/creating-custom-blocks#model-bloku }
+        - number: "02"
+          title: { pl: Scaffold, en: Scaffold }
+          description: { pl: Bezpieczne wygenerowanie struktury startowej., en: Safely generating the initial structure. }
+          url: { pl: /pl/dokumentacja/tworzenie-wlasnych-blokow#scaffold, en: /en/documentation/creating-custom-blocks#scaffold }
+        - number: "03"
+          title: { pl: Kontrakt pól, en: Field contract }
+          description: { pl: "Typy, reguły, tłumaczenia i repeatery.", en: "Types, rules, translations and repeaters." }
+          url: { pl: /pl/dokumentacja/tworzenie-wlasnych-blokow#developer-experience, en: /en/documentation/creating-custom-blocks#developer-experience }
+        - number: "04"
+          title: { pl: Renderer PHP, en: PHP renderer }
+          description: { pl: Znormalizowane dane i ograniczony RenderContext., en: Normalized data and the constrained RenderContext. }
+          url: { pl: /pl/dokumentacja/tworzenie-wlasnych-blokow#renderer, en: /en/documentation/creating-custom-blocks#renderer }
+        - number: "05"
+          title: { pl: Media i assety, en: Media and assets }
+          description: { pl: "Obrazy, warianty, CSS, JavaScript i fingerprinting.", en: "Images, variants, CSS, JavaScript and fingerprinting." }
+          url: { pl: /pl/dokumentacja/tworzenie-wlasnych-blokow#media-assets, en: /en/documentation/creating-custom-blocks#media-assets }
+        - number: "06"
+          title: { pl: Instancja bloku, en: Block instance }
+          description: { pl: "content.yml, UUID v7 i operacje Page Buildera.", en: "content.yml, UUID v7 and Page Builder operations." }
+          url: { pl: /pl/dokumentacja/tworzenie-wlasnych-blokow#instancja, en: /en/documentation/creating-custom-blocks#instancja }
+        - number: "07"
+          title: { pl: Testowanie, en: Testing }
+          description: { pl: "Walidacja pakietu, strony i publicznego HTML.", en: "Package, page and public HTML validation." }
+          url: { pl: /pl/dokumentacja/tworzenie-wlasnych-blokow#testowanie, en: /en/documentation/creating-custom-blocks#testowanie }
+        - number: "08"
+          title: { pl: Diagnostyka, en: Troubleshooting }
+          description: { pl: Najczęstsze błędy i ich właściwa warstwa., en: Common failures and their correct layer. }
+          url: { pl: /pl/dokumentacja/tworzenie-wlasnych-blokow#diagnostyka-bloku, en: /en/documentation/creating-custom-blocks#diagnostyka-bloku }
+  - id: 01a06830-3003-7403-8403-000000000003
+    type: technical-table
+    enabled: true
+    data:
+      eyebrow:
+        pl: Anatomia pakietu
+        en: Package anatomy
+      title:
+        pl: Jeden katalog, pięć jasno określonych ról.
+        en: One directory, five clearly defined roles.
+      intro:
+        pl: Rejestr skanuje bezpośrednie podkatalogi `blocks/`. Tylko dwa pliki są obowiązkowe; pozostałe rozszerzają prezentację i doświadczenie edytora.
+        en: The registry scans direct subdirectories of `blocks/`. Only two files are required; the others extend presentation and the editor experience.
+      column_1: { pl: Plik, en: File }
+      column_2: { pl: Status, en: Status }
+      column_3: { pl: Odpowiedzialność, en: Responsibility }
+      column_4: { pl: Odbiorca, en: Consumer }
+      rows:
+        - cell_1: { pl: block.yml, en: block.yml }
+          cell_2: { pl: Wymagany, en: Required }
+          cell_3: { pl: "Definiuje metadane, pola i reguły walidacji.", en: "Defines metadata, fields and validation rules." }
+          cell_4: { pl: Registry i Page Builder, en: Registry and Page Builder }
+        - cell_1: { pl: render.php, en: render.php }
+          cell_2: { pl: Wymagany, en: Required }
+          cell_3: { pl: Zamienia zlokalizowane dane na fragment HTML., en: Converts localized data into an HTML fragment. }
+          cell_4: { pl: BlockRenderer, en: BlockRenderer }
+        - cell_1: { pl: style.css, en: style.css }
+          cell_2: { pl: Opcjonalny, en: Optional }
+          cell_3: { pl: Zawiera style ograniczone klasą komponentu., en: Contains styles scoped with the component class. }
+          cell_4: { pl: AssetCollector, en: AssetCollector }
+        - cell_1: { pl: script.js, en: script.js }
+          cell_2: { pl: Opcjonalny, en: Optional }
+          cell_3: { pl: Dodaje progresywne zachowanie w przeglądarce., en: Adds progressive browser behaviour. }
+          cell_4: { pl: AssetCollector, en: AssetCollector }
+        - cell_1: { pl: preview.webp, en: preview.webp }
+          cell_2: { pl: Opcjonalny, en: Optional }
+          cell_3: { pl: Pokazuje podgląd komponentu w pickerze bloków., en: Shows a component preview in the block picker. }
+          cell_4: { pl: Panel administratora, en: Admin panel }
+  - id: 01a06830-3003-7404-8404-000000000004
+    type: article-content
+    enabled: true
+    data:
+      anchor: model-bloku
+      content:
+        pl: |-
+          ## 1. Zrozum granicę systemu bloków
+
+          Blok jest **pakietem kodu deweloperskiego**, a nie fragmentem treści tworzonym przez redaktora. Deweloper definiuje jego możliwości w `blocks/<type>/`; redaktor tworzy później instancje tego typu w Page Builderze i uzupełnia wyłącznie pola dopuszczone przez schemat.
+
+          Ta granica jest celowa. Panel może zmienić tytuł, kolejność elementów albo wskazany obraz, ale nie może edytować PHP, CSS, JavaScriptu ani samego kontraktu. Kod wykonywalny trafia na serwer przez kontrolowany proces wdrożenia, natomiast treść może być aktualizowana bez deployu aplikacji.
+
+          `BlockRegistry` przegląda bezpośrednie podkatalogi `blocks/`. Nazwa katalogu staje się typem bloku i musi być slugiem złożonym z małych znaków ASCII, cyfr oraz łączników, np. `feature-card` albo `pricing-table`. Rejestr pomija katalogi ukryte i dowiązania symboliczne. Sam katalog, `block.yml` oraz `render.php` muszą być zwykłymi plikami znajdującymi się pod stałym korzeniem bloków.
+
+          Dodanie standardowego bloku nie wymaga dopisywania trasy, kontrolera, tabeli bazy, serializera API ani instrukcji warunkowej w jądrze. Rejestr odkrywa pakiet, Page Builder generuje formularz ze schematu, `BlockProcessor` waliduje dane, a adaptery HTML i JSON korzystają z tego samego znormalizowanego modelu.
+
+          ## 2. Oddziel typ od instancji
+
+          Katalog `blocks/feature-card/` opisuje **typ** dostępny w całej witrynie. Wpis w `pages/.../content.yml` jest **instancją** tego typu na konkretnej stronie. Jedna definicja może obsługiwać dowolną liczbę instancji, a każda ma własny UUID v7, stan `enabled` i dane.
+
+          Zmiana `block.yml` wpływa na walidację wszystkich istniejących instancji. Usunięcie pola, zmiana jego typu lub oznaczenie go jako wymaganego może więc unieważnić wcześniej poprawne strony. Traktuj schemat jak publiczny kontrakt: zmiany niekompatybilne wymagają migracji treści w tym samym wydaniu.
+        en: |-
+          ## 1. Understand the block-system boundary
+
+          A block is a **developer-owned code package**, not a piece of content authored by an editor. The developer defines its capabilities in `blocks/<type>/`; an editor later creates instances of that type in Page Builder and fills only the fields permitted by the schema.
+
+          This boundary is deliberate. The panel may change a title, item order or selected image, but it cannot edit PHP, CSS, JavaScript or the contract itself. Executable code reaches the server through a controlled deployment process, while content can be updated without deploying the application.
+
+          `BlockRegistry` scans direct subdirectories of `blocks/`. A directory name becomes the block type and must be a lowercase ASCII slug containing digits or hyphens, for example `feature-card` or `pricing-table`. The registry ignores hidden directories and symbolic links. The package directory, `block.yml` and `render.php` must be regular files under the fixed block root.
+
+          Adding a standard block requires no route, controller, database table, API serializer or core conditional. The registry discovers the package, Page Builder generates a form from its schema, `BlockProcessor` validates data, and the HTML and JSON adapters use the same normalized model.
+
+          ## 2. Separate a type from an instance
+
+          The `blocks/feature-card/` directory describes a **type** available across the site. An entry in `pages/.../content.yml` is an **instance** of that type on a particular page. One definition can support any number of instances, each with its own UUID v7, `enabled` state and data.
+
+          Changing `block.yml` affects validation of every existing instance. Removing a field, changing its type or making it required can invalidate previously correct pages. Treat the schema as a public contract: incompatible changes require a content migration in the same release.
+      note:
+        pl: Nie zapisuj logiki biznesowej w `content.yml`. YAML przechowuje dane instancji, a zachowanie komponentu należy do wersjonowanego pakietu bloku.
+        en: Do not store business logic in `content.yml`. YAML stores instance data; component behaviour belongs to the versioned block package.
+  - id: 01a06830-3003-7405-8405-000000000005
+    type: article-content
+    enabled: true
+    data:
+      anchor: scaffold
+      content:
+        pl: |-
+          ## 3. Wygeneruj bezpieczny scaffold
+
+          Najszybszy start zapewnia CLI:
+
+          ```bash
+          php bin/cms block:create feature-card --with-assets
+          ```
+
+          Bez `--with-assets` powstaną tylko obowiązkowe `block.yml` i `render.php`. Z opcją CLI doda również `style.css` oraz `script.js`. Polecenie odrzuci niepoprawny slug i istniejący katalog — nigdy celowo nie nadpisuje pakietu.
+
+          Operacja jest odporna na częściowy zapis. `BlockScaffolder` zakłada blokadę na katalogu `blocks/`, tworzy prywatny katalog tymczasowy z losową nazwą, zapisuje do niego komplet plików, ustawia prawa i dopiero na końcu publikuje cały pakiet przez zmianę nazwy katalogu. Awaria po drugim pliku nie pozostawia półgotowego typu widocznego dla rejestru.
+
+          Wygenerowana definicja zawiera tłumaczalny, wymagany `title` oraz opcjonalny `content` typu Markdown. Renderer bezpiecznie przekazuje tytuł do `escape()`, a treść do `markdown()`. Jest to działający punkt startowy, nie docelowy model domenowy komponentu.
+
+          Po wygenerowaniu sprawdź strukturę:
+
+          ```text
+          blocks/feature-card/
+          ├── block.yml
+          ├── render.php
+          ├── style.css
+          └── script.js
+          ```
+
+          Pliki pakietu wersjonuj razem. Nie przesyłaj samego renderera bez odpowiadającego mu schematu — w czasie wdrożenia rejestr może wtedy odczytać kontrakt niezgodny z kodem.
+        en: |-
+          ## 3. Generate a safe scaffold
+
+          The CLI provides the fastest start:
+
+          ```bash
+          php bin/cms block:create feature-card --with-assets
+          ```
+
+          Without `--with-assets`, only the required `block.yml` and `render.php` are created. With the option, the CLI also adds `style.css` and `script.js`. The command rejects an invalid slug and an existing directory; it never deliberately overwrites a package.
+
+          The operation resists partial writes. `BlockScaffolder` locks the `blocks/` directory, creates a private randomly named temporary directory, writes the complete file set, assigns permissions and only then publishes the package by renaming the directory. A failure after the second file cannot leave a half-built type visible to the registry.
+
+          The generated definition contains a translatable required `title` and optional Markdown `content`. The renderer safely passes the title to `escape()` and content to `markdown()`. This is a working starting point, not the component's final domain model.
+
+          Inspect the generated structure:
+
+          ```text
+          blocks/feature-card/
+          ├── block.yml
+          ├── render.php
+          ├── style.css
+          └── script.js
+          ```
+
+          Version the package files together. Do not deploy the renderer without its matching schema: the registry could otherwise read a contract that does not match the code.
+      note:
+        pl: Scaffold tworzy pliki z bezpiecznymi wartościami początkowymi. Od tego momentu są zwykłym kodem źródłowym i podlegają przeglądowi, testom oraz wdrożeniu.
+        en: The scaffold creates files with safe initial values. From then on they are ordinary source code subject to review, testing and deployment.
+  - id: 01a06830-3003-7406-8406-000000000006
+    type: code-showcase
+    enabled: true
+    data:
+      eyebrow:
+        pl: Zamknięty kontrakt danych
+        en: Closed data contract
+      title:
+        pl: Schemat jest jednocześnie dokumentacją, walidatorem i formularzem.
+        en: The schema is documentation, validator and form at once.
+      description:
+        pl: Przykładowa karta funkcji pokazuje pola tłumaczalne, wybór z allowlisty oraz repeater. Każdy klucz danych nieobecny w `fields` zostanie odrzucony.
+        en: This feature-card example demonstrates translatable fields, an allowlisted choice and a repeater. Every data key absent from `fields` is rejected.
+      filename: blocks/feature-card/block.yml
+      code: |-
+        schemaVersion: 1
+        name:
+          pl: Karta funkcji
+          en: Feature card
+        description:
+          pl: Karta z listą korzyści.
+          en: A card with a list of benefits.
+        icon: star
+        fields:
+          title:
+            type: text
+            required: true
+            translatable: true
+            minLength: 1
+            maxLength: 120
+          tone:
+            type: select
+            required: true
+            translatable: false
+            options: [mint, violet, amber]
+          items:
+            type: repeater
+            required: true
+            translatable: false
+            minItems: 1
+            maxItems: 6
+            fields:
+              label:
+                type: text
+                required: true
+                translatable: true
+                maxLength: 100
+      bullets:
+        - text: { pl: "`schemaVersion: 1` jawnie wersjonuje format definicji.", en: "`schemaVersion: 1` explicitly versions the definition format." }
+        - text: { pl: "`translatable` określa kształt wartości zapisanej w YAML.", en: "`translatable` determines the shape stored in YAML." }
+        - text: { pl: "`options` jest allowlistą, a nie podpowiedzią interfejsu.", en: "`options` is an allowlist, not merely a UI suggestion." }
+        - text: { pl: Repeater waliduje każdy element rekurencyjnie., en: The repeater validates every item recursively. }
+  - id: 01a06830-3003-7407-8407-000000000007
+    type: article-content
+    enabled: true
+    data:
+      anchor: pola
+      content:
+        pl: |-
+          ## 4. Zdefiniuj metadane i pola
+
+          Główny dokument `block.yml` musi być mapą. `schemaVersion` ma obecnie wartość `1`. `name` i `description` są mapami językowymi używanymi w panelu, `icon` identyfikuje ikonę, a `fields` opisuje dopuszczalne dane instancji.
+
+          Nazwa pola zaczyna się małą literą i może zawierać litery ASCII, cyfry oraz podkreślenia. Dobre nazwy opisują znaczenie (`heading`, `items`, `background_tone`), a nie pozycję w formularzu (`field_1`). Każda definicja pola zawiera `type`, `required` oraz `translatable`; dodatkowe reguły zależą od typu.
+
+          Kontrakt jest zamknięty. Jeśli instancja zawiera `data.subtitle`, którego nie ma w `fields`, walidator zwróci `UNKNOWN_FIELD`. Dzięki temu literówka nie staje się cicho ignorowaną treścią, a usunięty element schematu nie pozostaje niewidzialnym balastem w YAML.
+
+          ## 5. Dobierz typ do znaczenia danych
+
+          `text`, `textarea` i `markdown` normalizują zakończenia linii i obsługują `minLength` oraz `maxLength` (także aliasy `min` i `max`). Różnią się kontrolką panelu oraz sposobem użycia: Markdown należy renderować przez `markdown()`, a zwykły tekst przez `escape()`.
+
+          `number` przyjmuje liczbę całkowitą lub skończony float. Reguły `min`, `max` i `integer: true` zawężają zakres. Numeryczny string z formularza jest normalizowany, ale `NaN` i nieskończoność są odrzucane.
+
+          `boolean` przechowuje wartość logiczną. `select` wymaga jednej wartości z `options` lub `allowedValues`; `multiselect` wymaga unikalnej listy wartości i może stosować `minItems` oraz `maxItems`. Opcje mogą być prostymi stringami albo obiektami `{value, label}`, gdy panel potrzebuje tłumaczalnych etykiet.
+
+          `url` dopuszcza absolutne adresy HTTP(S) oraz adresy root-relative zaczynające się pojedynczym `/`. Odrzuca `//host`, protokoły skryptowe i przypadkowy tekst. `email`, `date`, `datetime` i `color` mają ścisłą walidację formatu. Data używa `YYYY-MM-DD`, datetime formatu `datetime-local` lub RFC 3339, a kolor postaci `#rrggbb` albo `#rrggbbaa` i jest normalizowany do małych liter.
+
+          `image` oraz `file` są referencjami do pliku znajdującego się w katalogu bieżącej strony. Nie są dowolną ścieżką ani publicznym URL-em. `repeater` jest listą map i jako jedyny typ może deklarować własne zagnieżdżone `fields`.
+        en: |-
+          ## 4. Define metadata and fields
+
+          The root `block.yml` document must be a mapping. `schemaVersion` is currently `1`. `name` and `description` are locale mappings used in the panel, `icon` identifies an icon, and `fields` describes permitted instance data.
+
+          A field name starts with a lowercase letter and may contain ASCII letters, digits and underscores. Good names describe meaning (`heading`, `items`, `background_tone`), not form position (`field_1`). Every field definition contains `type`, `required` and `translatable`; further rules depend on the type.
+
+          The contract is closed. If an instance contains `data.subtitle` absent from `fields`, validation returns `UNKNOWN_FIELD`. A typo therefore cannot become silently ignored content, and a removed schema element cannot remain invisible baggage in YAML.
+
+          ## 5. Match the type to the meaning
+
+          `text`, `textarea` and `markdown` normalize line endings and support `minLength` and `maxLength` (including `min` and `max` aliases). Their admin controls and usage differ: Markdown goes through `markdown()`, while plain text goes through `escape()`.
+
+          `number` accepts an integer or finite float. `min`, `max` and `integer: true` narrow the range. A numeric form string is normalized, while `NaN` and infinity are rejected.
+
+          `boolean` stores a logical value. `select` requires one value from `options` or `allowedValues`; `multiselect` requires a unique list and may use `minItems` and `maxItems`. Options can be plain strings or `{value, label}` objects when the panel needs translated labels.
+
+          `url` permits absolute HTTP(S) URLs and root-relative addresses beginning with a single `/`. It rejects `//host`, script protocols and arbitrary text. `email`, `date`, `datetime` and `color` have strict format validation. A date uses `YYYY-MM-DD`, datetime uses a `datetime-local` or RFC 3339 form, and a color is `#rrggbb` or `#rrggbbaa`, normalized to lowercase.
+
+          `image` and `file` reference a file in the current page directory. They are not arbitrary paths or public URLs. `repeater` is a list of mappings and is the only type allowed to declare nested `fields`.
+      note:
+        pl: Wybierz najbardziej precyzyjny typ. Pole `text` przechowujące URL lub datę omija walidację, którą silnik już oferuje.
+        en: Choose the most precise type. A `text` field storing a URL or date bypasses validation already provided by the engine.
+  - id: 01a06830-3003-7408-8408-000000000008
+    type: technical-table
+    enabled: true
+    data:
+      eyebrow:
+        pl: Referencja pól
+        en: Field reference
+      title:
+        pl: Typ, wartość, reguły i właściwe użycie.
+        en: Type, value, rules and correct usage.
+      intro:
+        pl: Ta tabela jest skrótem do projektowania schematu. Walidacja definicji uruchamia się przy pierwszym użyciu rejestru, zanim dane trafią do renderera.
+        en: This table is a schema-design shortcut. Definition validation runs when the registry is first used, before data reaches the renderer.
+      column_1: { pl: Typ, en: Type }
+      column_2: { pl: Wartość, en: Value }
+      column_3: { pl: Reguły, en: Rules }
+      column_4: { pl: Zastosowanie, en: Use }
+      rows:
+        - cell_1: { pl: text / textarea, en: text / textarea }
+          cell_2: { pl: String, en: String }
+          cell_3: { pl: minLength i maxLength, en: minLength and maxLength }
+          cell_4: { pl: Tekst bez formatowania, en: Unformatted text }
+        - cell_1: { pl: markdown, en: markdown }
+          cell_2: { pl: String Markdown, en: Markdown string }
+          cell_3: { pl: minLength i maxLength, en: minLength and maxLength }
+          cell_4: { pl: Dłuższa treść redakcyjna, en: Rich editorial content }
+        - cell_1: { pl: number / boolean, en: number / boolean }
+          cell_2: { pl: Liczba lub bool, en: Number or bool }
+          cell_3: { pl: "min, max oraz integer", en: "min, max and integer" }
+          cell_4: { pl: Parametry i przełączniki, en: Parameters and switches }
+        - cell_1: { pl: select / multiselect, en: select / multiselect }
+          cell_2: { pl: Wartość lub lista, en: Value or list }
+          cell_3: { pl: options oraz limity listy, en: options and list limits }
+          cell_4: { pl: Zamknięte warianty, en: Closed variants }
+        - cell_1: { pl: url / email, en: url / email }
+          cell_2: { pl: Sformatowany string, en: Formatted string }
+          cell_3: { pl: Ścisły format, en: Strict format }
+          cell_4: { pl: Linki i dane kontaktowe, en: Links and contact data }
+        - cell_1: { pl: date / datetime / color, en: date / datetime / color }
+          cell_2: { pl: Sformatowany string, en: Formatted string }
+          cell_3: { pl: Kalendarz lub wzorzec, en: Calendar or pattern }
+          cell_4: { pl: Metadane prezentacyjne, en: Presentation metadata }
+        - cell_1: { pl: image / file, en: image / file }
+          cell_2: { pl: Mapa z src, en: Mapping with src }
+          cell_3: { pl: Bezpieczna ścieżka i istnienie, en: Safe path and existence }
+          cell_4: { pl: Media lokalne strony, en: Page-local media }
+        - cell_1: { pl: repeater, en: repeater }
+          cell_2: { pl: Lista map, en: List of mappings }
+          cell_3: { pl: fields i limity elementów, en: fields and item limits }
+          cell_4: { pl: Powtarzalne struktury, en: Repeatable structures }
+  - id: 01a06830-3003-7409-8409-000000000009
+    type: article-content
+    enabled: true
+    data:
+      anchor: lokalizacja
+      content:
+        pl: |-
+          ## 6. Modeluj tłumaczenia jako część typu
+
+          `translatable: true` zmienia kształt przechowywanej wartości. Zamiast stringa pole zawiera mapę locale:
+
+          ```yaml
+          title:
+            pl: Szybki rendering
+            en: Fast rendering
+          ```
+
+          Dla pola wymaganego poprawna, niepusta wartość musi istnieć we wszystkich aktywnych językach. Pole opcjonalne może pominąć tłumaczenie; publiczna projekcja użyje wtedy wartości języka domyślnego jako fallbacku. Klucze języków spoza `config/languages.yml` są odrzucane.
+
+          Nie ustawiaj `translatable: true` mechanicznie. Warto tłumaczyć tekst czy URL zależny od locale, ale wariant koloru, liczbowy limit, flaga logiczna lub lista technicznych opcji zwykle powinny pozostać wspólne. Każda dodatkowa oś tłumaczenia zwiększa liczbę wartości wymagających utrzymania.
+
+          ## 7. Buduj repeatery rekurencyjnie
+
+          Repeater przechowuje uporządkowaną listę elementów. Sam repeater zwykle ma `translatable: false`, natomiast jego pola tekstowe mogą być tłumaczalne:
+
+          ```yaml
+          items:
+            - label:
+                pl: Walidacja przed zapisem
+                en: Validation before write
+            - label:
+                pl: Atomowa publikacja
+                en: Atomic publication
+          ```
+
+          `minItems` i `maxItems` ograniczają długość listy. Każdy element musi być mapą, a jego klucze są sprawdzane względem zagnieżdżonego `fields`. Ścieżka błędu zachowuje indeks, np. `data.items.0.label.en`, dzięki czemu Page Builder może przypisać komunikat do konkretnej kontrolki.
+
+          Schematy z wieloma poziomami są technicznie możliwe, ale projektuj je oszczędnie. Jeśli redaktor musi poruszać się po trzech zagnieżdżonych listach, komponent prawdopodobnie łączy kilka różnych odpowiedzialności i powinien zostać rozbity.
+        en: |-
+          ## 6. Model translations as part of the type
+
+          `translatable: true` changes the stored value shape. Instead of a string, the field contains a locale mapping:
+
+          ```yaml
+          title:
+            pl: Szybki rendering
+            en: Fast rendering
+          ```
+
+          A required field needs a valid non-empty value for every enabled language. An optional field may omit a translation; the public projection then falls back to the default-language value. Language keys absent from `config/languages.yml` are rejected.
+
+          Do not set `translatable: true` mechanically. Text and locale-specific URLs benefit from translation, while a color variant, numeric limit, boolean flag or list of technical options should usually remain shared. Every extra translation axis increases the number of values requiring maintenance.
+
+          ## 7. Build repeaters recursively
+
+          A repeater stores an ordered list of items. The repeater itself is usually `translatable: false`, while its text fields can be translatable:
+
+          ```yaml
+          items:
+            - label:
+                pl: Walidacja przed zapisem
+                en: Validation before write
+            - label:
+                pl: Atomowa publikacja
+                en: Atomic publication
+          ```
+
+          `minItems` and `maxItems` constrain list length. Every item must be a mapping, and its keys are checked against nested `fields`. The error path retains the index, for example `data.items.0.label.en`, allowing Page Builder to assign the message to the exact control.
+
+          Deep schemas are technically possible, but design them sparingly. If an editor has to navigate three nested lists, the component probably combines several responsibilities and should be split.
+      note:
+        pl: Tłumaczenie jest regułą kontraktu, nie dekoracją panelu. Renderer otrzymuje już wartość wybraną dla bieżącego locale.
+        en: Translation is a contract rule, not admin-panel decoration. The renderer receives a value already selected for the active locale.
+  - id: 01a06830-3003-7410-8410-000000000010
+    type: article-content
+    enabled: true
+    data:
+      anchor: renderer
+      content:
+        pl: |-
+          ## 8. Renderuj wyłącznie dane po walidacji
+
+          `render.php` jest zaufanym kodem deweloperskim wymaganym przez `BlockRenderer`. W momencie jego wykonania `$data` zawiera dane zwalidowane, znormalizowane i zlokalizowane przez `BlockProcessor`. Renderer nie powinien ponownie interpretować surowego YAML ani rozwiązywać języka.
+
+          ```php
+          <?php
+
+          declare(strict_types=1);
+
+          $tone = $data['tone'];
+          ?>
+          <section class="feature-card feature-card--<?= $context->escape($tone) ?>">
+              <div class="container">
+                  <h2><?= $context->escape($data['title']) ?></h2>
+                  <ul>
+                      <?php foreach ($data['items'] as $item): ?>
+                          <li><?= $context->escape($item['label']) ?></li>
+                      <?php endforeach; ?>
+                  </ul>
+              </div>
+          </section>
+          ```
+
+          `escape()` stosuj do zwykłego tekstu i wartości atrybutów. `markdown()` jest jedyną właściwą drogą dla pola Markdown: używa CommonMark, usuwa surowy HTML i blokuje niebezpieczne odnośniki. Nie wykonuj własnego `echo $data[...]` dla treści użytkownika i nie traktuj Markdown jako zaufanego HTML.
+
+          `url()` waliduje adres przed umieszczeniem go w `href`. `asset()` przyjmuje wyłącznie bezwzględną ścieżkę root-relative do zasobu. `image()`, `imageUrl()` oraz `picture()` pracują na znormalizowanej mapie obrazu i kontekście bieżącej strony. `locale()` zwraca aktywny język, a `partial()` renderuje tylko nazwany partial odkryty przez stały rejestr.
+
+          Kontekst celowo nie udostępnia kontenera DI, PDO, sesji, requestu, filesystemu, SMTP ani sekretów. Renderer ma być deterministyczną projekcją danych komponentu do HTML, a nie drugim kontrolerem.
+
+          ## 9. Nie duplikuj logiki lokalizacji
+
+          Jeżeli `title` jest tłumaczalny, `$data['title']` w rendererze jest już stringiem dla bieżącego locale — nie mapą z `pl` i `en`. To samo dotyczy tłumaczalnych pól wewnątrz repeatera oraz `alt` obrazu. Kod `$data['title'][$context->locale()]` byłby więc błędem warstwy.
+        en: |-
+          ## 8. Render only validated data
+
+          `render.php` is trusted developer code required by `BlockRenderer`. When it runs, `$data` contains data validated, normalized and localized by `BlockProcessor`. The renderer should not reinterpret raw YAML or resolve the language again.
+
+          ```php
+          <?php
+
+          declare(strict_types=1);
+
+          $tone = $data['tone'];
+          ?>
+          <section class="feature-card feature-card--<?= $context->escape($tone) ?>">
+              <div class="container">
+                  <h2><?= $context->escape($data['title']) ?></h2>
+                  <ul>
+                      <?php foreach ($data['items'] as $item): ?>
+                          <li><?= $context->escape($item['label']) ?></li>
+                      <?php endforeach; ?>
+                  </ul>
+              </div>
+          </section>
+          ```
+
+          Use `escape()` for plain text and attribute values. `markdown()` is the only correct route for a Markdown field: it uses CommonMark, strips raw HTML and blocks unsafe links. Never directly `echo $data[...]` for user content, and do not treat Markdown as trusted HTML.
+
+          `url()` validates an address before placing it in `href`. `asset()` accepts only an absolute root-relative asset path. `image()`, `imageUrl()` and `picture()` operate on a normalized image mapping and current-page context. `locale()` returns the active language, and `partial()` renders only a named partial discovered through a fixed registry.
+
+          The context deliberately exposes no DI container, PDO, session, request, filesystem, SMTP or secrets. A renderer should be a deterministic projection from component data to HTML, not a second controller.
+
+          ## 9. Do not duplicate localization logic
+
+          If `title` is translatable, `$data['title']` in the renderer is already a string for the active locale — not a `pl`/`en` mapping. The same applies to translatable repeater fields and image `alt`. Code such as `$data['title'][$context->locale()]` therefore violates the layer contract.
+      note:
+        pl: Walidacja danych nie zastępuje kodowania kontekstowego. Poprawny string nadal musi przejść przez `escape()`, `url()` albo właściwy helper mediów.
+        en: Data validation does not replace contextual encoding. A valid string must still pass through `escape()`, `url()` or the appropriate media helper.
+  - id: 01a06830-3003-7411-8411-000000000011
+    type: article-content
+    enabled: true
+    data:
+      anchor: media-assets
+      content:
+        pl: |-
+          ## 10. Odwołuj się do mediów lokalnych strony
+
+          Pole `image` przechowuje mapę z `src` i opcjonalnym, lokalizowanym `alt`:
+
+          ```yaml
+          image:
+            src: architecture.png
+            alt:
+              pl: Schemat pipeline’u renderowania
+              en: Rendering pipeline diagram
+          ```
+
+          `src` jest nazwą pliku w katalogu konkretnej strony, nie ścieżką `pages/...`, URL-em ani ścieżką absolutną. Walidator odrzuca wyjście poza katalog, pliki ukryte, `content.yml`, nieobsługiwane rozszerzenie obrazu oraz brak fizycznego pliku. Pole `file` działa podobnie, ale nie ogranicza referencji do rozszerzeń graficznych.
+
+          Najprostszy renderer używa `<?= $context->image($data['image']) ?>`. Możesz przekazać wymiary, format, tryb `contain` lub `cover` i bezpieczną allowlistę atrybutów. Dla obrazu responsywnego użyj `picture()`:
+
+          ```php
+          <?= $context->picture(
+              $data['image'],
+              [480, 768, 1200],
+              'webp',
+              16 / 9,
+              'cover',
+              '(max-width: 720px) 100vw, 1200px',
+              ['class' => 'feature-card__image'],
+          ) ?>
+          ```
+
+          Tryb `cover` wymaga dodatniego aspect ratio, a warianty przyjmują wymiary od 1 do 8192 pikseli. Helper generuje `<picture>`, `srcset`, fallback, ALT oraz wymiary ograniczające layout shift.
+
+          ## 11. Publikuj CSS i JavaScript warunkowo
+
+          `AssetCollector` sprawdza wyłącznie `style.css` i `script.js`. Dany typ jest przetwarzany raz, nawet jeśli strona ma kilka jego instancji. Jeśli blok nie występuje w publicznym zestawie strony, jego zasoby nie są dodawane do HTML.
+
+          Źródło musi być zwykłym plikiem mniejszym niż 1 MiB; symlinki są odrzucane. `AssetPublisher` liczy SHA-256 zawartości i publikuje kopię pod adresem podobnym do `/assets/blocks/feature-card/feature-card.a1b2c3d4e5f67890.css`. Zmiana bajtu tworzy nowy URL, dlatego plik może otrzymać długi cache HTTP bez ryzyka serwowania starej wersji.
+
+          PHP potrzebuje zapisu do `public/assets/blocks/`. W aktualnym kodzie nowy publiczny katalog typu otrzymuje `0755`, a plik assetu `0644`, aby proces serwera WWW mógł go odczytać również wtedy, gdy działa jako inny użytkownik niż PHP-FPM.
+
+          JavaScript powinien działać progresywnie, obsługiwać wiele instancji i nie zakładać, że blok istnieje:
+
+          ```js
+          document.querySelectorAll('.feature-card').forEach((block) => {
+            block.dataset.ready = 'true';
+          });
+          ```
+        en: |-
+          ## 10. Reference page-local media
+
+          An `image` field stores a mapping with `src` and optional localized `alt`:
+
+          ```yaml
+          image:
+            src: architecture.png
+            alt:
+              pl: Schemat pipeline’u renderowania
+              en: Rendering pipeline diagram
+          ```
+
+          `src` is a filename in the particular page directory, not a `pages/...` path, URL or absolute path. Validation rejects directory traversal, hidden files, `content.yml`, unsupported image extensions and a missing physical file. A `file` field behaves similarly without restricting the reference to image extensions.
+
+          The simplest renderer uses `<?= $context->image($data['image']) ?>`. You can pass dimensions, format, `contain` or `cover` fit and an allowlisted set of attributes. Use `picture()` for a responsive image:
+
+          ```php
+          <?= $context->picture(
+              $data['image'],
+              [480, 768, 1200],
+              'webp',
+              16 / 9,
+              'cover',
+              '(max-width: 720px) 100vw, 1200px',
+              ['class' => 'feature-card__image'],
+          ) ?>
+          ```
+
+          `cover` requires a positive aspect ratio, and variant dimensions range from 1 to 8192 pixels. The helper generates `<picture>`, `srcset`, a fallback, ALT and dimensions that reduce layout shift.
+
+          ## 11. Publish CSS and JavaScript conditionally
+
+          `AssetCollector` checks only `style.css` and `script.js`. A type is processed once, even when a page contains several instances. If a block is absent from the page's public block set, its assets are not added to HTML.
+
+          A source must be a regular file smaller than 1 MiB; symlinks are rejected. `AssetPublisher` hashes contents with SHA-256 and publishes a copy at a URL such as `/assets/blocks/feature-card/feature-card.a1b2c3d4e5f67890.css`. Changing one byte creates a new URL, allowing a long HTTP cache without serving an obsolete version.
+
+          PHP needs write access to `public/assets/blocks/`. In the current code, a new public type directory receives `0755` and an asset file `0644`, allowing the web-server process to read it even when it runs as a different user from PHP-FPM.
+
+          JavaScript should enhance progressively, support multiple instances and never assume that a block exists:
+
+          ```js
+          document.querySelectorAll('.feature-card').forEach((block) => {
+            block.dataset.ready = 'true';
+          });
+          ```
+      note:
+        pl: "`blocks/<type>/style.css` jest źródłem deweloperskim. `public/assets/blocks/...` zawiera wygenerowaną, odtwarzalną kopię runtime i nie powinien być edytowany ręcznie."
+        en: "`blocks/<type>/style.css` is developer source. `public/assets/blocks/...` contains a generated reproducible runtime copy and should not be edited manually."
+  - id: 01a06830-3003-7412-8412-000000000012
+    type: article-content
+    enabled: true
+    data:
+      anchor: instancja
+      content:
+        pl: |-
+          ## 12. Dodaj instancję do strony
+
+          Instancja w `content.yml` ma cztery dozwolone właściwości:
+
+          ```yaml
+          blocks:
+            - id: 01994d31-4fd1-7f32-9c2a-e89d624cda37
+              type: feature-card
+              enabled: true
+              data:
+                title:
+                  pl: Bezpieczne zapisy
+                  en: Safe writes
+                tone: mint
+                items:
+                  - label:
+                      pl: Rewizje SHA-256
+                      en: SHA-256 revisions
+          ```
+
+          `id` musi być UUID v7 zapisanym małymi znakami i unikalnym na stronie. `type` wskazuje nazwę katalogu pakietu. `enabled` kontroluje publikację, a `data` musi dokładnie odpowiadać `fields`. Nie dodawaj komentarzy konfiguracyjnych jako dodatkowych kluczy bloku — nieznane właściwości są odrzucane.
+
+          Blok wyłączony nadal podlega pełnej walidacji, lecz jest pomijany w publicznym HTML i API. Dzięki temu ukrycie komponentu nie staje się sposobem na przechowywanie danych niezgodnych z bieżącym kontraktem.
+
+          ## 13. Używaj Page Buildera jako klienta schematu
+
+          Po dodaniu pakietu pojawia się on automatycznie w pickerze `/admin/pages/builder?path=<identity>`. Formularz nie jest zapisany w bloku — `BlockFormRenderer` buduje kontrolki na podstawie typów i reguł. Języki pochodzą z `config/languages.yml`, więc komponent nie zakłada na stałe pary PL/EN.
+
+          Administrator może dodać, edytować, duplikować, włączać, wyłączać, przeciągać i usuwać instancje. Duplikowanie generuje nowy UUID v7. Formularze Markdown korzystają z lokalnego EasyMDE, a podgląd klienta jest sanitizowany niezależnie od serwerowego renderera CommonMark.
+
+          Każdy formularz niesie rewizję SHA-256 `content.yml`. Zapis pobiera blokadę strony, ponownie odczytuje dokument i zwraca HTTP 409, jeśli ktoś zapisał nowszą wersję. Dopiero kompletna walidacja strony oraz wszystkich bloków poprzedza atomową zmianę pliku.
+
+          `preview.webp`, jeśli istnieje, jest udostępniany wyłącznie przez uwierzytelniony endpoint przyjmujący typ bloku — panel nie przyjmuje dowolnej ścieżki pliku.
+        en: |-
+          ## 12. Add an instance to a page
+
+          A `content.yml` instance has four allowed properties:
+
+          ```yaml
+          blocks:
+            - id: 01994d31-4fd1-7f32-9c2a-e89d624cda37
+              type: feature-card
+              enabled: true
+              data:
+                title:
+                  pl: Bezpieczne zapisy
+                  en: Safe writes
+                tone: mint
+                items:
+                  - label:
+                      pl: Rewizje SHA-256
+                      en: SHA-256 revisions
+          ```
+
+          `id` must be a lowercase UUID v7 unique within the page. `type` points to the package directory name. `enabled` controls publication, and `data` must match `fields` exactly. Do not add configuration comments as extra block keys: unknown properties are rejected.
+
+          A disabled block is still fully validated but omitted from public HTML and API output. Hiding a component therefore cannot become a way to retain data that violates the current contract.
+
+          ## 13. Use Page Builder as a schema client
+
+          After adding the package, it appears automatically in the `/admin/pages/builder?path=<identity>` picker. The form is not hard-coded in the block: `BlockFormRenderer` builds controls from types and rules. Languages come from `config/languages.yml`, so the component does not assume a fixed PL/EN pair.
+
+          An administrator can add, edit, duplicate, enable, disable, drag and delete instances. Duplication generates a new UUID v7. Markdown forms use the locally vendored EasyMDE, while client preview is sanitized independently from the server-side CommonMark renderer.
+
+          Every form carries the SHA-256 revision of `content.yml`. A save locks the page, rereads the document and returns HTTP 409 if someone saved a newer version. Only complete validation of the page and every block precedes atomic file replacement.
+
+          When present, `preview.webp` is served only through an authenticated endpoint receiving a block type; the panel never accepts an arbitrary file path.
+      note:
+        pl: Panel zarządza instancjami i treścią. Definicja, renderer oraz assety pozostają niezmiennie własnością dewelopera.
+        en: The panel manages instances and content. The definition, renderer and assets remain developer-owned.
+  - id: 01a06830-3003-7413-8413-000000000013
+    type: article-content
+    enabled: true
+    data:
+      anchor: testowanie
+      content:
+        pl: |-
+          ## 14. Testuj kontrakt warstwowo
+
+          Zacznij od kontroli całego projektu:
+
+          ```bash
+          composer check
+          ```
+
+          Pipeline uruchamia PHP CS Fixer, PHPStan i PHPUnit. Nowy renderer podlega regułom stylu oraz analizie typów, ale komponent wymaga też testów zachowania.
+
+          Minimalny zestaw przypadków obejmuje:
+
+          1. poprawne dane przechodzą normalizację;
+          2. brak wymaganego pola zwraca błąd z właściwą ścieżką;
+          3. nieznane pole jest odrzucane;
+          4. brak tłumaczenia wymaganego pola jest odrzucany;
+          5. wartości spoza `options` nie przechodzą;
+          6. repeater respektuje oba limity i waliduje elementy;
+          7. renderer koduje tekst zawierający `<`, `>`, `&` i cudzysłowy;
+          8. Markdown nie przepuszcza surowego HTML ani niebezpiecznego schematu URL;
+          9. asset występuje raz przy wielu instancjach typu;
+          10. brak bloku oznacza brak jego CSS i JavaScriptu w dokumencie.
+
+          Przed produkcją uruchom również:
+
+          ```bash
+          php bin/cms release:check
+          ```
+
+          Ta kontrola skanuje wszystkie strony i kolekcje, ładuje definicje, weryfikuje layouty oraz waliduje każdą instancję — także wyłączoną. Wydanie z `[FAIL]` nie jest gotowe do przełączenia ruchu.
+
+          ## 15. Wdróż pakiet atomowo na poziomie wydania
+
+          Repozytorium przechowuje `blocks/feature-card/`, lecz nie fingerprintowane kopie z `public/assets/blocks/`. Po wdrożeniu pierwsze renderowanie strony publikuje brakujące zasoby. Przy immutable deployment rozgrzej strony podczas budowania artefaktu i przenieś powstały katalog publicznych assetów razem z wydaniem.
+
+          Po zmianie schematu sprawdź wszystkie istniejące instancje przed publikacją kodu. Najbezpieczniejsza kolejność dla zmiany niekompatybilnej to przygotowanie migracji YAML, wykonanie jej na kopii treści, uruchomienie `release:check`, a dopiero później przełączenie kompletnego wydania.
+        en: |-
+          ## 14. Test the contract in layers
+
+          Begin with the complete project check:
+
+          ```bash
+          composer check
+          ```
+
+          The pipeline runs PHP CS Fixer, PHPStan and PHPUnit. A new renderer is subject to style rules and static analysis, but the component also needs behavioural tests.
+
+          A minimum case set covers:
+
+          1. valid data passes normalization;
+          2. a missing required field returns an error at the correct path;
+          3. an unknown field is rejected;
+          4. a missing required translation is rejected;
+          5. values outside `options` fail;
+          6. a repeater respects both limits and validates its items;
+          7. the renderer encodes text containing `<`, `>`, `&` and quotes;
+          8. Markdown does not allow raw HTML or unsafe URL schemes;
+          9. an asset appears once for multiple instances of a type;
+          10. no block means no corresponding CSS or JavaScript in the document.
+
+          Before production, also run:
+
+          ```bash
+          php bin/cms release:check
+          ```
+
+          This check scans every page and collection, loads definitions, verifies layouts and validates every instance — including disabled ones. A release containing `[FAIL]` is not ready to receive traffic.
+
+          ## 15. Deploy the package atomically at release level
+
+          The repository stores `blocks/feature-card/`, but not fingerprinted copies from `public/assets/blocks/`. After deployment, the first page render publishes missing assets. With an immutable deployment, warm the pages while building the artifact and move the resulting public asset directory with the release.
+
+          After changing a schema, check all existing instances before publishing code. The safest order for an incompatible change is to prepare a YAML migration, run it against a content copy, execute `release:check`, and only then switch to the complete release.
+      note:
+        pl: Test samego `render.php` nie wystarcza. Najważniejsze błędy powstają na granicach schematu, lokalizacji, mediów i publikacji assetów.
+        en: Testing `render.php` alone is insufficient. The most important failures occur at schema, localization, media and asset-publication boundaries.
+  - id: 01a06830-3003-7414-8414-000000000014
+    type: diagnostic-table
+    enabled: true
+    data:
+      anchor: diagnostyka-bloku
+      eyebrow:
+        pl: 16 / Diagnostyka
+        en: 16 / Troubleshooting
+      title:
+        pl: Znajdź warstwę, zanim zmienisz kod.
+        en: Find the layer before changing code.
+      intro:
+        pl: Komunikat widoczny przy zapisie albo renderowaniu zwykle wskazuje granicę, która odrzuciła dane. Zacznij od kontraktu i ścieżki błędu.
+        en: A message shown during saving or rendering usually identifies the boundary that rejected data. Begin with the contract and error path.
+      rows:
+        - layer: { pl: Registry, en: Registry }
+          problem: { pl: Typ bloku nie pojawia się w pickerze, en: Block type does not appear in the picker }
+          cause: { pl: "Niepoprawna nazwa katalogu, brak wymaganego pliku, symlink albo błędny schemat.", en: "Invalid directory name, missing required file, symlink or invalid schema." }
+          check: { pl: "Sprawdź slug katalogu, zwykłe pliki `block.yml` i `render.php` oraz `schemaVersion: 1`.", en: "Check the directory slug, regular `block.yml` and `render.php` files, and `schemaVersion: 1`." }
+        - layer: { pl: Schema, en: Schema }
+          problem: { pl: Zapis zwraca UNKNOWN_FIELD, en: Save returns UNKNOWN_FIELD }
+          cause: { pl: Dane zawierają klucz nieobecny w definicji lub stary klucz po refaktorze., en: Data contains a key absent from the definition or an old key left after refactoring. }
+          check: { pl: Porównaj dokładnie `data` z `fields`; usuń albo jawnie zmigruj stary klucz., en: Compare `data` with `fields` exactly; remove or explicitly migrate the old key. }
+        - layer: { pl: Lokalizacja, en: Localization }
+          problem: { pl: Brak wymaganej translacji, en: Required translation is missing }
+          cause: { pl: Pole tłumaczalne nie ma wartości dla jednego z aktywnych języków., en: A translatable field has no value for one of the enabled languages. }
+          check: { pl: Sprawdź `config/languages.yml` oraz każdy wymagany mapping locale w instancji., en: Check `config/languages.yml` and every required locale mapping in the instance. }
+        - layer: { pl: Media, en: Media }
+          problem: { pl: MEDIA_NOT_FOUND, en: MEDIA_NOT_FOUND }
+          cause: { pl: "`src` nie wskazuje istniejącego pliku w katalogu bieżącej strony.", en: "`src` does not reference an existing file in the current page directory." }
+          check: { pl: Umieść plik obok `content.yml` i zapisz samą bezpieczną nazwę względną., en: Place the file next to `content.yml` and store only its safe relative name. }
+        - layer: { pl: Renderer, en: Renderer }
+          problem: { pl: Błąd typu lub niezdefiniowany indeks, en: Type error or undefined index }
+          cause: { pl: Kod renderera zakłada inne dane niż aktualny schemat lub nie obsługuje pola opcjonalnego., en: Renderer code assumes data different from the current schema or does not handle an optional field. }
+          check: { pl: Zsynchronizuj renderer ze schematem i dla opcji stosuj `$data['field'] ?? wartość`., en: Synchronize renderer and schema; use `$data['field'] ?? value` for optional fields. }
+        - layer: { pl: Assety, en: Assets }
+          problem: { pl: CSS lub JS zwraca 403, en: CSS or JavaScript returns 403 }
+          cause: { pl: Serwer WWW nie może przejść przez katalog publicznego assetu lub odczytać `.htaccess`., en: The web server cannot traverse the public asset directory or read `.htaccess`. }
+          check: { pl: "Sprawdź pełne `namei -l`, katalogi `0755`, pliki `0644` oraz log Apache.", en: "Check full `namei -l`, `0755` directories, `0644` files and the Apache error log." }
+        - layer: { pl: Współbieżność, en: Concurrency }
+          problem: { pl: Page Builder zwraca HTTP 409, en: Page Builder returns HTTP 409 }
+          cause: { pl: Formularz zawiera starszą rewizję niż aktualny `content.yml`., en: The form contains an older revision than the current `content.yml`. }
+          check: { pl: "Odśwież stronę, ponownie zastosuj zmianę i zapisz na aktualnej rewizji.", en: "Refresh the page, reapply the change and save against the current revision." }
+      note:
+        pl: Nie obchodź walidatora przez ręczne osłabienie schematu. Najpierw ustal, czy błąd leży w definicji, instancji, pliku medium czy rendererze.
+        en: Do not bypass validation by weakening the schema. First determine whether the fault belongs to the definition, instance, media file or renderer.
+  - id: 01a06830-3003-7415-8415-000000000015
+    type: article-content
+    enabled: true
+    data:
+      anchor: checklista-bloku
+      content:
+        pl: |-
+          ## 17. Checklista gotowego bloku
+
+          Przed uznaniem komponentu za ukończony potwierdź:
+
+          1. typ ma poprawny slug, a pakiet nie jest symlinkiem;
+          2. `block.yml` i `render.php` są zwykłymi, czytelnymi plikami;
+          3. każde pole ma precyzyjny typ, limit i świadomą decyzję o tłumaczeniu;
+          4. required fields mają wartości we wszystkich aktywnych językach;
+          5. renderer używa właściwego helpera dla każdego kontekstu;
+          6. pola opcjonalne mają bezpieczne wartości domyślne;
+          7. repeatery mają rozsądne `minItems` i `maxItems`;
+          8. obrazy istnieją przy stronie i mają lokalizowany ALT;
+          9. CSS działa bez globalnych selektorów kolidujących z layoutem;
+          10. JavaScript obsługuje zero, jedną i wiele instancji;
+          11. widok desktopowy i mobilny zachowują hierarchię oraz dostępność;
+          12. `composer check` i `php bin/cms release:check` kończą się sukcesem.
+
+          Gotowy blok jest małym, zamkniętym modułem: ma jawne wejście, walidację, bezpieczną projekcję HTML i zasoby ładowane na żądanie. Ta przewidywalność jest ważniejsza niż liczba opcji udostępnionych redaktorowi.
+        en: |-
+          ## 17. Finished-block checklist
+
+          Before declaring the component complete, confirm that:
+
+          1. the type has a valid slug and the package is not a symlink;
+          2. `block.yml` and `render.php` are regular readable files;
+          3. every field has a precise type, limit and deliberate translation decision;
+          4. required fields have values in every enabled language;
+          5. the renderer uses the correct helper for every context;
+          6. optional fields have safe defaults;
+          7. repeaters have reasonable `minItems` and `maxItems`;
+          8. images exist beside the page and have localized ALT;
+          9. CSS avoids global selectors that collide with the layout;
+          10. JavaScript supports zero, one and many instances;
+          11. desktop and mobile views preserve hierarchy and accessibility;
+          12. `composer check` and `php bin/cms release:check` succeed.
+
+          A finished block is a small closed module: it has explicit input, validation, a safe HTML projection and assets loaded on demand. That predictability matters more than the number of options exposed to an editor.
+      note:
+        pl: Jeśli kontraktu bloku nie da się wyjaśnić jednym zdaniem, prawdopodobnie warto podzielić komponent na dwa prostsze typy.
+        en: If the block contract cannot be explained in one sentence, consider splitting the component into two simpler types.
+  - id: 01a06830-3003-7416-8416-000000000016
+    type: call-to-action
+    enabled: true
+    data:
+      eyebrow:
+        pl: Następny tutorial
+        en: Next tutorial
+      title:
+        pl: Teraz uporządkuj całą strukturę treści.
+        en: Now organize the complete content structure.
+      description:
+        pl: Kolejny rozdział wyjaśni stabilne tożsamości stron, lokalizowane slugi, kolekcje, dziedziczenie tras i kontrakty plików YAML.
+        en: The next chapter explains stable page identities, localized slugs, collections, route ancestry and YAML file contracts.
+      button_label:
+        pl: Przejdź do struktury treści
+        en: Continue to content structure
+      button_url:
+        pl: /pl/dokumentacja/struktura-tresci
+        en: /en/documentation/content-structure
