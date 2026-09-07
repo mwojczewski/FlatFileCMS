@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FlatFileCms\Rendering;
 
 use FlatFileCms\Domain\Content\PageIdentity;
+use FlatFileCms\Http\ErrorView;
 use FlatFileCms\Media\MediaRepository;
 use FlatFileCms\Media\MediaUrlGenerator;
 use FlatFileCms\Presentation\PageViewModel;
@@ -26,7 +27,7 @@ final readonly class PageRenderer
     public function render(
         PageViewModel $page,
         array $navigation,
-        ?\FlatFileCms\Http\ErrorView $error = null,
+        ?ErrorView $error = null,
     ): RenderedPage {
         $context = new RenderContext(
             $page->locale(),
@@ -45,11 +46,11 @@ final readonly class PageRenderer
             $data['_block_id'] = ContentData::string($block['id'] ?? null, "blocks.{$index}.id");
             $data['_page_id'] = $page->id();
             $data['_return_path'] = $page->url();
-            $content .= $this->blocks->render($type, $data, $context);
+            $content .= $this->blocks->render($type, $data, $context, $error);
         }
 
         return new RenderedPage(
-            $this->layouts->render($page, $content, $navigation, $assets, $context),
+            $this->layouts->render($page, $content, $navigation, $assets, $context, $error),
             max(
                 $assets->modifiedAt(),
                 $this->layouts->modifiedAt($page->layout()),
