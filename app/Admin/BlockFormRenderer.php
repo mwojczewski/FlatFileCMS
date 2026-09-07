@@ -109,14 +109,16 @@ final readonly class BlockFormRenderer
         }
 
         $inputType = match ($type) {
-            'number', 'url', 'email', 'date', 'color' => $type,
+            'number', 'email', 'date', 'color' => $type,
             'datetime' => 'datetime-local',
             default => 'text',
         };
 
+        $inputMode = $type === 'url' ? ' inputmode="url"' : '';
+
         return '<input type="' . $inputType . '" name="' . self::escape($name) . '" value="'
             . self::escape(\is_int($value) || \is_float($value) ? (string) $value : (\is_string($value) ? $value : ''))
-            . '"' . $this->attributes($definition, $languages) . '>';
+            . '"' . $inputMode . $this->attributes($definition, $languages) . '>';
     }
 
     private function repeater(

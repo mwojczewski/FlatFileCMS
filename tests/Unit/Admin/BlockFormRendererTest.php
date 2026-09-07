@@ -37,4 +37,29 @@ final class BlockFormRendererTest extends TestCase
         self::assertStringContainsString('class="markdown-input"', $html);
         self::assertStringContainsString('name="data[content][pl]"', $html);
     }
+
+    public function testUrlFieldsAllowRelativePathsInTheBrowser(): void
+    {
+        $definition = new BlockDefinition(
+            'call-to-action',
+            ['pl' => 'Wezwanie do działania'],
+            [],
+            null,
+            ['button_url' => new FieldDefinition('button_url', 'url', true, false, [])],
+            '/blocks/call-to-action',
+            '/blocks/call-to-action/render.php',
+            1,
+        );
+
+        $html = (new BlockFormRenderer())->render(
+            $definition,
+            new LanguageConfig('pl', ['pl' => 'Polski']),
+            ['button_url' => '/en/documentation/getting-started'],
+        );
+
+        self::assertStringContainsString('type="text"', $html);
+        self::assertStringContainsString('inputmode="url"', $html);
+        self::assertStringContainsString('value="/en/documentation/getting-started"', $html);
+        self::assertStringNotContainsString('type="url"', $html);
+    }
 }

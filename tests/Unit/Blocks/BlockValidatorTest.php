@@ -89,6 +89,29 @@ final class BlockValidatorTest extends TestCase
         self::assertSame('First', $firstItem['label']);
     }
 
+    public function testUrlFieldAcceptsRelativePath(): void
+    {
+        $normalized = $this->validator->validate(
+            $this->registry->get('complex'),
+            [
+                'title' => ['pl' => 'Oferta'],
+                'count' => 4,
+                'active' => true,
+                'tone' => 'dark',
+                'tags' => ['new'],
+                'website' => '/en/documentation/getting-started',
+                'date' => '2026-08-29',
+                'color' => '#aabbcc',
+                'image' => ['src' => 'photo.jpg'],
+                'items' => [['label' => ['pl' => 'Pierwsza']]],
+            ],
+            $this->languages,
+            PageIdentity::fromString('offer'),
+        );
+
+        self::assertSame('/en/documentation/getting-started', $normalized->values()['website']);
+    }
+
     public function testItReportsMultipleValidationErrorsWithPaths(): void
     {
         try {
