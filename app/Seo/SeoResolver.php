@@ -30,6 +30,7 @@ final readonly class SeoResolver
             $publicUrl,
             $languages,
             $configuration,
+            !$page->identity()->isHomepage(),
         );
     }
 
@@ -48,6 +49,7 @@ final readonly class SeoResolver
             $publicUrl,
             $languages,
             $configuration,
+            true,
         );
     }
 
@@ -62,6 +64,7 @@ final readonly class SeoResolver
         string $publicUrl,
         LanguageConfig $languages,
         ConfigurationDocument $configuration,
+        bool $appendTitleSuffix,
     ): array {
         $setup = $configuration->data();
         $global = $this->map($this->localization->resolve($setup['seo'] ?? [], $locale, $languages));
@@ -71,7 +74,9 @@ final readonly class SeoResolver
         $title = $this->optionalString($pageSeo['title'] ?? null)
             ?? $resourceTitle;
         $suffix = $this->optionalString($global['titleSuffix'] ?? null);
-        $fullTitle = $suffix === null || str_ends_with($title, $suffix) ? $title : "{$title} — {$suffix}";
+        $fullTitle = !$appendTitleSuffix || $suffix === null || str_ends_with($title, $suffix)
+            ? $title
+            : "{$title} — {$suffix}";
         $description = $this->optionalString($pageSeo['description'] ?? null)
             ?? $this->optionalString($global['description'] ?? null)
             ?? '';
@@ -88,6 +93,7 @@ final readonly class SeoResolver
         $openGraph['description'] ??= $description;
         $openGraph['url'] ??= $canonical;
         $openGraph['image'] ??= $global['ogImage'] ?? null;
+        $openGraph['type'] ??= $global['ogType'] ?? 'website';
 
         $twitter = [...$this->map($global['twitter'] ?? []), ...$this->map($pageSeo['twitter'] ?? [])];
         $twitter['title'] ??= $fullTitle;

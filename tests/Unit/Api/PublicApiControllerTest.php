@@ -69,6 +69,20 @@ final class PublicApiControllerTest extends TestCase
         self::assertMatchesRegularExpression('/^"[a-f0-9]{64}"$/D', $response->headers()['ETag']);
     }
 
+    public function testHomepageDoesNotAppendGlobalTitleSuffix(): void
+    {
+        $response = $this->controller->homepage(new Request(
+            'GET',
+            '/api/v1/pages/homepage',
+            query: ['lang' => 'en'],
+        ));
+        $data = $this->decode($response);
+        $seo = ContentData::map($data['seo'] ?? null, 'seo');
+
+        self::assertSame(200, $response->status());
+        self::assertSame('Home', $seo['title']);
+    }
+
     public function testItReturnsNotModifiedForMatchingEtag(): void
     {
         $request = new Request(

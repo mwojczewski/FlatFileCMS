@@ -1,3 +1,12 @@
+<?php
+$redirectStatuses = [
+    301 => 'Przekierowanie stałe',
+    302 => 'Przekierowanie tymczasowe',
+    303 => 'Przejdź do innego adresu (metoda GET)',
+    307 => 'Przekierowanie tymczasowe (zachowuje metodę)',
+    308 => 'Przekierowanie stałe (zachowuje metodę)',
+];
+?>
 <div class="toolbar crud-toolbar">
     <div><p class="eyebrow">Routing</p><p class="lead">Reguły są stosowane przed rozwiązywaniem stron i kolekcji.</p></div>
 </div>
@@ -7,7 +16,7 @@
         <input type="hidden" name="_csrf" value="<?= $escape($csrfToken) ?>"><input type="hidden" name="revision" value="<?= $escape($revision) ?>">
         <label>Adres źródłowy<input name="source" placeholder="/stary-adres" required></label>
         <label>Adres docelowy<input name="target" placeholder="/nowy-adres" required></label>
-        <label>Kod<select name="status"><?php foreach ([301, 302, 303, 307, 308] as $status): ?><option value="<?= $status ?>"><?= $status ?></option><?php endforeach; ?></select></label>
+        <label>Kod HTTP<select name="status"><?php foreach ($redirectStatuses as $status => $description): ?><option value="<?= $status ?>"><?= $status ?> — <?= $escape($description) ?></option><?php endforeach; ?></select></label>
         <label class="check compact-check"><input type="checkbox" name="enabled" value="1" checked><span>Aktywne</span></label>
         <button type="submit">Dodaj regułę</button>
     </form>
@@ -20,7 +29,7 @@
                 <input type="hidden" name="_csrf" value="<?= $escape($csrfToken) ?>"><input type="hidden" name="revision" value="<?= $escape($revision) ?>"><input type="hidden" name="id" value="<?= $escape($rule->id()) ?>">
                 <label>Adres źródłowy<input name="source" value="<?= $escape($rule->source()) ?>" required></label>
                 <label>Adres docelowy<input name="target" value="<?= $escape($rule->target()) ?>" required></label>
-                <label>Kod<select name="status"><?php foreach ([301, 302, 303, 307, 308] as $status): ?><option value="<?= $status ?>"<?= $rule->status() === $status ? ' selected' : '' ?>><?= $status ?></option><?php endforeach; ?></select></label>
+                <label>Kod HTTP<select name="status"><?php foreach ($redirectStatuses as $status => $description): ?><option value="<?= $status ?>"<?= $rule->status() === $status ? ' selected' : '' ?>><?= $status ?> — <?= $escape($description) ?></option><?php endforeach; ?></select></label>
                 <label class="check compact-check"><input type="checkbox" name="enabled" value="1"<?= $rule->enabled() ? ' checked' : '' ?>><span>Aktywne</span></label>
                 <button type="submit">Zapisz</button>
             </form>

@@ -81,6 +81,39 @@
     return node;
   };
 
+  const icons = {
+    up: '<path d="m18 15-6-6-6 6"/>',
+    down: '<path d="m6 9 6 6 6-6"/>',
+    outdent: '<path d="M9 18h10M9 12h10M9 6h10M5 8l-4 4 4 4"/>',
+    edit: '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4z"/>',
+    addChild: '<path d="M5 4v6a4 4 0 0 0 4 4h10"/><path d="m16 11 3 3-3 3"/><path d="M12 18v4m-2-2h4"/>',
+    remove: '<path d="M3 6h18M8 6V4h8v2m-9 0 1 15h8l1-15M10 11v6m4-6v6"/>',
+  };
+
+  const iconButton = (label, icon, action, modifier = "") => {
+    const node = button(
+      label,
+      action,
+      `icon-button navigation-action ${modifier}`.trim(),
+    );
+    node.textContent = "";
+    node.setAttribute("aria-label", label);
+    node.title = label;
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("width", "18");
+    svg.setAttribute("height", "18");
+    svg.setAttribute("fill", "none");
+    svg.setAttribute("stroke", "currentColor");
+    svg.setAttribute("stroke-width", "2");
+    svg.setAttribute("stroke-linecap", "round");
+    svg.setAttribute("stroke-linejoin", "round");
+    svg.setAttribute("aria-hidden", "true");
+    svg.innerHTML = icons[icon];
+    node.append(svg);
+    return node;
+  };
+
   const input = (label, value, onInput, options = {}) => {
     const wrapper = element("label");
     wrapper.append(label);
@@ -298,38 +331,40 @@
     const actions = element("div", "navigation-item-actions");
     if (index > 0)
       actions.append(
-        button(
-          "↑",
+        iconButton(
+          "Przenieś wyżej",
+          "up",
           () => {
             [items[index - 1], items[index]] = [items[index], items[index - 1]];
             render();
           },
-          "icon-button",
+          "navigation-action-move",
         ),
       );
     if (index < items.length - 1)
       actions.append(
-        button(
-          "↓",
+        iconButton(
+          "Przenieś niżej",
+          "down",
           () => {
             [items[index], items[index + 1]] = [items[index + 1], items[index]];
             render();
           },
-          "icon-button",
+          "navigation-action-move",
         ),
       );
     if (parentContext)
       actions.append(
-        button("Wysuń", () => {
+        iconButton("Wysuń o jeden poziom", "outdent", () => {
           const moved = removeFrom(items, index);
           parentContext.items.splice(parentContext.index + 1, 0, moved);
           render();
-        }),
+        }, "navigation-action-structure"),
       );
-    actions.append(button("Edytuj", () => openDialog(item)));
+    actions.append(iconButton("Edytuj pozycję", "edit", () => openDialog(item), "navigation-action-edit"));
     if (depth < 8)
       actions.append(
-        button("Dodaj dziecko", () => {
+        iconButton("Dodaj pozycję podrzędną", "addChild", () => {
           const child = normalizeItem({ label: { [defaultLocale]: "" } });
           item.children.push(child);
           render();
@@ -338,18 +373,19 @@
             if (childIndex >= 0) item.children.splice(childIndex, 1);
             render();
           });
-        }),
+        }, "navigation-action-add"),
       );
     actions.append(
-      button(
-        "Usuń",
+      iconButton(
+        "Usuń pozycję",
+        "remove",
         () => {
           if (window.confirm("Usunąć tę pozycję wraz z jej dziećmi?")) {
             removeFrom(items, index);
             render();
           }
         },
-        "button compact danger-text",
+        "navigation-action-remove",
       ),
     );
     row.append(handle, summary, actions);

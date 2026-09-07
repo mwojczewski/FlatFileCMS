@@ -648,6 +648,97 @@ tbody tr:hover {
   text-align: right;
 }
 
+.crud-table .page-actions-column {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.page-row-actions {
+  align-items: center;
+  justify-content: end;
+}
+
+.icon-button {
+  --icon-button-color: var(--admin-ink);
+  --icon-button-border: var(--admin-line);
+  --icon-button-background: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  min-height: 2rem;
+  padding: 0;
+  border: 1px solid var(--icon-button-border);
+  border-radius: 0.45rem;
+  color: var(--icon-button-color);
+  background: var(--icon-button-background);
+  box-shadow: none;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.icon-button svg {
+  display: block;
+  width: 1.125rem;
+  height: 1.125rem;
+  flex: 0 0 auto;
+}
+
+.page-row-actions .icon-button {
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.page-action-add {
+  --icon-button-color: #24734d;
+  --icon-button-border: #c9e7d7;
+  --icon-button-background: #eef9f3;
+}
+
+.page-action-builder {
+  --icon-button-color: #5050bd;
+  --icon-button-border: #d8d8f4;
+  --icon-button-background: #f1f1fc;
+}
+
+.page-row-actions .icon-button.is-disabled {
+  --icon-button-color: #a0a5b1;
+  --icon-button-border: #e4e6eb;
+  --icon-button-background: #f5f6f8;
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.page-action-edit {
+  --icon-button-color: #566072;
+  --icon-button-border: #dfe2e8;
+  --icon-button-background: #f7f8fa;
+}
+
+.icon-button:not(.is-disabled):hover {
+  color: var(--icon-button-color);
+  background: var(--icon-button-background);
+  border-color: currentColor;
+  box-shadow: none;
+  transform: translateY(-1px);
+}
+
+.page-row-actions .icon-button:focus-visible {
+  outline: 3px solid rgb(91 91 214 / 22%);
+  outline-offset: 2px;
+}
+
+@media (max-width: 700px) {
+  .page-row-actions {
+    align-items: center;
+  }
+}
+
 .page-cell small {
   display: block;
   margin-top: 0.15rem;
@@ -892,6 +983,38 @@ tbody tr:hover {
   min-height: 2.15rem;
   padding: 0.45rem 0.68rem;
   font-size: 0.83rem;
+}
+
+.block-actions .icon-button {
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  min-height: 2rem;
+  padding: 0;
+}
+
+.builder-action-edit {
+  --icon-button-color: #5050bd;
+  --icon-button-border: #d8d8f4;
+  --icon-button-background: #f1f1fc;
+}
+
+.builder-action-toggle {
+  --icon-button-color: #8a641b;
+  --icon-button-border: #eadbae;
+  --icon-button-background: #fff8e7;
+}
+
+.builder-action-duplicate {
+  --icon-button-color: #24734d;
+  --icon-button-border: #c9e7d7;
+  --icon-button-background: #eef9f3;
+}
+
+.builder-action-remove {
+  --icon-button-color: #a53b46;
+  --icon-button-border: #efcfd3;
+  --icon-button-background: #fff2f3;
 }
 
 .order-form {
@@ -1531,6 +1654,10 @@ hr {
     white-space: normal;
   }
 
+  .page-row-actions {
+    align-items: end;
+  }
+
   .row-actions .button,
   .row-actions button {
     width: 100%;
@@ -1542,16 +1669,20 @@ hr {
 
   .block-actions {
     grid-column: 1 / -1;
-    justify-content: stretch;
+    justify-content: flex-end;
   }
 
   .block-actions > * {
-    flex: 1;
+    flex: 0 0 auto;
   }
 
   .block-actions .button,
   .block-actions button {
     width: 100%;
+  }
+
+  .block-actions .icon-button {
+    width: 2rem;
   }
 
   .picker-grid,
@@ -1681,15 +1812,47 @@ hr {
   font-size: 0.76rem;
 }
 
-.icon-button {
-  min-width: 2rem;
-  min-height: 2rem;
-  padding: 0.2rem;
-  border: 1px solid var(--admin-line);
-  border-radius: 0.45rem;
-  color: var(--admin-ink);
-  background: #fff;
-  cursor: pointer;
+.navigation-item-actions .navigation-action {
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.navigation-action-move,
+.navigation-action-structure {
+  --icon-button-color: #566072;
+  --icon-button-border: #dfe2e8;
+  --icon-button-background: #f7f8fa;
+}
+
+.navigation-action-edit {
+  --icon-button-color: #5050bd;
+  --icon-button-border: #d8d8f4;
+  --icon-button-background: #f1f1fc;
+}
+
+.navigation-action-add {
+  --icon-button-color: #24734d;
+  --icon-button-border: #c9e7d7;
+  --icon-button-background: #eef9f3;
+}
+
+.navigation-action-remove {
+  --icon-button-color: #a53b46;
+  --icon-button-border: #efcfd3;
+  --icon-button-background: #fff2f3;
+}
+
+.navigation-item-actions .navigation-action:hover {
+  color: var(--icon-button-color);
+  background: var(--icon-button-background);
+}
+
+.navigation-item-actions .navigation-action:focus-visible {
+  outline: 3px solid rgb(91 91 214 / 22%);
+  outline-offset: 2px;
 }
 
 .navigation-children {
@@ -1807,9 +1970,9 @@ hr {
 
 .redirect-form {
   display: grid;
-  grid-template-columns: minmax(10rem, 1fr) minmax(12rem, 1.4fr) 7rem auto auto;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.75rem;
-  align-items: end;
+  align-items: start;
 }
 
 .redirect-card {
@@ -1915,8 +2078,9 @@ hr {
   }
 
   .navigation-item-actions {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 
   .navigation-children {
