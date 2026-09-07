@@ -7,6 +7,7 @@ slug:
 title:
   pl: Możliwości FlatFile CMS
   en: FlatFile CMS features
+order: 0
 seo:
   title:
     pl: Możliwości FlatFile CMS — techniczny przewodnik
@@ -147,25 +148,39 @@ blocks:
         - cell_1: { pl: Content, en: Content }
           cell_2: { pl: YAML, en: YAML }
           cell_3:
-            { pl: "Odczyt, rewizje i stabilna tożsamość", en: "Reads, revisions and stable identity" }
+            {
+              pl: "Odczyt, rewizje i stabilna tożsamość",
+              en: "Reads, revisions and stable identity",
+            }
           cell_4: { pl: Model domenowy, en: Domain model }
         - cell_1: { pl: Blocks, en: Blocks }
           cell_2: { pl: Dane bloku, en: Block data }
           cell_3:
-            { pl: "Walidacja, normalizacja i lokalizacja", en: "Validation, normalization and localization" }
+            {
+              pl: "Walidacja, normalizacja i lokalizacja",
+              en: "Validation, normalization and localization",
+            }
           cell_4: { pl: Normalized data, en: Normalized data }
         - cell_1: { pl: ViewModel, en: ViewModel }
           cell_2: { pl: Strona i konfiguracja, en: Page and configuration }
           cell_3:
-            { pl: "SEO, nawigacja, media i aktywne bloki", en: "SEO, navigation, media and enabled blocks" }
+            {
+              pl: "SEO, nawigacja, media i aktywne bloki",
+              en: "SEO, navigation, media and enabled blocks",
+            }
           cell_4: { pl: Publiczny model, en: Public model }
         - cell_1: { pl: Rendering, en: Rendering }
           cell_2: { pl: Publiczny model, en: Public model }
-          cell_3: { pl: Renderery bloków i layout PHP, en: Block renderers and PHP layout }
+          cell_3:
+            {
+              pl: Renderery bloków i layout PHP,
+              en: Block renderers and PHP layout,
+            }
           cell_4: { pl: HTML, en: HTML }
         - cell_1: { pl: API, en: API }
           cell_2: { pl: Publiczny model, en: Public model }
-          cell_3: { pl: Kontrolowana serializacja, en: Controlled serialization }
+          cell_3:
+            { pl: Kontrolowana serializacja, en: Controlled serialization }
           cell_4: { pl: JSON, en: JSON }
   - id: 01a05e10-1001-7404-8404-000000000004
     type: architecture

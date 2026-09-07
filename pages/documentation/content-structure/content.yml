@@ -1,0 +1,731 @@
+schemaVersion: 1
+enabled: true
+layout: default
+slug:
+  pl: struktura-tresci
+  en: content-structure
+title:
+  pl: Struktura treści i routing w FlatFile CMS
+  en: Content structure and routing in FlatFile CMS
+date: "2026-09-05"
+order: 4
+category: content-structure
+excerpt:
+  pl: Techniczny przewodnik po tożsamościach stron, kontraktach content.yml, lokalizowanych slugach, hierarchii tras, kolekcjach i bezpiecznych operacjach na drzewie treści.
+  en: A technical guide to page identities, content.yml contracts, localized slugs, route hierarchy, collections and safe content-tree operations.
+seo:
+  title:
+    pl: Struktura treści i routing FlatFile CMS — kompletny tutorial
+    en: FlatFile CMS content structure and routing — complete tutorial
+  description:
+    pl: Naucz się projektować strony, hierarchie i kolekcje FlatFile CMS oraz bezpiecznie zarządzać lokalizowanymi trasami i plikami YAML.
+    en: Learn to design FlatFile CMS pages, hierarchies and collections and safely manage localized routes and YAML files.
+  robots:
+    index: true
+    follow: true
+  openGraph: {}
+  twitter: {}
+  jsonLd:
+    "@context": https://schema.org
+    "@type": TechArticle
+    headline: Content structure and routing in FlatFile CMS
+    dateModified: "2026-09-05"
+blocks:
+  - id: 01a06d50-4004-7401-8401-000000000001
+    type: docs-hero
+    enabled: true
+    data:
+      breadcrumb:
+        pl: Dokumentacja / 04 / Struktura treści
+        en: Documentation / 04 / Content structure
+      title:
+        pl: Struktura treści i routing
+        en: Content structure and routing
+      lead:
+        pl: Jak katalogi stają się stabilnymi tożsamościami, slugi budują wielojęzyczne URL-e, a kolekcje zamieniają bezpośrednie dzieci w filtrowane i paginowane zestawy — bez utraty bezpieczeństwa zapisu.
+        en: How directories become stable identities, slugs build multilingual URLs and collections turn direct children into filtered, paginated sets without sacrificing write safety.
+      level: średniozaawansowany
+      reading_time:
+        pl: około 40 minut
+        en: about 40 minutes
+      updated: "2026-09-05"
+      topics:
+        - label: { pl: content.yml, en: content.yml }
+        - label: { pl: Routing, en: Routing }
+        - label: { pl: Lokalizacja, en: Localization }
+        - label: { pl: Kolekcje, en: Collections }
+        - label: { pl: Paginacja, en: Pagination }
+        - label: { pl: Bezpieczny zapis, en: Safe writes }
+  - id: 01a06d50-4004-7402-8402-000000000002
+    type: docs-toc
+    enabled: true
+    data:
+      title:
+        pl: Mapa modelu treści
+        en: Content-model map
+      intro:
+        pl: Najpierw oddzielimy wewnętrzną tożsamość od publicznego adresu. Potem zbudujemy stronę, trasę wielojęzyczną, hierarchię i kolekcję, a na końcu prześledzimy bezpieczne operacje panelu.
+        en: First we separate internal identity from public address. Then we build a page, multilingual route, hierarchy and collection before tracing safe administration operations.
+      items:
+        - number: "01"
+          title: { pl: Tożsamość, en: Identity }
+          description: { pl: Katalog techniczny jako trwały klucz strony., en: Technical directory as the stable page key. }
+          url: { pl: /pl/dokumentacja/struktura-tresci#tozsamosc, en: /en/documentation/content-structure#tozsamosc }
+        - number: "02"
+          title: { pl: Kontrakt strony, en: Page contract }
+          description: { pl: "Metadane, SEO, atrybuty i lista bloków.", en: "Metadata, SEO, attributes and the block list." }
+          url: { pl: /pl/dokumentacja/struktura-tresci#developer-experience, en: /en/documentation/content-structure#developer-experience }
+        - number: "03"
+          title: { pl: Routing językowy, en: Localized routing }
+          description: { pl: "Prefiksy locale, fallbacki i slugi przodków.", en: "Locale prefixes, fallbacks and ancestor slugs." }
+          url: { pl: /pl/dokumentacja/struktura-tresci#routing, en: /en/documentation/content-structure#routing }
+        - number: "04"
+          title: { pl: Kolekcje, en: Collections }
+          description: { pl: pagination.yml i wybór bezpośrednich dzieci., en: pagination.yml and direct-child selection. }
+          url: { pl: /pl/dokumentacja/struktura-tresci#kolekcje, en: /en/documentation/content-structure#kolekcje }
+        - number: "05"
+          title: { pl: Query kolekcji, en: Collection query }
+          description: { pl: "Sortowanie, filtry, allowlisty i paginacja.", en: "Sorting, filters, allowlists and pagination." }
+          url: { pl: /pl/dokumentacja/struktura-tresci#query-kolekcji, en: /en/documentation/content-structure#query-kolekcji }
+        - number: "06"
+          title: { pl: Panel, en: Admin }
+          description: { pl: "Tworzenie, edycja, przenoszenie i usuwanie.", en: "Creating, editing, moving and deleting." }
+          url: { pl: /pl/dokumentacja/struktura-tresci#panel, en: /en/documentation/content-structure#panel }
+        - number: "07"
+          title: { pl: Spójność zapisu, en: Write integrity }
+          description: { pl: "Rewizje, blokady, walidacja i atomowa publikacja.", en: "Revisions, locks, validation and atomic publication." }
+          url: { pl: /pl/dokumentacja/struktura-tresci#spojnosc, en: /en/documentation/content-structure#spojnosc }
+        - number: "08"
+          title: { pl: Diagnostyka, en: Troubleshooting }
+          description: { pl: Konflikty tras i typowe błędy struktury., en: Route collisions and common structure errors. }
+          url: { pl: /pl/dokumentacja/struktura-tresci#diagnostyka-struktury, en: /en/documentation/content-structure#diagnostyka-struktury }
+  - id: 01a06d50-4004-7403-8403-000000000003
+    type: technical-table
+    enabled: true
+    data:
+      eyebrow:
+        pl: Warstwy modelu
+        en: Model layers
+      title:
+        pl: Ta sama treść ma kilka różnych identyfikatorów.
+        en: The same content has several different identifiers.
+      intro:
+        pl: Pomylenie katalogu, slugu i pełnej trasy prowadzi do kruchych linków. Każda wartość ma własną odpowiedzialność i inny cykl życia.
+        en: Confusing a directory, slug and full route creates fragile links. Each value has its own responsibility and lifecycle.
+      column_1: { pl: Pojęcie, en: Concept }
+      column_2: { pl: Przykład, en: Example }
+      column_3: { pl: Odpowiedzialność, en: Responsibility }
+      column_4: { pl: Stabilność, en: Stability }
+      rows:
+        - cell_1: { pl: Tożsamość techniczna, en: Technical identity }
+          cell_2: { pl: documentation/content-structure, en: documentation/content-structure }
+          cell_3: { pl: Wskazuje katalog i zasób wewnątrz CMS-a., en: Identifies the directory and CMS resource. }
+          cell_4: { pl: Stabilna, en: Stable }
+        - cell_1: { pl: Slug lokalny, en: Local slug }
+          cell_2: { pl: struktura-tresci, en: content-structure }
+          cell_3: { pl: Określa jeden segment publicznego URL-a., en: Defines one public URL segment. }
+          cell_4: { pl: Może się zmieniać, en: May change }
+        - cell_1: { pl: Trasa publiczna, en: Public route }
+          cell_2: { pl: /pl/dokumentacja/struktura-tresci, en: /en/documentation/content-structure }
+          cell_3: { pl: Łączy locale i slugi całego łańcucha przodków., en: Combines locale and all ancestor slugs. }
+          cell_4: { pl: Wynikowa, en: Derived }
+        - cell_1: { pl: Tytuł, en: Title }
+          cell_2: { pl: Struktura treści, en: Content structure }
+          cell_3: { pl: Identyfikuje stronę dla człowieka i interfejsu., en: Identifies the page for people and interfaces. }
+          cell_4: { pl: Redakcyjna, en: Editorial }
+        - cell_1: { pl: UUID bloku, en: Block UUID }
+          cell_2: { pl: UUID v7, en: UUID v7 }
+          cell_3: { pl: Rozróżnia instancje komponentów na stronie., en: Distinguishes component instances on a page. }
+          cell_4: { pl: Stabilna w obrębie strony, en: Stable within page }
+  - id: 01a06d50-4004-7404-8404-000000000004
+    type: article-content
+    enabled: true
+    data:
+      anchor: tozsamosc
+      content:
+        pl: |-
+          ## 1. Zacznij od drzewa katalogów
+
+          FlatFile CMS traktuje `pages/` jako korzeń modelu treści. Zwykła strona jest katalogiem zawierającym `content.yml`, a kolekcja — katalogiem zawierającym `pagination.yml`. W wersji kontraktu 1 jeden katalog nie może być jednocześnie stroną i kolekcją.
+
+          ```text
+          pages/
+          ├── homepage/content.yml
+          └── documentation/
+              ├── pagination.yml
+              ├── getting-started/content.yml
+              ├── creating-custom-blocks/content.yml
+              └── content-structure/content.yml
+          ```
+
+          Relatywna ścieżka katalogu jest stabilną tożsamością techniczną. `documentation/content-structure` identyfikuje stronę niezależnie od języka i publicznego URL-a. Segmenty muszą być małymi slugami ASCII. Tożsamość jest używana przez repozytoria, panel, blokady, media lokalne strony i linki wewnętrzne.
+
+          Nie nazywaj katalogów według tymczasowej kampanii albo tłumaczenia wybranego języka. Dobra tożsamość opisuje trwałą rolę zasobu. Zmiana publicznego slugu nie wymaga zmiany katalogu; przeniesienie katalogu jest osobną operacją zmieniającą tożsamość całego poddrzewa.
+
+          ## 2. Traktuj homepage jako przypadek specjalny
+
+          `pages/homepage/content.yml` ma stałą tożsamość `homepage` i nie deklaruje `slug`. Jego publiczna ścieżka to korzeń danego locale. Homepage można edytować, ale panel nie pozwala go utworzyć ponownie, przenieść ani usunąć.
+
+          Przy jednym aktywnym języku korzeń ma postać `/`. Przy kilku aktywnych językach powstają np. `/pl/` i `/en/`, a żądanie bez prefiksu jest przekierowywane do domyślnego locale.
+        en: |-
+          ## 1. Start with the directory tree
+
+          FlatFile CMS treats `pages/` as the content-model root. A regular page is a directory containing `content.yml`; a collection contains `pagination.yml`. In contract version 1, one directory cannot be both a page and a collection.
+
+          ```text
+          pages/
+          ├── homepage/content.yml
+          └── documentation/
+              ├── pagination.yml
+              ├── getting-started/content.yml
+              ├── creating-custom-blocks/content.yml
+              └── content-structure/content.yml
+          ```
+
+          The relative directory path is the stable technical identity. `documentation/content-structure` identifies a page independently from language and public URL. Segments must be lowercase ASCII slugs. Repositories, the admin panel, locks, page-local media and internal links use this identity.
+
+          Do not name directories after a temporary campaign or one language's translation. A good identity describes the resource's lasting role. Changing a public slug does not require renaming the directory; moving the directory is a separate operation that changes the identity of the complete subtree.
+
+          ## 2. Treat the homepage as a special case
+
+          `pages/homepage/content.yml` has the fixed `homepage` identity and declares no `slug`. Its public path is the root of each locale. The homepage can be edited, but the panel cannot recreate, move or delete it.
+
+          With one enabled language the root is `/`. With several enabled languages, routes such as `/pl/` and `/en/` are created, and an unprefixed request is redirected to the default locale.
+      note:
+        pl: Nazwa katalogu jest kluczem systemowym. Slug jest częścią interfejsu publicznego. Nie używaj tych pojęć zamiennie.
+        en: A directory name is a system key. A slug is part of the public interface. Do not use these terms interchangeably.
+  - id: 01a06d50-4004-7405-8405-000000000005
+    type: code-showcase
+    enabled: true
+    data:
+      eyebrow:
+        pl: Kontrakt strony
+        en: Page contract
+      title:
+        pl: Jeden dokument opisuje metadane, SEO i kolejność bloków.
+        en: One document describes metadata, SEO and block order.
+      description:
+        pl: Pola rdzeniowe są interpretowane przez PageRepository. Dodatkowe wartości najwyższego poziomu pozostają atrybutami strony i mogą zasilać zapytanie kolekcji.
+        en: PageRepository interprets core fields. Additional root-level values remain page attributes and can feed a collection query.
+      filename: pages/documentation/content-structure/content.yml
+      code: |-
+        schemaVersion: 1
+        enabled: true
+        layout: default
+        slug:
+          pl: struktura-tresci
+          en: content-structure
+        title:
+          pl: Struktura treści
+          en: Content structure
+        date: "2026-09-05"
+        order: 4
+        category: content-structure
+        excerpt:
+          pl: Przewodnik po modelu treści.
+          en: A content-model guide.
+        seo:
+          title:
+            pl: Struktura treści — tutorial
+            en: Content structure — tutorial
+          robots:
+            index: true
+            follow: true
+        blocks: []
+      bullets:
+        - text: { pl: "`schemaVersion` wersjonuje kontrakt dokumentu.", en: "`schemaVersion` versions the document contract." }
+        - text: { pl: "`enabled` decyduje o publicznej dostępności.", en: "`enabled` controls public availability." }
+        - text: { pl: "`layout` wskazuje bezpieczną nazwę z rejestru layoutów.", en: "`layout` selects a safe name from the layout registry." }
+        - text: { pl: "Date, order i category są atrybutami kolekcji.", en: "Date, order and category are collection attributes." }
+  - id: 01a06d50-4004-7406-8406-000000000006
+    type: article-content
+    enabled: true
+    data:
+      anchor: kontrakt-strony
+      content:
+        pl: |-
+          ## 3. Poznaj pola rdzeniowe content.yml
+
+          `PageRepository` wymaga `schemaVersion: 1`, logicznego `enabled`, lokalizowanych `title`, listy `blocks` oraz — poza homepage — lokalizowanych `slug`. `layout` jest opcjonalny; jego brak oznacza layout domyślny z `config/setup.yml`. Podana nazwa musi być bezpiecznym slugiem i istnieć w `templates/layouts/`.
+
+          `seo` jest mapą przekazywaną do warstwy rozwiązywania metadanych. Typowe pola to lokalizowane `title` i `description`, opcjonalny `canonical`, `robots.index`, `robots.follow`, `openGraph`, `twitter` i `jsonLd`. Publiczna warstwa SEO łączy je z ustawieniami witryny zamiast ujawniać surową konfigurację.
+
+          `blocks` jest uporządkowaną listą instancji. Kolejność w YAML jest kolejnością renderowania. Każda instancja ma UUID v7, typ, stan i dane zgodne z `block.yml`. System waliduje także bloki wyłączone, lecz nie publikuje ich w HTML ani API.
+
+          Wszystkie nieznane pola najwyższego poziomu nie są automatycznie błędem. Repozytorium zachowuje je jako `attributes`, ponieważ kolekcje potrzebują domenowych metadanych takich jak `date`, `category`, `tags`, `order` czy lokalizowany `excerpt`. To kontrolowane rozszerzenie dotyczy strony jako dokumentu — dane pojedynczego bloku nadal mają kontrakt zamknięty.
+
+          ## 4. Rozumiej fallback języka domyślnego
+
+          `config/languages.yml` wskazuje aktywne języki oraz domyślny locale. Dla tytułu i slugu wartość domyślnego języka jest źródłem fallbacku. Jeśli opcjonalnego tłumaczenia brakuje, repozytorium może użyć wartości domyślnej.
+
+          Nie oznacza to, że warto celowo publikować wszystkie języki z tym samym slugiem. Fallback ułatwia stopniową migrację, ale pełne tłumaczenia dają przewidywalne URL-e i metadane. Każdy podany klucz locale musi należeć do aktywnej konfiguracji.
+        en: |-
+          ## 3. Learn the core content.yml fields
+
+          `PageRepository` requires `schemaVersion: 1`, boolean `enabled`, localized `title`, a `blocks` list and — except for the homepage — localized `slug`. `layout` is optional; absence selects the default from `config/setup.yml`. A provided name must be a safe slug and exist in `templates/layouts/`.
+
+          `seo` is a mapping passed to the metadata resolution layer. Typical fields include localized `title` and `description`, optional `canonical`, `robots.index`, `robots.follow`, `openGraph`, `twitter` and `jsonLd`. The public SEO layer combines these with site settings rather than exposing raw configuration.
+
+          `blocks` is an ordered instance list. YAML order is render order. Every instance has a UUID v7, type, state and data conforming to `block.yml`. The system validates disabled blocks too, but does not publish them in HTML or API output.
+
+          Unknown root-level fields are not automatically errors. The repository retains them as `attributes`, because collections need domain metadata such as `date`, `category`, `tags`, `order` or localized `excerpt`. This controlled extension applies to the page document; individual block data still uses a closed contract.
+
+          ## 4. Understand default-language fallback
+
+          `config/languages.yml` identifies enabled languages and the default locale. For titles and slugs, the default-language value is the fallback source. If an optional translation is missing, the repository may use the default value.
+
+          This does not mean every language should deliberately publish the same slug. Fallback helps gradual migration, while complete translations provide predictable URLs and metadata. Every supplied locale key must belong to the enabled configuration.
+      note:
+        pl: Dodatkowe atrybuty umieszczaj na najwyższym poziomie tylko wtedy, gdy opisują stronę jako element kolekcji. Dane prezentacyjne należą do bloków.
+        en: Add custom root attributes only when they describe the page as a collection item. Presentation data belongs inside blocks.
+  - id: 01a06d50-4004-7407-8407-000000000007
+    type: article-content
+    enabled: true
+    data:
+      anchor: routing
+      content:
+        pl: |-
+          ## 5. Buduj trasę z całego łańcucha przodków
+
+          `PageRouteIndex` nie używa nazw katalogów jako publicznych segmentów. Dla każdego locale przechodzi przez tożsamość strony i rozwiązuje slug każdego przodka — niezależnie od tego, czy przodek jest zwykłą stroną, czy kolekcją.
+
+          Dla tożsamości `documentation/content-structure` oraz dwóch aktywnych języków wynik wygląda tak:
+
+          ```text
+          identity: documentation/content-structure
+          PL:       /pl/dokumentacja/struktura-tresci
+          EN:       /en/documentation/content-structure
+          ```
+
+          Jeśli zmienisz `slug.pl` kolekcji z `dokumentacja` na `przewodniki`, automatycznie zmieni się polska trasa wszystkich potomków. Tożsamości katalogów i relacje wewnętrzne pozostają bez zmian.
+
+          Każdy nie-homepage element zagnieżdżonej tożsamości musi mieć istniejącego przodka będącego stroną albo kolekcją. Sam pusty katalog nie tworzy segmentu routingowego. Brak `pages/documentation/content.yml` lub `pagination.yml` sprawia, że potomka nie da się poprawnie osadzić w publicznym drzewie.
+
+          ## 6. Prefiksuj locale tylko wtedy, gdy jest potrzebny
+
+          Przy jednym aktywnym języku URL-e są nieprefiksowane. Przy więcej niż jednym wszystkie publiczne trasy HTML mają prefiks locale. Żądanie bez prefiksu jest przekierowywane do analogicznej ścieżki języka domyślnego.
+
+          Indeks tras budowany jest osobno dla każdego locale. Slugi rodzeństwa muszą być unikalne w danym języku, a wynikowa trasa strony nie może kolidować z trasą innej strony lub kolekcji. Konflikt jest wykrywany przed zapisem panelu i przez `release:check`.
+
+          ## 7. Linkuj wewnętrznie przez tożsamość
+
+          Kontrakt linków wewnętrznych przechowuje stabilny cel zamiast przetłumaczonego URL-a:
+
+          ```yaml
+          link:
+            type: page
+            page: services/websites
+          ```
+
+          Kolekcję wskazuje `type: collection` i jej tożsamość. Generator rozwiązuje bieżący URL dla aktywnego locale. Link zewnętrzny używa `type: url` oraz pełnego adresu HTTP(S). Dzięki temu zmiana slugu nie wymaga ręcznego przeszukiwania nawigacji.
+        en: |-
+          ## 5. Build a route from the complete ancestor chain
+
+          `PageRouteIndex` does not use directory names as public segments. For each locale it walks the page identity and resolves every ancestor slug, whether the ancestor is a regular page or collection.
+
+          For `documentation/content-structure` with two enabled languages, the result is:
+
+          ```text
+          identity: documentation/content-structure
+          PL:       /pl/dokumentacja/struktura-tresci
+          EN:       /en/documentation/content-structure
+          ```
+
+          If the collection's `slug.pl` changes from `dokumentacja` to `przewodniki`, every descendant Polish route changes automatically. Directory identities and internal relationships remain intact.
+
+          Every nested non-homepage identity segment needs an existing ancestor page or collection. An empty directory does not create a routing segment. Without `pages/documentation/content.yml` or `pagination.yml`, a child cannot be correctly embedded in the public tree.
+
+          ## 6. Prefix locale only when necessary
+
+          With one enabled language, URLs are unprefixed. With more than one, every public HTML route carries a locale prefix. An unprefixed request redirects to the corresponding default-language path.
+
+          The route index is built separately per locale. Sibling slugs must be unique in a given language, and a resulting page route cannot collide with another page or collection. The admin detects a conflict before saving, and `release:check` detects it during deployment.
+
+          ## 7. Link internally by identity
+
+          The internal-link contract stores a stable target instead of a translated URL:
+
+          ```yaml
+          link:
+            type: page
+            page: services/websites
+          ```
+
+          A collection uses `type: collection` and its identity. The URL generator resolves the current path for the active locale. An external link uses `type: url` and a complete HTTP(S) address. Slug changes therefore do not require manually searching navigation.
+      note:
+        pl: Pełny publiczny URL jest wartością wynikową. Nie duplikuj go w danych, jeśli komponent potrafi wskazać stabilną tożsamość.
+        en: A complete public URL is a derived value. Do not duplicate it in data when a component can reference stable identity.
+  - id: 01a06d50-4004-7408-8408-000000000008
+    type: article-content
+    enabled: true
+    data:
+      anchor: kolekcje
+      content:
+        pl: |-
+          ## 8. Utwórz kolekcję przez pagination.yml
+
+          Kolekcja jest publicznym zasobem i przodkiem routingu, ale zamiast własnych bloków renderuje wynik zapytania po stronach potomnych:
+
+          ```yaml
+          schemaVersion: 1
+          type: collection
+          enabled: true
+          layout: collection
+          slug:
+            pl: aktualnosci
+            en: blog
+          title:
+            pl: Aktualności
+            en: Blog
+          source: children
+          sort:
+            field: date
+            direction: desc
+          pagination:
+            perPage: 12
+          filters:
+            - parameter: category
+              field: category
+              allowedValues: [news, guide]
+          ```
+
+          `schemaVersion` musi wynosić 1, `type` — `collection`, a `source` — `children`. Wersja 1 obsługuje wyłącznie aktywne **bezpośrednie dzieci**. Wnuki nie są automatycznie włączane do wyniku. `layout` wskazuje plik z `templates/layouts/`, który otrzymuje już zlokalizowaną kolekcję, elementy, paginację, aktywne filtry, SEO, nawigację i ograniczony `RenderContext`.
+
+          Katalog kolekcji nie ma `content.yml`. Treść i media każdego wpisu pozostają w katalogu odpowiedniej strony potomnej.
+
+          ## 9. Dodawaj atrybuty do dzieci
+
+          Każda bezpośrednia strona potomna może deklarować dodatkowe pola najwyższego poziomu:
+
+          ```yaml
+          date: "2026-09-05"
+          category: guide
+          tags: [yaml, routing]
+          excerpt:
+            pl: Przewodnik po strukturze treści.
+            en: A guide to content structure.
+          ```
+
+          Kolekcja lokalizuje atrybuty przed serializacją i filtrowaniem. Wybierz spójne typy w całym zbiorze. Jeśli `date` jest raz datą ISO, a raz dowolnym opisem, sortowanie tekstowe nie będzie reprezentować chronologii.
+        en: |-
+          ## 8. Create a collection with pagination.yml
+
+          A collection is a public resource and route ancestor, but instead of its own blocks it renders a query over child pages:
+
+          ```yaml
+          schemaVersion: 1
+          type: collection
+          enabled: true
+          layout: collection
+          slug:
+            pl: aktualnosci
+            en: blog
+          title:
+            pl: Aktualności
+            en: Blog
+          source: children
+          sort:
+            field: date
+            direction: desc
+          pagination:
+            perPage: 12
+          filters:
+            - parameter: category
+              field: category
+              allowedValues: [news, guide]
+          ```
+
+          `schemaVersion` must equal 1, `type` must be `collection`, and `source` must be `children`. Version 1 supports only enabled **direct children**. Grandchildren are not automatically included. `layout` selects a file from `templates/layouts/` and receives an already localized collection, items, pagination, active filters, SEO, navigation and constrained `RenderContext`.
+
+          A collection directory has no `content.yml`. It may contain technical media unrelated to an individual entry if the layout deliberately supports them; the standard media model remains local to each child page.
+
+          ## 9. Add attributes to children
+
+          Every direct child page may declare additional root fields:
+
+          ```yaml
+          date: "2026-09-05"
+          category: guide
+          tags: [yaml, routing]
+          excerpt:
+            pl: Przewodnik po strukturze treści.
+            en: A guide to content structure.
+          ```
+
+          The collection localizes attributes before serialization and filtering. Use consistent types across the set. If `date` is an ISO date in one item and arbitrary prose in another, textual sorting will not represent chronology.
+      note:
+        pl: "Kolekcja nie jest folderem wyszukującym rekurencyjnie. `source: children` to precyzyjny kontrakt jednego poziomu."
+        en: "A collection is not a recursively searching folder. `source: children` is a precise one-level contract."
+  - id: 01a06d50-4004-7409-8409-000000000009
+    type: article-content
+    enabled: true
+    data:
+      anchor: query-kolekcji
+      content:
+        pl: |-
+          ## 10. Sortuj po jawnie wybranym polu
+
+          `sort.field` może wskazać atrybut dziecka albo pole wbudowane: `id`, `title` lub `modifiedAt`. Kierunek to `asc` albo `desc`. Brakujące wartości trafiają po elementach, które je mają, niezależnie od kierunku; tożsamość jest stabilnym tie-breakerem, więc identyczne wartości nie powodują losowej kolejności między żądaniami.
+
+          Do kolejności dokumentacji najlepiej użyć liczbowego `order` i `asc`. Do bloga — daty ISO `YYYY-MM-DD` i `desc`. `modifiedAt` odzwierciedla mtime pliku, więc może zmienić się podczas operacji deploymentu; nie zastępuje świadomej daty publikacji.
+
+          ## 11. Ogranicz filtry allowlistą
+
+          Każdy publiczny parametr filtra musi być zadeklarowany. `parameter` jest nazwą w query string, a `field` wskazuje atrybut dziecka. Wersja 1 stosuje ścisłą równość. Jeśli atrybut jest listą, dopasowanie zachodzi, gdy lista zawiera żądaną wartość.
+
+          `allowedValues` jest opcjonalne, ale zalecane. Ogranicza powierzchnię wejścia, dokumentuje publiczne warianty i zapobiega tworzeniu nieograniczonej liczby adresów cache. Niedozwolona wartość zadeklarowanego filtra jest odrzucana. Niezadeklarowany parametr nie staje się filtrem i nie pozwala odpytywać dowolnego pola repozytorium.
+
+          Przykładowe żądania HTML i API:
+
+          ```text
+          GET /pl/aktualnosci?category=guide&page=2
+          GET /api/v1/collections/aktualnosci?lang=pl&category=guide&page=2
+          ```
+
+          ## 12. Paginuj deterministycznie
+
+          `pagination.perPage` przyjmuje od 1 do 100. Query najpierw wybiera aktywne bezpośrednie dzieci, następnie lokalizuje i filtruje, sortuje, oblicza metadane paginacji i wycina bieżący fragment.
+
+          Żądanie strony większej niż ostatnia nie przekierowuje. Zwraca żądany numer strony i pustą listę elementów. Taka semantyka jest przewidywalna dla klientów headless i nie ukrywa błędnego parametru za automatyczną korektą.
+        en: |-
+          ## 10. Sort by an explicitly selected field
+
+          `sort.field` can reference a child attribute or built-in `id`, `title` or `modifiedAt`. Direction is `asc` or `desc`. Missing values follow items that have a value regardless of direction; identity acts as a stable tie-breaker, so equal values never create random ordering between requests.
+
+          Documentation order works best with numeric `order` and `asc`. A blog uses an ISO `YYYY-MM-DD` date and `desc`. `modifiedAt` reflects file mtime and may change during deployment; it does not replace a deliberate publication date.
+
+          ## 11. Bound filters with an allowlist
+
+          Every public filter parameter must be declared. `parameter` is the query-string name, while `field` references a child attribute. Version 1 uses strict equality. If an attribute is a list, a match occurs when the list contains the requested value.
+
+          `allowedValues` is optional but recommended. It bounds the input surface, documents public variants and prevents an unbounded number of cache URLs. A disallowed value for a declared filter is rejected. An undeclared parameter does not become a filter and cannot query an arbitrary repository field.
+
+          Example HTML and API requests:
+
+          ```text
+          GET /pl/aktualnosci?category=guide&page=2
+          GET /api/v1/collections/aktualnosci?lang=pl&category=guide&page=2
+          ```
+
+          ## 12. Paginate deterministically
+
+          `pagination.perPage` accepts values from 1 to 100. The query selects enabled direct children first, then localizes and filters, sorts, calculates pagination metadata and slices the current result.
+
+          Requesting a page beyond the final one does not redirect. It reports the requested number and returns an empty item list. This behaviour is predictable for headless clients and does not conceal an invalid parameter through automatic correction.
+      note:
+        pl: Sortowanie i filtrowanie działają na danych, nie na wizualnym HTML wpisu. Projektuj atrybuty kolekcji jak mały, spójny schemat domenowy.
+        en: Sorting and filtering operate on data, not the entry's visual HTML. Design collection attributes as a small consistent domain schema.
+  - id: 01a06d50-4004-7410-8410-000000000010
+    type: article-content
+    enabled: true
+    data:
+      anchor: panel
+      content:
+        pl: |-
+          ## 13. Zarządzaj stronami przez dwa wyspecjalizowane edytory
+
+          `/admin/pages` zarządza drzewem i metadanymi: stanem publikacji, layoutem, tytułami, slugami, SEO, tworzeniem, przenoszeniem i usuwaniem. Page Builder pod `/admin/pages/builder?path=<identity>` zarządza wyłącznie listą bloków. Rozdział odpowiedzialności zapobiega przypadkowemu mieszaniu zmian strukturalnych z redakcją komponentów.
+
+          Kolekcje są widoczne jako węzły drzewa. Stronę można utworzyć bezpośrednio pod kolekcją, ale ustawienia samej kolekcji edytuje osobny formularz. Utworzenie `services/websites` wymaga istniejącego rodzica `services`; panel nie buduje niejawnego łańcucha pustych katalogów.
+
+          Edytor metadanych zachowuje bloki, niestandardowe atrybuty kolekcji i nieznane deweloperskie pola strony. Nie przepisuje całego dokumentu do minimalnego formularza, dzięki czemu zmiana tytułu nie usuwa `date`, `category` ani `excerpt`.
+
+          ## 14. Traktuj przeniesienie jak zmianę poddrzewa
+
+          Move zmienia pełną tożsamość katalogu razem z potomkami i mediami lokalnymi. Nie można przenieść strony do jej własnego poddrzewa ani użyć homepage jako źródła lub celu.
+
+          Operacja najpierw waliduje istniejące drzewo, wykonuje zmianę nazwy katalogu, unieważnia indeks plików i waliduje wynik. Jeśli nowa struktura tworzy brakującego przodka, konflikt trasy lub inny błąd, CMS przenosi katalog z powrotem i ponownie unieważnia indeks.
+
+          Usunięcie wymaga wpisania `delete` i jest trwałe. Obejmuje stronę, wszystkich potomków oraz media. Nie ma kosza ani bazy zawierającej kopię YAML — odzyskanie wymaga backupu lub historii systemu wersjonowania.
+        en: |-
+          ## 13. Manage pages through two specialized editors
+
+          `/admin/pages` owns the tree and metadata: publication state, layout, titles, slugs, SEO, creation, moving and deletion. Page Builder at `/admin/pages/builder?path=<identity>` owns only the block list. This responsibility split prevents structural changes from becoming entangled with component editing.
+
+          Collections appear as tree nodes. A page can be created directly under a collection, but a separate form edits the collection itself. Creating `services/websites` requires the `services` parent to exist; the panel does not build an implicit chain of empty directories.
+
+          The metadata editor preserves blocks, custom collection attributes and unknown developer page fields. It does not rewrite the complete document into its minimal form, so a title change cannot remove `date`, `category` or `excerpt`.
+
+          ## 14. Treat a move as a subtree change
+
+          Moving changes the complete directory identity together with descendants and page-local media. A page cannot move inside its own subtree, and the homepage cannot be the source or destination.
+
+          The operation validates the existing tree, renames the directory, invalidates the file index and validates the result. If the new structure creates a missing ancestor, route collision or another error, the CMS moves the directory back and invalidates the index again.
+
+          Deletion requires typing `delete` and is permanent. It includes the page, all descendants and media. There is no trash or database copy of YAML; recovery requires a backup or version-control history.
+      note:
+        pl: Przed usunięciem lub przeniesieniem dużego poddrzewa wykonaj spójny backup `pages/`. Rewizja chroni przed konfliktem, ale nie jest historią wersji.
+        en: Before deleting or moving a large subtree, make a consistent `pages/` backup. A revision protects against conflicts but is not version history.
+  - id: 01a06d50-4004-7411-8411-000000000011
+    type: article-content
+    enabled: true
+    data:
+      anchor: spojnosc
+      content:
+        pl: |-
+          ## 15. Rozróżniaj rewizję, blokadę i zapis atomowy
+
+          Te trzy mechanizmy rozwiązują różne problemy:
+
+          - **rewizja SHA-256** wykrywa, że formularz pracuje na starszej zawartości;
+          - **blokada** serializuje operacje konkurujące o ten sam zasób lub całe drzewo;
+          - **zapis atomowy** gwarantuje, że czytelnik zobaczy starą albo nową wersję, nigdy połowę dokumentu.
+
+          Formularz otrzymuje rewizję pełnych bajtów pliku. Podczas zapisu CMS pobiera blokadę, ponownie liczy bieżącą rewizję i przy różnicy zwraca HTTP 409. Poprawny kandydat przechodzi walidację strony, layoutu, bloków i całego indeksu tras, zanim tymczasowy plik zostanie zsynchronizowany i atomowo przemianowany.
+
+          Operacje drzewa używają wspólnej blokady `pages:tree`, ponieważ utworzenie, przeniesienie albo usunięcie jednego katalogu może zmienić trasy wielu zasobów. Page Builder używa blokady konkretnej strony dla zmiany listy bloków.
+
+          ## 16. Waliduj całe drzewo przed wydaniem
+
+          Ręczna edycja YAML omija formularze panelu, ale nie omija kontraktu uruchomieniowego. Po każdej większej zmianie wykonaj:
+
+          ```bash
+          composer check
+          php bin/cms release:check
+          ```
+
+          `release:check` ładuje strony i kolekcje, buduje indeks tras dla wszystkich aktywnych języków, sprawdza layouty, nawigację i bloki. Błąd jednej wyłączonej instancji nadal może zablokować kontrolę, ponieważ wyłączenie nie służy do przechowywania niepoprawnych danych.
+
+          Cache sparsowanego YAML jest oparty na rewizji źródła. Nawet jeśli mtime i rozmiar się nie zmienią, cache nie jest akceptowany bez zgodnego SHA-256. `php bin/cms cache:clear` może usunąć odtwarzalne wpisy, ale nie naprawia błędnej struktury dokumentu.
+        en: |-
+          ## 15. Distinguish revision, lock and atomic write
+
+          These three mechanisms solve different problems:
+
+          - a **SHA-256 revision** detects a form based on older content;
+          - a **lock** serializes operations competing for one resource or the complete tree;
+          - an **atomic write** ensures readers see the old or new version, never half a document.
+
+          A form receives the revision of the complete file bytes. During save, the CMS obtains a lock, calculates the current revision again and returns HTTP 409 on mismatch. A valid candidate passes page, layout, block and route-index validation before a temporary file is synchronized and atomically renamed.
+
+          Tree operations use the shared `pages:tree` lock because creating, moving or deleting one directory may alter routes for several resources. Page Builder uses a page-specific lock for block-list mutations.
+
+          ## 16. Validate the complete tree before release
+
+          Manual YAML editing bypasses admin forms but not the runtime contract. After every substantial change, run:
+
+          ```bash
+          composer check
+          php bin/cms release:check
+          ```
+
+          `release:check` loads pages and collections, builds the route index for every enabled language and checks layouts, navigation and blocks. One invalid disabled instance can still fail validation because disabling is not a storage mechanism for invalid data.
+
+          Parsed-YAML cache is keyed by source revision. Even when mtime and size remain unchanged, cache is not accepted without a matching SHA-256. `php bin/cms cache:clear` removes reproducible entries but cannot repair an invalid document structure.
+      note:
+        pl: HTTP 409 oznacza ochronę nowszej wersji, nie awarię filesystemu. Odśwież dane i świadomie połącz zmiany.
+        en: HTTP 409 means a newer version was protected, not that the filesystem failed. Refresh and deliberately merge the changes.
+  - id: 01a06d50-4004-7412-8412-000000000012
+    type: diagnostic-table
+    enabled: true
+    data:
+      anchor: diagnostyka-struktury
+      eyebrow:
+        pl: 17 / Diagnostyka
+        en: 17 / Troubleshooting
+      title:
+        pl: Najpierw ustal, który kontrakt został naruszony.
+        en: First identify the violated contract.
+      intro:
+        pl: Podobny błąd 404 może wynikać z wyłączenia strony, nieistniejącego przodka albo niewłaściwego locale. Diagnozuj od struktury do publicznej trasy.
+        en: A similar 404 can result from a disabled page, missing ancestor or incorrect locale. Diagnose from structure toward the public route.
+      rows:
+        - layer: { pl: Dokument, en: Document }
+          problem: { pl: YAML document is malformed, en: YAML document is malformed }
+          cause: { pl: "Błąd składni, alias YAML, niedozwolony tag albo niepoprawny typ korzenia.", en: "Syntax error, YAML alias, forbidden tag or invalid root type." }
+          check: { pl: Sprawdź wcięcia i typy; dokument musi być mapą z prostymi wartościami bez aliasów., en: Check indentation and types; the document must be a mapping of safe values without aliases. }
+        - layer: { pl: Tożsamość, en: Identity }
+          problem: { pl: Nie można utworzyć zagnieżdżonej strony, en: A nested page cannot be created }
+          cause: { pl: "Rodzic nie istnieje jako strona lub kolekcja albo segment nie jest slugiem ASCII.", en: "Parent is not an existing page or collection, or a segment is not an ASCII slug." }
+          check: { pl: Sprawdź każdy segment tożsamości i obecność `content.yml` albo `pagination.yml` u rodzica., en: Check every identity segment and the parent's `content.yml` or `pagination.yml`. }
+        - layer: { pl: Routing, en: Routing }
+          problem: { pl: Konflikt publicznej trasy, en: Public route collision }
+          cause: { pl: "Dwoje rodzeństwa ma ten sam slug w jednym locale albo strona koliduje z kolekcją.", en: "Two siblings share a slug in one locale, or a page collides with a collection." }
+          check: { pl: "Porównaj wynikowe ścieżki we wszystkich językach, nie tylko nazwy katalogów.", en: "Compare derived paths in every language, not only directory names." }
+        - layer: { pl: Widoczność, en: Visibility }
+          problem: { pl: Istniejąca strona zwraca 404, en: An existing page returns 404 }
+          cause: { pl: "Strona jest wyłączona albo żądanie używa niewłaściwego prefiksu locale lub wynikowej ścieżki.", en: "The page is disabled, or the request uses the wrong locale prefix or derived path." }
+          check: { pl: "Sprawdź `enabled`, aktywne języki, slugi przodków i pełny URL.", en: "Check `enabled`, enabled languages, ancestor slugs and the complete URL." }
+        - layer: { pl: Kolekcja, en: Collection }
+          problem: { pl: Wpis nie pojawia się na liście, en: An entry is absent from the list }
+          cause: { pl: "Nie jest aktywnym bezpośrednim dzieckiem, nie spełnia filtra albo znajduje się poza stroną paginacji.", en: "It is not an enabled direct child, does not match a filter or lies outside the requested page." }
+          check: { pl: "Sprawdź parent identity, `enabled`, atrybut filtra, sortowanie i parametr `page`.", en: "Check parent identity, `enabled`, filter attribute, sorting and the `page` parameter." }
+        - layer: { pl: Sortowanie, en: Sorting }
+          problem: { pl: Kolejność wpisów jest zaskakująca, en: Entry order is surprising }
+          cause: { pl: "Brakuje pola sortowania, typy są niespójne albo użyto modifiedAt zamiast jawnej daty.", en: "Sort field is missing, types are inconsistent or modifiedAt was used instead of an explicit date." }
+          check: { pl: "Ujednolić atrybut wszystkich dzieci i pamiętać, że brakujące wartości trafiają na koniec.", en: "Normalize the attribute across children and remember missing values sort last." }
+        - layer: { pl: Współbieżność, en: Concurrency }
+          problem: { pl: Formularz zwraca HTTP 409, en: A form returns HTTP 409 }
+          cause: { pl: Plik zmienił się po otwarciu formularza., en: The file changed after the form was opened. }
+          check: { pl: "Odśwież aktualną rewizję, ponownie zastosuj zmianę i zapisz bez nadpisywania cudzej pracy.", en: "Refresh the current revision, reapply the change and save without overwriting another edit." }
+      note:
+        pl: Zawsze sprawdzaj wynikową trasę dla każdego aktywnego locale. Poprawna polska ścieżka nie dowodzi, że angielski indeks tras jest wolny od konfliktu.
+        en: Always check the derived route for every enabled locale. A valid Polish path does not prove the English route index is collision-free.
+  - id: 01a06d50-4004-7413-8413-000000000013
+    type: article-content
+    enabled: true
+    data:
+      anchor: checklista-struktury
+      content:
+        pl: |-
+          ## 18. Checklista dobrze zaprojektowanej treści
+
+          Przed publikacją nowego obszaru potwierdź:
+
+          1. katalogi mają trwałe, techniczne nazwy ASCII;
+          2. każdy katalog zawiera dokładnie `content.yml` albo `pagination.yml`;
+          3. homepage nie deklaruje slugu;
+          4. każda zagnieżdżona strona ma rzeczywistego przodka;
+          5. slugi są znaczeniowe i unikalne wśród rodzeństwa dla każdego locale;
+          6. tytuły i slugi mają wartość domyślnego locale oraz świadomie dobrane fallbacki lub tłumaczenia;
+          7. atrybuty dzieci kolekcji mają spójne typy;
+          8. sortowanie używa stabilnego pola domenowego;
+          9. publiczne filtry są zadeklarowane i ograniczone allowlistą;
+          10. `perPage` mieści się w zakresie od 1 do 100;
+          11. linki wewnętrzne wskazują tożsamości zamiast ręcznie zapisanych tras;
+          12. przeniesienie lub usunięcie ma aktualny backup;
+          13. `composer check` i `release:check` przechodzą bez błędów.
+
+          Dobrze zaprojektowane drzewo oddziela trwałą strukturę systemową od zmiennego języka publicznego. Dzięki temu treść może ewoluować, a routing pozostaje walidowalny i przewidywalny.
+        en: |-
+          ## 18. Well-designed content checklist
+
+          Before publishing a new area, confirm that:
+
+          1. directories have durable technical ASCII names;
+          2. each directory contains exactly `content.yml` or `pagination.yml`;
+          3. the homepage declares no slug;
+          4. every nested page has a real ancestor;
+          5. slugs are meaningful and unique among siblings for every locale;
+          6. titles and slugs have a default-locale value and deliberate fallbacks or translations;
+          7. collection-child attributes use consistent types;
+          8. sorting uses a stable domain field;
+          9. public filters are declared and bounded by an allowlist;
+          10. `perPage` lies between 1 and 100;
+          11. internal links reference identities rather than handwritten routes;
+          12. a current backup exists before moving or deleting;
+          13. `composer check` and `release:check` pass.
+
+          A well-designed tree separates durable system structure from mutable public language. Content can then evolve while routing remains validatable and predictable.
+      note:
+        pl: Projektuj strukturę według relacji domenowych, nie według chwilowego wyglądu menu. Nawigacja jest projekcją drzewa, a nie jego właścicielem.
+        en: Design structure around domain relationships, not the menu's current appearance. Navigation is a projection of the tree, not its owner.
+  - id: 01a06d50-4004-7414-8414-000000000014
+    type: call-to-action
+    enabled: true
+    data:
+      eyebrow:
+        pl: Następny tutorial
+        en: Next tutorial
+      title:
+        pl: Prześledź rendering od YAML do HTML.
+        en: Trace rendering from YAML to HTML.
+      description:
+        pl: Kolejny rozdział rozłoży pipeline SSR na repozytoria, ViewModel, lokalizację, renderery bloków, layout, assety oraz cache HTTP.
+        en: The next chapter breaks the SSR pipeline into repositories, ViewModel, localization, block renderers, layout, assets and HTTP caching.
+      button_label:
+        pl: Przejdź do renderowania
+        en: Continue to rendering
+      button_url:
+        pl: /pl/dokumentacja/renderowanie
+        en: /en/documentation/rendering

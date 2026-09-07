@@ -12,6 +12,8 @@ final readonly class ErrorHandler
     public function __construct(
         private bool $debug = false,
         private ?LoggerInterface $logger = null,
+        private ?ApiErrorResponder $apiErrors = null,
+        private ?WebErrorRenderer $webErrors = null,
     ) {}
 
     public function render(Request $request, Throwable $exception): Response
@@ -26,16 +28,17 @@ final readonly class ErrorHandler
             || str_contains($request->header('accept') ?? '', 'application/json')
             || str_starts_with($request->header('content-type') ?? '', 'application/json');
         if ($expectsJson) {
-            $error = ['code' => $code, 'message' => $publicMessage];
-            if ($this->debug) {
-                $error['debug'] = $exception->getMessage();
-            }
-
             $headers = str_starts_with($request->path(), '/admin/')
                 ? ['Cache-Control' => 'no-store', 'Pragma' => 'no-cache']
                 : [];
+            $response = ($this->apiErrors ?? new ApiErrorResponder())->respond(
+                $status,
+                $code,
+                $publicMessage,
+                $this->debug ? $exception->getMessage() : null,
+            );
 
-            return Response::json(['error' => $error], $status, $headers);
+            return new Response($response->body(), $response->status(), [...$response->headers(), ...$headers]);
         }
 
         if ($status === 401 && str_starts_with($request->path(), '/admin')) {
@@ -43,6 +46,17 @@ final readonly class ErrorHandler
                 'Cache-Control' => 'no-store',
                 'Pragma' => 'no-cache',
             ]);
+        }
+
+        if (!str_starts_with($request->path(), '/admin') && $this->webErrors !== null) {
+            try {
+                $response = $this->webErrors->render($request, $status);
+                if ($response !== null) {
+                    return $response;
+                }
+            } catch (Throwable $renderingException) {
+                $this->log($request, $renderingException, 500, 'ERROR_PAGE_RENDERING_FAILED');
+            }
         }
 
         $title = $status === 404 ? 'Nie znaleziono strony' : 'Wystąpił błąd';

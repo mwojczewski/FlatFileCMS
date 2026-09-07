@@ -1,0 +1,14 @@
+schemaVersion: 1
+enabled: true
+layout: default
+title: { pl: Zbyt wiele żądań, en: Too many requests }
+seo: {}
+blocks:
+  - id: 0199a123-4290-7000-8000-000000000001
+    type: error-message
+    enabled: true
+    data:
+      title: { pl: Zwolnij na chwilę, en: Please slow down }
+      content: { pl: Otrzymaliśmy zbyt wiele żądań. Spróbuj ponownie za moment., en: We received too many requests. Try again in a moment. }
+      buttonLabel: { pl: Wróć na stronę główną, en: Return to homepage }
+      buttonUrl: /

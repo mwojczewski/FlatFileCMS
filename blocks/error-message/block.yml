@@ -1,0 +1,33 @@
+schemaVersion: 1
+name:
+  pl: Komunikat błędu
+  en: Error message
+description:
+  pl: Wyświetla kod HTTP, jego standardowy opis i pomocniczą treść.
+  en: Displays the HTTP status, its standard description and supporting content.
+icon: warning
+fields:
+  title:
+    type: text
+    required: true
+    translatable: true
+    minLength: 1
+    maxLength: 160
+    label: { pl: Nagłówek, en: Heading }
+  content:
+    type: markdown
+    required: false
+    translatable: true
+    maxLength: 3000
+    label: { pl: Treść, en: Content }
+  buttonLabel:
+    type: text
+    required: false
+    translatable: true
+    maxLength: 80
+    label: { pl: Etykieta przycisku, en: Button label }
+  buttonUrl:
+    type: url
+    required: false
+    translatable: false
+    label: { pl: Adres przycisku, en: Button URL }

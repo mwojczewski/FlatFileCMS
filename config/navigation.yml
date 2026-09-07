@@ -1,7 +1,4 @@
 main:
-  - label: { pl: Możliwości, en: Features }
-    link: { type: page, page: features }
-    target: _self
   - label: { pl: Dokumentacja, en: Docs }
     link: { type: collection, collection: documentation }
     target: _self
@@ -16,9 +13,6 @@ main:
     target: _self
 
 footer:
-  - label: { pl: Możliwości, en: Features }
-    link: { type: page, page: features }
-    target: _self
   - label: { pl: Architektura, en: Architecture }
     link: { type: url, url: "/#architektura" }
     target: _self

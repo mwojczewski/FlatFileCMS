@@ -1,0 +1,14 @@
+schemaVersion: 1
+enabled: true
+layout: default
+title: { pl: Nie udało się obsłużyć żądania, en: The request could not be processed }
+seo: {}
+blocks:
+  - id: 0199a123-4000-7000-8000-000000000001
+    type: error-message
+    enabled: true
+    data:
+      title: { pl: Coś jest nie tak z tym żądaniem, en: Something is wrong with this request }
+      content: { pl: Sprawdź adres lub przesłane dane i spróbuj ponownie., en: Check the address or submitted data and try again. }
+      buttonLabel: { pl: Wróć na stronę główną, en: Return to homepage }
+      buttonUrl: /

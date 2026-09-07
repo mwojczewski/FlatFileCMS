@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Rendering;
 
+use FlatFileCms\Http\ErrorView;
 use FlatFileCms\Presentation\PageViewModel;
 
 final readonly class LayoutRenderer
@@ -20,12 +21,13 @@ final readonly class LayoutRenderer
         array $navigation,
         AssetCollection $assets,
         RenderContext $context,
+        ?ErrorView $error = null,
     ): string {
         $template = $this->registry->get($page->layout());
         $seo = $page->seo();
 
         return $this->buffer->capture(
-            static function () use ($template, $page, $seo, $content, $navigation, $assets, $context): void {
+            static function () use ($template, $page, $seo, $content, $navigation, $assets, $context, $error): void {
                 require $template;
             },
         );

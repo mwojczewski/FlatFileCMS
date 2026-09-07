@@ -47,6 +47,7 @@ use FlatFileCms\Config\ConfigurationRepository;
 use FlatFileCms\Config\LanguageRepository;
 use FlatFileCms\Config\SiteTextRepository;
 use FlatFileCms\Content\ContentFileIndex;
+use FlatFileCms\Content\ErrorPageRepository;
 use FlatFileCms\Content\PageBlockManager;
 use FlatFileCms\Content\PageManager;
 use FlatFileCms\Content\PageRepository;
@@ -55,10 +56,12 @@ use FlatFileCms\Core\Container;
 use FlatFileCms\Core\Environment;
 use FlatFileCms\Core\ProductionGuard;
 use FlatFileCms\Domain\Localization\LocalizedDataResolver;
+use FlatFileCms\Http\ApiErrorResponder;
 use FlatFileCms\Http\ErrorHandler;
 use FlatFileCms\Http\HtmlResponseFactory;
 use FlatFileCms\Http\Router;
 use FlatFileCms\Http\TrustedProxyResolver;
+use FlatFileCms\Http\WebErrorRenderer;
 use FlatFileCms\Infrastructure\Database\Database;
 use FlatFileCms\Infrastructure\Filesystem\AtomicFileWriter;
 use FlatFileCms\Infrastructure\Filesystem\DirectoryOperator;
@@ -402,6 +405,14 @@ $container->set(
         $container->get(YamlFileRepository::class),
         $container->get(SafePathResolver::class),
         $container->get(ContentFileIndex::class),
+    ),
+);
+$container->set(
+    ErrorPageRepository::class,
+    static fn(Container $container): ErrorPageRepository => new ErrorPageRepository(
+        $container->get(YamlFileRepository::class),
+        $container->get(SafePathResolver::class),
+        $container->get(PageRepository::class),
     ),
 );
 $container->set(
@@ -760,6 +771,17 @@ $container->set(
     ),
 );
 $container->set(HtmlResponseFactory::class, static fn(): HtmlResponseFactory => new HtmlResponseFactory());
+$container->set(ApiErrorResponder::class, static fn(): ApiErrorResponder => new ApiErrorResponder());
+$container->set(
+    WebErrorRenderer::class,
+    static fn(Container $container): WebErrorRenderer => new WebErrorRenderer(
+        $container->get(LanguageRepository::class),
+        $container->get(ConfigurationRepository::class),
+        $container->get(ErrorPageRepository::class),
+        $container->get(BlockProcessor::class),
+        $container->get(PageRenderer::class),
+    ),
+);
 $container->set(
     SiteController::class,
     static fn(Container $container): SiteController => new SiteController(
@@ -805,6 +827,8 @@ $container->set(Router::class, static function (Container $container) use ($proj
 $container->set(ErrorHandler::class, static fn(Container $container): ErrorHandler => new ErrorHandler(
     debug: $container->get(Environment::class)->debug(),
     logger: $container->get(LoggerInterface::class),
+    apiErrors: $container->get(ApiErrorResponder::class),
+    webErrors: $container->get(WebErrorRenderer::class),
 ));
 
 return new Application(

@@ -1,0 +1,14 @@
+schemaVersion: 1
+enabled: true
+layout: default
+title: { pl: Wystąpił błąd, en: Something went wrong }
+seo: {}
+blocks:
+  - id: 0199a123-5000-7000-8000-000000000001
+    type: error-message
+    enabled: true
+    data:
+      title: { pl: Nie udało się wyświetlić strony, en: We could not display the page }
+      content: { pl: To problem po naszej stronie. Spróbuj ponownie później., en: The problem is on our side. Please try again later. }
+      buttonLabel: { pl: Wróć na stronę główną, en: Return to homepage }
+      buttonUrl: /

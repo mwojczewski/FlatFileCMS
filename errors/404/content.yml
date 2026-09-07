@@ -1,0 +1,14 @@
+schemaVersion: 1
+enabled: true
+layout: default
+title: { pl: Nie znaleziono strony, en: Page not found }
+seo: {}
+blocks:
+  - id: 0199a123-4040-7000-8000-000000000001
+    type: error-message
+    enabled: true
+    data:
+      title: { pl: Nie znaleźliśmy tej strony, en: We could not find this page }
+      content: { pl: Adres może być nieaktualny albo zawierać literówkę., en: The address may be outdated or contain a typo. }
+      buttonLabel: { pl: Wróć na stronę główną, en: Return to homepage }
+      buttonUrl: /

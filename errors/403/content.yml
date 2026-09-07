@@ -1,0 +1,14 @@
+schemaVersion: 1
+enabled: true
+layout: default
+title: { pl: Brak dostępu, en: Access forbidden }
+seo: {}
+blocks:
+  - id: 0199a123-4030-7000-8000-000000000001
+    type: error-message
+    enabled: true
+    data:
+      title: { pl: Nie masz dostępu do tej strony, en: You cannot access this page }
+      content: { pl: Jeśli uważasz, że to pomyłka, skontaktuj się z administratorem., en: If you think this is a mistake, contact the administrator. }
+      buttonLabel: { pl: Wróć na stronę główną, en: Return to homepage }
+      buttonUrl: /
