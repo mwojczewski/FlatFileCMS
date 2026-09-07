@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use FlatFileCms\Admin\AdminAuthController;
 use FlatFileCms\Admin\AdminCollectionController;
+use FlatFileCms\Admin\AdminLogController;
 use FlatFileCms\Admin\AdminMediaController;
 use FlatFileCms\Admin\AdminPageBuilderController;
 use FlatFileCms\Admin\AdminPageController;
@@ -95,6 +96,7 @@ return static function (Router $router, ?Container $container = null): void {
         $pages = static fn(): AdminPageController => $container->get(AdminPageController::class);
         $builder = static fn(): AdminPageBuilderController => $container->get(AdminPageBuilderController::class);
         $media = static fn(): AdminMediaController => $container->get(AdminMediaController::class);
+        $logs = static fn(): AdminLogController => $container->get(AdminLogController::class);
         $collections = static fn(): AdminCollectionController => $container->get(AdminCollectionController::class);
         $users = static fn(): AdminUserController => $container->get(AdminUserController::class);
         $settings = static fn(): AdminSettingsController => $container->get(AdminSettingsController::class);
@@ -138,6 +140,7 @@ return static function (Router $router, ?Container $container = null): void {
         $router->post('/admin/pages/builder/reorder', static fn(Request $request): Response => $builder()->reorder($request), 'admin.builder.reorder');
         $router->post('/admin/pages/builder/delete', static fn(Request $request): Response => $builder()->delete($request), 'admin.builder.delete');
         $router->get('/admin/media', static fn(Request $request): Response => $media()->index($request), 'admin.media.index');
+        $router->get('/admin/logs', static fn(Request $request): Response => $logs()->index($request), 'admin.logs.index');
         $router->get('/admin/media/picker', static fn(Request $request): Response => $media()->picker($request), 'admin.media.picker');
         $router->post('/admin/media/upload', static fn(Request $request): Response => $media()->upload($request), 'admin.media.upload');
         $router->post('/admin/media/delete', static fn(Request $request): Response => $media()->delete($request), 'admin.media.delete');

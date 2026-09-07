@@ -44,6 +44,227 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Application log reader */
+.log-overview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.log-health {
+  flex: 0 0 auto;
+  min-width: 10rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid #bdebd9;
+  border-radius: 0.85rem;
+  background: var(--admin-success-soft);
+  text-align: right;
+}
+
+.log-health.has-errors {
+  border-color: #f1bcbc;
+  background: var(--admin-danger-soft);
+}
+.log-health strong {
+  display: block;
+  font-size: 1.45rem;
+}
+.log-health span {
+  color: var(--admin-muted);
+  font-size: 0.78rem;
+}
+
+.log-filters {
+  display: grid;
+  grid-template-columns: minmax(13rem, 1fr) minmax(10rem, 0.65fr) minmax(
+      15rem,
+      1.4fr
+    ) auto auto;
+  gap: 0.8rem;
+  align-items: end;
+  margin-bottom: 1rem;
+}
+
+.log-filters label {
+  margin: 0;
+}
+.log-filters .button {
+  white-space: nowrap;
+}
+
+.log-summary {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin: 1rem 0;
+}
+
+.log-summary > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.7rem;
+  border: 1px solid var(--admin-line);
+  border-radius: 0.7rem;
+  background: var(--admin-surface);
+}
+
+.log-level {
+  display: inline-flex;
+  padding: 0.2rem 0.48rem;
+  border-radius: 999px;
+  color: #475467;
+  background: #eef0f4;
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.level-debug {
+  color: #475467;
+  background: #eef0f4;
+}
+.level-info {
+  color: #175cd3;
+  background: #eff8ff;
+}
+.level-notice {
+  color: #087a55;
+  background: #eafbf4;
+}
+.level-warning {
+  color: #9a4c0d;
+  background: #fff4e5;
+}
+.level-error,
+.level-critical,
+.level-alert,
+.level-emergency {
+  color: #b42318;
+  background: #fff0f0;
+}
+
+.log-list {
+  display: grid;
+  gap: 0.75rem;
+}
+.log-entry {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--admin-line);
+  border-left: 0.28rem solid #b9bfca;
+  border-radius: 0.75rem;
+  background: var(--admin-surface);
+  box-shadow: 0 5px 18px rgb(21 23 34 / 4%);
+}
+.log-entry.level-border-warning {
+  border-left-color: #d97706;
+}
+.log-entry.level-border-error,
+.log-entry.level-border-critical,
+.log-entry.level-border-alert,
+.log-entry.level-border-emergency {
+  border-left-color: var(--admin-danger);
+}
+.log-entry header {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--admin-muted);
+  font-size: 0.78rem;
+}
+.log-channel {
+  margin-left: auto;
+}
+.log-message {
+  margin: 0.8rem 0 0;
+  color: var(--admin-ink);
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.log-entry details {
+  margin-top: 0.8rem;
+}
+.log-entry summary {
+  color: var(--admin-accent-dark);
+  cursor: pointer;
+  font-weight: 700;
+}
+.log-context {
+  display: grid;
+  gap: 0.45rem;
+  margin-bottom: 0;
+}
+.log-context > div {
+  display: grid;
+  grid-template-columns: minmax(7rem, 0.25fr) minmax(0, 1fr);
+  gap: 0.75rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--admin-line);
+}
+.log-context dt {
+  color: var(--admin-muted);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.log-context dd {
+  min-width: 0;
+  margin: 0;
+}
+.log-context pre {
+  margin: 0;
+  padding: 0.55rem;
+  border-radius: 0.45rem;
+  background: #f6f7f9;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 70rem) {
+  .log-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .log-search {
+    grid-column: 1 / -1;
+  }
+  .log-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 42rem) {
+  .log-overview {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .log-health {
+    text-align: left;
+  }
+  .log-filters {
+    grid-template-columns: 1fr;
+  }
+  .log-search {
+    grid-column: auto;
+  }
+  .log-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .log-entry header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .log-channel {
+    width: 100%;
+    margin-left: 0;
+  }
+  .log-context > div {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+}
+
 button,
 input,
 select,

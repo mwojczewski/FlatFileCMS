@@ -5,6 +5,7 @@ declare(strict_types=1);
 use FlatFileCms\Admin\AdminAuthController;
 use FlatFileCms\Admin\AdminCollectionController;
 use FlatFileCms\Admin\AdminLayout;
+use FlatFileCms\Admin\AdminLogController;
 use FlatFileCms\Admin\AdminMediaController;
 use FlatFileCms\Admin\AdminPageBuilderController;
 use FlatFileCms\Admin\AdminPageController;
@@ -75,6 +76,7 @@ use FlatFileCms\Infrastructure\Yaml\YamlFileCache;
 use FlatFileCms\Infrastructure\Yaml\YamlFileRepository;
 use FlatFileCms\Infrastructure\Yaml\YamlParser;
 use FlatFileCms\Logging\LoggerFactory;
+use FlatFileCms\Logging\LogReader;
 use FlatFileCms\Logging\RuntimeErrorLogger;
 use FlatFileCms\Mail\Mailer;
 use FlatFileCms\Mail\MailException;
@@ -123,6 +125,10 @@ RuntimeErrorLogger::register($logger);
 $container = new Container();
 $container->set(Environment::class, static fn(): Environment => $environment);
 $container->set(LoggerInterface::class, static fn(): LoggerInterface => $logger);
+$container->set(
+    LogReader::class,
+    static fn(Container $container): LogReader => new LogReader($container->get(Environment::class)->projectRoot()),
+);
 $container->set(
     TrustedProxyResolver::class,
     static fn(Container $container): TrustedProxyResolver => TrustedProxyResolver::fromString(
@@ -613,6 +619,15 @@ $container->set(
         $container->get(AdminView::class),
         $container->get(AdminLayout::class),
         $container->get(AuditLogger::class),
+    ),
+);
+$container->set(
+    AdminLogController::class,
+    static fn(Container $container): AdminLogController => new AdminLogController(
+        $container->get(Authenticator::class),
+        $container->get(LogReader::class),
+        $container->get(AdminView::class),
+        $container->get(AdminLayout::class),
     ),
 );
 $container->set(

@@ -5,6 +5,7 @@ $links = [
     ['/admin/navigation', 'navigation', 'Nawigacja', 'Menu i hierarchia linków'],
     ['/admin/redirects', 'redirects', 'Przekierowania', 'Reguły adresów 3xx'],
     ['/admin/settings', 'settings', 'Konfiguracja', 'SEO, witryna i multimedia'],
+    ['/admin/logs', 'logs', 'Logi', 'Błędy i zdarzenia aplikacji'],
     ['/admin/users', 'users', 'Administratorzy', 'Konta panelu'],
     ['/admin/security', 'account', 'Konto', 'Hasło i zabezpieczenia'],
 ];
