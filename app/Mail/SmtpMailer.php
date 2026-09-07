@@ -6,6 +6,7 @@ namespace FlatFileCms\Mail;
 
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
 
 final readonly class SmtpMailer implements Mailer
 {
@@ -23,11 +24,17 @@ final readonly class SmtpMailer implements Mailer
         }
     }
 
-    public function send(string $recipient, string $subject, string $text, string $html): void
-    {
+    public function send(
+        string $recipient,
+        string $subject,
+        string $text,
+        string $html,
+        ?string $replyTo = null,
+    ): void {
         try {
             $message = new PHPMailer(true);
             $message->isSMTP();
+            $message->Timeout = 10;
             $message->Host = $this->host;
             $message->Port = $this->port;
             $message->SMTPAuth = $this->username !== '';
@@ -44,13 +51,20 @@ final readonly class SmtpMailer implements Mailer
 
             $message->setFrom($this->fromAddress, $this->fromName);
             $message->addAddress($recipient);
+            if ($replyTo !== null) {
+                $message->addReplyTo($replyTo);
+            }
             $message->Subject = $subject;
             $message->isHTML(true);
             $message->Body = $html;
             $message->AltBody = $text;
             $message->send();
         } catch (Exception $exception) {
-            throw new MailException('Unable to send the email.', previous: $exception);
+            throw new MailException(
+                'Unable to send the email. SMTP: '
+                . json_encode($message->getSMTPInstance()->getError(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+                previous: $exception,
+            );
         }
     }
 }

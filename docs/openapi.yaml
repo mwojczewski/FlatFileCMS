@@ -1,0 +1,550 @@
+openapi: 3.1.0
+info:
+  title: FlatfileCMS Public API
+  version: 1.0.0
+  summary: Read-only, headless API for FlatfileCMS content.
+  description: |
+    The FlatfileCMS public API exposes localized pages, collections,
+    navigation, and a safe configuration projection. Clients never read
+    YAML files directly.
+
+    The API is read-only. The `lang` parameter selects the content language;
+    when omitted, the active default language from `config/languages.yml` is used.
+  license:
+    name: Proprietary
+
+servers:
+  - url: /
+    description: Current FlatfileCMS installation
+
+tags:
+  - name: System
+    description: Application health and availability.
+  - name: Pages
+    description: Published CMS pages.
+  - name: Collections
+    description: Filtered and paginated page collections.
+  - name: Navigation
+    description: Localized menus with resolved URLs.
+  - name: Configuration
+    description: Public website configuration projection.
+
+paths:
+  /api/v1/health:
+    get:
+      tags: [System]
+      operationId: getHealth
+      summary: Check application health
+      responses:
+        '200':
+          description: The application is operational.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+              example:
+                status: ok
+                application: FlatFile CMS
+                stage: 13
+    head:
+      tags: [System]
+      operationId: headHealth
+      summary: Check application availability without a response body
+      responses:
+        '200':
+          description: The application is operational.
+
+  /api/v1/pages:
+    get:
+      tags: [Pages]
+      operationId: getHomepage
+      summary: Get the homepage
+      description: This route intentionally returns the homepage, not a list of pages.
+      parameters:
+        - $ref: '#/components/parameters/Language'
+        - $ref: '#/components/parameters/IfNoneMatch'
+        - $ref: '#/components/parameters/IfModifiedSince'
+      responses:
+        '200':
+          $ref: '#/components/responses/Page'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '400':
+          $ref: '#/components/responses/LanguageNotAvailable'
+        '404':
+          $ref: '#/components/responses/PageNotFound'
+    head:
+      tags: [Pages]
+      operationId: headHomepage
+      summary: Get homepage metadata without a response body
+      parameters:
+        - $ref: '#/components/parameters/Language'
+      responses:
+        '200':
+          description: Homepage metadata.
+          headers:
+            ETag: { $ref: '#/components/headers/ETag' }
+            Last-Modified: { $ref: '#/components/headers/LastModified' }
+
+  /api/v1/pages/{path}:
+    get:
+      tags: [Pages]
+      operationId: getPage
+      summary: Get a page by its public path
+      description: |
+        The path may contain multiple segments, for example `offer/websites`.
+        It does not include a locale prefix; the `lang` parameter selects the language.
+      parameters:
+        - $ref: '#/components/parameters/ContentPath'
+        - $ref: '#/components/parameters/Language'
+        - $ref: '#/components/parameters/IfNoneMatch'
+        - $ref: '#/components/parameters/IfModifiedSince'
+      responses:
+        '200':
+          $ref: '#/components/responses/Page'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '400':
+          $ref: '#/components/responses/LanguageNotAvailable'
+        '404':
+          $ref: '#/components/responses/PageNotFound'
+    head:
+      tags: [Pages]
+      operationId: headPage
+      summary: Get page metadata without a response body
+      parameters:
+        - $ref: '#/components/parameters/ContentPath'
+        - $ref: '#/components/parameters/Language'
+      responses:
+        '200':
+          description: Page metadata.
+          headers:
+            ETag: { $ref: '#/components/headers/ETag' }
+            Last-Modified: { $ref: '#/components/headers/LastModified' }
+        '404':
+          $ref: '#/components/responses/PageNotFound'
+
+  /api/v1/navigation:
+    get:
+      tags: [Navigation]
+      operationId: getNavigation
+      summary: Get all navigation menus
+      parameters:
+        - $ref: '#/components/parameters/Language'
+        - $ref: '#/components/parameters/IfNoneMatch'
+        - $ref: '#/components/parameters/IfModifiedSince'
+      responses:
+        '200':
+          description: Localized navigation menus.
+          headers:
+            ETag: { $ref: '#/components/headers/ETag' }
+            Last-Modified: { $ref: '#/components/headers/LastModified' }
+            Cache-Control: { $ref: '#/components/headers/CacheControl' }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Navigation'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '400':
+          $ref: '#/components/responses/LanguageNotAvailable'
+    head:
+      tags: [Navigation]
+      operationId: headNavigation
+      summary: Get navigation metadata without a response body
+      parameters:
+        - $ref: '#/components/parameters/Language'
+      responses:
+        '200':
+          description: Navigation metadata.
+
+  /api/v1/config:
+    get:
+      tags: [Configuration]
+      operationId: getPublicConfiguration
+      summary: Get the public website configuration
+      description: Returns only the explicit public projection, never the raw setup.yml file.
+      parameters:
+        - $ref: '#/components/parameters/Language'
+        - $ref: '#/components/parameters/IfNoneMatch'
+        - $ref: '#/components/parameters/IfModifiedSince'
+      responses:
+        '200':
+          description: Public configuration and language information.
+          headers:
+            ETag: { $ref: '#/components/headers/ETag' }
+            Last-Modified: { $ref: '#/components/headers/LastModified' }
+            Cache-Control: { $ref: '#/components/headers/CacheControl' }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicConfiguration'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '400':
+          $ref: '#/components/responses/LanguageNotAvailable'
+    head:
+      tags: [Configuration]
+      operationId: headPublicConfiguration
+      summary: Get configuration metadata without a response body
+      parameters:
+        - $ref: '#/components/parameters/Language'
+      responses:
+        '200':
+          description: Public configuration metadata.
+
+  /api/v1/collections/{path}:
+    get:
+      tags: [Collections]
+      operationId: getCollection
+      summary: Get a collection
+      description: |
+        Returns collection items with pagination. Additional query parameters
+        act as filters; only filters declared by the collection are applied.
+      parameters:
+        - $ref: '#/components/parameters/ContentPath'
+        - $ref: '#/components/parameters/Language'
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/IfNoneMatch'
+        - $ref: '#/components/parameters/IfModifiedSince'
+      responses:
+        '200':
+          description: Collection with its items and pagination metadata.
+          headers:
+            ETag: { $ref: '#/components/headers/ETag' }
+            Last-Modified: { $ref: '#/components/headers/LastModified' }
+            Cache-Control: { $ref: '#/components/headers/CacheControl' }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollectionResponse'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '400':
+          description: Invalid language, page number, or filter.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidQuery:
+                  value:
+                    error:
+                      code: INVALID_COLLECTION_QUERY
+                      message: Page must be a positive integer
+                invalidLanguage:
+                  value:
+                    error:
+                      code: LANGUAGE_NOT_AVAILABLE
+                      message: Language is not available
+        '404':
+          description: The collection does not exist or is not public.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: COLLECTION_NOT_FOUND
+                  message: Collection not found
+    head:
+      tags: [Collections]
+      operationId: headCollection
+      summary: Get collection metadata without a response body
+      parameters:
+        - $ref: '#/components/parameters/ContentPath'
+        - $ref: '#/components/parameters/Language'
+        - $ref: '#/components/parameters/PageNumber'
+      responses:
+        '200':
+          description: Collection metadata.
+        '404':
+          description: The collection does not exist or is not public.
+
+components:
+  parameters:
+    Language:
+      name: lang
+      in: query
+      required: false
+      description: Active language code. Defaults to the installation's primary language.
+      schema:
+        type: string
+        minLength: 2
+      example: en
+    ContentPath:
+      name: path
+      in: path
+      required: true
+      description: Localized public path; it may contain slashes.
+      schema:
+        type: string
+        minLength: 1
+      example: offer/websites
+    PageNumber:
+      name: page
+      in: query
+      required: false
+      description: One-based collection page number.
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    IfNoneMatch:
+      name: If-None-Match
+      in: header
+      required: false
+      description: ETag value from a previous response.
+      schema:
+        type: string
+    IfModifiedSince:
+      name: If-Modified-Since
+      in: header
+      required: false
+      description: Last known modification date in HTTP-date format.
+      schema:
+        type: string
+
+  headers:
+    ETag:
+      description: SHA-256 of the exact JSON representation, enclosed in double quotes.
+      schema:
+        type: string
+    LastModified:
+      description: Latest modification time of all sources affecting the response.
+      schema:
+        type: string
+    CacheControl:
+      description: Public response that must be revalidated.
+      schema:
+        type: string
+        const: public, max-age=0, must-revalidate
+
+  responses:
+    Page:
+      description: Localized and normalized page.
+      headers:
+        ETag: { $ref: '#/components/headers/ETag' }
+        Last-Modified: { $ref: '#/components/headers/LastModified' }
+        Cache-Control: { $ref: '#/components/headers/CacheControl' }
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Page'
+    NotModified:
+      description: The resource has not changed; the response has no body.
+      headers:
+        ETag: { $ref: '#/components/headers/ETag' }
+        Last-Modified: { $ref: '#/components/headers/LastModified' }
+        Cache-Control: { $ref: '#/components/headers/CacheControl' }
+    LanguageNotAvailable:
+      description: The selected language is not active.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: LANGUAGE_NOT_AVAILABLE
+              message: Language is not available
+    PageNotFound:
+      description: The page does not exist or is not public.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: PAGE_NOT_FOUND
+              message: Page not found
+
+  schemas:
+    Health:
+      type: object
+      additionalProperties: false
+      required: [status, application, stage]
+      properties:
+        status:
+          type: string
+          const: ok
+        application:
+          type: string
+          const: FlatFile CMS
+        stage:
+          type: integer
+
+    Page:
+      type: object
+      additionalProperties: false
+      required: [id, locale, url, layout, title, seo, blocks]
+      properties:
+        id:
+          type: string
+          example: services
+        locale:
+          type: string
+          example: en
+        url:
+          type: string
+          example: /en/offer
+        layout:
+          type: string
+          example: default
+        title:
+          type: string
+          example: Offer
+        seo:
+          $ref: '#/components/schemas/Seo'
+        blocks:
+          type: array
+          description: Enabled blocks normalized according to their block.yml definitions.
+          items:
+            $ref: '#/components/schemas/Block'
+
+    Block:
+      type: object
+      required: [id, type, data]
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+        data:
+          type: object
+          additionalProperties: true
+      additionalProperties: true
+
+    Seo:
+      type: object
+      properties:
+        title: { type: string }
+        description: { type: string }
+        canonical: { type: string, format: uri }
+        robots:
+          type: object
+          properties:
+            index: { type: boolean }
+            follow: { type: boolean }
+          additionalProperties: true
+        openGraph: { type: object, additionalProperties: true }
+        twitter: { type: object, additionalProperties: true }
+        jsonLd: { type: object, additionalProperties: true }
+      additionalProperties: true
+
+    CollectionResponse:
+      type: object
+      additionalProperties: false
+      required: [collection, items, pagination, filters]
+      properties:
+        collection:
+          $ref: '#/components/schemas/Collection'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CollectionItem'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+        filters:
+          type: object
+          additionalProperties:
+            type: string
+
+    Collection:
+      type: object
+      required: [id, locale, url, layout, title, seo]
+      properties:
+        id: { type: string, example: blog }
+        locale: { type: string, example: en }
+        url: { type: string, example: /en/news }
+        layout: { type: string, example: collection }
+        title: { type: string, example: News }
+        seo: { $ref: '#/components/schemas/Seo' }
+      additionalProperties: true
+
+    CollectionItem:
+      type: object
+      required: [id, url, title, attributes]
+      properties:
+        id: { type: string, example: blog/first-post }
+        url: { type: string, example: /en/news/first-post }
+        title: { type: string, example: First post }
+        attributes:
+          type: object
+          additionalProperties: true
+      additionalProperties: true
+
+    Pagination:
+      type: object
+      additionalProperties: false
+      required: [page, perPage, totalItems, totalPages]
+      properties:
+        page: { type: integer, minimum: 1 }
+        perPage: { type: integer, minimum: 1 }
+        totalItems: { type: integer, minimum: 0 }
+        totalPages: { type: integer, minimum: 0 }
+
+    Navigation:
+      type: object
+      additionalProperties: false
+      required: [locale, menus]
+      properties:
+        locale: { type: string, example: en }
+        menus:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/NavigationItem'
+
+    NavigationItem:
+      type: object
+      required: [label, url]
+      properties:
+        label: { type: string }
+        url: { type: string }
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/NavigationItem'
+      additionalProperties: true
+
+    PublicConfiguration:
+      type: object
+      additionalProperties: false
+      required: [locale, defaultLocale, multilingual, languages, config]
+      properties:
+        locale: { type: string, example: en }
+        defaultLocale: { type: string, example: en }
+        multilingual: { type: boolean }
+        languages:
+          type: object
+          additionalProperties: true
+        config:
+          type: object
+          description: Public and localized configuration projection.
+          additionalProperties: true
+
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum:
+                - PAGE_NOT_FOUND
+                - COLLECTION_NOT_FOUND
+                - INVALID_COLLECTION_QUERY
+                - LANGUAGE_NOT_AVAILABLE
+                - ROUTE_NOT_FOUND
+                - METHOD_NOT_ALLOWED
+                - REQUEST_BODY_TOO_LARGE
+                - INTERNAL_SERVER_ERROR
+            message:
+              type: string

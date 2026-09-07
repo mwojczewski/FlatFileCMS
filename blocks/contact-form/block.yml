@@ -1,0 +1,119 @@
+schemaVersion: 1
+name: { pl: Formularz kontaktowy, en: Contact form }
+description: { pl: Konfigurowalny formularz wysyłający wiadomość e-mail., en: Configurable email contact form. }
+icon: mail
+fields:
+  eyebrow:
+    type: text
+    required: false
+    translatable: true
+    maxLength: 80
+    label: { pl: Etykieta nad nagłówkiem, en: Eyebrow }
+  title:
+    type: text
+    required: true
+    translatable: true
+    maxLength: 160
+    label: { pl: Nagłówek, en: Heading }
+  introduction:
+    type: textarea
+    required: false
+    translatable: true
+    maxLength: 600
+    label: { pl: Wprowadzenie, en: Introduction }
+  recipient:
+    type: email
+    required: true
+    translatable: false
+    label: { pl: Adres odbiorcy, en: Recipient address }
+  subject:
+    type: text
+    required: true
+    translatable: true
+    maxLength: 180
+    label: { pl: Temat wiadomości, en: Message subject }
+  fields:
+    type: repeater
+    required: true
+    translatable: false
+    minItems: 1
+    maxItems: 20
+    label: { pl: Pola formularza, en: Form fields }
+    fields:
+      name:
+        type: text
+        required: true
+        translatable: false
+        minLength: 1
+        maxLength: 50
+        label: { pl: Nazwa techniczna, en: Technical name }
+      label:
+        type: text
+        required: true
+        translatable: true
+        maxLength: 120
+        label: { pl: Etykieta pola, en: Field label }
+      type:
+        type: select
+        required: true
+        translatable: false
+        label: { pl: Typ pola, en: Field type }
+        options:
+          - { value: text, label: { pl: Tekst, en: Text } }
+          - { value: email, label: { pl: E-mail, en: Email } }
+          - { value: tel, label: { pl: Telefon, en: Phone } }
+          - { value: textarea, label: { pl: Długi tekst, en: Long text } }
+          - { value: select, label: { pl: Lista wyboru, en: Select } }
+          - { value: checkbox, label: { pl: Pole wyboru, en: Checkbox } }
+      required:
+        type: boolean
+        required: false
+        translatable: false
+        label: { pl: Pole wymagane, en: Required field }
+      options:
+        type: textarea
+        required: false
+        translatable: false
+        maxLength: 2000
+        label: { pl: Opcje listy (jedna na wiersz), en: Select options (one per line) }
+  submit_label:
+    type: text
+    required: true
+    translatable: true
+    maxLength: 80
+    label: { pl: Tekst przycisku, en: Button label }
+  success_message:
+    type: textarea
+    required: true
+    translatable: true
+    maxLength: 400
+    label: { pl: Komunikat po wysłaniu, en: Success message }
+  error_message:
+    type: textarea
+    required: true
+    translatable: true
+    maxLength: 400
+    label: { pl: Komunikat błędu, en: Error message }
+  rate_limit_message:
+    type: textarea
+    required: true
+    translatable: true
+    maxLength: 400
+    label: { pl: Komunikat po przekroczeniu limitu, en: Rate-limit message }
+  send_confirmation:
+    type: boolean
+    required: false
+    translatable: false
+    label: { pl: Wyślij potwierdzenie do nadawcy, en: Send confirmation to sender }
+  confirmation_subject:
+    type: text
+    required: true
+    translatable: true
+    maxLength: 180
+    label: { pl: Temat potwierdzenia, en: Confirmation subject }
+  confirmation_message:
+    type: textarea
+    required: true
+    translatable: true
+    maxLength: 2000
+    label: { pl: Treść potwierdzenia, en: Confirmation message }

@@ -19,6 +19,8 @@ use FlatFileCms\Api\ApiResponseFactory;
 use FlatFileCms\Api\CollectionSerializer;
 use FlatFileCms\Api\PageSerializer;
 use FlatFileCms\Api\PublicApiController;
+use FlatFileCms\ApiDocs\ApiDocumentationController;
+use FlatFileCms\ApiDocs\OpenApiDocument;
 use FlatFileCms\Audit\AuditLogger;
 use FlatFileCms\Auth\AdminUserManager;
 use FlatFileCms\Auth\Authenticator;
@@ -47,7 +49,6 @@ use FlatFileCms\Config\ConfigurationRepository;
 use FlatFileCms\Config\LanguageRepository;
 use FlatFileCms\Config\SiteTextRepository;
 use FlatFileCms\Content\ContentFileIndex;
-use FlatFileCms\Content\ErrorPageRepository;
 use FlatFileCms\Content\PageBlockManager;
 use FlatFileCms\Content\PageManager;
 use FlatFileCms\Content\PageRepository;
@@ -56,12 +57,12 @@ use FlatFileCms\Core\Container;
 use FlatFileCms\Core\Environment;
 use FlatFileCms\Core\ProductionGuard;
 use FlatFileCms\Domain\Localization\LocalizedDataResolver;
-use FlatFileCms\Http\ApiErrorResponder;
+use FlatFileCms\Forms\ContactFormController;
+use FlatFileCms\Forms\ContactFormService;
 use FlatFileCms\Http\ErrorHandler;
 use FlatFileCms\Http\HtmlResponseFactory;
 use FlatFileCms\Http\Router;
 use FlatFileCms\Http\TrustedProxyResolver;
-use FlatFileCms\Http\WebErrorRenderer;
 use FlatFileCms\Infrastructure\Database\Database;
 use FlatFileCms\Infrastructure\Filesystem\AtomicFileWriter;
 use FlatFileCms\Infrastructure\Filesystem\DirectoryOperator;
@@ -396,6 +397,26 @@ $container->set(
     ),
 );
 $container->set(
+    ContactFormService::class,
+    static fn(Container $container): ContactFormService => new ContactFormService(
+        $container->get(LanguageRepository::class),
+        $container->get(PageRepository::class),
+        new RateLimiter(
+            $container->get(Database::class)->connection(),
+            $container->get(Environment::class)->get('APP_SECRET'),
+            $container->get(Environment::class)->integer('CONTACT_FORM_MAX_ATTEMPTS', 5),
+            $container->get(Environment::class)->integer('CONTACT_FORM_WINDOW_SECONDS', 3600),
+        ),
+        $container->get(Mailer::class),
+    ),
+);
+$container->set(
+    ContactFormController::class,
+    static fn(Container $container): ContactFormController => new ContactFormController(
+        $container->get(ContactFormService::class),
+    ),
+);
+$container->set(
     ContentFileIndex::class,
     static fn(Container $container): ContentFileIndex => new ContentFileIndex($container->get(SafePathResolver::class)),
 );
@@ -405,14 +426,6 @@ $container->set(
         $container->get(YamlFileRepository::class),
         $container->get(SafePathResolver::class),
         $container->get(ContentFileIndex::class),
-    ),
-);
-$container->set(
-    ErrorPageRepository::class,
-    static fn(Container $container): ErrorPageRepository => new ErrorPageRepository(
-        $container->get(YamlFileRepository::class),
-        $container->get(SafePathResolver::class),
-        $container->get(PageRepository::class),
     ),
 );
 $container->set(
@@ -701,6 +714,21 @@ $container->set(
         $container->get(ApiResponseFactory::class),
     ),
 );
+$container->set(
+    OpenApiDocument::class,
+    static fn(Container $container): OpenApiDocument => new OpenApiDocument(
+        $container->get(Environment::class)->projectRoot()
+        . '/docs/openapi.yaml',
+    ),
+);
+
+$container->set(
+    ApiDocumentationController::class,
+    static fn(Container $container): ApiDocumentationController =>
+    new ApiDocumentationController(
+        $container->get(OpenApiDocument::class),
+    ),
+);
 $container->set(OutputBuffer::class, static fn(): OutputBuffer => new OutputBuffer());
 $container->set(MarkdownRenderer::class, static fn(): MarkdownRenderer => new MarkdownRenderer());
 $container->set(
@@ -771,17 +799,6 @@ $container->set(
     ),
 );
 $container->set(HtmlResponseFactory::class, static fn(): HtmlResponseFactory => new HtmlResponseFactory());
-$container->set(ApiErrorResponder::class, static fn(): ApiErrorResponder => new ApiErrorResponder());
-$container->set(
-    WebErrorRenderer::class,
-    static fn(Container $container): WebErrorRenderer => new WebErrorRenderer(
-        $container->get(LanguageRepository::class),
-        $container->get(ConfigurationRepository::class),
-        $container->get(ErrorPageRepository::class),
-        $container->get(BlockProcessor::class),
-        $container->get(PageRenderer::class),
-    ),
-);
 $container->set(
     SiteController::class,
     static fn(Container $container): SiteController => new SiteController(
@@ -827,8 +844,6 @@ $container->set(Router::class, static function (Container $container) use ($proj
 $container->set(ErrorHandler::class, static fn(Container $container): ErrorHandler => new ErrorHandler(
     debug: $container->get(Environment::class)->debug(),
     logger: $container->get(LoggerInterface::class),
-    apiErrors: $container->get(ApiErrorResponder::class),
-    webErrors: $container->get(WebErrorRenderer::class),
 ));
 
 return new Application(

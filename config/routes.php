@@ -12,7 +12,9 @@ use FlatFileCms\Admin\AdminSettingsController;
 use FlatFileCms\Admin\AdminUserController;
 use FlatFileCms\Admin\PasswordResetController;
 use FlatFileCms\Api\PublicApiController;
+use FlatFileCms\ApiDocs\ApiDocumentationController;
 use FlatFileCms\Core\Container;
+use FlatFileCms\Forms\ContactFormController;
 use FlatFileCms\Http\HttpException;
 use FlatFileCms\Http\Request;
 use FlatFileCms\Http\Response;
@@ -73,6 +75,22 @@ return static function (Router $router, ?Container $container = null): void {
     }
 
     if ($container !== null) {
+        $apiDocs = static fn(): ApiDocumentationController =>
+            $container->get(ApiDocumentationController::class);
+
+        $router->get(
+            '/api/openapi.json',
+            static fn(Request $request): Response =>
+            $apiDocs()->specification($request),
+            'api.documentation.specification',
+        );
+
+        $router->get(
+            '/api/docs',
+            static fn(Request $request): Response =>
+            $apiDocs()->documentation($request),
+            'api.documentation.ui',
+        );
         $admin = static fn(): AdminAuthController => $container->get(AdminAuthController::class);
         $pages = static fn(): AdminPageController => $container->get(AdminPageController::class);
         $builder = static fn(): AdminPageBuilderController => $container->get(AdminPageBuilderController::class);
@@ -155,6 +173,11 @@ return static function (Router $router, ?Container $container = null): void {
         '/media/{path*}',
         static fn(Request $request): Response => $container->get(PublicMediaController::class)->show($request),
         'site.media',
+    );
+    $router->post(
+        '/forms/contact',
+        static fn(Request $request): Response => $container->get(ContactFormController::class)->submit($request),
+        'site.forms.contact',
     );
 
     $router->get('/sitemap.xml', static fn(Request $request): Response => $container->get(SitemapController::class)->show($request), 'site.sitemap');

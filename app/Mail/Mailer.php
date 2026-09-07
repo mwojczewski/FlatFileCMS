@@ -6,5 +6,11 @@ namespace FlatFileCms\Mail;
 
 interface Mailer
 {
-    public function send(string $recipient, string $subject, string $text, string $html): void;
+    public function send(
+        string $recipient,
+        string $subject,
+        string $text,
+        string $html,
+        ?string $replyTo = null,
+    ): void;
 }

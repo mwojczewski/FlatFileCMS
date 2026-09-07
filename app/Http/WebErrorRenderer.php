@@ -16,12 +16,23 @@ final readonly class WebErrorRenderer
 {
     /** @var array<int, string> */
     private const array DESCRIPTIONS = [
-        400 => 'Bad Request', 401 => 'Unauthorized', 403 => 'Forbidden', 404 => 'Not Found',
-        405 => 'Method Not Allowed', 408 => 'Request Timeout', 409 => 'Conflict',
-        410 => 'Gone', 413 => 'Content Too Large', 415 => 'Unsupported Media Type',
-        422 => 'Unprocessable Content', 429 => 'Too Many Requests',
-        500 => 'Internal Server Error', 501 => 'Not Implemented', 502 => 'Bad Gateway',
-        503 => 'Service Unavailable', 504 => 'Gateway Timeout',
+        400 => 'Bad Request',
+        401 => 'Unauthorized',
+        403 => 'Forbidden',
+        404 => 'Not Found',
+        405 => 'Method Not Allowed',
+        408 => 'Request Timeout',
+        409 => 'Conflict',
+        410 => 'Gone',
+        413 => 'Content Too Large',
+        415 => 'Unsupported Media Type',
+        422 => 'Unprocessable Content',
+        429 => 'Too Many Requests',
+        500 => 'Internal Server Error',
+        501 => 'Not Implemented',
+        502 => 'Bad Gateway',
+        503 => 'Service Unavailable',
+        504 => 'Gateway Timeout',
     ];
 
     public function __construct(
@@ -65,7 +76,7 @@ final readonly class WebErrorRenderer
             $this->blocks->forPublicPage($page, $locale, $languages),
             [],
         );
-        $homepageUrl = $languages->isMultilingual() ? '/' . $locale . '/' : '/';
+        $homepageUrl = $languages->isMultilingual() ? "/{$locale}/" : '/';
         $rendered = $this->renderer->render(
             $view,
             [],

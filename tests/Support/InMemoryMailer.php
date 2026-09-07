@@ -8,20 +8,26 @@ use FlatFileCms\Mail\Mailer;
 
 final class InMemoryMailer implements Mailer
 {
-    /** @var list<array{recipient: string, subject: string, text: string, html: string}> */
+    /** @var list<array{recipient: string, subject: string, text: string, html: string, replyTo: ?string}> */
     private array $messages = [];
 
-    public function send(string $recipient, string $subject, string $text, string $html): void
-    {
+    public function send(
+        string $recipient,
+        string $subject,
+        string $text,
+        string $html,
+        ?string $replyTo = null,
+    ): void {
         $this->messages[] = [
             'recipient' => $recipient,
             'subject' => $subject,
             'text' => $text,
             'html' => $html,
+            'replyTo' => $replyTo,
         ];
     }
 
-    /** @return array{recipient: string, subject: string, text: string, html: string} */
+    /** @return array{recipient: string, subject: string, text: string, html: string, replyTo: ?string} */
     public function lastMessage(): array
     {
         if ($this->messages === []) {
