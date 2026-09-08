@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Infrastructure\Database;
 
+use FlatFileCms\Support\UuidV7;
 use PDO;
 
 final readonly class SchemaInstaller
@@ -16,6 +17,9 @@ final readonly class SchemaInstaller
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT NOT NULL COLLATE NOCASE UNIQUE,
+    public_id TEXT NOT NULL UNIQUE,
+    first_name TEXT NOT NULL DEFAULT '',
+    last_name TEXT NOT NULL DEFAULT '',
     password_hash TEXT NOT NULL,
     role TEXT NOT NULL CHECK (role IN ('ROLE_ADMIN', 'ROLE_SUPERADMIN')),
     enabled INTEGER NOT NULL DEFAULT 1 CHECK (enabled IN (0, 1)),
@@ -59,5 +63,41 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
 CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_user ON password_reset_tokens(user_id);
 CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_expiry ON password_reset_tokens(expires_at);
 SQL);
+        $this->addUserProfileColumn('first_name');
+        $this->addUserProfileColumn('last_name');
+        $this->addPublicUserIds();
+    }
+
+    private function addUserProfileColumn(string $name): void
+    {
+        $statement = $this->database->query('PRAGMA table_info(users)');
+        if ($statement === false) {
+            throw new DatabaseException('Unable to inspect the users table.');
+        }
+        $columns = $statement->fetchAll(PDO::FETCH_COLUMN, 1);
+        if (!\in_array($name, $columns, true)) {
+            $this->database->exec("ALTER TABLE users ADD COLUMN {$name} TEXT NOT NULL DEFAULT ''");
+        }
+    }
+
+    private function addPublicUserIds(): void
+    {
+        $statement = $this->database->query('PRAGMA table_info(users)');
+        if ($statement === false) {
+            throw new DatabaseException('Unable to inspect the users table.');
+        }
+        $columns = $statement->fetchAll(PDO::FETCH_COLUMN, 1);
+        if (!\in_array('public_id', $columns, true)) {
+            $this->database->exec("ALTER TABLE users ADD COLUMN public_id TEXT NOT NULL DEFAULT ''");
+        }
+        $missing = $this->database->query("SELECT id FROM users WHERE public_id = ''");
+        if ($missing === false) {
+            throw new DatabaseException('Unable to migrate public user identifiers.');
+        }
+        $update = $this->database->prepare('UPDATE users SET public_id = :public_id WHERE id = :id');
+        foreach ($missing->fetchAll(PDO::FETCH_COLUMN) as $id) {
+            $update->execute(['public_id' => UuidV7::generate(), 'id' => $id]);
+        }
+        $this->database->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_public_id ON users(public_id)');
     }
 }

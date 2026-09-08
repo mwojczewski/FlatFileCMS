@@ -5,39 +5,43 @@ slug:
   pl: obrazy-w-katalogu-i-kodzie-strony
   en: images-in-page-directories-and-code
 title:
-  pl: Obrazy w katalogu i kodzie strony — od pliku do responsywnego HTML
-  en: Images in page directories and code — from file to responsive HTML
-date: "2026-09-01"
+  pl: 'Obrazy w katalogu i kodzie strony — od pliku do responsywnego HTML'
+  en: 'Images in page directories and code — from file to responsive HTML'
+date: '2026-09-01'
 category: media
 excerpt:
-  pl: Praktyczny przewodnik po dodawaniu obrazu do katalogu strony, konfiguracji YAML i bezpiecznym renderowaniu w PHP.
-  en: A practical guide to adding an image to a page directory, configuring YAML and rendering it safely in PHP.
+  pl: 'Praktyczny przewodnik po dodawaniu obrazu do katalogu strony, konfiguracji YAML i bezpiecznym renderowaniu w PHP.'
+  en: 'A practical guide to adding an image to a page directory, configuring YAML and rendering it safely in PHP.'
 seo:
   title:
-    pl: Jak dodawać obrazy do stron FlatFile CMS
-    en: How to add images to FlatFile CMS pages
+    pl: 'Jak dodawać obrazy do stron FlatFile CMS'
+    en: 'How to add images to FlatFile CMS pages'
   description:
-    pl: Dowiedz się, gdzie zapisać plik obrazu, jak odwołać się do niego w YAML i wyrenderować responsywny HTML w bloku PHP.
-    en: Learn where to store an image, how to reference it in YAML and render responsive HTML in a PHP block.
+    pl: 'Dowiedz się, gdzie zapisać plik obrazu, jak odwołać się do niego w YAML i wyrenderować responsywny HTML w bloku PHP.'
+    en: 'Learn where to store an image, how to reference it in YAML and render responsive HTML in a PHP block.'
 blocks:
-  - id: 01a05d61-1001-7301-8301-000000000001
+  -
+    id: 01a05d61-1001-7301-8301-000000000001
     type: article-hero
     enabled: true
     data:
-      category: { pl: Media, en: Media }
-      date: "2026-09-01"
+      category:
+        pl: Media
+        en: Media
+      date: '2026-09-01'
       title:
-        pl: Obrazy w katalogu i kodzie strony
-        en: Images in page directories and code
+        pl: 'Obrazy w katalogu i kodzie strony'
+        en: 'Images in page directories and code'
       lead:
-        pl: Plik trafia do katalogu strony, YAML opisuje jego użycie, a bezpieczny renderer PHP zamienia go w gotowy, fingerprintowany HTML. Prześledźmy cały proces.
-        en: The file lives beside the page, YAML describes its use, and a safe PHP renderer turns it into fingerprinted HTML. Let’s follow the complete workflow.
+        pl: 'Plik trafia do katalogu strony, YAML opisuje jego użycie, a bezpieczny renderer PHP zamienia go w gotowy, fingerprintowany HTML. Prześledźmy cały proces.'
+        en: 'The file lives beside the page, YAML describes its use, and a safe PHP renderer turns it into fingerprinted HTML. Let’s follow the complete workflow.'
       image:
         src: cover.png
         alt:
-          pl: Ilustracja przepływu obrazu z katalogu przez YAML do gotowej strony
-          en: An illustration of an image flowing from a directory through YAML into a finished page
-  - id: 01a05d61-1001-7302-8302-000000000002
+          pl: 'Ilustracja przepływu obrazu z katalogu przez YAML do gotowej strony'
+          en: 'An illustration of an image flowing from a directory through YAML into a finished page'
+  -
+    id: 01a05d61-1001-7302-8302-000000000002
     type: article-content
     enabled: true
     data:
@@ -189,21 +193,23 @@ blocks:
 
           The gallery below follows exactly this pattern — it uses the same `cover.png`, but describes its role with an independent ALT and caption.
       note:
-        pl: Nie wpisuj `/pages/...` ani publicznego `/media/...` w polu `src`. Zapisz wyłącznie bezpieczną ścieżkę względną, na przykład `cover.png`.
-        en: Do not put `/pages/...` or a public `/media/...` URL in `src`. Store only a safe relative path such as `cover.png`.
-  - id: 01a05d61-1001-7303-8303-000000000003
+        pl: 'Nie wpisuj `/pages/...` ani publicznego `/media/...` w polu `src`. Zapisz wyłącznie bezpieczną ścieżkę względną, na przykład `cover.png`.'
+        en: 'Do not put `/pages/...` or a public `/media/...` URL in `src`. Store only a safe relative path such as `cover.png`.'
+  -
+    id: 01a05d61-1001-7303-8303-000000000003
     type: article-gallery
     enabled: true
     data:
       title:
-        pl: Od pliku lokalnego do obrazu gotowego dla przeglądarki
-        en: From a local file to a browser-ready image
+        pl: 'Od pliku lokalnego do obrazu gotowego dla przeglądarki'
+        en: 'From a local file to a browser-ready image'
       images:
-        - image:
+        -
+          image:
             src: cover.png
             alt:
-              pl: Schemat katalogu, konfiguracji YAML i wyrenderowanej strony
-              en: A diagram of a directory, YAML configuration and a rendered page
+              pl: 'Schemat katalogu, konfiguracji YAML i wyrenderowanej strony'
+              en: 'A diagram of a directory, YAML configuration and a rendered page'
           caption:
-            pl: Jeden plik pozostaje lokalny dla strony, a CMS bezpiecznie wzbogaca go o publiczny URL i metadane.
-            en: One file remains local to the page while the CMS safely enriches it with a public URL and metadata.
+            pl: 'Jeden plik pozostaje lokalny dla strony, a CMS bezpiecznie wzbogaca go o publiczny URL i metadane.'
+            en: 'One file remains local to the page while the CMS safely enriches it with a public URL and metadata.'

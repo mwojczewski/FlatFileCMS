@@ -10,14 +10,13 @@ use FlatFileCms\Http\Response;
 
 final readonly class AdminLayout
 {
-    private const string ASSET_VERSION = '13.1.0';
+    private const string ASSET_VERSION = '14.5.0';
 
     public function __construct(
         private Authenticator $authenticator,
         private CsrfTokenManager $csrf,
         private AdminView $views,
-    ) {
-    }
+    ) {}
 
     public function render(
         string $title,
@@ -58,6 +57,8 @@ final readonly class AdminLayout
             'content' => $content,
             'active' => $active,
             'email' => $user?->email() ?? '',
+            'displayName' => $user?->displayName() ?? '',
+            'accountInitials' => $user?->initials() ?? '',
             'csrfToken' => $this->csrf->token(),
         ]);
 

@@ -43,9 +43,9 @@ final readonly class ConsoleApplication
                 'runtime:prune' => $this->pruneRuntime(\array_slice($arguments, 2)),
                 'database:migrate' => $this->migrateDatabase(\array_slice($arguments, 2)),
                 'release:check' => $this->releaseCheck(\array_slice($arguments, 2)),
-                'install' => $this->createUser($arguments[2] ?? null, Role::Superadmin, install: true),
-                'user:create' => $this->createUser($arguments[2] ?? null, Role::Admin),
-                'user:create-superadmin' => $this->createUser($arguments[2] ?? null, Role::Superadmin),
+                'install' => $this->createUser(\array_slice($arguments, 2), Role::Superadmin, install: true),
+                'user:create' => $this->createUser(\array_slice($arguments, 2), Role::Admin),
+                'user:create-superadmin' => $this->createUser(\array_slice($arguments, 2), Role::Superadmin),
                 'user:password' => $this->changePassword($arguments[2] ?? null),
                 'user:security-keys:clear' => $this->clearSecurityKeys($arguments[2] ?? null),
                 default => $this->unknown($command),
@@ -83,15 +83,31 @@ final readonly class ConsoleApplication
         return 0;
     }
 
-    private function createUser(?string $email, Role $role, bool $install = false): int
+    /** @param list<string> $arguments */
+    private function createUser(array $arguments, Role $role, bool $install = false): int
     {
+        $email = array_shift($arguments);
         $email ??= throw new InvalidArgumentException('Email argument is required.');
+        $firstName = '';
+        $lastName = '';
+        foreach ($arguments as $argument) {
+            if (str_starts_with($argument, '--first-name=')) {
+                $firstName = substr($argument, 13);
+            } elseif (str_starts_with($argument, '--last-name=')) {
+                $lastName = substr($argument, 12);
+            } else {
+                throw new InvalidArgumentException('Invalid user option. See php bin/cms help.');
+            }
+        }
+        if (($firstName === '') !== ($lastName === '')) {
+            throw new InvalidArgumentException('First name and last name must be provided together.');
+        }
         $password = $this->passwords->read();
         if ($install) {
-            $this->users()->install($email, $password);
+            $this->users()->install($email, $password, $firstName, $lastName);
             $this->output("CMS database installed and first superadmin created.\n");
         } else {
-            $this->users()->create($email, $password, $role);
+            $this->users()->create($email, $password, $role, $firstName, $lastName);
             $this->output(\sprintf("%s created.\n", $role->value));
         }
 
@@ -246,9 +262,9 @@ Usage:
   php bin/cms <command> [arguments]
 
 Commands:
-  install <email>                         Install SQLite and create the first superadmin
-  user:create <email>                     Create an admin
-  user:create-superadmin <email>          Create a technical superadmin
+  install <email> [name options]          Install SQLite and create the first superadmin
+  user:create <email> [name options]      Create an admin
+  user:create-superadmin <email> [options] Create a technical superadmin
   user:password <email>                   Change a user password
   user:security-keys:clear <email>         Remove all WebAuthn/YubiKey credentials
   block:create <type> [--with-assets]      Create a developer block package
@@ -261,6 +277,7 @@ Commands:
   release:check                            Validate production runtime, content and deployment
 
 Set CMS_PASSWORD for non-interactive use. Avoid shell history and process arguments.
+Name options: --first-name="Anna Maria" --last-name="Kowalska" (provide both or neither).
 TEXT;
 
         return $help . "\n";

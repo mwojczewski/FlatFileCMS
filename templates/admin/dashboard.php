@@ -22,7 +22,34 @@ $rating = static fn(string $value): string => match ($value) {
     'good' => 'Dobry', 'needs-work' => 'Do poprawy', default => 'Słaby',
 };
 $rows = static fn(string $key): array => is_array($analytics[$key] ?? null) ? $analytics[$key] : [];
+$contentSummary = is_array($contentSummary ?? null) ? $contentSummary : [];
 ?>
+<section class="dashboard-overview" aria-labelledby="dashboard-overview-title">
+    <div class="dashboard-welcome">
+        <div>
+            <p class="eyebrow">Przegląd systemu</p>
+            <h2 id="dashboard-overview-title">Witaj w FlatFile CMS</h2>
+            <p>Treść, struktura witryny i najważniejsze akcje w jednym miejscu.</p>
+        </div>
+        <a class="button" href="/admin/pages/create">Dodaj stronę</a>
+    </div>
+    <div class="content-summary" aria-label="Stan zawartości">
+        <a href="/admin/pages"><strong><?= $number($contentSummary['pages'] ?? 0) ?></strong><span>Strony</span></a>
+        <a href="/admin/pages"><strong><?= $number($contentSummary['collections'] ?? 0) ?></strong><span>Kolekcje</span></a>
+        <a href="/admin/pages"><strong><?= $number($contentSummary['published'] ?? 0) ?></strong><span>Aktywne</span></a>
+        <a href="/admin/settings"><strong><?= $number($contentSummary['languages'] ?? 0) ?></strong><span>Języki</span></a>
+    </div>
+    <nav class="dashboard-quick-actions" aria-label="Szybkie akcje">
+        <a href="/admin/pages"><span class="quick-action-icon" aria-hidden="true">▤</span><span><strong>Zarządzaj stronami</strong><small>Treść i edytor bloków</small></span><b aria-hidden="true">→</b></a>
+        <a href="/admin/navigation"><span class="quick-action-icon" aria-hidden="true">⌘</span><span><strong>Edytuj nawigację</strong><small>Menu i hierarchia linków</small></span><b aria-hidden="true">→</b></a>
+        <a href="/admin/settings"><span class="quick-action-icon" aria-hidden="true">⚙</span><span><strong>Konfiguracja</strong><small>SEO, witryna i multimedia</small></span><b aria-hidden="true">→</b></a>
+    </nav>
+</section>
+
+<div class="dashboard-section-heading">
+    <div><p class="eyebrow">Analityka</p><h2>Ruch w witrynie</h2></div>
+    <p>Dane z Cloudflare Web Analytics</p>
+</div>
 <div class="analytics-toolbar">
     <div>
         <p class="eyebrow">Cloudflare Web Analytics</p>

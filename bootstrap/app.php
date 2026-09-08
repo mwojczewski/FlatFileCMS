@@ -232,7 +232,7 @@ $container->set(
 $container->set(
     CloudflareAnalyticsConfig::class,
     static fn(Container $container): CloudflareAnalyticsConfig =>
-        CloudflareAnalyticsConfig::fromEnvironment($container->get(Environment::class)),
+    CloudflareAnalyticsConfig::fromEnvironment($container->get(Environment::class)),
 );
 $container->set(AnalyticsHttpClient::class, static fn(): AnalyticsHttpClient => new NativeAnalyticsHttpClient());
 $container->set(
@@ -245,7 +245,7 @@ $container->set(
 $container->set(
     AnalyticsCache::class,
     static fn(Container $container): AnalyticsCache =>
-        new AnalyticsCache($container->get(Environment::class)->projectRoot()),
+    new AnalyticsCache($container->get(Environment::class)->projectRoot()),
 );
 $container->set(
     CloudflareAnalyticsService::class,
@@ -261,6 +261,9 @@ $container->set(
     static fn(Container $container): AdminAnalyticsController => new AdminAnalyticsController(
         $container->get(Authenticator::class),
         $container->get(CloudflareAnalyticsService::class),
+        $container->get(LanguageRepository::class),
+        $container->get(PageRepository::class),
+        $container->get(CollectionRepository::class),
         $container->get(AdminView::class),
         $container->get(AdminLayout::class),
     ),
@@ -641,6 +644,8 @@ $container->set(
         $container->get(Authenticator::class),
         $container->get(CsrfTokenManager::class),
         $container->get(LanguageRepository::class),
+        $container->get(PageRepository::class),
+        $container->get(CollectionRepository::class),
         $container->get(PageBlockManager::class),
         $container->get(BlockRegistry::class),
         $container->get(BlockFormDataMapper::class),

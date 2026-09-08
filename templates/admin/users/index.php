@@ -19,10 +19,8 @@
             <?php foreach ($users as $user): ?>
                 <tr>
                     <td class="page-cell">
-                        <strong><?= $escape($user->email()) ?></strong>
-                        <small>ID:
-                            <?= $user->id() ?>     <?= $user->id() === $actor->id() ? ' · Twoje konto' : '' ?>
-                        </small>
+                        <strong><?= $escape($user->displayName()) ?></strong>
+                        <small><?= $escape($user->email()) ?><?= $user->id() === $actor->id() ? ' · Twoje konto' : '' ?></small>
                     </td>
                     <td><?= $user->role()->value === 'ROLE_SUPERADMIN' ? '<span class="status">Konto techniczne</span>' : '<span class="status collection">Administrator</span>' ?>
                     </td>
@@ -33,7 +31,7 @@
                     <td>
                         <div class="row-actions">
                             <?php if ($user->role()->value === 'ROLE_ADMIN'): ?>
-                                <a class="button compact secondary" href="/admin/users/edit?id=<?= $user->id() ?>">Edytuj</a>
+                                <a class="button compact secondary" href="/admin/users/edit?id=<?= $escape($user->publicId()) ?>">Edytuj</a>
                             <?php else: ?>
                                 <span class="muted">Zarządzane wyłącznie przez CLI</span>
                             <?php endif; ?>

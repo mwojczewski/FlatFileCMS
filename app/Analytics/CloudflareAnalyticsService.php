@@ -18,8 +18,7 @@ final readonly class CloudflareAnalyticsService
         private CloudflareAnalyticsConfig $config,
         private AnalyticsCache $cache,
         private LoggerInterface $logger,
-    ) {
-    }
+    ) {}
 
     /** @return array<string, mixed> */
     public function dashboard(string $requestedRange): array

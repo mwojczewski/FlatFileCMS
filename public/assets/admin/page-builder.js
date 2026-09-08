@@ -212,6 +212,7 @@ const builderList = document.querySelector("[data-builder-list]");
 const orderForm = document.querySelector("[data-order-form]");
 const orderFields = document.querySelector("[data-order-fields]");
 const orderSubmit = document.querySelector("[data-order-submit]");
+const orderMessage = document.querySelector("[data-order-message]");
 let dragged = null;
 
 function synchronizeOrder() {
@@ -235,6 +236,9 @@ function synchronizeOrder() {
   });
   if (orderSubmit instanceof HTMLButtonElement) {
     orderSubmit.disabled = false;
+  }
+  if (orderMessage instanceof HTMLElement) {
+    orderMessage.textContent = "Kolejność została zmieniona";
   }
 }
 
@@ -267,6 +271,22 @@ builderList?.addEventListener("dragover", (event) => {
 });
 
 orderForm?.addEventListener("submit", synchronizeOrder);
+
+const blockSearch = document.querySelector("[data-block-search]");
+if (blockSearch instanceof HTMLInputElement) {
+  const cards = [...document.querySelectorAll("[data-block-card]")];
+  const empty = document.querySelector("[data-block-library-empty]");
+  blockSearch.addEventListener("input", () => {
+    const query = blockSearch.value.trim().toLocaleLowerCase("pl");
+    let visible = 0;
+    cards.forEach((card) => {
+      const matches = (card.dataset.blockSearchValue ?? "").includes(query);
+      card.hidden = !matches;
+      visible += matches ? 1 : 0;
+    });
+    if (empty instanceof HTMLElement) empty.hidden = visible !== 0;
+  });
+}
 
 document.addEventListener("submit", (event) => {
   if (!(event.target instanceof HTMLFormElement)) {

@@ -76,7 +76,7 @@ final readonly class PublicMediaController
             throw new InvalidArgumentException('Media URL is incomplete.');
         }
         $filename = array_pop($segments);
-        $fingerprint = array_pop($segments);
+        $fingerprint = array_pop($segments) ?? "";
         if (
             $filename === ''
             || preg_match('/^[a-f0-9]{16}$/D', $fingerprint) !== 1

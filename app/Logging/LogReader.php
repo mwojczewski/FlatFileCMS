@@ -35,8 +35,8 @@ final readonly class LogReader
             }
             $files[] = [
                 'name' => $name,
-                'size' => (int) (filesize($path) ?: 0),
-                'modified' => (int) (filemtime($path) ?: 0),
+                'size' => filesize($path) ?: 0,
+                'modified' => filemtime($path) ?: 0,
             ];
         }
 

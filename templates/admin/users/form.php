@@ -1,13 +1,15 @@
 <?php
 $editing = $user !== null;
 $currentEmail = $email ?? ($editing ? $user->email() : '');
+$currentFirstName = $firstName ?? ($editing ? $user->firstName() : '');
+$currentLastName = $lastName ?? ($editing ? $user->lastName() : '');
 $currentEnabled = $enabled ?? ($editing ? $user->enabled() : true);
 ?>
 <?php if ($error !== ''): ?>
     <p class="error"><?= $escape($error) ?></p><?php endif; ?>
 <form class="stack crud-form" method="post" action="<?= $editing ? '/admin/users/update' : '/admin/users/create' ?>">
     <input type="hidden" name="_csrf" value="<?= $escape($csrfToken) ?>">
-    <?php if ($editing): ?><input type="hidden" name="id" value="<?= $user->id() ?>"><?php endif; ?>
+    <?php if ($editing): ?><input type="hidden" name="id" value="<?= $escape($user->publicId()) ?>"><?php endif; ?>
     <section class="form-section">
         <div class="section-heading">
             <div>
@@ -17,6 +19,10 @@ $currentEnabled = $enabled ?? ($editing ? $user->enabled() : true);
             <p>Nowe konta zawsze otrzymują rolę ROLE_ADMIN.</p>
         </div>
         <div class="settings-grid">
+            <label>Imię<input type="text" name="first_name" value="<?= $escape($currentFirstName) ?>" required
+                    autocomplete="given-name" maxlength="100"></label>
+            <label>Nazwisko<input type="text" name="last_name" value="<?= $escape($currentLastName) ?>" required
+                    autocomplete="family-name" maxlength="100"></label>
             <label>Email<input type="email" name="email" value="<?= $escape($currentEmail) ?>" required
                     autocomplete="email"></label>
             <?php if ($editing): ?>
@@ -54,7 +60,7 @@ $currentEnabled = $enabled ?? ($editing ? $user->enabled() : true);
         </div>
         <form method="post" action="/admin/users/delete" data-confirm="Usunąć konto administratora?">
             <input type="hidden" name="_csrf" value="<?= $escape($csrfToken) ?>"><input type="hidden" name="id"
-                value="<?= $user->id() ?>">
+                value="<?= $escape($user->publicId()) ?>">
             <button type="submit" class="danger" <?= $user->id() === $actor?->id() ? ' disabled' : '' ?>>Usuń
                 administratora</button>
         </form>

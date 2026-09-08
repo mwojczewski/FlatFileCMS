@@ -14,9 +14,12 @@ use FlatFileCms\Blocks\BlockRegistry;
 use FlatFileCms\Blocks\BlockValidationException;
 use FlatFileCms\Blocks\InvalidBlockDefinitionException;
 use FlatFileCms\Blocks\ValidationError;
+use FlatFileCms\Collections\CollectionRepository;
 use FlatFileCms\Config\LanguageRepository;
 use FlatFileCms\Content\InvalidContentException;
 use FlatFileCms\Content\PageBlockManager;
+use FlatFileCms\Content\PageRepository;
+use FlatFileCms\Content\PageRouteIndex;
 use FlatFileCms\Domain\Content\PageIdentity;
 use FlatFileCms\Domain\Localization\LanguageConfig;
 use FlatFileCms\Http\HttpException;
@@ -34,6 +37,8 @@ final readonly class AdminPageBuilderController
         private Authenticator $authenticator,
         private CsrfTokenManager $csrf,
         private LanguageRepository $languages,
+        private PageRepository $pages,
+        private CollectionRepository $collections,
         private PageBlockManager $manager,
         private BlockRegistry $registry,
         private BlockFormDataMapper $dataMapper,
@@ -53,8 +58,16 @@ final readonly class AdminPageBuilderController
         } catch (InvalidArgumentException | InvalidContentException | FilesystemException $exception) {
             throw new HttpException(404, 'PAGE_NOT_FOUND', 'Page not found.', previous: $exception);
         }
-        $viewBlocks = [];
         $languages = $this->languages->get();
+        $routeIndex = PageRouteIndex::build(
+            $this->pages->all($languages),
+            $languages,
+            $this->collections->all($languages),
+        );
+        $localizedPath = $routeIndex->pathFor($identity, $languages->default());
+        $localePrefix = $languages->isMultilingual() ? '/' . $languages->default() : '';
+        $previewUrl = $localizedPath === '' ? ($localePrefix === '' ? '/' : $localePrefix . '/') : $localePrefix . '/' . $localizedPath;
+        $viewBlocks = [];
         foreach ($blocks as $position => $block) {
             $id = ContentData::string($block['id'] ?? null, 'block.id');
             $type = ContentData::string($block['type'] ?? null, 'block.type');
@@ -76,6 +89,7 @@ final readonly class AdminPageBuilderController
             'blocks' => $viewBlocks,
             'revision' => $editable->revision(),
             'csrfToken' => $this->csrf->token(),
+            'previewUrl' => $previewUrl,
         ]);
 
         return $this->page('Bloki strony', $content, scripts: true);

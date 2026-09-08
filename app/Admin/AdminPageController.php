@@ -49,7 +49,7 @@ final readonly class AdminPageController
     {
         $this->requireUser();
         $languages = $this->languages->get();
-        /** @var array<string, array{identity: PageIdentity, title: string, enabled: bool, collection: bool}> $entries */
+        /** @var array<string, array{identity: PageIdentity, title: string, enabled: bool, collection: bool, modifiedAt: int}> $entries */
         $entries = [];
         foreach ($this->pages->all($languages) as $page) {
             $entries[$page->identity()->value()] = [
@@ -57,6 +57,7 @@ final readonly class AdminPageController
                 'title' => $page->title($languages->default(), $languages->default()),
                 'enabled' => $page->enabled(),
                 'collection' => false,
+                'modifiedAt' => $page->modifiedAt(),
             ];
         }
         foreach ($this->collections->all($languages) as $collection) {
@@ -65,6 +66,7 @@ final readonly class AdminPageController
                 'title' => $collection->title($languages->default(), $languages->default()),
                 'enabled' => $collection->enabled(),
                 'collection' => true,
+                'modifiedAt' => $collection->modifiedAt(),
             ];
         }
         uksort($entries, static function (string $left, string $right): int {
@@ -77,7 +79,11 @@ final readonly class AdminPageController
 
             return $left <=> $right;
         });
-        return $this->page('Strony', $this->views->render('pages/index', ['entries' => array_values($entries)]));
+        return $this->page('Strony', $this->views->render('pages/index', [
+            'entries' => array_values($entries),
+            'languageCount' => \count($languages->codes()),
+            'languageCodes' => $languages->codes(),
+        ]));
     }
 
     public function createForm(Request $request): Response

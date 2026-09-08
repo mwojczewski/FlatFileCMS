@@ -16,6 +16,7 @@ use FlatFileCms\Auth\UserRepository;
 use FlatFileCms\Http\HttpException;
 use FlatFileCms\Http\Request;
 use FlatFileCms\Http\Response;
+use FlatFileCms\Support\UuidV7;
 use InvalidArgumentException;
 
 final readonly class AdminUserController
@@ -63,8 +64,10 @@ final readonly class AdminUserController
                 $this->bodyString($request, 'email'),
                 $this->bodyString($request, 'password'),
                 $this->bodyString($request, 'password_confirmation'),
+                $this->bodyString($request, 'first_name'),
+                $this->bodyString($request, 'last_name'),
             );
-            $this->audit->log('user.created', $actor->id(), "users/{$user->id()}", $request->clientIp());
+            $this->audit->log('user.created', $actor->id(), "users/{$user->publicId()}", $request->clientIp());
 
             return Response::redirect('/admin/users?created=1', 303);
         } catch (AuthenticationException | InvalidArgumentException $exception) {
@@ -72,6 +75,8 @@ final readonly class AdminUserController
                 'user' => null,
                 'actor' => $actor,
                 'email' => $this->optionalBodyString($request, 'email'),
+                'firstName' => $this->optionalBodyString($request, 'first_name'),
+                'lastName' => $this->optionalBodyString($request, 'last_name'),
                 'csrfToken' => $this->csrf->token(),
                 'error' => $exception->getMessage(),
             ], 422);
@@ -95,26 +100,31 @@ final readonly class AdminUserController
     {
         $actor = $this->requireUser();
         $this->validateCsrf($request);
-        $id = $this->bodyId($request);
+        $publicId = $this->bodyId($request);
+        $target = $this->visibleAdmin($publicId, $actor);
         try {
             $user = $this->manager->update(
                 $actor,
-                $id,
+                $target->id(),
                 $this->bodyString($request, 'email'),
                 ($request->parsedBody()['enabled'] ?? null) === '1',
                 $this->optionalBodyString($request, 'password'),
                 $this->optionalBodyString($request, 'password_confirmation'),
+                $this->bodyString($request, 'first_name'),
+                $this->bodyString($request, 'last_name'),
             );
-            $this->audit->log('user.updated', $actor->id(), "users/{$user->id()}", $request->clientIp());
+            $this->audit->log('user.updated', $actor->id(), "users/{$user->publicId()}", $request->clientIp());
 
-            return Response::redirect("/admin/users/edit?id={$user->id()}&saved=1", 303);
+            return Response::redirect("/admin/users/edit?id={$user->publicId()}&saved=1", 303);
         } catch (AuthenticationException | InvalidArgumentException | UserNotFoundException $exception) {
-            $user = $this->visibleAdmin($id, $actor);
+            $user = $this->visibleAdmin($publicId, $actor);
 
             return $this->page('Edycja administratora', 'users/form', [
                 'user' => $user,
                 'actor' => $actor,
                 'email' => $this->optionalBodyString($request, 'email'),
+                'firstName' => $this->optionalBodyString($request, 'first_name'),
+                'lastName' => $this->optionalBodyString($request, 'last_name'),
                 'enabled' => ($request->parsedBody()['enabled'] ?? null) === '1',
                 'csrfToken' => $this->csrf->token(),
                 'error' => $exception->getMessage(),
@@ -126,10 +136,11 @@ final readonly class AdminUserController
     {
         $actor = $this->requireUser();
         $this->validateCsrf($request);
-        $id = $this->bodyId($request);
+        $publicId = $this->bodyId($request);
+        $target = $this->visibleAdmin($publicId, $actor);
         try {
-            $this->manager->delete($actor, $id);
-            $this->audit->log('user.deleted', $actor->id(), "users/{$id}", $request->clientIp());
+            $this->manager->delete($actor, $target->id());
+            $this->audit->log('user.deleted', $actor->id(), "users/{$publicId}", $request->clientIp());
 
             return Response::redirect('/admin/users?deleted=1', 303);
         } catch (AuthenticationException | InvalidArgumentException | UserNotFoundException $exception) {
@@ -137,10 +148,10 @@ final readonly class AdminUserController
         }
     }
 
-    private function visibleAdmin(int $id, User $actor): User
+    private function visibleAdmin(string $id, User $actor): User
     {
         try {
-            $user = $this->users->getVisibleTo($id, $actor);
+            $user = $this->users->getVisibleByPublicId($id, $actor);
             if ($user->role() !== Role::Admin) {
                 throw new UserNotFoundException('User not found.');
             }
@@ -151,25 +162,25 @@ final readonly class AdminUserController
         }
     }
 
-    private function queryId(Request $request): int
+    private function queryId(Request $request): string
     {
         $value = $request->query()['id'] ?? null;
 
         return $this->id($value);
     }
 
-    private function bodyId(Request $request): int
+    private function bodyId(Request $request): string
     {
         return $this->id($request->parsedBody()['id'] ?? null);
     }
 
-    private function id(mixed $value): int
+    private function id(mixed $value): string
     {
-        if (!\is_string($value) || preg_match('/^[1-9][0-9]*$/D', $value) !== 1) {
+        if (!\is_string($value) || !UuidV7::isValid($value)) {
             throw new HttpException(400, 'USER_ID_INVALID', 'User identifier is invalid.');
         }
 
-        return (int) $value;
+        return $value;
     }
 
     private function bodyString(Request $request, string $key): string

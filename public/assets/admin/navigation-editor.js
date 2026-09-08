@@ -35,6 +35,8 @@
   const destinations = readData("navigation-destinations");
   const localeEntries = Object.entries(languageData.items ?? {});
   const defaultLocale = languageData.default ?? localeEntries[0]?.[0] ?? "pl";
+  const menuCount = document.querySelector("[data-navigation-menu-count]");
+  const itemCount = document.querySelector("[data-navigation-item-count]");
   let dragged = null;
   let editedItem = null;
   let editedDraft = null;
@@ -71,6 +73,27 @@
     const node = document.createElement(name);
     if (className) node.className = className;
     if (text) node.textContent = text;
+    return node;
+  };
+
+  const countItems = (items) =>
+    items.reduce((total, item) => total + 1 + countItems(item.children), 0);
+
+  const kindIcon = (type) => {
+    const node = element("span", `navigation-kind-icon is-${type}`);
+    node.setAttribute("aria-hidden", "true");
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("fill", "none");
+    svg.setAttribute("stroke", "currentColor");
+    svg.setAttribute("stroke-width", "1.8");
+    svg.innerHTML =
+      type === "page"
+        ? '<path d="M6 2h8l5 5v15H6z"/><path d="M14 2v6h5M9 13h6M9 17h4"/>'
+        : type === "collection"
+          ? '<rect x="3" y="5" width="14" height="14" rx="2"/><path d="M7 2h12a2 2 0 0 1 2 2v12"/>'
+          : '<path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.1 1"/><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.1-1"/>';
+    node.append(svg);
     return node;
   };
 
@@ -275,30 +298,63 @@
 
   const renderItem = (item, items, index, depth, parentContext) => {
     const card = element("article", "navigation-item");
+    card.draggable = true;
     card.style.setProperty("--navigation-depth", String(depth));
     const row = element("div", "navigation-item-row");
     const handle = element("span", "drag-handle", "⋮⋮");
-    handle.draggable = true;
     handle.tabIndex = 0;
     handle.setAttribute("role", "button");
     handle.setAttribute("aria-label", "Przeciągnij, aby zmienić kolejność");
     handle.title = "Przeciągnij, aby zmienić kolejność";
-    handle.addEventListener("dragstart", () => {
-      dragged = { items, index, item };
+    card.addEventListener("dragstart", (event) => {
+      if (
+        event.target instanceof Element &&
+        event.target.closest(".navigation-item-actions")
+      ) {
+        event.preventDefault();
+        return;
+      }
+      dragged = { items, item, card };
       card.classList.add("dragging");
+      if (event.dataTransfer) {
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", "navigation-item");
+      }
     });
-    handle.addEventListener("dragend", () => {
+    card.addEventListener("dragend", () => {
       dragged = null;
       card.classList.remove("dragging");
       editor
         .querySelectorAll(".drag-over")
         .forEach((node) => node.classList.remove("drag-over"));
+      render();
     });
     card.addEventListener("dragover", (event) => {
       event.preventDefault();
       event.stopPropagation();
-      if (dragged && !containsItem(dragged.item, item))
-        card.classList.add("drag-over");
+      if (!dragged || containsItem(dragged.item, item)) return;
+      editor
+        .querySelectorAll(".drag-over")
+        .forEach((node) => node.classList.toggle("drag-over", node === card));
+      card.classList.add("drag-over");
+      if (dragged.items !== items || dragged.item === item) return;
+
+      const currentIndex = items.indexOf(dragged.item);
+      const targetIndex = items.indexOf(item);
+      if (currentIndex < 0 || targetIndex < 0) return;
+      const rectangle = card.getBoundingClientRect();
+      const after = event.clientY > rectangle.top + rectangle.height / 2;
+      let destinationIndex = targetIndex + (after ? 1 : 0);
+      if (currentIndex < destinationIndex) destinationIndex -= 1;
+      if (destinationIndex === currentIndex) return;
+
+      items.splice(currentIndex, 1);
+      items.splice(destinationIndex, 0, dragged.item);
+      card.parentElement?.insertBefore(
+        dragged.card,
+        after ? card.nextSibling : card,
+      );
+      sync();
     });
     card.addEventListener("dragleave", (event) => {
       if (
@@ -312,13 +368,12 @@
       event.preventDefault();
       event.stopPropagation();
       card.classList.remove("drag-over");
-      if (!dragged || (dragged.items === items && dragged.index === index))
-        return;
+      if (!dragged || dragged.items === items) return;
       if (containsItem(dragged.item, item)) return;
-      const moved = removeFrom(dragged.items, dragged.index);
-      let destinationIndex = index;
-      if (dragged.items === items && dragged.index < index)
-        destinationIndex -= 1;
+      const sourceIndex = dragged.items.indexOf(dragged.item);
+      if (sourceIndex < 0) return;
+      const moved = removeFrom(dragged.items, sourceIndex);
+      const destinationIndex = items.indexOf(item);
       items.splice(destinationIndex, 0, moved);
       render();
     });
@@ -388,7 +443,7 @@
         "navigation-action-remove",
       ),
     );
-    row.append(handle, summary, actions);
+    row.append(handle, kindIcon(item.type), summary, actions);
     card.append(row);
 
     if (item.children.length > 0) {
@@ -433,6 +488,9 @@
 
   const render = () => {
     editor.replaceChildren();
+    if (menuCount instanceof HTMLElement) menuCount.textContent = String(menus.length);
+    if (itemCount instanceof HTMLElement)
+      itemCount.textContent = String(menus.reduce((total, menu) => total + countItems(menu.items), 0));
     menus.forEach((menu, menuIndex) => {
       const section = element("section", "form-section navigation-menu");
       const heading = element("div", "section-heading navigation-menu-heading");
@@ -441,6 +499,7 @@
         element("p", "eyebrow", "Menu"),
         element("h2", "", menu.name),
       );
+      title.append(element("span", "navigation-menu-count", `${countItems(menu.items)} pozycji`));
       const menuActions = element("div", "actions");
       menuActions.append(
         button("Dodaj pozycję", () => {
