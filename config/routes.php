@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use FlatFileCms\Admin\AdminAnalyticsController;
 use FlatFileCms\Admin\AdminAuthController;
 use FlatFileCms\Admin\AdminCollectionController;
 use FlatFileCms\Admin\AdminLogController;
@@ -93,6 +94,7 @@ return static function (Router $router, ?Container $container = null): void {
             'api.documentation.ui',
         );
         $admin = static fn(): AdminAuthController => $container->get(AdminAuthController::class);
+        $analytics = static fn(): AdminAnalyticsController => $container->get(AdminAnalyticsController::class);
         $pages = static fn(): AdminPageController => $container->get(AdminPageController::class);
         $builder = static fn(): AdminPageBuilderController => $container->get(AdminPageBuilderController::class);
         $media = static fn(): AdminMediaController => $container->get(AdminMediaController::class);
@@ -160,7 +162,8 @@ return static function (Router $router, ?Container $container = null): void {
         $router->get('/admin/users/edit', static fn(Request $request): Response => $users()->editForm($request), 'admin.users.edit');
         $router->post('/admin/users/update', static fn(Request $request): Response => $users()->update($request), 'admin.users.update');
         $router->post('/admin/users/delete', static fn(Request $request): Response => $users()->delete($request), 'admin.users.delete');
-        $router->get('/admin', static fn(Request $request): Response => $admin()->dashboard($request), 'admin.entry');
+        $router->get('/admin/analytics/export', static fn(Request $request): Response => $analytics()->export($request), 'admin.analytics.export');
+        $router->get('/admin', static fn(Request $request): Response => $analytics()->dashboard($request), 'admin.entry');
     }
 
     if ($container === null) {

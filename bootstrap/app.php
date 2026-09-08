@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use FlatFileCms\Admin\AdminAnalyticsController;
 use FlatFileCms\Admin\AdminAuthController;
 use FlatFileCms\Admin\AdminCollectionController;
 use FlatFileCms\Admin\AdminLayout;
@@ -16,6 +17,12 @@ use FlatFileCms\Admin\AdminView;
 use FlatFileCms\Admin\BlockFormDataMapper;
 use FlatFileCms\Admin\BlockFormRenderer;
 use FlatFileCms\Admin\PasswordResetController;
+use FlatFileCms\Analytics\AnalyticsCache;
+use FlatFileCms\Analytics\AnalyticsHttpClient;
+use FlatFileCms\Analytics\CloudflareAnalyticsConfig;
+use FlatFileCms\Analytics\CloudflareAnalyticsService;
+use FlatFileCms\Analytics\CloudflareGraphQlClient;
+use FlatFileCms\Analytics\NativeAnalyticsHttpClient;
 use FlatFileCms\Api\ApiResponseFactory;
 use FlatFileCms\Api\CollectionSerializer;
 use FlatFileCms\Api\PageSerializer;
@@ -220,6 +227,42 @@ $container->set(
         $container->get(Authenticator::class),
         $container->get(CsrfTokenManager::class),
         $container->get(AdminView::class),
+    ),
+);
+$container->set(
+    CloudflareAnalyticsConfig::class,
+    static fn(Container $container): CloudflareAnalyticsConfig =>
+        CloudflareAnalyticsConfig::fromEnvironment($container->get(Environment::class)),
+);
+$container->set(AnalyticsHttpClient::class, static fn(): AnalyticsHttpClient => new NativeAnalyticsHttpClient());
+$container->set(
+    CloudflareGraphQlClient::class,
+    static fn(Container $container): CloudflareGraphQlClient => new CloudflareGraphQlClient(
+        $container->get(AnalyticsHttpClient::class),
+        $container->get(CloudflareAnalyticsConfig::class),
+    ),
+);
+$container->set(
+    AnalyticsCache::class,
+    static fn(Container $container): AnalyticsCache =>
+        new AnalyticsCache($container->get(Environment::class)->projectRoot()),
+);
+$container->set(
+    CloudflareAnalyticsService::class,
+    static fn(Container $container): CloudflareAnalyticsService => new CloudflareAnalyticsService(
+        $container->get(CloudflareGraphQlClient::class),
+        $container->get(CloudflareAnalyticsConfig::class),
+        $container->get(AnalyticsCache::class),
+        $container->get(LoggerInterface::class),
+    ),
+);
+$container->set(
+    AdminAnalyticsController::class,
+    static fn(Container $container): AdminAnalyticsController => new AdminAnalyticsController(
+        $container->get(Authenticator::class),
+        $container->get(CloudflareAnalyticsService::class),
+        $container->get(AdminView::class),
+        $container->get(AdminLayout::class),
     ),
 );
 $container->set(

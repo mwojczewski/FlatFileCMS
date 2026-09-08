@@ -10,13 +10,14 @@ use FlatFileCms\Http\Response;
 
 final readonly class AdminLayout
 {
-    private const string ASSET_VERSION = '13.0.0';
+    private const string ASSET_VERSION = '13.1.0';
 
     public function __construct(
         private Authenticator $authenticator,
         private CsrfTokenManager $csrf,
         private AdminView $views,
-    ) {}
+    ) {
+    }
 
     public function render(
         string $title,
@@ -86,12 +87,12 @@ final readonly class AdminLayout
 
     private function stylesheet(string $path): string
     {
-        return '<link rel="stylesheet" href="' . $path . '?v=' . self::ASSET_VERSION . '">';
+        return "<link rel=\"stylesheet\" href=\"{$path}?v=" . self::ASSET_VERSION . "\">";
     }
 
     private function script(string $path): string
     {
-        return '<script src="' . $path . '?v=' . self::ASSET_VERSION . '" defer></script>';
+        return "<script src=\"{$path}?v=" . self::ASSET_VERSION . "\" defer></script>";
     }
 
 }
