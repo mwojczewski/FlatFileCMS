@@ -1,30 +1,83 @@
 main:
-  - label: { pl: Architektura, en: Architecture }
-    link: { type: url, url: "/#architektura" }
+  -
+    label:
+      pl: Architektura
+      en: Architecture
+    link:
+      type: url
+      url: '/#architektura'
     target: _self
-  - label: { pl: Dokumentacja, en: Docs }
-    link: { type: collection, collection: documentation }
+    children: {}
+  -
+    label:
+      pl: Dokumentacja
+      en: Docs
+    link:
+      type: collection
+      collection: documentation
     target: _self
-  - label: { pl: API, en: API }
-    link: { type: url, url: /api/docs }
+    children: {}
+  -
+    label:
+      pl: API
+      en: API
+    link:
+      type: url
+      url: /api/docs
     target: _blank
-  - label: { pl: Insights, en: Insights }
-    link: { type: collection, collection: insights }
+    children: {}
+  -
+    label:
+      pl: Insights
+      en: Insights
+    link:
+      type: collection
+      collection: insights
     target: _self
-  - label: { pl: Kontakt, en: Contact }
-    link: { type: page, page: contact }
+    children: {}
+  -
+    label:
+      pl: Kontakt
+      en: Contact
+    link:
+      type: page
+      page: contact
     target: _self
-
+    children: {}
 footer:
-  - label: { pl: Architektura, en: Architecture }
-    link: { type: url, url: "/#architektura" }
+  -
+    label:
+      pl: Architektura
+      en: Architecture
+    link:
+      type: url
+      url: '/#architektura'
     target: _self
-  - label: { pl: Status API, en: API }
-    link: { type: url, url: /api/docs }
+    children: {}
+  -
+    label:
+      pl: 'Status API'
+      en: API
+    link:
+      type: url
+      url: /api/docs
     target: _blank
-  - label: { pl: Panel, en: Panel }
-    link: { type: url, url: /admin }
+    children: {}
+  -
+    label:
+      pl: Panel
+      en: Panel
+    link:
+      type: url
+      url: /admin
     target: _self
-  - label: { pl: Kontakt, en: Contact }
-    link: { type: page, page: contact }
+    children: {}
+  -
+    label:
+      pl: Kontakt
+      en: Contact
+    link:
+      type: page
+      page: contact
     target: _self
+    children: {}

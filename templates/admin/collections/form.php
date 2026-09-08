@@ -17,8 +17,11 @@ $seoDescription = $strings($seo['description'] ?? []);
 $canonical = is_string($seo['canonical'] ?? null) ? $seo['canonical'] : '';
 $filters = json_encode($data['filters'] ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
 ?>
-<div class="toolbar crud-intro"><p>Zarządzaj routingiem, paginacją, sortowaniem i filtrami zapisanymi w <code>pagination.yml</code>.</p><a class="button secondary" href="/admin/pages">Wróć do listy</a></div>
-<form class="stack crud-form" method="post" action="/admin/collections/update">
+<div class="form-page-header">
+    <div><p class="eyebrow">Ustawienia kolekcji</p><h2><?= $escape($title[$languages->default()] ?? $identity->value()) ?></h2><p class="lead">Routing, paginacja i sposób prezentowania elementów kolekcji.</p></div>
+    <div class="form-page-actions"><a class="button secondary" href="/admin/pages">Wróć do stron</a><a class="button secondary" href="/admin/media?path=<?= rawurlencode($identity->value()) ?>">Multimedia</a></div>
+</div>
+<form class="stack crud-form editor-form" method="post" action="/admin/collections/update">
     <input type="hidden" name="_csrf" value="<?= $escape($csrfToken) ?>"><input type="hidden" name="identity" value="<?= $escape($identity->value()) ?>"><input type="hidden" name="revision" value="<?= $escape($editable->revision()->value()) ?>">
     <section class="form-section">
         <div class="section-heading"><div><p class="eyebrow">Podstawowe</p><h2>Ustawienia kolekcji</h2></div><p>Źródłem pozostają bezpośrednie katalogi potomne.</p></div>
@@ -56,5 +59,5 @@ $filters = json_encode($data['filters'] ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPE
             <div class="robots-grid"><label class="check"><input type="checkbox" name="robots_index" value="1"<?= ($robots['index'] ?? true) === true ? ' checked' : '' ?>><span><strong>Pozwól indeksować</strong></span></label><label class="check"><input type="checkbox" name="robots_follow" value="1"<?= ($robots['follow'] ?? true) === true ? ' checked' : '' ?>><span><strong>Pozwól śledzić linki</strong></span></label></div>
         </fieldset>
     </section>
-    <div class="actions form-actions"><a class="button secondary" href="/admin/pages">Anuluj</a><button type="submit">Zapisz kolekcję</button></div>
+    <div class="actions form-actions"><span class="form-actions-context">Zmiany dotyczą: <?= $escape($identity->value()) ?></span><a class="button secondary" href="/admin/pages">Anuluj</a><button type="submit">Zapisz kolekcję</button></div>
 </form>

@@ -9,72 +9,107 @@ title:
   en: Contact
 seo:
   title:
-    pl: Kontakt — FlatFile CMS
-    en: Contact — FlatFile CMS
+    pl: 'Kontakt — FlatFile CMS'
+    en: 'Contact — FlatFile CMS'
   description:
-    pl: Skontaktuj się z zespołem FlatFile CMS.
-    en: Contact the FlatFile CMS team.
-  robots: { index: true, follow: true }
-  openGraph: { type: website }
+    pl: 'Skontaktuj się z zespołem FlatFile CMS.'
+    en: 'Contact the FlatFile CMS team.'
+  robots:
+    index: true
+    follow: true
+  openGraph:
+    type: website
   twitter: {}
   jsonLd: {}
 blocks:
-  - id: 01a15e40-2b79-7001-8a01-000000000001
+  -
+    id: 01a15e40-2b79-7001-8a01-000000000001
     type: contact-form
     enabled: true
     data:
-      eyebrow: { pl: Porozmawiajmy, en: Let's talk }
-      title: { pl: Napisz do nas, en: Get in touch }
+      eyebrow:
+        pl: Porozmawiajmy
+        en: "Let's talk"
+      title:
+        pl: 'Napisz do nas'
+        en: 'Get in touch'
       introduction:
-        pl: Wypełnij formularz, a odpowiemy na podany adres e-mail.
-        en: Complete the form and we will reply to the email address provided.
+        pl: 'Wypełnij formularz, a odpowiemy na podany adres e-mail.'
+        en: 'Complete the form and we will reply to the email address provided.'
       recipient: kontakt@example.com
-      subject: { pl: Nowa wiadomość z formularza kontaktowego, en: New contact form message }
+      subject:
+        pl: 'Nowa wiadomość z formularza kontaktowego'
+        en: 'New contact form message'
       fields:
-        - name: full_name
-          label: { pl: Imię i nazwisko, en: Full name }
+        -
+          name: full_name
+          label:
+            pl: 'Imię i nazwisko'
+            en: 'Full name'
           type: text
           required: true
-          options: ""
-        - name: email
-          label: { pl: Adres e-mail, en: Email address }
+          options: ''
+        -
+          name: email
+          label:
+            pl: 'Adres e-mail'
+            en: 'Email address'
           type: email
           required: true
-          options: ""
-        - name: topic
-          label: { pl: Temat rozmowy, en: Topic }
+          options: ''
+        -
+          name: topic
+          label:
+            pl: 'Temat rozmowy'
+            en: Topic
           type: select
           required: true
-          options: "Wdrożenie CMS\nWspółpraca\nWsparcie techniczne\nInne"
-        - name: phone
-          label: { pl: Telefon, en: Phone }
+          options: |-
+            Wdrożenie CMS
+            Współpraca
+            Wsparcie techniczne
+            Inne
+        -
+          name: phone
+          label:
+            pl: Telefon
+            en: Phone
           type: tel
           required: false
-          options: ""
-        - name: message
-          label: { pl: Wiadomość, en: Message }
+          options: ''
+        -
+          name: message
+          label:
+            pl: Wiadomość
+            en: Message
           type: textarea
           required: true
-          options: ""
-        - name: consent
+          options: ''
+        -
+          name: consent
           label:
-            pl: Zgadzam się na wykorzystanie podanych danych w celu udzielenia odpowiedzi
-            en: I agree to the use of my data in order to receive a response
+            pl: 'Zgadzam się na wykorzystanie podanych danych w celu udzielenia odpowiedzi'
+            en: 'I agree to the use of my data in order to receive a response'
           type: checkbox
           required: true
-          options: ""
-      submit_label: { pl: Wyślij wiadomość, en: Send message }
+          options: ''
+      submit_label:
+        pl: 'Wyślij wiadomość'
+        en: 'Send message'
       success_message:
-        pl: Dziękujemy. Wiadomość została wysłana, a jej kopia trafiła na Twój adres.
-        en: Thank you. Your message has been sent and a confirmation was emailed to you.
+        pl: 'Dziękujemy. Wiadomość została wysłana, a jej kopia trafiła na Twój adres.'
+        en: 'Thank you. Your message has been sent and a confirmation was emailed to you.'
       error_message:
-        pl: Nie udało się wysłać formularza. Sprawdź wymagane pola i spróbuj ponownie.
-        en: The form could not be sent. Check the required fields and try again.
+        pl: 'Nie udało się wysłać formularza. Sprawdź wymagane pola i spróbuj ponownie.'
+        en: 'The form could not be sent. Check the required fields and try again.'
       rate_limit_message:
-        pl: Wysłano zbyt wiele wiadomości. Spróbuj ponownie później.
-        en: Too many messages have been sent. Please try again later.
+        pl: 'Wysłano zbyt wiele wiadomości. Spróbuj ponownie później.'
+        en: 'Too many messages have been sent. Please try again later.'
       send_confirmation: true
-      confirmation_subject: { pl: Otrzymaliśmy Twoją wiadomość, en: We received your message }
+      confirmation_subject:
+        pl: 'Otrzymaliśmy Twoją wiadomość'
+        en: 'We received your message'
       confirmation_message:
-        pl: Dziękujemy za kontakt. Otrzymaliśmy Twoją wiadomość i odpowiemy możliwie szybko.
-        en: Thank you for contacting us. We received your message and will reply as soon as possible.
+        pl: 'Dziękujemy za kontakt. Otrzymaliśmy Twoją wiadomość i odpowiemy możliwie szybko.'
+        en: 'Thank you for contacting us. We received your message and will reply as soon as possible.'
+order: 0

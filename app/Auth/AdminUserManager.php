@@ -48,8 +48,8 @@ final readonly class AdminUserManager
         ?string $lastName = null,
     ): User {
         $user = $this->adminVisibleTo($id, $actor);
-        if ($user->id() === $actor->id() && !$enabled) {
-            throw new InvalidArgumentException('You cannot disable your own account.');
+        if ($user->id() === $actor->id()) {
+            throw new InvalidArgumentException('Własnym kontem możesz zarządzać wyłącznie w sekcji Konto.');
         }
         if ($firstName !== null && $lastName !== null) {
             $this->validateProfile($firstName, $lastName);

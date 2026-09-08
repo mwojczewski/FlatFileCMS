@@ -17,6 +17,7 @@ use FlatFileCms\Http\Request;
 use FlatFileCms\Http\Response;
 use InvalidArgumentException;
 use JsonException;
+use Psr\Log\LoggerInterface;
 
 final readonly class AdminAuthController
 {
@@ -30,6 +31,7 @@ final readonly class AdminAuthController
         private AdminView $views,
         private AdminLayout $layout,
         private AuditLogger $audit,
+        private LoggerInterface $logger,
     ) {}
 
     public function loginForm(Request $request): Response
@@ -66,7 +68,15 @@ final readonly class AdminAuthController
 
             return Response::redirect($requiresSecondFactor ? '/admin/2fa' : '/admin', 303);
         } catch (AuthenticationException $exception) {
-            $this->audit->log('auth.login_failed', null, 'auth/session', $request->clientIp());
+            $email = $request->parsedBody()['email'] ?? null;
+            $identifier = \is_string($email) ? mb_substr(mb_strtolower(trim($email)), 0, 254) : '';
+            $metadata = ['reason' => $exception->reason(), 'email' => $identifier];
+            $this->audit->log('auth.login_failed', null, 'auth/session', $request->clientIp(), $metadata);
+            $this->logger->warning('Admin panel login failed', [
+                'reason' => $exception->reason(),
+                'email' => $identifier,
+                'ip' => $request->clientIp(),
+            ]);
             return $this->page('Logowanie', $this->views->render('auth/login', [
                 'csrfToken' => $this->csrf->token(),
                 'passwordReset' => false,
@@ -103,6 +113,7 @@ final readonly class AdminAuthController
 
     public function authenticationVerify(Request $request): Response
     {
+        $user = null;
         try {
             $this->csrf->validate($request->header('x-csrf-token'));
             $user = $this->authenticator->pendingUser();
@@ -112,6 +123,13 @@ final readonly class AdminAuthController
 
             return $this->jsonResponse(['success' => true, 'redirect' => '/admin']);
         } catch (AuthenticationException $exception) {
+            $metadata = ['reason' => 'invalid_second_factor', 'detail' => $exception->reason()];
+            $this->audit->log('auth.second_factor_failed', $user?->id(), 'auth/session', $request->clientIp(), $metadata);
+            $this->logger->warning('Admin panel second-factor authentication failed', [
+                'reason' => 'invalid_second_factor',
+                'user_id' => $user?->id(),
+                'ip' => $request->clientIp(),
+            ]);
             throw new HttpException(401, 'WEBAUTHN_AUTHENTICATION_FAILED', $exception->getMessage());
         }
     }
@@ -130,6 +148,7 @@ final readonly class AdminAuthController
     {
         $user = $this->requireUser();
         return $this->page('Konto', $this->views->render('account/index', [
+            'user' => $user,
             'passwordChanged' => ($request->query()['password_changed'] ?? null) === '1',
             'credentialCount' => \count($this->credentials->forUser($user->id())),
         ]));
@@ -140,6 +159,7 @@ final readonly class AdminAuthController
         $user = $this->requireUser();
 
         return $this->page('Klucze bezpieczeństwa', $this->views->render('account/security-keys', [
+            'user' => $user,
             'credentials' => $this->credentials->forUser($user->id()),
             'csrfToken' => $this->csrf->token(),
         ]), scripts: true);

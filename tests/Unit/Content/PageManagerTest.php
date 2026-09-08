@@ -143,6 +143,22 @@ YAML);
         self::assertDirectoryDoesNotExist($this->project->path('pages/offer'));
     }
 
+    public function testItReorganizesPagesAndStoresSiblingOrder(): void
+    {
+        $parent = $this->manager->create(PageIdentity::fromString('guides'), $this->metadata('Poradniki', 'poradniki'), $this->languages);
+        $first = $this->manager->create(PageIdentity::fromString('first'), $this->metadata('Pierwsza', 'pierwsza'), $this->languages);
+        $second = $this->manager->create(PageIdentity::fromString('second'), $this->metadata('Druga', 'druga'), $this->languages);
+
+        $destination = $this->manager->reorganize($second->identity(), $parent->identity(), 0, $second->revision(), $this->languages);
+        self::assertSame('guides/second', $destination->value());
+        self::assertFileExists($this->project->path('pages/guides/second/content.yml'));
+        self::assertSame(0, $this->manager->editable($destination)->data()['order']);
+
+        $firstRevision = $this->manager->editable($first->identity())->revision();
+        $this->manager->reorganize($first->identity(), null, 0, $firstRevision, $this->languages);
+        self::assertSame(0, $this->manager->editable($first->identity())->data()['order']);
+    }
+
     private function manager(): PageManager
     {
         $paths = new SafePathResolver($this->project->path());

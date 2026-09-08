@@ -214,6 +214,7 @@ const orderFields = document.querySelector("[data-order-fields]");
 const orderSubmit = document.querySelector("[data-order-submit]");
 const orderMessage = document.querySelector("[data-order-message]");
 let dragged = null;
+let dragGhost = null;
 
 function synchronizeOrder() {
   if (!builderList || !orderFields) {
@@ -248,10 +249,24 @@ builderList?.addEventListener("dragstart", (event) => {
   }
   dragged = event.target.closest("[data-block-id]");
   dragged?.classList.add("dragging");
+  builderList.classList.add("is-sorting");
+  if (dragged instanceof HTMLElement && event.dataTransfer) {
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", dragged.dataset.blockId ?? "");
+    dragGhost = dragged.querySelector(".builder-preview-toolbar")?.cloneNode(true);
+    if (dragGhost instanceof HTMLElement) {
+      dragGhost.className = "builder-drag-ghost";
+      document.body.append(dragGhost);
+      event.dataTransfer.setDragImage(dragGhost, 28, 20);
+    }
+  }
 });
 
 builderList?.addEventListener("dragend", () => {
   dragged?.classList.remove("dragging");
+  builderList?.classList.remove("is-sorting");
+  dragGhost?.remove();
+  dragGhost = null;
   dragged = null;
 });
 
@@ -272,6 +287,182 @@ builderList?.addEventListener("dragover", (event) => {
 
 orderForm?.addEventListener("submit", synchronizeOrder);
 
+const inspector = document.querySelector("[data-block-inspector]");
+const inspectorTitle = document.querySelector("[data-inspector-title]");
+const liveState = document.querySelector("[data-editor-live-state]");
+const previewTimers = new WeakMap();
+const previewRequests = new WeakMap();
+
+function selectBlock(id) {
+  if (!id) return;
+  document.querySelectorAll("[data-block-select]").forEach((item) => {
+    item.classList.toggle("selected", item.getAttribute("data-block-select") === id);
+  });
+  let selectedForm = null;
+  document.querySelectorAll("[data-block-form]").forEach((form) => {
+    const selected = form.getAttribute("data-block-form") === id;
+    form.hidden = !selected;
+    if (selected) selectedForm = form;
+  });
+  if (selectedForm instanceof HTMLFormElement) {
+    if (inspectorTitle instanceof HTMLElement) {
+      inspectorTitle.textContent = selectedForm.dataset.blockName ?? "Blok";
+    }
+    inspector?.classList.add("is-open");
+    if (!selectedForm.querySelector("[data-markdown-editor]")) {
+      inspector?.classList.remove("is-expanded");
+    }
+    window.CmsMarkdownEditors?.refresh(selectedForm);
+  }
+}
+
+function setInspectorExpanded(expanded) {
+  if (!(inspector instanceof HTMLElement)) return;
+  inspector.classList.toggle("is-expanded", expanded);
+  const button = inspector.querySelector("[data-inspector-expand]");
+  if (button instanceof HTMLButtonElement) {
+    button.setAttribute("aria-label", expanded ? "Zwęź panel edycji" : "Rozszerz panel edycji");
+    button.title = expanded ? "Zwęź panel edycji" : "Rozszerz panel edycji";
+    button.setAttribute("aria-pressed", String(expanded));
+  }
+  const visibleForm = inspector.querySelector("[data-block-form]:not([hidden])");
+  if (visibleForm instanceof HTMLElement) {
+    window.requestAnimationFrame(() =>
+      window.CmsMarkdownEditors?.refresh(visibleForm),
+    );
+  }
+}
+
+function resizePreviewFrame(frame) {
+  if (!(frame instanceof HTMLIFrameElement)) return;
+  try {
+    const body = frame.contentDocument?.body;
+    const root = frame.contentDocument?.documentElement;
+    const stage = frame.closest("[data-preview-stage]");
+    if (!body || !root || !(stage instanceof HTMLElement)) return;
+    const virtualWidth = 1440;
+    const scale = Math.min(1, stage.clientWidth / virtualWidth);
+    frame.style.width = `${virtualWidth}px`;
+    frame.style.transform = `scale(${scale})`;
+    const contentHeight = Math.max(body.scrollHeight, root.scrollHeight, 96);
+    frame.style.height = `${contentHeight}px`;
+    stage.style.height = `${Math.ceil(contentHeight * scale)}px`;
+    body.addEventListener("click", () => selectBlock(frame.dataset.previewFrame));
+    body.querySelectorAll("a, button, input, textarea, select").forEach((element) => {
+      element.addEventListener("click", (event) => event.preventDefault());
+    });
+  } catch {
+    frame.style.height = "240px";
+  }
+}
+
+document.querySelectorAll("[data-preview-frame]").forEach((frame) => {
+  if (!(frame instanceof HTMLIFrameElement)) return;
+  frame.addEventListener("load", () => {
+    resizePreviewFrame(frame);
+    window.setTimeout(() => resizePreviewFrame(frame), 250);
+    window.setTimeout(() => resizePreviewFrame(frame), 900);
+  });
+  if (frame.contentDocument?.readyState === "complete") resizePreviewFrame(frame);
+});
+
+if (typeof ResizeObserver === "function") {
+  const previewResizeObserver = new ResizeObserver((entries) => {
+    entries.forEach((entry) => {
+      const frame = entry.target.querySelector("[data-preview-frame]");
+      if (frame instanceof HTMLIFrameElement) resizePreviewFrame(frame);
+    });
+  });
+  document.querySelectorAll("[data-preview-stage]").forEach((stage) =>
+    previewResizeObserver.observe(stage),
+  );
+}
+
+document.addEventListener("click", (event) => {
+  if (!(event.target instanceof Element)) return;
+  const edit = event.target.closest("[data-block-edit]");
+  if (edit instanceof HTMLButtonElement) {
+    selectBlock(edit.dataset.blockEdit);
+    return;
+  }
+  const item = event.target.closest("[data-block-select]");
+  if (item instanceof HTMLElement && !event.target.closest("form, button, a")) {
+    selectBlock(item.dataset.blockSelect);
+  }
+  if (event.target.closest("[data-inspector-close]")) {
+    if (inspector?.classList.contains("is-expanded")) {
+      setInspectorExpanded(false);
+    } else {
+      inspector?.classList.remove("is-open");
+    }
+    return;
+  }
+  if (event.target.closest("[data-inspector-expand]")) {
+    setInspectorExpanded(!inspector?.classList.contains("is-expanded"));
+  }
+});
+
+inspector?.addEventListener("focusin", (event) => {
+  if (!(event.target instanceof Element)) return;
+  if (event.target.closest(".EasyMDEContainer") || event.target.matches("textarea[data-markdown-editor]")) {
+    setInspectorExpanded(true);
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && inspector?.classList.contains("is-expanded")) {
+    setInspectorExpanded(false);
+  }
+});
+
+async function refreshBlockPreview(form) {
+  const id = form.dataset.blockForm;
+  const frame = id
+    ? document.querySelector(`[data-preview-frame="${CSS.escape(id)}"]`)
+    : null;
+  const status = form.querySelector("[data-block-preview-status]");
+  if (!(frame instanceof HTMLIFrameElement)) return;
+
+  previewRequests.get(form)?.abort();
+  const controller = new AbortController();
+  previewRequests.set(form, controller);
+  if (status instanceof HTMLElement) status.textContent = "Aktualizuję podgląd…";
+  if (liveState instanceof HTMLElement) liveState.textContent = "Aktualizuję podgląd…";
+
+  try {
+    const response = await fetch("/admin/pages/builder/render-preview", {
+      method: "POST",
+      body: new FormData(form),
+      credentials: "same-origin",
+      headers: { Accept: "application/json" },
+      signal: controller.signal,
+    });
+    const payload = await response.json();
+    if (!response.ok || typeof payload.preview !== "string") {
+      throw new Error("Preview validation failed.");
+    }
+    frame.srcdoc = payload.preview;
+    if (status instanceof HTMLElement) status.textContent = "Podgląd aktualny";
+    if (liveState instanceof HTMLElement) liveState.textContent = "Niezapisane zmiany";
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") return;
+    if (status instanceof HTMLElement) status.textContent = "Uzupełnij poprawnie pola";
+    if (liveState instanceof HTMLElement) liveState.textContent = "Podgląd czeka na poprawne dane";
+  }
+}
+
+document.querySelectorAll("[data-block-form]").forEach((form) => {
+  if (!(form instanceof HTMLFormElement)) return;
+  const schedule = () => {
+    const current = previewTimers.get(form);
+    if (current) window.clearTimeout(current);
+    previewTimers.set(form, window.setTimeout(() => refreshBlockPreview(form), 350));
+  };
+  form.addEventListener("input", schedule);
+  form.addEventListener("change", schedule);
+  form.addEventListener("cms:content-added", schedule);
+});
+
 const blockSearch = document.querySelector("[data-block-search]");
 if (blockSearch instanceof HTMLInputElement) {
   const cards = [...document.querySelectorAll("[data-block-card]")];
@@ -287,13 +478,3 @@ if (blockSearch instanceof HTMLInputElement) {
     if (empty instanceof HTMLElement) empty.hidden = visible !== 0;
   });
 }
-
-document.addEventListener("submit", (event) => {
-  if (!(event.target instanceof HTMLFormElement)) {
-    return;
-  }
-  const message = event.target.dataset.confirm;
-  if (message && !window.confirm(message)) {
-    event.preventDefault();
-  }
-});

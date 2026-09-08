@@ -45,6 +45,7 @@ $pageIcon = static function (bool $collection, bool $homepage): string {
     </label>
     <span class="pages-result-count" data-page-result-count><?= count($entries) ?> pozycji</span>
 </div>
+<div class="pages-reorder-help"><span aria-hidden="true">↕</span><p><strong>Przeciągnij stronę, aby zmienić jej położenie.</strong> Upuść między wierszami, aby ustawić kolejność, albo na środku wiersza, aby utworzyć zagnieżdżenie.</p><span data-page-tree-state role="status" aria-live="polite"></span></div>
 <div class="table-wrap crud-table pages-table">
     <table>
         <thead>
@@ -57,7 +58,7 @@ $pageIcon = static function (bool $collection, bool $homepage): string {
                 <th class="page-actions-column" aria-label="Akcje"></th>
             </tr>
         </thead>
-        <tbody>
+        <tbody data-page-tree data-page-tree-csrf="<?= $escape($csrfToken) ?>">
             <?php if ($entries === []): ?>
                 <tr>
                     <td class="table-empty" colspan="6">Brak stron. Dodaj pierwszą stronę, aby rozpocząć.</td>
@@ -66,7 +67,7 @@ $pageIcon = static function (bool $collection, bool $homepage): string {
                 $identity = $entry['identity']->value();
                 $depth = count($entry['identity']->segments()) - 1;
                 $branch = $hasChildren($identity); ?>
-                <tr data-page-row data-page-identity="<?= $escape($identity) ?>" data-page-depth="<?= $depth ?>" data-page-search-value="<?= $escape(mb_strtolower($entry['title'] . ' ' . $identity)) ?>">
+                <tr data-page-row data-page-identity="<?= $escape($identity) ?>" data-page-depth="<?= $depth ?>" data-page-collection="<?= $entry['collection'] ? '1' : '0' ?>" data-page-revision="<?= $escape($entry['revision']) ?>" data-page-search-value="<?= $escape(mb_strtolower($entry['title'] . ' ' . $identity)) ?>"<?= $entry['identity']->isHomepage() ? '' : ' draggable="true"' ?>>
                     <td class="page-cell">
                         <span class="tree" style="--depth:<?= $depth ?>"><?php if ($branch): ?><button class="page-branch-toggle" type="button" data-page-branch-toggle aria-expanded="true" aria-label="Zwiń podstrony"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 10 5 5 5-5"/></svg></button><?php else: ?><span class="page-branch-spacer"></span><?php endif; ?><span class="page-type-icon <?= $entry['collection'] ? 'is-collection' : ($entry['identity']->isHomepage() ? 'is-homepage' : 'is-page') ?>" aria-hidden="true"><?= $pageIcon($entry['collection'], $entry['identity']->isHomepage()) ?></span><?= $escape($entry['title']) ?></span>
                         <small style="--depth:<?= $depth ?>"><?= $escape($identity) ?></small>

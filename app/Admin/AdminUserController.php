@@ -87,6 +87,7 @@ final readonly class AdminUserController
     {
         $actor = $this->requireUser();
         $user = $this->visibleAdmin($this->queryId($request), $actor);
+        $this->assertNotSelf($user, $actor);
 
         return $this->page('Edycja administratora', 'users/form', [
             'user' => $user,
@@ -102,6 +103,7 @@ final readonly class AdminUserController
         $this->validateCsrf($request);
         $publicId = $this->bodyId($request);
         $target = $this->visibleAdmin($publicId, $actor);
+        $this->assertNotSelf($target, $actor);
         try {
             $user = $this->manager->update(
                 $actor,
@@ -167,6 +169,13 @@ final readonly class AdminUserController
         $value = $request->query()['id'] ?? null;
 
         return $this->id($value);
+    }
+
+    private function assertNotSelf(User $user, User $actor): void
+    {
+        if ($user->id() === $actor->id()) {
+            throw new HttpException(403, 'USER_SELF_EDIT_FORBIDDEN', 'Własnym kontem możesz zarządzać wyłącznie w sekcji Konto.');
+        }
     }
 
     private function bodyId(Request $request): string

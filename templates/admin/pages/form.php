@@ -21,7 +21,11 @@ $canonical = is_string($seo['canonical'] ?? null) ? $seo['canonical'] : '';
 $revision = $editable?->revision()->value();
 $creating = $editable === null;
 ?>
-<form class="stack crud-form" method="post" action="<?= $escape($action) ?>" <?= $creating ? ' data-canonical-suggest data-site-url="' . $escape($siteUrl) . '" data-canonical-base-path="' . $escape($canonicalBasePath) . '"' : '' ?>>
+<div class="form-page-header">
+    <div><p class="eyebrow"><?= $creating ? 'Nowa zawartość' : 'Ustawienia strony' ?></p><h2><?= $creating ? 'Utwórz stronę' : $escape($titleValues[$languages->default()] ?? $currentIdentity) ?></h2><p class="lead"><?= $creating ? 'Zdefiniuj adres, tłumaczenia i widoczność nowej strony.' : 'Edytujesz metadane i ustawienia publikacji strony.' ?></p></div>
+    <div class="form-page-actions"><a class="button secondary" href="/admin/pages">Wróć do stron</a><?php if (!$creating): ?><a class="button secondary" href="/admin/media?path=<?= rawurlencode($currentIdentity) ?>">Multimedia</a><a class="button" href="/admin/pages/builder?path=<?= rawurlencode($currentIdentity) ?>">Edytor bloków</a><?php endif; ?></div>
+</div>
+<form class="stack crud-form editor-form" method="post" action="<?= $escape($action) ?>" <?= $creating ? ' data-canonical-suggest data-site-url="' . $escape($siteUrl) . '" data-canonical-base-path="' . $escape($canonicalBasePath) . '"' : '' ?>>
     <input type="hidden" name="_csrf" value="<?= $escape($csrfToken) ?>"><?php if ($revision !== null): ?><input
             type="hidden" name="revision" value="<?= $escape($revision) ?>"><?php endif; ?>
     <section class="form-section">
@@ -92,8 +96,8 @@ $creating = $editable === null;
                             stronie.</small></span></label></div>
         </fieldset>
     </section>
-    <div class="actions form-actions"><a class="button secondary" href="/admin/pages">Anuluj</a><button
-            type="submit">Zapisz zmiany</button></div>
+    <div class="actions form-actions"><span class="form-actions-context"><?= $creating ? 'Nowa strona nie została jeszcze zapisana' : 'Zmiany dotyczą: ' . $escape($currentIdentity) ?></span><a class="button secondary" href="/admin/pages">Anuluj</a><button
+            type="submit"><?= $creating ? 'Utwórz stronę' : 'Zapisz zmiany' ?></button></div>
 </form>
 <?php if (!$creating && !$homepage && $revision !== null): ?>
     <section class="danger-zone">

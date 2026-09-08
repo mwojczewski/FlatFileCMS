@@ -280,6 +280,7 @@ $container->set(
         $container->get(AdminView::class),
         $container->get(AdminLayout::class),
         $container->get(AuditLogger::class),
+        $container->get(LoggerInterface::class),
     ),
 );
 $container->set(
@@ -648,8 +649,15 @@ $container->set(
         $container->get(CollectionRepository::class),
         $container->get(PageBlockManager::class),
         $container->get(BlockRegistry::class),
+        $container->get(BlockValidator::class),
         $container->get(BlockFormDataMapper::class),
         $container->get(BlockFormRenderer::class),
+        $container->get(BlockRenderer::class),
+        $container->get(AssetCollector::class),
+        $container->get(MarkdownRenderer::class),
+        $container->get(PartialRenderer::class),
+        $container->get(MediaRepository::class),
+        $container->get(MediaUrlGenerator::class),
         $container->get(AdminView::class),
         $container->get(AdminLayout::class),
         $container->get(AuditLogger::class),

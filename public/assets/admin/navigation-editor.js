@@ -37,10 +37,15 @@
   const defaultLocale = languageData.default ?? localeEntries[0]?.[0] ?? "pl";
   const menuCount = document.querySelector("[data-navigation-menu-count]");
   const itemCount = document.querySelector("[data-navigation-item-count]");
+  const revision = document.querySelector("[data-navigation-revision]");
+  const saveState = document.querySelector("[data-navigation-save-state]");
   let dragged = null;
   let editedItem = null;
   let editedDraft = null;
   let discardEditedItem = null;
+  let saveTimer = null;
+  let saving = false;
+  let saveAgain = false;
 
   const normalizeItem = (raw = {}) => {
     const link = raw.link && typeof raw.link === "object" ? raw.link : null;
@@ -135,6 +140,20 @@
     svg.innerHTML = icons[icon];
     node.append(svg);
     return node;
+  };
+
+  const actionsMenu = (actions, label = "Działania") => {
+    const menu = element("details", "navigation-actions-menu");
+    const trigger = element("summary", "", "•••");
+    trigger.setAttribute("aria-label", label);
+    trigger.title = label;
+    actions.querySelectorAll(".navigation-action").forEach((action) => {
+      const actionLabel = action.getAttribute("aria-label");
+      if (actionLabel) action.append(element("span", "navigation-action-label", actionLabel));
+    });
+    actions.classList.add("navigation-actions-popover");
+    menu.append(trigger, actions);
+    return menu;
   };
 
   const input = (label, value, onInput, options = {}) => {
@@ -309,7 +328,7 @@
     card.addEventListener("dragstart", (event) => {
       if (
         event.target instanceof Element &&
-        event.target.closest(".navigation-item-actions")
+        event.target.closest(".navigation-item-actions, .navigation-actions-menu")
       ) {
         event.preventDefault();
         return;
@@ -327,7 +346,7 @@
       editor
         .querySelectorAll(".drag-over")
         .forEach((node) => node.classList.remove("drag-over"));
-      render();
+      render(true);
     });
     card.addEventListener("dragover", (event) => {
       event.preventDefault();
@@ -375,7 +394,7 @@
       const moved = removeFrom(dragged.items, sourceIndex);
       const destinationIndex = items.indexOf(item);
       items.splice(destinationIndex, 0, moved);
-      render();
+      render(true);
     });
 
     const summary = element("div", "navigation-item-summary");
@@ -391,7 +410,7 @@
           "up",
           () => {
             [items[index - 1], items[index]] = [items[index], items[index - 1]];
-            render();
+            render(true);
           },
           "navigation-action-move",
         ),
@@ -403,7 +422,7 @@
           "down",
           () => {
             [items[index], items[index + 1]] = [items[index + 1], items[index]];
-            render();
+            render(true);
           },
           "navigation-action-move",
         ),
@@ -413,7 +432,7 @@
         iconButton("Wysuń o jeden poziom", "outdent", () => {
           const moved = removeFrom(items, index);
           parentContext.items.splice(parentContext.index + 1, 0, moved);
-          render();
+          render(true);
         }, "navigation-action-structure"),
       );
     actions.append(iconButton("Edytuj pozycję", "edit", () => openDialog(item), "navigation-action-edit"));
@@ -426,7 +445,7 @@
           openDialog(child, () => {
             const childIndex = item.children.indexOf(child);
             if (childIndex >= 0) item.children.splice(childIndex, 1);
-            render();
+            render(true);
           });
         }, "navigation-action-add"),
       );
@@ -437,13 +456,13 @@
         () => {
           if (window.confirm("Usunąć tę pozycję wraz z jej dziećmi?")) {
             removeFrom(items, index);
-            render();
+            render(true);
           }
         },
         "navigation-action-remove",
       ),
     );
-    row.append(handle, kindIcon(item.type), summary, actions);
+    row.append(handle, kindIcon(item.type), summary, actionsMenu(actions));
     card.append(row);
 
     if (item.children.length > 0) {
@@ -486,7 +505,52 @@
     );
   };
 
-  const render = () => {
+  const setSaveState = (state, label) => {
+    if (!(saveState instanceof HTMLElement)) return;
+    saveState.dataset.state = state;
+    const text = saveState.querySelector("span");
+    if (text) text.textContent = label;
+  };
+
+  const save = async () => {
+    if (!(revision instanceof HTMLInputElement)) return;
+    if (saving) {
+      saveAgain = true;
+      return;
+    }
+    saving = true;
+    setSaveState("saving", "Zapisywanie…");
+    sync();
+    try {
+      const response = await fetch(form.action, {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: new FormData(form),
+      });
+      const data = await response.json();
+      if (!response.ok || typeof data.revision !== "string") {
+        throw new Error(data.error?.message ?? "Nie udało się zapisać nawigacji.");
+      }
+      revision.value = data.revision;
+      setSaveState("saved", "Wszystkie zmiany zapisane");
+    } catch (error) {
+      setSaveState("error", error instanceof Error ? error.message : "Błąd zapisu");
+    } finally {
+      saving = false;
+      if (saveAgain) {
+        saveAgain = false;
+        void save();
+      }
+    }
+  };
+
+  const queueSave = () => {
+    window.clearTimeout(saveTimer);
+    setSaveState("pending", "Zmiany oczekują na zapis");
+    saveTimer = window.setTimeout(() => void save(), 450);
+  };
+
+  const render = (shouldSave = false) => {
     editor.replaceChildren();
     if (menuCount instanceof HTMLElement) menuCount.textContent = String(menus.length);
     if (itemCount instanceof HTMLElement)
@@ -505,11 +569,11 @@
         button("Dodaj pozycję", () => {
           const item = normalizeItem({ label: { [defaultLocale]: "" } });
           menu.items.push(item);
-          render();
+          render(false);
           openDialog(item, () => {
             const itemIndex = menu.items.indexOf(item);
             if (itemIndex >= 0) menu.items.splice(itemIndex, 1);
-            render();
+            render(true);
           });
         }),
       );
@@ -520,13 +584,13 @@
             () => {
               if (window.confirm("Usunąć całe menu?")) {
                 menus.splice(menuIndex, 1);
-                render();
+                render(true);
               }
             },
             "button compact danger-text",
           ),
         );
-      heading.append(title, menuActions);
+      heading.append(title, actionsMenu(menuActions, "Działania menu"));
       section.append(
         heading,
         input(
@@ -535,6 +599,7 @@
           (value) => {
             menu.name = value;
             sync();
+            queueSave();
           },
           { required: true, pattern: "[a-z][a-z0-9_-]*" },
         ),
@@ -549,6 +614,7 @@
       editor.append(section);
     });
     sync();
+    if (shouldSave) queueSave();
   };
 
   document
@@ -559,7 +625,7 @@
       while (menus.some((menu) => menu.name === name))
         name = `menu-${++suffix}`;
       menus.push({ name, items: [] });
-      render();
+      render(true);
     });
   dialogForm.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -577,7 +643,7 @@
     editedDraft = null;
     discardEditedItem = null;
     dialog.close();
-    render();
+    render(true);
   });
   document
     .querySelectorAll("[data-navigation-dialog-close]")

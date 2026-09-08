@@ -68,6 +68,54 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+document.querySelectorAll(".success, .error").forEach((message) => {
+  if (!(message instanceof HTMLElement) || message.textContent.trim() === "") return;
+  message.setAttribute("role", message.classList.contains("error") ? "alert" : "status");
+  message.setAttribute("aria-live", message.classList.contains("error") ? "assertive" : "polite");
+});
+
+const statusMessages = {
+  created: "Element został utworzony.",
+  updated: "Zmiany zostały zapisane.",
+  saved: "Zmiany zostały zapisane.",
+  reordered: "Nowa kolejność została zapisana.",
+  uploaded: "Plik został przesłany.",
+  deleted: "Element został usunięty.",
+};
+const currentUrl = new URL(window.location.href);
+const activeStatus = Object.keys(statusMessages).find(
+  (name) => currentUrl.searchParams.get(name) === "1",
+);
+const adminContent = document.querySelector(".admin-content");
+if (activeStatus && adminContent instanceof HTMLElement) {
+  const notification = document.createElement("div");
+  notification.className = "panel-notification success";
+  notification.setAttribute("role", "status");
+  notification.setAttribute("aria-live", "polite");
+  notification.innerHTML = `<span aria-hidden="true">✓</span><p>${statusMessages[activeStatus]}</p><button type="button" aria-label="Zamknij komunikat">×</button>`;
+  adminContent.prepend(notification);
+  notification.querySelector("button")?.addEventListener("click", () => notification.remove());
+  currentUrl.searchParams.delete(activeStatus);
+  window.history.replaceState({}, "", currentUrl);
+}
+
+document.addEventListener("submit", (event) => {
+  if (!(event.target instanceof HTMLFormElement)) return;
+  const message = event.target.dataset.confirm;
+  if (message && !window.confirm(message)) {
+    event.preventDefault();
+    return;
+  }
+  if (event.defaultPrevented) return;
+  const form = event.target;
+  window.requestAnimationFrame(() => {
+    form.setAttribute("aria-busy", "true");
+    form.querySelectorAll('button[type="submit"]').forEach((button) => {
+      button.disabled = true;
+    });
+  });
+});
+
 const firstInvalid = document.querySelector(
   '[aria-invalid="true"], .error + form input',
 );
@@ -118,13 +166,101 @@ if (pageSearch instanceof HTMLInputElement) {
   });
 }
 
+const pageTree = document.querySelector("[data-page-tree]");
+if (pageTree instanceof HTMLTableSectionElement) {
+  const state = document.querySelector("[data-page-tree-state]");
+  let draggedRow = null;
+  let dropMode = "before";
+  const parentOf = (identity) => {
+    const separator = identity.lastIndexOf("/");
+    return separator < 0 ? "" : identity.slice(0, separator);
+  };
+  const setState = (message, type = "") => {
+    if (!(state instanceof HTMLElement)) return;
+    state.textContent = message;
+    state.dataset.state = type;
+  };
+  pageTree.addEventListener("dragstart", (event) => {
+    const row = event.target instanceof Element ? event.target.closest("[data-page-row][draggable=true]") : null;
+    if (!(row instanceof HTMLTableRowElement)) return;
+    draggedRow = row;
+    row.classList.add("is-dragging");
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", row.dataset.pageIdentity ?? "");
+    }
+  });
+  pageTree.addEventListener("dragover", (event) => {
+    const row = event.target instanceof Element ? event.target.closest("[data-page-row]") : null;
+    if (!(row instanceof HTMLTableRowElement) || !draggedRow || row === draggedRow) return;
+    const target = row.dataset.pageIdentity ?? "";
+    const source = draggedRow.dataset.pageIdentity ?? "";
+    if (target.startsWith(`${source}/`)) return;
+    event.preventDefault();
+    pageTree.querySelectorAll(".is-drop-before, .is-drop-inside, .is-drop-after").forEach((item) => item.classList.remove("is-drop-before", "is-drop-inside", "is-drop-after"));
+    const rectangle = row.getBoundingClientRect();
+    const ratio = (event.clientY - rectangle.top) / rectangle.height;
+    dropMode = target !== "homepage" && ratio > 0.28 && ratio < 0.72 ? "inside" : ratio >= 0.5 ? "after" : "before";
+    row.classList.add(`is-drop-${dropMode}`);
+  });
+  pageTree.addEventListener("drop", async (event) => {
+    const targetRow = event.target instanceof Element ? event.target.closest("[data-page-row]") : null;
+    if (!(targetRow instanceof HTMLTableRowElement) || !draggedRow || targetRow === draggedRow) return;
+    event.preventDefault();
+    const source = draggedRow.dataset.pageIdentity ?? "";
+    const target = targetRow.dataset.pageIdentity ?? "";
+    const parent = dropMode === "inside" ? target : parentOf(target);
+    const siblings = [...pageTree.querySelectorAll("[data-page-row]")].filter((row) => parentOf(row.dataset.pageIdentity ?? "") === parent && row !== draggedRow);
+    const targetIndex = siblings.indexOf(targetRow);
+    const position = dropMode === "inside" ? Number.MAX_SAFE_INTEGER : Math.max(0, targetIndex + (dropMode === "after" ? 1 : 0));
+    setState("Zapisywanie nowego położenia…", "saving");
+    const body = new FormData();
+    body.set("_csrf", pageTree.dataset.pageTreeCsrf ?? "");
+    body.set("source", source);
+    body.set("parent", parent);
+    body.set("position", String(position));
+    body.set("revision", draggedRow.dataset.pageRevision ?? "");
+    try {
+      const response = await fetch("/admin/pages/reorder", { method: "POST", headers: { Accept: "application/json" }, body });
+      if (!response.ok) throw new Error("Nie udało się zmienić położenia strony.");
+      setState("Położenie zapisane", "saved");
+      window.location.reload();
+    } catch (error) {
+      setState(error instanceof Error ? error.message : "Błąd zapisu", "error");
+    }
+  });
+  pageTree.addEventListener("dragend", () => {
+    pageTree.querySelectorAll(".is-dragging, .is-drop-before, .is-drop-inside, .is-drop-after").forEach((item) => item.classList.remove("is-dragging", "is-drop-before", "is-drop-inside", "is-drop-after"));
+    draggedRow = null;
+  });
+}
+
 document.addEventListener("click", (event) => {
   if (!(event.target instanceof Element)) return;
-  const activeMenu = event.target.closest("[data-page-actions-menu]");
-  document.querySelectorAll("[data-page-actions-menu][open]").forEach((menu) => {
+  const activeMenu = event.target.closest("[data-page-actions-menu], [data-actions-menu], .navigation-actions-menu");
+  document.querySelectorAll("[data-page-actions-menu][open], [data-actions-menu][open], .navigation-actions-menu[open]").forEach((menu) => {
     if (menu !== activeMenu) menu.removeAttribute("open");
   });
 });
+
+const mediaSearch = document.querySelector("[data-media-search]");
+if (mediaSearch instanceof HTMLInputElement) {
+  const mediaCards = [...document.querySelectorAll("[data-media-card]")];
+  const emptyMedia = document.querySelector("[data-media-empty]");
+  const mediaCount = document.querySelector("[data-media-result-count]");
+  const updateMediaResults = () => {
+    const query = mediaSearch.value.trim().toLocaleLowerCase("pl");
+    let visible = 0;
+    mediaCards.forEach((card) => {
+      const matches = (card.dataset.mediaSearchValue ?? "").includes(query);
+      card.hidden = !matches;
+      visible += matches ? 1 : 0;
+    });
+    if (emptyMedia instanceof HTMLElement) emptyMedia.hidden = visible !== 0;
+    if (mediaCount instanceof HTMLElement) mediaCount.textContent = `${visible} ${visible === 1 ? "plik" : "plików"}`;
+  };
+  mediaSearch.addEventListener("input", updateMediaResults);
+}
 
 const lightbox = document.querySelector("[data-media-lightbox]");
 document.addEventListener("click", (event) => {

@@ -178,6 +178,9 @@ const mount = (root = document) => {
       });
 
       editors.set(textarea, editor);
+      editor.codemirror.on("change", () => {
+        textarea.dispatchEvent(new Event("input", { bubbles: true }));
+      });
     });
 };
 

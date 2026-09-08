@@ -76,6 +76,48 @@ final class AuthenticationTest extends TestCase
         self::assertSame($user->id(), $authenticator->requireUser()->id());
     }
 
+    public function testPasswordLoginClassifiesUnknownEmailWithoutChangingPublicMessage(): void
+    {
+        [$users, $credentials, $database] = $this->repositories();
+        $authenticator = new Authenticator(
+            $users,
+            $credentials,
+            new PasswordHasher(),
+            new ArraySessionStore(),
+            new RateLimiter($database, 'test-secret', 5, 900),
+        );
+
+        try {
+            $authenticator->passwordLogin('missing@example.test', 'Wrong!Password1');
+            self::fail('Expected login to be rejected.');
+        } catch (AuthenticationException $exception) {
+            self::assertSame('Invalid email or password.', $exception->getMessage());
+            self::assertSame('unknown_email', $exception->reason());
+        }
+    }
+
+    public function testPasswordLoginClassifiesInvalidPasswordWithoutChangingPublicMessage(): void
+    {
+        [$users, $credentials, $database] = $this->repositories();
+        $hasher = new PasswordHasher();
+        $users->create('admin@example.test', $hasher->hash('Valid!Password1'), Role::Admin);
+        $authenticator = new Authenticator(
+            $users,
+            $credentials,
+            $hasher,
+            new ArraySessionStore(),
+            new RateLimiter($database, 'test-secret', 5, 900),
+        );
+
+        try {
+            $authenticator->passwordLogin('admin@example.test', 'Wrong!Password1');
+            self::fail('Expected login to be rejected.');
+        } catch (AuthenticationException $exception) {
+            self::assertSame('Invalid email or password.', $exception->getMessage());
+            self::assertSame('invalid_password', $exception->reason());
+        }
+    }
+
     public function testExpiredAuthenticatedSessionIsInvalidatedServerSide(): void
     {
         [$users, $credentials, $database] = $this->repositories();
@@ -224,6 +266,17 @@ SQL)->execute(['handle' => random_bytes(32)]);
 
         $this->expectException(\FlatFileCms\Auth\UserNotFoundException::class);
         $manager->delete($actor, $superadmin->id());
+    }
+
+    public function testAdminUserManagerCannotEditOwnAccount(): void
+    {
+        [$users] = $this->repositories();
+        $hasher = new PasswordHasher();
+        $actor = $users->create('actor@example.test', $hasher->hash('Valid!Password1'), Role::Admin, 'Jan', 'Nowak');
+        $manager = new AdminUserManager($users, new PasswordPolicy(), $hasher);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $manager->update($actor, $actor->id(), 'changed@example.test', true, '', '', 'Jan', 'Kowalski');
     }
 
     /** @return array{UserRepository, WebAuthnCredentialRepository, \PDO} */

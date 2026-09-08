@@ -90,8 +90,12 @@ final readonly class AdminSettingsController
             }
             $decoded = json_decode($payload, true, flags: JSON_THROW_ON_ERROR);
             $data = $this->stringMapping($decoded, 'navigation');
-            $this->navigation->update($data, $this->revision($request->parsedBody()['revision'] ?? null));
+            $document = $this->navigation->update($data, $this->revision($request->parsedBody()['revision'] ?? null));
             $this->audit->log('navigation.updated', $actor->id(), 'config/navigation.yml', $request->clientIp());
+
+            if ($request->header('accept') === 'application/json') {
+                return Response::json(['revision' => $document->revision()->value()]);
+            }
 
             return Response::redirect('/admin/navigation?saved=1', 303);
         } catch (RevisionConflictException $exception) {
