@@ -35,19 +35,29 @@ $contentSummary = is_array($contentSummary ?? null) ? $contentSummary : [];
     </div>
     <div class="content-summary" aria-label="Stan zawartości">
         <a href="/admin/pages"><strong><?= $number($contentSummary['pages'] ?? 0) ?></strong><span>Strony</span></a>
-        <a href="/admin/pages"><strong><?= $number($contentSummary['collections'] ?? 0) ?></strong><span>Kolekcje</span></a>
-        <a href="/admin/pages"><strong><?= $number($contentSummary['published'] ?? 0) ?></strong><span>Aktywne</span></a>
-        <a href="/admin/settings"><strong><?= $number($contentSummary['languages'] ?? 0) ?></strong><span>Języki</span></a>
+        <a
+            href="/admin/pages"><strong><?= $number($contentSummary['collections'] ?? 0) ?></strong><span>Kolekcje</span></a>
+        <a
+            href="/admin/pages"><strong><?= $number($contentSummary['published'] ?? 0) ?></strong><span>Aktywne</span></a>
+        <a
+            href="/admin/settings"><strong><?= $number($contentSummary['languages'] ?? 0) ?></strong><span>Języki</span></a>
     </div>
     <nav class="dashboard-quick-actions" aria-label="Szybkie akcje">
-        <a href="/admin/pages"><span class="quick-action-icon" aria-hidden="true">▤</span><span><strong>Zarządzaj stronami</strong><small>Treść i edytor bloków</small></span><b aria-hidden="true">→</b></a>
-        <a href="/admin/navigation"><span class="quick-action-icon" aria-hidden="true">⌘</span><span><strong>Edytuj nawigację</strong><small>Menu i hierarchia linków</small></span><b aria-hidden="true">→</b></a>
-        <a href="/admin/settings"><span class="quick-action-icon" aria-hidden="true">⚙</span><span><strong>Konfiguracja</strong><small>SEO, witryna i multimedia</small></span><b aria-hidden="true">→</b></a>
+        <a href="/admin/pages"><span class="quick-action-icon" aria-hidden="true">▤</span><span><strong>Zarządzaj
+                    stronami</strong><small>Treść i edytor bloków</small></span><b aria-hidden="true">→</b></a>
+        <a href="/admin/navigation"><span class="quick-action-icon" aria-hidden="true">⌘</span><span><strong>Edytuj
+                    nawigację</strong><small>Menu i hierarchia linków</small></span><b aria-hidden="true">→</b></a>
+        <a href="/admin/settings"><span class="quick-action-icon"
+                aria-hidden="true">⚙</span><span><strong>Konfiguracja</strong><small>SEO, witryna i
+                    multimedia</small></span><b aria-hidden="true">→</b></a>
     </nav>
 </section>
 
 <div class="dashboard-section-heading">
-    <div><p class="eyebrow">Analityka</p><h2>Ruch w witrynie</h2></div>
+    <div>
+        <p class="eyebrow">Analityka</p>
+        <h2>Ruch w witrynie</h2>
+    </div>
     <p>Dane z Cloudflare Web Analytics</p>
 </div>
 <div class="analytics-toolbar">
@@ -68,7 +78,13 @@ $contentSummary = is_array($contentSummary ?? null) ? $contentSummary : [];
 
 <?php if ($status !== 'ready'): ?>
     <section class="analytics-empty">
-        <div class="analytics-empty-icon" aria-hidden="true">⌁</div>
+        <div class="analytics-empty-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-graph-up-arrow"
+                viewBox="0 0 16 16">
+                <path fill-rule="evenodd"
+                    d="M0 0h1v15h15v1H0zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5" />
+            </svg>
+        </div>
         <?php if ($status === 'disabled'): ?>
             <h2>Analityka jest wyłączona</h2>
             <p>Włącz ją ustawiając <code>CLOUDFLARE_ANALYTICS_ENABLED=1</code> w <code>.env.local</code>.</p>
