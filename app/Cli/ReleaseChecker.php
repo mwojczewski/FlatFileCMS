@@ -157,7 +157,6 @@ final readonly class ReleaseChecker
             'config/redirects.yml',
             'public/index.php',
             'public/.htaccess',
-            'public/assets/admin/admin.css',
             'public/assets/admin/admin-core.css',
             'public/assets/admin/admin-builder.css',
             'public/assets/admin/admin-shell.css',

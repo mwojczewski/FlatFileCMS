@@ -11,7 +11,6 @@ return RectorConfig::configure()
         __DIR__ . '/blocks',
         __DIR__ . '/bootstrap',
         __DIR__ . '/config',
-        __DIR__ . '/integration',
         __DIR__ . '/public',
         __DIR__ . '/templates',
         __DIR__ . '/tests',

@@ -23,7 +23,6 @@ use FlatFileCms\Infrastructure\Yaml\YamlParser;
 use FlatFileCms\Media\MediaException;
 use FlatFileCms\Media\MediaInspector;
 use FlatFileCms\Media\MediaManager;
-use FlatFileCms\Media\MediaName;
 use FlatFileCms\Media\MediaRepository;
 use FlatFileCms\Media\MediaUrlGenerator;
 use FlatFileCms\Media\MediaVariantService;

@@ -134,16 +134,6 @@ final readonly class AdminAuthController
         }
     }
 
-    public function dashboard(Request $request): Response
-    {
-        $user = $this->authenticator->user();
-        if ($user === null) {
-            return Response::redirect('/admin/login');
-        }
-
-        return $this->page('Panel', $this->views->render('dashboard', ['user' => $user]));
-    }
-
     public function security(Request $request): Response
     {
         $user = $this->requireUser();
@@ -325,7 +315,6 @@ final readonly class AdminAuthController
     private function page(string $title, string $content, int $status = 200, bool $scripts = false): Response
     {
         $active = match ($title) {
-            'Panel' => 'dashboard',
             'Konto', 'Zmiana hasła', 'Klucze bezpieczeństwa' => 'account',
             default => '',
         };

@@ -132,15 +132,12 @@ final readonly class AdminPageController
 
         $languages = $this->languages->get();
 
-        return $this->page('Edycja strony', $this->views->render('pages/edit', [
-            'identity' => $identity,
-            'form' => $this->views->render('pages/form', $this->formData(
-                '/admin/pages/update',
-                $languages,
-                $editable,
-                $identity,
-            )),
-        ]));
+        return $this->page('Edycja strony', $this->views->render('pages/form', $this->formData(
+            '/admin/pages/update',
+            $languages,
+            $editable,
+            $identity,
+        )));
     }
 
     public function update(Request $request): Response

@@ -6,7 +6,6 @@ namespace FlatFileCms\Media;
 
 use DOMDocument;
 use DOMElement;
-use DOMNode;
 
 final class SvgSanitizer
 {
