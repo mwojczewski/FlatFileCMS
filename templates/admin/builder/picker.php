@@ -21,13 +21,31 @@ $blockIcon = static function (string $type): string {
 };
 ?>
 <div class="block-library-heading">
-    <div><p class="eyebrow">Biblioteka bloków</p><h2>Co chcesz dodać?</h2><p class="lead">Wybierz komponent, który pojawi się na stronie <code><?= $escape($identity->value()) ?></code>.</p></div>
+    <div>
+        <p class="eyebrow">Biblioteka bloków</p>
+        <h2>Co chcesz dodać?</h2>
+        <p class="lead">Wybierz komponent, który pojawi się na stronie <code><?= $escape($identity->value()) ?></code>.
+        </p>
+    </div>
     <a class="button secondary" href="/admin/pages/builder?path=<?= rawurlencode($identity->value()) ?>">Anuluj</a>
 </div>
-<label class="pages-search block-search"><span class="sr-only">Szukaj bloku</span><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input type="search" placeholder="Szukaj bloku…" data-block-search autocomplete="off"></label>
+<label class="pages-search block-search"><span class="sr-only">Szukaj bloku</span><svg aria-hidden="true"
+        viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="7" />
+        <path d="m20 20-4-4" />
+    </svg><input type="search" placeholder="Szukaj bloku…" data-block-search autocomplete="off"></label>
 <div class="picker-grid block-library" data-block-library>
-    <?php foreach ($cards as $card): $definition = $card['definition']; ?>
-        <a class="picker-card" data-block-card data-block-search-value="<?= $escape(mb_strtolower($card['name'] . ' ' . $card['description'] . ' ' . $definition->type())) ?>" href="/admin/pages/builder/create?path=<?= rawurlencode($identity->value()) ?>&amp;type=<?= rawurlencode($definition->type()) ?>"><?php if ($card['preview']): ?><img src="/admin/pages/builder/preview?type=<?= rawurlencode($definition->type()) ?>" alt=""><?php else: ?><span class="block-icon" aria-hidden="true"><?= $blockIcon($definition->type()) ?></span><?php endif; ?><span><strong><?= $escape($card['name']) ?></strong><small><?= $escape($card['description']) ?></small><code><?= $escape($definition->type()) ?></code></span></a>
+    <?php foreach ($cards as $card):
+        $definition = $card['definition']; ?>
+        <a class="picker-card" data-block-card
+            data-block-search-value="<?= $escape(mb_strtolower($card['name'] . ' ' . $card['description'] . ' ' . $definition->type())) ?>"
+            href="/admin/pages/builder/create?path=<?= rawurlencode($identity->value()) ?>&amp;type=<?= rawurlencode($definition->type()) ?>"><?php if ($card['preview']): ?><img
+                    src="/admin/pages/builder/preview?type=<?= rawurlencode($definition->type()) ?>" alt=""><?php else: ?><span
+                    class="block-icon"
+                    aria-hidden="true"><?= $blockIcon($definition->type()) ?></span><?php endif; ?><span><strong><?= $escape($card['name']) ?></strong><small><?= $escape($card['description']) ?></small><code><?= $escape($definition->type()) ?></code></span></a>
     <?php endforeach; ?>
 </div>
-<div class="empty-state block-library-empty" data-block-library-empty hidden><strong>Nie znaleziono takiego bloku.</strong><p>Spróbuj użyć innej nazwy.</p></div>
+<div class="empty-state block-library-empty" data-block-library-empty hidden><strong>Nie znaleziono takiego
+        bloku.</strong>
+    <p>Spróbuj użyć innej nazwy.</p>
+</div>

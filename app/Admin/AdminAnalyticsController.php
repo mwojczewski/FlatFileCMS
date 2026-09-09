@@ -24,7 +24,8 @@ final readonly class AdminAnalyticsController
         private CollectionRepository $collections,
         private AdminView $views,
         private AdminLayout $layout,
-    ) {}
+    ) {
+    }
 
     public function dashboard(Request $request): Response
     {

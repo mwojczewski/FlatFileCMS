@@ -13,6 +13,7 @@ final readonly class AdminLayout
     private const string ASSET_VERSION = '18.0.0';
 
     private const array ADMIN_STYLESHEETS = [
+        '/assets/admin/admin-root.css',
         '/assets/admin/admin-analytics.css',
         '/assets/admin/admin-pages.css',
         '/assets/admin/admin-builder.css',
@@ -31,7 +32,8 @@ final readonly class AdminLayout
         private Authenticator $authenticator,
         private CsrfTokenManager $csrf,
         private AdminView $views,
-    ) {}
+    ) {
+    }
 
     public function render(
         string $title,
@@ -103,7 +105,7 @@ final readonly class AdminLayout
 
     private function stylesheet(string $path): string
     {
-        return "<link rel=\"stylesheet\" href=\"{$path}?v=" . self::ASSET_VERSION . "\">";
+        return "<link rel=\"stylesheet\" href=\"{$path}?v=" . self::ASSET_VERSION . "\">\n";
     }
 
     /** @param list<string> $paths */

@@ -34,17 +34,23 @@ $icon = static function (string $name): string {
                 <span class="admin-brand-mark">F</span>
                 <span class="admin-brand-copy"><strong>FlatFile</strong><small>CMS</small></span>
             </a>
-            <button class="sidebar-collapse" type="button" data-sidebar-collapse aria-label="Zwiń panel boczny" title="Zwiń panel boczny" aria-expanded="true">
-                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 7-5 5 5 5"/></svg>
+            <button class="sidebar-collapse" type="button" data-sidebar-collapse aria-label="Zwiń panel boczny"
+                title="Zwiń panel boczny" aria-expanded="true">
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m14 7-5 5 5 5" />
+                </svg>
             </button>
             <button class="sidebar-close" type="button" data-admin-menu-close aria-label="Zamknij menu">×</button>
         </div>
         <nav class="admin-navigation" aria-label="Nawigacja panelu">
             <p class="navigation-label">Zarządzanie</p>
             <?php foreach ($links as $index => [$url, $name, $label, $description, $iconName]):
-                if ($index === 5): ?><p class="navigation-label navigation-label-secondary">System</p><?php endif;
+                if ($index === 5): ?>
+                    <p class="navigation-label navigation-label-secondary">System</p><?php endif;
                 $current = $active === $name; ?>
-                <a href="<?= $url ?>" class="<?= $current ? 'active' : '' ?>"<?= $current ? ' aria-current="page"' : '' ?> title="<?= $escape($label . ' — ' . $description) ?>">
+                <a href="<?= $url ?>" class="<?= $current ? 'active' : '' ?>" <?= $current ? ' aria-current="page"' : '' ?>
+                    title="<?= $escape($label . ' — ' . $description) ?>">
                     <span class="nav-icon"><?= $icon($iconName) ?></span>
                     <span class="nav-copy"><strong><?= $label ?></strong><small><?= $description ?></small></span>
                 </a>
@@ -52,8 +58,10 @@ $icon = static function (string $name): string {
         </nav>
         <div class="sidebar-status"><span aria-hidden="true"></span><span>Panel gotowy</span></div>
         <div class="sidebar-account">
-            <span class="account-avatar" aria-hidden="true" title="<?= $escape($displayName) ?>"><?= $escape($accountInitials) ?></span>
-            <span class="account-copy"><strong><?= $escape($displayName) ?></strong><small><?= $escape($email) ?></small></span>
+            <span class="account-avatar" aria-hidden="true"
+                title="<?= $escape($displayName) ?>"><?= $escape($accountInitials) ?></span>
+            <span
+                class="account-copy"><strong><?= $escape($displayName) ?></strong><small><?= $escape($email) ?></small></span>
             <form method="post" action="/admin/logout">
                 <input type="hidden" name="_csrf" value="<?= $escape($csrfToken) ?>">
                 <button type="submit" class="sidebar-logout" aria-label="Wyloguj" title="Wyloguj">↗</button>
@@ -63,12 +71,16 @@ $icon = static function (string $name): string {
     <div class="admin-workspace">
         <header class="admin-topbar">
             <div class="topbar-start">
-                <button class="menu-toggle" type="button" data-admin-menu aria-label="Otwórz menu" aria-controls="admin-navigation" aria-expanded="false"><span></span><span></span><span></span></button>
-                <a class="mobile-brand" href="/admin"><span class="admin-brand-mark">F</span><strong>FlatFile CMS</strong></a>
+                <button class="menu-toggle" type="button" data-admin-menu aria-label="Otwórz menu"
+                    aria-controls="admin-navigation"
+                    aria-expanded="false"><span></span><span></span><span></span></button>
+                <a class="mobile-brand" href="/admin"><span class="admin-brand-mark">F</span><strong>FlatFile
+                        CMS</strong></a>
                 <span class="topbar-context"><?= $escape($title) ?></span>
             </div>
             <div class="topbar-actions">
-                <a class="topbar-site-link" href="/" target="_blank" rel="noopener">Otwórz witrynę <span aria-hidden="true">↗</span></a>
+                <a class="topbar-site-link" href="/" target="_blank" rel="noopener">Otwórz witrynę <span
+                        aria-hidden="true">↗</span></a>
                 <span class="topbar-avatar" aria-hidden="true"><?= $escape($accountInitials) ?></span>
                 <form method="post" action="/admin/logout">
                     <input type="hidden" name="_csrf" value="<?= $escape($csrfToken) ?>">
@@ -77,7 +89,12 @@ $icon = static function (string $name): string {
             </div>
         </header>
         <main class="admin-main" id="admin-content">
-            <header class="page-heading"><div><p class="eyebrow">Panel administracyjny</p><h1><?= $escape($title) ?></h1></div></header>
+            <header class="page-heading">
+                <div>
+                    <p class="eyebrow">Panel administracyjny</p>
+                    <h1><?= $escape($title) ?></h1>
+                </div>
+            </header>
             <div class="admin-content"><?= $content ?></div>
         </main>
     </div>

@@ -8,10 +8,17 @@ $currentEnabled = $enabled ?? ($editing ? $user->enabled() : true);
 <?php if ($error !== ''): ?>
     <p class="error"><?= $escape($error) ?></p><?php endif; ?>
 <div class="form-page-header">
-    <div><p class="eyebrow"><?= $editing ? 'Edycja dostępu' : 'Nowe konto' ?></p><h2><?= $editing ? $escape($user->displayName()) : 'Dodaj administratora' ?></h2><p class="lead"><?= $editing ? 'Zmień dane, hasło lub dostęp użytkownika do panelu.' : 'Utwórz konto z rolą administratora panelu.' ?></p></div>
+    <div>
+        <p class="eyebrow"><?= $editing ? 'Edycja dostępu' : 'Nowe konto' ?></p>
+        <h2><?= $editing ? $escape($user->displayName()) : 'Dodaj administratora' ?></h2>
+        <p class="lead">
+            <?= $editing ? 'Zmień dane, hasło lub dostęp użytkownika do panelu.' : 'Utwórz konto z rolą administratora panelu.' ?>
+        </p>
+    </div>
     <div class="form-page-actions"><a class="button secondary" href="/admin/users">Wróć do administratorów</a></div>
 </div>
-<form class="stack crud-form editor-form account-editor-form" method="post" action="<?= $editing ? '/admin/users/update' : '/admin/users/create' ?>">
+<form class="stack crud-form editor-form account-editor-form" method="post"
+    action="<?= $editing ? '/admin/users/update' : '/admin/users/create' ?>">
     <input type="hidden" name="_csrf" value="<?= $escape($csrfToken) ?>">
     <?php if ($editing): ?><input type="hidden" name="id" value="<?= $escape($user->publicId()) ?>"><?php endif; ?>
     <section class="form-section">
@@ -50,7 +57,9 @@ $currentEnabled = $enabled ?? ($editing ? $user->enabled() : true);
                     autocomplete="new-password" minlength="8"></label>
         </div>
     </section>
-    <div class="actions form-actions"><span class="form-actions-context"><?= $editing ? 'Edytujesz istniejące konto' : 'Konto otrzyma rolę administratora' ?></span><a class="button secondary" href="/admin/users">Anuluj</a><button
+    <div class="actions form-actions"><span
+            class="form-actions-context"><?= $editing ? 'Edytujesz istniejące konto' : 'Konto otrzyma rolę administratora' ?></span><a
+            class="button secondary" href="/admin/users">Anuluj</a><button
             type="submit"><?= $editing ? 'Zapisz zmiany' : 'Utwórz konto' ?></button></div>
 </form>
 <?php if ($editing): ?>
