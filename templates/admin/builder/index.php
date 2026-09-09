@@ -60,8 +60,13 @@ $enabledCount = count(array_filter($blocks, static fn(array $block): bool => $bl
                     draggable="true" data-block-id="<?= $escape($block['id']) ?>"
                     data-block-select="<?= $escape($block['id']) ?>">
                     <header class="builder-preview-toolbar">
-                        <button type="button" class="drag-handle" aria-label="Przeciągnij blok"
-                            title="Zmień kolejność">⋮⋮</button>
+                        <button type="button" class="drag-handle" aria-label="Przeciągnij blok" title="Zmień kolejność">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-grip-vertical" viewBox="0 0 16 16">
+                                <path
+                                    d="M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0M7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0M7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0" />
+                            </svg>
+                        </button>
                         <span class="builder-preview-type"><?= $escape($block['name']) ?></span>
                         <span class="block-visibility <?= $block['enabled'] ? 'is-visible' : '' ?>"><i
                                 aria-hidden="true"></i><?= $block['enabled'] ? 'Widoczny' : 'Ukryty' ?></span>
