@@ -37,12 +37,7 @@ final readonly class Authenticator
             $this->limiter->hit('login_account', $identifier);
             $this->limiter->hit('login_ip', $ip);
             $this->limiter->hit('login_pair', $pair);
-            $reason = match (true) {
-                $user === null => 'unknown_email',
-                !$user->enabled() => 'account_disabled',
-                default => 'invalid_password',
-            };
-            throw new AuthenticationException('Invalid email or password.', $reason);
+            throw new AuthenticationException('Invalid email or password.');
         }
         $this->limiter->clear('login_account', $identifier);
         $this->limiter->clear('login_pair', $pair);

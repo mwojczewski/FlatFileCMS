@@ -49,7 +49,7 @@ final readonly class AdminPageController
     {
         $this->requireUser();
         $languages = $this->languages->get();
-        /** @var array<string, array{identity: PageIdentity, title: string, enabled: bool, collection: bool, modifiedAt: int, order: int, revision: string}> $entries */
+        /** @var array<string, array{identity: PageIdentity, title: string, enabled: bool, collection: bool}> $entries */
         $entries = [];
         foreach ($this->pages->all($languages) as $page) {
             $entries[$page->identity()->value()] = [
@@ -57,9 +57,6 @@ final readonly class AdminPageController
                 'title' => $page->title($languages->default(), $languages->default()),
                 'enabled' => $page->enabled(),
                 'collection' => false,
-                'modifiedAt' => $page->modifiedAt(),
-                'order' => \is_int($page->attributes()['order'] ?? null) ? $page->attributes()['order'] : 0,
-                'revision' => $page->revision()->value(),
             ];
         }
         foreach ($this->collections->all($languages) as $collection) {
@@ -68,18 +65,19 @@ final readonly class AdminPageController
                 'title' => $collection->title($languages->default(), $languages->default()),
                 'enabled' => $collection->enabled(),
                 'collection' => true,
-                'modifiedAt' => $collection->modifiedAt(),
-                'order' => $collection->order(),
-                'revision' => $collection->revision()->value(),
             ];
         }
-        $entries = $this->orderedEntries($entries);
-        return $this->page('Strony', $this->views->render('pages/index', [
-            'entries' => $entries,
-            'languageCount' => \count($languages->codes()),
-            'languageCodes' => $languages->codes(),
-            'csrfToken' => $this->csrf->token(),
-        ]));
+        uksort($entries, static function (string $left, string $right): int {
+            if ($left === 'homepage') {
+                return -1;
+            }
+            if ($right === 'homepage') {
+                return 1;
+            }
+
+            return $left <=> $right;
+        });
+        return $this->page('Strony', $this->views->render('pages/index', ['entries' => array_values($entries)]));
     }
 
     public function createForm(Request $request): Response
@@ -132,12 +130,15 @@ final readonly class AdminPageController
 
         $languages = $this->languages->get();
 
-        return $this->page('Edycja strony', $this->views->render('pages/form', $this->formData(
-            '/admin/pages/update',
-            $languages,
-            $editable,
-            $identity,
-        )));
+        return $this->page('Edycja strony', $this->views->render('pages/edit', [
+            'identity' => $identity,
+            'form' => $this->views->render('pages/form', $this->formData(
+                '/admin/pages/update',
+                $languages,
+                $editable,
+                $identity,
+            )),
+        ]));
     }
 
     public function update(Request $request): Response
@@ -216,69 +217,9 @@ final readonly class AdminPageController
         }
     }
 
-    public function reorder(Request $request): Response
-    {
-        $actor = $this->requireUser();
-        try {
-            $this->validateCsrf($request);
-            $source = $this->identity($request->parsedBody()['source'] ?? null);
-            $parentValue = $request->parsedBody()['parent'] ?? '';
-            if (!\is_string($parentValue)) {
-                throw new InvalidArgumentException('Parent identity is invalid.');
-            }
-            $positionValue = $request->parsedBody()['position'] ?? null;
-            if (!\is_string($positionValue) || preg_match('/^[0-9]+$/D', $positionValue) !== 1) {
-                throw new InvalidArgumentException('Page position is invalid.');
-            }
-            $destination = $this->manager->reorganize(
-                $source,
-                $parentValue === '' ? null : $this->identity($parentValue),
-                (int) $positionValue,
-                $this->revision($request->parsedBody()['revision'] ?? null),
-                $this->languages->get(),
-            );
-            $this->audit->log('page.reordered', $actor->id(), "pages/{$destination->value()}", $request->clientIp(), ['from' => $source->value()]);
-
-            return Response::json(['success' => true]);
-        } catch (RevisionConflictException $exception) {
-            throw new HttpException(409, 'PAGE_REVISION_CONFLICT', 'Page changed in another session.', previous: $exception);
-        } catch (InvalidArgumentException | InvalidContentException | FilesystemException $exception) {
-            throw new HttpException(422, 'PAGE_REORDER_INVALID', $exception->getMessage(), previous: $exception);
-        }
-    }
-
     private function queryIdentity(Request $request): PageIdentity
     {
         return $this->identity($request->query()['path'] ?? null);
-    }
-
-    /**
-     * @param array<string, array{identity: PageIdentity, title: string, enabled: bool, collection: bool, modifiedAt: int, order: int, revision: string}> $entries
-     * @return list<array{identity: PageIdentity, title: string, enabled: bool, collection: bool, modifiedAt: int, order: int, revision: string}>
-     */
-    private function orderedEntries(array $entries): array
-    {
-        $children = [];
-        foreach ($entries as $identity => $entry) {
-            $separator = strrpos($identity, '/');
-            $parent = $separator === false ? '' : substr($identity, 0, $separator);
-            $children[$parent][] = $entry;
-        }
-        foreach ($children as &$siblings) {
-            usort($siblings, static fn(array $left, array $right): int => [$left['identity']->isHomepage() ? 0 : 1, $left['order'], $left['identity']->value()] <=> [$right['identity']->isHomepage() ? 0 : 1, $right['order'], $right['identity']->value()]);
-        }
-        unset($siblings);
-
-        $ordered = [];
-        $append = static function (string $parent) use (&$append, &$ordered, $children): void {
-            foreach ($children[$parent] ?? [] as $entry) {
-                $ordered[] = $entry;
-                $append($entry['identity']->value());
-            }
-        };
-        $append('');
-
-        return $ordered;
     }
 
     private function identity(mixed $value): PageIdentity

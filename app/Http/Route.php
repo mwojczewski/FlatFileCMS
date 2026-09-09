@@ -29,6 +29,11 @@ final readonly class Route
         return \in_array(strtoupper($method), $this->methods, true);
     }
 
+    public function matchesPath(string $path): bool
+    {
+        return $this->parameters($path) !== null;
+    }
+
     /** @return array<string, string>|null */
     public function parameters(string $path): ?array
     {

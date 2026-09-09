@@ -5,153 +5,168 @@ slug:
   pl: pierwsze-uruchomienie
   en: getting-started
 title:
-  pl: "Pierwsze uruchomienie FlatFile CMS"
-  en: "Getting started with FlatFile CMS"
-date: "2026-09-02"
+  pl: 'Pierwsze uruchomienie FlatFile CMS'
+  en: 'Getting started with FlatFile CMS'
+date: '2026-09-02'
 order: 1
 category: getting-started
 excerpt:
-  pl: "Instalacja, konfiguracja środowiska, pierwsze konto administratora i kontrola działania - od pustego katalogu do lokalnego CMS-a."
-  en: "Installation, environment configuration, the first administrator account and verification - from an empty directory to a working local CMS."
+  pl: 'Instalacja, konfiguracja środowiska, pierwsze konto administratora i kontrola działania - od pustego katalogu do lokalnego CMS-a.'
+  en: 'Installation, environment configuration, the first administrator account and verification - from an empty directory to a working local CMS.'
 seo:
   title:
-    pl: "Pierwsze uruchomienie FlatFile CMS - kompletny tutorial"
-    en: "Getting started with FlatFile CMS - complete tutorial"
+    pl: 'Pierwsze uruchomienie FlatFile CMS - kompletny tutorial'
+    en: 'Getting started with FlatFile CMS - complete tutorial'
   description:
-    pl: "Krok po kroku zainstaluj FlatFile CMS na PHP 8.5, skonfiguruj środowisko, utwórz superadministratora i zweryfikuj aplikację."
-    en: "Install FlatFile CMS on PHP 8.5, configure the environment, create a superadmin and verify the application step by step."
+    pl: 'Krok po kroku zainstaluj FlatFile CMS na PHP 8.5, skonfiguruj środowisko, utwórz superadministratora i zweryfikuj aplikację.'
+    en: 'Install FlatFile CMS on PHP 8.5, configure the environment, create a superadmin and verify the application step by step.'
   robots:
     index: true
     follow: true
   openGraph: {}
   twitter: {}
   jsonLd:
-    "@context": "https://schema.org"
-    "@type": TechArticle
-    headline: "Getting started with FlatFile CMS"
-    dateModified: "2026-09-02"
+    '@context': 'https://schema.org'
+    '@type': TechArticle
+    headline: 'Getting started with FlatFile CMS'
+    dateModified: '2026-09-02'
 blocks:
-  - id: 01a05ef2-2002-7401-8401-000000000001
+  -
+    id: 01a05ef2-2002-7401-8401-000000000001
     type: docs-hero
     enabled: true
     data:
       breadcrumb:
-        pl: "Dokumentacja / 02 / Pierwsze uruchomienie"
-        en: "Documentation / 02 / Getting started"
+        pl: 'Dokumentacja / 02 / Pierwsze uruchomienie'
+        en: 'Documentation / 02 / Getting started'
       title:
-        pl: "Od repozytorium do działającego CMS-a"
-        en: "From repository to a running CMS"
+        pl: 'Od repozytorium do działającego CMS-a'
+        en: 'From repository to a running CMS'
       lead:
-        pl: "Kompletny tutorial instalacji FlatFile CMS - wymagania PHP, zależności Composera, konfiguracja środowiska, baza SQLite, pierwsze konto i kontrola całego przepływu HTTP."
-        en: "A complete FlatFile CMS installation tutorial covering PHP requirements, Composer dependencies, environment configuration, SQLite, the first account and verification of the complete HTTP flow."
+        pl: 'Kompletny tutorial instalacji FlatFile CMS - wymagania PHP, zależności Composera, konfiguracja środowiska, baza SQLite, pierwsze konto i kontrola całego przepływu HTTP.'
+        en: 'A complete FlatFile CMS installation tutorial covering PHP requirements, Composer dependencies, environment configuration, SQLite, the first account and verification of the complete HTTP flow.'
       level: podstawowy
       reading_time:
-        pl: "około 30 minut"
-        en: "about 30 minutes"
-      updated: "2026-09-02"
+        pl: 'około 30 minut'
+        en: 'about 30 minutes'
+      updated: '2026-09-02'
       topics:
-        - label:
-            pl: "PHP 8.5"
-            en: "PHP 8.5"
-        - label:
+        -
+          label:
+            pl: 'PHP 8.5'
+            en: 'PHP 8.5'
+        -
+          label:
             pl: Composer
             en: Composer
-        - label:
+        -
+          label:
             pl: SQLite
             en: SQLite
-        - label:
+        -
+          label:
             pl: Konfiguracja
             en: Configuration
-        - label:
+        -
+          label:
             pl: CLI
             en: CLI
-        - label:
+        -
+          label:
             pl: Diagnostyka
             en: Diagnostics
-  - id: 01a05ef2-2002-7402-8402-000000000002
+  -
+    id: 01a05ef2-2002-7402-8402-000000000002
     type: docs-toc
     enabled: true
     data:
       title:
-        pl: "Plan pierwszego uruchomienia"
-        en: "First-run plan"
+        pl: 'Plan pierwszego uruchomienia'
+        en: 'First-run plan'
       intro:
-        pl: "Przechodzimy kolejno przez środowisko wykonawcze, pobranie zależności, podział konfiguracji, instalację konta i test aplikacji. Nie pomijaj kontroli wymagań - większość problemów instalacyjnych powstaje przed uruchomieniem kodu CMS-a."
-        en: "We move through the runtime, dependency installation, configuration boundaries, account setup and application verification. Do not skip the requirements check: most installation failures occur before CMS code starts."
+        pl: 'Przechodzimy kolejno przez środowisko wykonawcze, pobranie zależności, podział konfiguracji, instalację konta i test aplikacji. Nie pomijaj kontroli wymagań - większość problemów instalacyjnych powstaje przed uruchomieniem kodu CMS-a.'
+        en: 'We move through the runtime, dependency installation, configuration boundaries, account setup and application verification. Do not skip the requirements check: most installation failures occur before CMS code starts.'
       items:
-        - number: "01"
+        -
+          number: '01'
           title:
             pl: Wymagania
             en: Requirements
           description:
-            pl: "PHP 8.5, rozszerzenia, Composer i prawa zapisu."
-            en: "PHP 8.5, extensions, Composer and write permissions."
+            pl: 'PHP 8.5, rozszerzenia, Composer i prawa zapisu.'
+            en: 'PHP 8.5, extensions, Composer and write permissions.'
           url:
-            pl: "/pl/dokumentacja/pierwsze-uruchomienie#wymagania"
-            en: "/en/documentation/getting-started#wymagania"
-        - number: "02"
+            pl: '/pl/dokumentacja/pierwsze-uruchomienie#wymagania'
+            en: '/en/documentation/getting-started#wymagania'
+        -
+          number: '02'
           title:
-            pl: "Instalacja kodu"
-            en: "Code installation"
+            pl: 'Instalacja kodu'
+            en: 'Code installation'
           description:
-            pl: "Checkout repozytorium i zależności z composer.lock."
-            en: "Repository checkout and dependencies from composer.lock."
+            pl: 'Checkout repozytorium i zależności z composer.lock.'
+            en: 'Repository checkout and dependencies from composer.lock.'
           url:
-            pl: "/pl/dokumentacja/pierwsze-uruchomienie#instalacja"
-            en: "/en/documentation/getting-started#instalacja"
-        - number: "03"
+            pl: '/pl/dokumentacja/pierwsze-uruchomienie#instalacja'
+            en: '/en/documentation/getting-started#instalacja'
+        -
+          number: '03'
           title:
             pl: Środowisko
             en: Environment
           description:
-            pl: "Sekrety, sesje, cache, poczta i WebAuthn."
-            en: "Secrets, sessions, caches, mail and WebAuthn."
+            pl: 'Sekrety, sesje, cache, poczta i WebAuthn.'
+            en: 'Secrets, sessions, caches, mail and WebAuthn.'
           url:
-            pl: "/pl/dokumentacja/pierwsze-uruchomienie#srodowisko"
-            en: "/en/documentation/getting-started#srodowisko"
-        - number: "04"
+            pl: '/pl/dokumentacja/pierwsze-uruchomienie#srodowisko'
+            en: '/en/documentation/getting-started#srodowisko'
+        -
+          number: '04'
           title:
-            pl: "Instalacja CMS-a"
-            en: "CMS installation"
+            pl: 'Instalacja CMS-a'
+            en: 'CMS installation'
           description:
-            pl: "Schemat SQLite i pierwszy superadministrator."
-            en: "SQLite schema and the first superadmin."
+            pl: 'Schemat SQLite i pierwszy superadministrator.'
+            en: 'SQLite schema and the first superadmin.'
           url:
-            pl: "/pl/dokumentacja/pierwsze-uruchomienie#konto"
-            en: "/en/documentation/getting-started#konto"
-        - number: "05"
+            pl: '/pl/dokumentacja/pierwsze-uruchomienie#konto'
+            en: '/en/documentation/getting-started#konto'
+        -
+          number: '05'
           title:
-            pl: "Serwer lokalny"
-            en: "Local server"
+            pl: 'Serwer lokalny'
+            en: 'Local server'
           description:
-            pl: "Front controller, router deweloperski i test tras."
-            en: "Front controller, development router and route tests."
+            pl: 'Front controller, router deweloperski i test tras.'
+            en: 'Front controller, development router and route tests.'
           url:
-            pl: "/pl/dokumentacja/pierwsze-uruchomienie#uruchomienie"
-            en: "/en/documentation/getting-started#uruchomienie"
-        - number: "06"
+            pl: '/pl/dokumentacja/pierwsze-uruchomienie#uruchomienie'
+            en: '/en/documentation/getting-started#uruchomienie'
+        -
+          number: '06'
           title:
             pl: Diagnostyka
             en: Troubleshooting
           description:
-            pl: "Typowe błędy i sposób izolowania ich przyczyn."
-            en: "Common failures and how to isolate their causes."
+            pl: 'Typowe błędy i sposób izolowania ich przyczyn.'
+            en: 'Common failures and how to isolate their causes.'
           url:
-            pl: "/pl/dokumentacja/pierwsze-uruchomienie#diagnostyka"
-            en: "/en/documentation/getting-started#diagnostyka"
-  - id: 01a05ef2-2002-7412-8412-000000000012
+            pl: '/pl/dokumentacja/pierwsze-uruchomienie#diagnostyka'
+            en: '/en/documentation/getting-started#diagnostyka'
+  -
+    id: 01a05ef2-2002-7412-8412-000000000012
     type: technical-table
     enabled: true
     data:
       eyebrow:
-        pl: "Mapa odpowiedzialności"
-        en: "Responsibility map"
+        pl: 'Mapa odpowiedzialności'
+        en: 'Responsibility map'
       title:
-        pl: "Cztery granice pierwszego uruchomienia."
-        en: "Four boundaries of the first run."
+        pl: 'Cztery granice pierwszego uruchomienia.'
+        en: 'Four boundaries of the first run.'
       intro:
-        pl: "Każda warstwa przyjmuje inne dane wejściowe i odpowiada za inny fragment startu aplikacji. Na telefonie każdy wiersz staje się samodzielną kartą z własnymi etykietami."
-        en: "Each layer accepts different input and owns a different part of application startup. On mobile, every row becomes a self-contained card with its own labels."
+        pl: 'Każda warstwa przyjmuje inne dane wejściowe i odpowiada za inny fragment startu aplikacji. Na telefonie każdy wiersz staje się samodzielną kartą z własnymi etykietami.'
+        en: 'Each layer accepts different input and owns a different part of application startup. On mobile, every row becomes a self-contained card with its own labels.'
       column_1:
         pl: Warstwa
         en: Layer
@@ -165,67 +180,73 @@ blocks:
         pl: Wyjście
         en: Output
       rows:
-        - cell_1:
+        -
+          cell_1:
             pl: System
             en: System
           cell_2:
-            pl: "PHP i rozszerzenia"
-            en: "PHP and extensions"
+            pl: 'PHP i rozszerzenia'
+            en: 'PHP and extensions'
           cell_3:
-            pl: "Wykonuje aplikację i operacje na obrazach."
-            en: "Runs the application and image operations."
+            pl: 'Wykonuje aplikację i operacje na obrazach.'
+            en: 'Runs the application and image operations.'
           cell_4:
-            pl: "Runtime PHP 8.5+"
-            en: "PHP 8.5+ runtime"
-        - cell_1:
+            pl: 'Runtime PHP 8.5+'
+            en: 'PHP 8.5+ runtime'
+        -
+          cell_1:
             pl: Composer
             en: Composer
           cell_2:
             pl: composer.lock
             en: composer.lock
           cell_3:
-            pl: "Instaluje dokładne wersje bibliotek."
-            en: "Installs exact library versions."
+            pl: 'Instaluje dokładne wersje bibliotek.'
+            en: 'Installs exact library versions.'
           cell_4:
             pl: vendor/autoload.php
             en: vendor/autoload.php
-        - cell_1:
+        -
+          cell_1:
             pl: Środowisko
             en: Environment
           cell_2:
             pl: .env.local
             en: .env.local
           cell_3:
-            pl: "Przechowuje sekrety i ustawienia serwera."
-            en: "Stores secrets and server-specific settings."
+            pl: 'Przechowuje sekrety i ustawienia serwera.'
+            en: 'Stores secrets and server-specific settings.'
           cell_4:
-            pl: "Konfiguracja runtime"
-            en: "Runtime configuration"
-        - cell_1:
-            pl: "Konfiguracja witryny"
-            en: "Site configuration"
+            pl: 'Konfiguracja runtime'
+            en: 'Runtime configuration'
+        -
+          cell_1:
+            pl: 'Konfiguracja witryny'
+            en: 'Site configuration'
           cell_2:
-            pl: "config/*.yml"
-            en: "config/*.yml"
+            pl: 'config/*.yml'
+            en: 'config/*.yml'
           cell_3:
-            pl: "Definiuje publiczne zachowanie witryny."
-            en: "Defines public site behaviour."
+            pl: 'Definiuje publiczne zachowanie witryny.'
+            en: 'Defines public site behaviour.'
           cell_4:
-            pl: "Model konfiguracji"
-            en: "Configuration model"
-        - cell_1:
+            pl: 'Model konfiguracji'
+            en: 'Configuration model'
+        -
+          cell_1:
             pl: Uwierzytelnianie
             en: Authentication
           cell_2:
-            pl: "Polecenie install"
-            en: "install command"
+            pl: 'Polecenie install'
+            en: 'install command'
           cell_3:
-            pl: "Tworzy schemat i konto techniczne."
-            en: "Creates the schema and technical account."
+            pl: 'Tworzy schemat i konto techniczne.'
+            en: 'Creates the schema and technical account.'
           cell_4:
             pl: cms.sqlite
             en: cms.sqlite
-  - id: 01a05ef2-2002-7403-8403-000000000003
+  -
+    id: 01a05ef2-2002-7403-8403-000000000003
     type: article-content
     enabled: true
     data:
@@ -284,9 +305,13 @@ blocks:
 
           Do not solve permission errors with `chmod -R 777`. The PHP user should write only where required. Runtime directories and allowed roots must not be symbolic links: the path resolver rejects arrangements that could allow an escape from a controlled directory.
       note:
-        pl: "Jeśli brakuje rozszerzenia, doinstaluj je dla dokładnie tej wersji PHP, której używa CLI i serwer, a następnie ponownie uruchom proces PHP-FPM."
-        en: "If an extension is missing, install it for the exact PHP version used by the CLI and web server, then restart the PHP-FPM process."
-  - id: 01a05ef2-2002-7404-8404-000000000004
+        pl: 'Jeśli brakuje rozszerzenia, doinstaluj je dla dokładnie tej wersji PHP, której używa CLI i serwer, a następnie ponownie uruchom proces PHP-FPM.'
+        en: 'If an extension is missing, install it for the exact PHP version used by the CLI and web server, then restart the PHP-FPM process.'
+      bookmarkDescription:
+        pl: Wymagania
+        en: Requirements
+  -
+    id: 01a05ef2-2002-7404-8404-000000000004
     type: article-content
     enabled: true
     data:
@@ -357,21 +382,25 @@ blocks:
 
           An environment variable does not override `site.url`, and YAML must not contain `APP_SECRET`, an SMTP password or other credentials. As a result, a copied content tree retains the site's public contract without carrying server secrets.
       note:
-        pl: "`composer.lock` jest częścią artefaktu wydania. Commituj go i instaluj dokładnie z niego zarówno lokalnie, jak i na serwerze."
-        en: "`composer.lock` is part of the release artifact. Commit it and install from it exactly, both locally and on the server."
-  - id: 01a05ef2-2002-7405-8405-000000000005
+        pl: '`composer.lock` jest częścią artefaktu wydania. Commituj go i instaluj dokładnie z niego zarówno lokalnie, jak i na serwerze.'
+        en: '`composer.lock` is part of the release artifact. Commit it and install from it exactly, both locally and on the server.'
+      bookmarkDescription:
+        pl: 'Instalacja kodu'
+        en: 'Code Installation'
+  -
+    id: 01a05ef2-2002-7405-8405-000000000005
     type: code-showcase
     enabled: true
     data:
       eyebrow:
-        pl: "Minimalne środowisko lokalne"
-        en: "Minimal local environment"
+        pl: 'Minimalne środowisko lokalne'
+        en: 'Minimal local environment'
       title:
-        pl: "Zacznij od jawnej, bezpiecznej konfiguracji."
-        en: "Start with explicit, safe configuration."
+        pl: 'Zacznij od jawnej, bezpiecznej konfiguracji.'
+        en: 'Start with explicit, safe configuration.'
       description:
-        pl: "Skopiuj wzorzec do `.env.local`, wygeneruj własny sekret i pozostaw plik poza repozytorium. Wartości poniżej służą do pracy lokalnej; produkcja wymaga HTTPS, bezpiecznego cookie i wyłączonego debugowania."
-        en: "Copy the template to `.env.local`, generate your own secret and keep the file out of the repository. These values are intended for local development; production requires HTTPS, a secure cookie and disabled debugging."
+        pl: 'Skopiuj wzorzec do `.env.local`, wygeneruj własny sekret i pozostaw plik poza repozytorium. Wartości poniżej służą do pracy lokalnej; produkcja wymaga HTTPS, bezpiecznego cookie i wyłączonego debugowania.'
+        en: 'Copy the template to `.env.local`, generate your own secret and keep the file out of the repository. These values are intended for local development; production requires HTTPS, a secure cookie and disabled debugging.'
       filename: .env.local
       code: |-
         APP_ENV=development
@@ -390,19 +419,24 @@ blocks:
         WEBAUTHN_RP_ID=localhost
         WEBAUTHN_RP_NAME="FlatFile CMS local"
       bullets:
-        - text:
-            pl: "APP_SECRET podpisuje dane bezpieczeństwa i musi być unikalny."
-            en: "APP_SECRET signs security data and must be unique."
-        - text:
-            pl: "Debug jest pomocny lokalnie, lecz zabroniony w produkcji."
-            en: "Debugging helps locally but is forbidden in production."
-        - text:
-            pl: "Cache JSON i serializowany można włączać niezależnie."
-            en: "JSON and serialized caches can be enabled independently."
-        - text:
-            pl: "RP ID to hostname bez protokołu, portu i ścieżki."
-            en: "The RP ID is a hostname without scheme, port or path."
-  - id: 01a05ef2-2002-7406-8406-000000000006
+        -
+          text:
+            pl: 'APP_SECRET podpisuje dane bezpieczeństwa i musi być unikalny.'
+            en: 'APP_SECRET signs security data and must be unique.'
+        -
+          text:
+            pl: 'Debug jest pomocny lokalnie, lecz zabroniony w produkcji.'
+            en: 'Debugging helps locally but is forbidden in production.'
+        -
+          text:
+            pl: 'Cache JSON i serializowany można włączać niezależnie.'
+            en: 'JSON and serialized caches can be enabled independently.'
+        -
+          text:
+            pl: 'RP ID to hostname bez protokołu, portu i ścieżki.'
+            en: 'The RP ID is a hostname without scheme, port or path.'
+  -
+    id: 01a05ef2-2002-7406-8406-000000000006
     type: article-content
     enabled: true
     data:
@@ -467,9 +501,13 @@ blocks:
 
           Do not add a trailing slash. When the production address changes, update `site.url`, not a nonexistent `APP_URL`. This address is used by canonical metadata and password-recovery email links, among other features.
       note:
-        pl: "YAML opisuje publiczny kontrakt witryny. Sekrety i dane dostępowe pozostają wyłącznie w środowisku wykonawczym."
+        pl: 'YAML opisuje publiczny kontrakt witryny. Sekrety i dane dostępowe pozostają wyłącznie w środowisku wykonawczym.'
         en: "YAML describes the site's public contract. Secrets and credentials remain exclusively in the runtime environment."
-  - id: 01a05ef2-2002-7407-8407-000000000007
+      bookmarkDescription:
+        pl: Środowisko
+        en: Environment
+  -
+    id: 01a05ef2-2002-7407-8407-000000000007
     type: article-content
     enabled: true
     data:
@@ -536,9 +574,13 @@ blocks:
 
           This command removes the selected user's WebAuthn credentials but does not change their password. Treat it as an account-recovery procedure, not a routine configuration switch.
       note:
-        pl: "Treść pozostaje w YAML. SQLite jest celowo ograniczony do administratorów i mechanizmów uwierzytelniania."
-        en: "Content stays in YAML. SQLite is deliberately limited to administrators and authentication mechanisms."
-  - id: 01a05ef2-2002-7408-8408-000000000008
+        pl: 'Treść pozostaje w YAML. SQLite jest celowo ograniczony do administratorów i mechanizmów uwierzytelniania.'
+        en: 'Content stays in YAML. SQLite is deliberately limited to administrators and authentication mechanisms.'
+      bookmarkDescription:
+        pl: 'Instalacja CMSa'
+        en: 'CMS Installation'
+  -
+    id: 01a05ef2-2002-7408-8408-000000000008
     type: article-content
     enabled: true
     data:
@@ -605,111 +647,123 @@ blocks:
 
           This checks the runtime and extensions, production guard, write permissions, configuration, all localized navigation, every page block, layouts, the SQLite schema and required deployment files. Every `[FAIL]` blocks the release; do not treat this command as an informational report.
       note:
-        pl: "Lokalny serwer PHP służy do developmentu. Produkcja powinna używać konfiguracji z `deploy/` i wskazywać dokument root wyłącznie na `public/`."
+        pl: 'Lokalny serwer PHP służy do developmentu. Produkcja powinna używać konfiguracji z `deploy/` i wskazywać dokument root wyłącznie na `public/`.'
         en: "PHP's built-in server is for development. Production should use a configuration from `deploy/` and point its document root exclusively at `public/`."
-  - id: 01a05ef2-2002-7409-8409-000000000009
+      bookmarkDescription:
+        pl: 'Serwer lokalny'
+        en: 'Local server'
+  -
+    id: 01a05ef2-2002-7409-8409-000000000009
     type: diagnostic-table
     enabled: true
     data:
       anchor: diagnostyka
       eyebrow:
-        pl: "12 / Diagnostyka"
-        en: "12 / Troubleshooting"
+        pl: '12 / Diagnostyka'
+        en: '12 / Troubleshooting'
       title:
-        pl: "Diagnozuj od najniższej warstwy."
-        en: "Troubleshoot from the lowest layer."
+        pl: 'Diagnozuj od najniższej warstwy.'
+        en: 'Troubleshoot from the lowest layer.'
       intro:
-        pl: "Zacznij od warstwy wykonawczej i przechodź wyżej dopiero po jej potwierdzeniu. Objaw widoczny w przeglądarce często ma źródło w PHP, rozszerzeniu albo prawach systemu plików, zanim żądanie dotrze do routera CMS-a."
-        en: "Start at the runtime layer and move upward only after confirming it. A browser-visible symptom often originates in PHP, an extension or filesystem permissions before the request reaches the CMS router."
+        pl: 'Zacznij od warstwy wykonawczej i przechodź wyżej dopiero po jej potwierdzeniu. Objaw widoczny w przeglądarce często ma źródło w PHP, rozszerzeniu albo prawach systemu plików, zanim żądanie dotrze do routera CMS-a.'
+        en: 'Start at the runtime layer and move upward only after confirming it. A browser-visible symptom often originates in PHP, an extension or filesystem permissions before the request reaches the CMS router.'
       rows:
-        - layer:
+        -
+          layer:
             pl: Composer
             en: Composer
           problem:
-            pl: "Brak pliku vendor/autoload.php"
-            en: "vendor/autoload.php is missing"
+            pl: 'Brak pliku vendor/autoload.php'
+            en: 'vendor/autoload.php is missing'
           cause:
-            pl: "Nie wykonano instalacji zależności albo polecenie uruchomiono poza katalogiem głównym projektu."
-            en: "Dependencies were not installed, or the command was run outside the project root."
+            pl: 'Nie wykonano instalacji zależności albo polecenie uruchomiono poza katalogiem głównym projektu.'
+            en: 'Dependencies were not installed, or the command was run outside the project root.'
           check:
-            pl: "Przejdź do katalogu zawierającego `composer.lock`, wykonaj `composer install` i sprawdź, czy powstał plik `vendor/autoload.php`."
-            en: "Enter the directory containing `composer.lock`, run `composer install` and confirm that `vendor/autoload.php` was created."
-        - layer:
+            pl: 'Przejdź do katalogu zawierającego `composer.lock`, wykonaj `composer install` i sprawdź, czy powstał plik `vendor/autoload.php`.'
+            en: 'Enter the directory containing `composer.lock`, run `composer install` and confirm that `vendor/autoload.php` was created.'
+        -
+          layer:
             pl: PHP
             en: PHP
           problem:
-            pl: "Brak klasy albo błąd składni po wdrożeniu"
-            en: "Missing class or syntax error after deployment"
+            pl: 'Brak klasy albo błąd składni po wdrożeniu'
+            en: 'Missing class or syntax error after deployment'
           cause:
-            pl: "Serwer korzysta z nieobsługiwanej wersji PHP albo checkout i katalog vendor pochodzą z różnych wydań."
-            en: "The server uses an unsupported PHP version, or the checkout and vendor directory come from different releases."
+            pl: 'Serwer korzysta z nieobsługiwanej wersji PHP albo checkout i katalog vendor pochodzą z różnych wydań.'
+            en: 'The server uses an unsupported PHP version, or the checkout and vendor directory come from different releases.'
           check:
-            pl: "Porównaj `php -v` dla CLI z wersją PHP-FPM. Następnie wykonaj `composer install` z aktualnego lockfile i uruchom `composer check`."
-            en: "Compare CLI `php -v` with the PHP-FPM version. Then run `composer install` from the current lockfile and execute `composer check`."
-        - layer:
+            pl: 'Porównaj `php -v` dla CLI z wersją PHP-FPM. Następnie wykonaj `composer install` z aktualnego lockfile i uruchom `composer check`.'
+            en: 'Compare CLI `php -v` with the PHP-FPM version. Then run `composer install` from the current lockfile and execute `composer check`.'
+        -
+          layer:
             pl: SQLite
             en: SQLite
           problem:
-            pl: "Komunikat „could not find driver”"
-            en: "“could not find driver” message"
+            pl: 'Komunikat „could not find driver”'
+            en: '“could not find driver” message'
           cause:
-            pl: "PDO jest dostępne, ale bieżący runtime nie ma załadowanego sterownika pdo_sqlite."
-            en: "PDO is available, but the current runtime has not loaded the pdo_sqlite driver."
+            pl: 'PDO jest dostępne, ale bieżący runtime nie ma załadowanego sterownika pdo_sqlite.'
+            en: 'PDO is available, but the current runtime has not loaded the pdo_sqlite driver.'
           check:
-            pl: "Wykonaj `php --ini` i `php -m`. Sprawdź osobno plik konfiguracyjny procesu PHP-FPM, ponieważ CLI może używać innego `php.ini`."
-            en: "Run `php --ini` and `php -m`. Inspect the PHP-FPM configuration separately because the CLI may use a different `php.ini`."
-        - layer:
+            pl: 'Wykonaj `php --ini` i `php -m`. Sprawdź osobno plik konfiguracyjny procesu PHP-FPM, ponieważ CLI może używać innego `php.ini`.'
+            en: 'Run `php --ini` and `php -m`. Inspect the PHP-FPM configuration separately because the CLI may use a different `php.ini`.'
+        -
+          layer:
             pl: Filesystem
             en: Filesystem
           problem:
-            pl: "Nie można utworzyć SQLite, sesji lub cache"
-            en: "SQLite, a session or cache cannot be created"
+            pl: 'Nie można utworzyć SQLite, sesji lub cache'
+            en: 'SQLite, a session or cache cannot be created'
           cause:
-            pl: "Proces PHP nie ma prawa zapisu, katalog ma niewłaściwego właściciela albo jest niedozwolonym dowiązaniem symbolicznym."
-            en: "The PHP process lacks write permission, the directory has the wrong owner or it is a forbidden symbolic link."
+            pl: 'Proces PHP nie ma prawa zapisu, katalog ma niewłaściwego właściciela albo jest niedozwolonym dowiązaniem symbolicznym.'
+            en: 'The PHP process lacks write permission, the directory has the wrong owner or it is a forbidden symbolic link.'
           check:
-            pl: "Sprawdź wyłącznie właściwy podkatalog `storage/`, jego właściciela i ścieżkę rzeczywistą. Nie ustawiaj rekursywnie uprawnień `777` dla projektu."
-            en: "Check only the relevant `storage/` subdirectory, its owner and real path. Do not recursively assign `777` permissions to the project."
-        - layer:
+            pl: 'Sprawdź wyłącznie właściwy podkatalog `storage/`, jego właściciela i ścieżkę rzeczywistą. Nie ustawiaj rekursywnie uprawnień `777` dla projektu.'
+            en: 'Check only the relevant `storage/` subdirectory, its owner and real path. Do not recursively assign `777` permissions to the project.'
+        -
+          layer:
             pl: Environment
             en: Environment
           problem:
-            pl: "Aplikacja produkcyjna odmawia startu"
-            en: "The production application refuses to start"
+            pl: 'Aplikacja produkcyjna odmawia startu'
+            en: 'The production application refuses to start'
           cause:
-            pl: "ProductionGuard wykrył debugowanie, słaby lub przykładowy sekret albo niezabezpieczone cookie administratora."
-            en: "ProductionGuard detected debugging, a weak or example secret, or an insecure administrator cookie."
+            pl: 'ProductionGuard wykrył debugowanie, słaby lub przykładowy sekret albo niezabezpieczone cookie administratora.'
+            en: 'ProductionGuard detected debugging, a weak or example secret, or an insecure administrator cookie.'
           check:
-            pl: "Ustaw `APP_DEBUG=0`, silny `APP_SECRET` i `SESSION_COOKIE_SECURE=1`. Napraw konfigurację środowiska zamiast omijać strażnika w kodzie."
-            en: "Set `APP_DEBUG=0`, a strong `APP_SECRET` and `SESSION_COOKIE_SECURE=1`. Fix the environment instead of bypassing the guard in code."
-        - layer:
+            pl: 'Ustaw `APP_DEBUG=0`, silny `APP_SECRET` i `SESSION_COOKIE_SECURE=1`. Napraw konfigurację środowiska zamiast omijać strażnika w kodzie.'
+            en: 'Set `APP_DEBUG=0`, a strong `APP_SECRET` and `SESSION_COOKIE_SECURE=1`. Fix the environment instead of bypassing the guard in code.'
+        -
+          layer:
             pl: Routing
             en: Routing
           problem:
-            pl: "Istniejąca strona zwraca HTTP 404"
-            en: "An existing page returns HTTP 404"
+            pl: 'Istniejąca strona zwraca HTTP 404'
+            en: 'An existing page returns HTTP 404'
           cause:
-            pl: "Strona jest wyłączona, slug nie odpowiada locale, brakuje prefiksu języka albo publiczny URL pomylono z tożsamością katalogu."
-            en: "The page is disabled, its slug does not match the locale, the language prefix is missing or the public URL was confused with directory identity."
+            pl: 'Strona jest wyłączona, slug nie odpowiada locale, brakuje prefiksu języka albo publiczny URL pomylono z tożsamością katalogu.'
+            en: 'The page is disabled, its slug does not match the locale, the language prefix is missing or the public URL was confused with directory identity.'
           check:
-            pl: "Sprawdź `enabled`, lokalizowany `slug`, `config/languages.yml` i adres z `/pl/` albo `/en/`. W razie potrzeby wykonaj `php bin/cms cache:clear`."
-            en: "Check `enabled`, the localized `slug`, `config/languages.yml` and the `/pl/` or `/en/` URL. Run `php bin/cms cache:clear` if necessary."
-        - layer:
+            pl: 'Sprawdź `enabled`, lokalizowany `slug`, `config/languages.yml` i adres z `/pl/` albo `/en/`. W razie potrzeby wykonaj `php bin/cms cache:clear`.'
+            en: 'Check `enabled`, the localized `slug`, `config/languages.yml` and the `/pl/` or `/en/` URL. Run `php bin/cms cache:clear` if necessary.'
+        -
+          layer:
             pl: Współbieżność
             en: Concurrency
           problem:
-            pl: "Formularz zapisu zwraca HTTP 409"
-            en: "A save form returns HTTP 409"
+            pl: 'Formularz zapisu zwraca HTTP 409'
+            en: 'A save form returns HTTP 409'
           cause:
-            pl: "Od otwarcia formularza inny zapis utworzył nowszą rewizję SHA-256 dokumentu YAML."
-            en: "Another write created a newer SHA-256 revision of the YAML document after the form was opened."
+            pl: 'Od otwarcia formularza inny zapis utworzył nowszą rewizję SHA-256 dokumentu YAML.'
+            en: 'Another write created a newer SHA-256 revision of the YAML document after the form was opened.'
           check:
-            pl: "Odśwież edytor, przenieś własne zmiany na aktualną treść i zapisz ponownie. Konflikt chroni nowszą wersję przed nadpisaniem."
-            en: "Refresh the editor, reapply your changes to the current content and save again. The conflict protects the newer version from being overwritten."
+            pl: 'Odśwież edytor, przenieś własne zmiany na aktualną treść i zapisz ponownie. Konflikt chroni nowszą wersję przed nadpisaniem.'
+            en: 'Refresh the editor, reapply your changes to the current content and save again. The conflict protects the newer version from being overwritten.'
       note:
-        pl: "Najpierw runtime, potem zależności, konfiguracja, baza i dopiero routing. Taka kolejność zwykle wskazuje rzeczywistą przyczynę bez zgadywania."
-        en: "Check the runtime first, then dependencies, configuration, database and finally routing. This order usually reveals the real cause without guesswork."
-  - id: 01a05ef2-2002-7411-8411-000000000011
+        pl: 'Najpierw runtime, potem zależności, konfiguracja, baza i dopiero routing. Taka kolejność zwykle wskazuje rzeczywistą przyczynę bez zgadywania.'
+        en: 'Check the runtime first, then dependencies, configuration, database and finally routing. This order usually reveals the real cause without guesswork.'
+  -
+    id: 01a05ef2-2002-7411-8411-000000000011
     type: article-content
     enabled: true
     data:
@@ -746,24 +800,28 @@ blocks:
 
           The next tutorial moves from using ready-made components to creating a custom block: its `block.yml` schema, PHP renderer, translatable fields, repeaters, validation and assets loaded only when the block appears on a page.
       note:
-        pl: "Traktuj tę listę jako warunek zakończenia instalacji, a nie tylko zestaw opcjonalnych testów."
-        en: "Treat this list as the installation completion condition, not merely a set of optional tests."
-  - id: 01a05ef2-2002-7410-8410-000000000010
+        pl: 'Traktuj tę listę jako warunek zakończenia instalacji, a nie tylko zestaw opcjonalnych testów.'
+        en: 'Treat this list as the installation completion condition, not merely a set of optional tests.'
+      bookmarkDescription:
+        pl: Diagnostyka
+        en: Troubleshooting
+  -
+    id: 01a05ef2-2002-7410-8410-000000000010
     type: call-to-action
     enabled: true
     data:
       eyebrow:
-        pl: "Kod źródłowy"
-        en: "Source code"
+        pl: 'Kod źródłowy'
+        en: 'Source code'
       title:
-        pl: "Masz działające środowisko. Teraz poznaj jego kontrakty."
-        en: "Your environment works. Now learn its contracts."
+        pl: 'Masz działające środowisko. Teraz poznaj jego kontrakty.'
+        en: 'Your environment works. Now learn its contracts.'
       description:
-        pl: "Zachowaj ten tutorial jako checklistę instalacji, a następnie przejdź do repozytorium i porównuj każdy kolejny rozdział z rzeczywistym kodem frameworka."
+        pl: 'Zachowaj ten tutorial jako checklistę instalacji, a następnie przejdź do repozytorium i porównuj każdy kolejny rozdział z rzeczywistym kodem frameworka.'
         en: "Keep this tutorial as your installation checklist, then open the repository and compare every following chapter with the framework's actual code."
       button_label:
-        pl: "Otwórz repozytorium"
-        en: "Open the repository"
+        pl: 'Otwórz repozytorium'
+        en: 'Open the repository'
       button_url:
-        pl: "https://github.com/mwojczewski/FlatFileCMS"
-        en: "https://github.com/mwojczewski/FlatFileCMS"
+        pl: 'https://github.com/mwojczewski/FlatFileCMS'
+        en: 'https://github.com/mwojczewski/FlatFileCMS'

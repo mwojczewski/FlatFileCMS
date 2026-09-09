@@ -10,23 +10,7 @@ use FlatFileCms\Http\Response;
 
 final readonly class AdminLayout
 {
-    private const string ASSET_VERSION = '18.0.0';
-
-    private const array ADMIN_STYLESHEETS = [
-        '/assets/admin/admin-root.css',
-        '/assets/admin/admin-analytics.css',
-        '/assets/admin/admin-pages.css',
-        '/assets/admin/admin-builder.css',
-        '/assets/admin/admin-core.css',
-        '/assets/admin/admin-shell.css',
-        '/assets/admin/admin-navigation.css',
-        '/assets/admin/admin-settings.css',
-        '/assets/admin/admin-forms.css',
-        '/assets/admin/admin-tree.css',
-        '/assets/admin/admin-system.css',
-        '/assets/admin/admin-account.css',
-        '/assets/admin/admin-auth.css',
-    ];
+    private const string ASSET_VERSION = '13.1.0';
 
     public function __construct(
         private Authenticator $authenticator,
@@ -73,8 +57,6 @@ final readonly class AdminLayout
             'content' => $content,
             'active' => $active,
             'email' => $user?->email() ?? '',
-            'displayName' => $user?->displayName() ?? '',
-            'accountInitials' => $user?->initials() ?? '',
             'csrfToken' => $this->csrf->token(),
         ]);
 
@@ -82,7 +64,7 @@ final readonly class AdminLayout
             $this->views->render('layout/document', [
                 'title' => $title,
                 'csrfToken' => $this->csrf->token(),
-                'styles' => $styles . $this->stylesheets(self::ADMIN_STYLESHEETS),
+                'styles' => $styles . $this->stylesheet('/assets/admin/admin.css'),
                 'scripts' => $this->script('/assets/admin/admin.js') . $scripts,
                 'bodyClass' => $authenticated ? 'admin-body' : 'auth-body',
                 'body' => $body,
@@ -104,13 +86,7 @@ final readonly class AdminLayout
 
     private function stylesheet(string $path): string
     {
-        return "<link rel=\"stylesheet\" href=\"{$path}?v=" . self::ASSET_VERSION . "\">\n";
-    }
-
-    /** @param list<string> $paths */
-    private function stylesheets(array $paths): string
-    {
-        return implode('', array_map($this->stylesheet(...), $paths));
+        return "<link rel=\"stylesheet\" href=\"{$path}?v=" . self::ASSET_VERSION . "\">";
     }
 
     private function script(string $path): string

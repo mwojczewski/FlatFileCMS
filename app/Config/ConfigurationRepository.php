@@ -79,13 +79,6 @@ final readonly class ConfigurationRepository
             if (preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/D', $layout) !== 1) {
                 throw new InvalidArgumentException('Default layout name is invalid.');
             }
-            $icons = ContentData::map($site['icons'] ?? [], 'site.icons');
-            foreach ($icons as $name => $href) {
-                if (!\in_array($name, ['svg', 'ico', 'png32', 'png16', 'appleTouch', 'appleTouchPrecomposed', 'manifest'], true)) {
-                    throw new InvalidArgumentException("Unknown site icon {$name}.");
-                }
-                $this->iconHref($href, "site.icons.{$name}");
-            }
 
             ContentData::map($data['media'] ?? [], 'media');
             $seo = ContentData::map($data['seo'] ?? [], 'seo');
@@ -131,22 +124,5 @@ final readonly class ConfigurationRepository
         }
 
         return $result;
-    }
-
-    private function iconHref(mixed $value, string $path): void
-    {
-        $href = ContentData::string($value, $path);
-        if ($href === '' || preg_match('/[\x00-\x20\x7F"\'<>]/', $href) === 1) {
-            throw new InvalidArgumentException("{$path} is invalid.");
-        }
-        if (str_starts_with($href, '/') && !str_starts_with($href, '//')) {
-            return;
-        }
-        if (
-            filter_var($href, FILTER_VALIDATE_URL) === false
-            || !\in_array(parse_url($href, PHP_URL_SCHEME), ['http', 'https'], true)
-        ) {
-            throw new InvalidArgumentException("{$path} must be a root-relative path or an HTTP(S) URL.");
-        }
     }
 }

@@ -19,6 +19,7 @@ use FlatFileCms\Config\LanguageRepository;
 use FlatFileCms\Content\PageRepository;
 use FlatFileCms\Domain\Localization\LocalizedDataResolver;
 use FlatFileCms\Http\HtmlResponseFactory;
+use FlatFileCms\Http\PublicHtmlCache;
 use FlatFileCms\Infrastructure\Filesystem\AtomicFileWriter;
 use FlatFileCms\Infrastructure\Filesystem\FileLockManager;
 use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
@@ -147,6 +148,7 @@ final class TestContentFactory
                 $partials,
             ),
             new HtmlResponseFactory(),
+            new PublicHtmlCache($paths, false, 'test', 'flatfile_cms_session'),
         );
     }
 }

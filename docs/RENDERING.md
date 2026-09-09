@@ -34,6 +34,13 @@ selects a layout by its safe registry name, for example `layout: default`; a
 filesystem path can never come from content. Partials follow the same rule in
 `templates/partials/` and are rendered with:
 
+Layouts render only their layout-specific body and optional additions to the
+document head. Every public layout delegates the outer document to
+`templates/document.php`, which owns the doctype, language attribute, shared
+head partial, body element, block scripts and optional Cloudflare Web Analytics
+beacon. Keeping it outside `templates/layouts/` prevents the document shell
+from being discovered as a selectable page layout.
+
 ```php
 <?= $context->partial('navigation', ['menus' => $navigation]) ?>
 ```

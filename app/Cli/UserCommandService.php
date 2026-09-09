@@ -24,26 +24,21 @@ final readonly class UserCommandService
         private AuditLogger $audit,
     ) {}
 
-    public function install(string $email, string $password, string $firstName = '', string $lastName = ''): void
+    public function install(string $email, string $password): void
     {
         $this->schema->install();
         if ($this->users->count() !== 0) {
             throw new RuntimeException('CMS already contains users.');
         }
-        $this->create($email, $password, Role::Superadmin, $firstName, $lastName);
+        $this->create($email, $password, Role::Superadmin);
     }
 
-    public function create(
-        string $email,
-        string $password,
-        Role $role = Role::Admin,
-        string $firstName = '',
-        string $lastName = '',
-    ): void {
+    public function create(string $email, string $password, Role $role = Role::Admin): void
+    {
         $this->schema->install();
         $this->policy->validate($password);
-        $user = $this->users->create($email, $this->hasher->hash($password), $role, $firstName, $lastName);
-        $this->audit->log('user.created', null, "users/{$user->publicId()}", 'cli', ['role' => $role->value]);
+        $user = $this->users->create($email, $this->hasher->hash($password), $role);
+        $this->audit->log('user.created', null, "users/{$user->id()}", 'cli', ['role' => $role->value]);
     }
 
     public function changePassword(string $email, string $password): void

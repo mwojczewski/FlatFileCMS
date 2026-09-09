@@ -27,7 +27,6 @@ final readonly class Collection
         private string $sortDirection,
         private int $perPage,
         private array $filters,
-        private int $order,
         private FileRevision $revision,
         private int $modifiedAt,
     ) {}
@@ -82,11 +81,6 @@ final readonly class Collection
     public function filters(): array
     {
         return $this->filters;
-    }
-
-    public function order(): int
-    {
-        return $this->order;
     }
 
     public function revision(): FileRevision

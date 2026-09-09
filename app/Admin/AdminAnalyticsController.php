@@ -7,9 +7,6 @@ namespace FlatFileCms\Admin;
 use FlatFileCms\Analytics\CloudflareAnalyticsService;
 use FlatFileCms\Auth\AuthenticationException;
 use FlatFileCms\Auth\Authenticator;
-use FlatFileCms\Collections\CollectionRepository;
-use FlatFileCms\Config\LanguageRepository;
-use FlatFileCms\Content\PageRepository;
 use FlatFileCms\Http\HttpException;
 use FlatFileCms\Http\Request;
 use FlatFileCms\Http\Response;
@@ -19,9 +16,6 @@ final readonly class AdminAnalyticsController
     public function __construct(
         private Authenticator $authenticator,
         private CloudflareAnalyticsService $analytics,
-        private LanguageRepository $languages,
-        private PageRepository $pages,
-        private CollectionRepository $collections,
         private AdminView $views,
         private AdminLayout $layout,
     ) {}
@@ -33,22 +27,10 @@ final readonly class AdminAnalyticsController
         }
         $range = $this->range($request);
         $data = $this->analytics->dashboard($range);
-        $languages = $this->languages->get();
-        $pages = $this->pages->all($languages);
-        $collections = $this->collections->all($languages);
 
         return $this->layout->render(
-            'Pulpit',
-            $this->views->render('dashboard', [
-                'analytics' => $data,
-                'contentSummary' => [
-                    'pages' => \count($pages),
-                    'collections' => \count($collections),
-                    'published' => \count(array_filter($pages, static fn($page): bool => $page->enabled()))
-                        + \count(array_filter($collections, static fn($collection): bool => $collection->enabled())),
-                    'languages' => \count($languages->codes()),
-                ],
-            ]),
+            'Analityka',
+            $this->views->render('dashboard', ['analytics' => $data]),
             active: 'dashboard',
         );
     }

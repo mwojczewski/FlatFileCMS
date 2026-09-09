@@ -23,6 +23,7 @@
     550 0.58rem ui-monospace,
     monospace;
   letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 .article-content article {
   color: #33443e;

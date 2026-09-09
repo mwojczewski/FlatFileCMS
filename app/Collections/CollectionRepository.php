@@ -144,7 +144,6 @@ final readonly class CollectionRepository
                 $sortDirection,
                 $perPage,
                 $this->filters($data['filters'] ?? []),
-                isset($data['order']) ? ContentData::integer($data['order'], 'order') : 0,
                 $revision,
                 $modifiedAt,
             );

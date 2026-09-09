@@ -9,7 +9,6 @@ final readonly class GlobalConfigurationInput
     /**
      * @param array<string, string> $titleSuffix
      * @param array<string, string> $description
-     * @param array<string, string> $siteIcons
      * @param array<string, mixed> $openGraph
      * @param array<string, mixed> $twitter
      * @param array<mixed> $jsonLd
@@ -20,7 +19,6 @@ final readonly class GlobalConfigurationInput
         public string $siteName,
         public string $siteUrl,
         public string $defaultLayout,
-        public array $siteIcons,
         public array $titleSuffix,
         public array $description,
         public ?string $ogImage,

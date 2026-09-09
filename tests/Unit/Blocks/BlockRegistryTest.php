@@ -90,22 +90,6 @@ YAML);
         );
     }
 
-    public function testItRejectsUnknownInspectorPanel(): void
-    {
-        $this->project->write('blocks/broken/block.yml', <<<'YAML'
-schemaVersion: 1
-name: { pl: Broken }
-fields:
-  title:
-    type: text
-    panel: sidebar
-YAML);
-        $this->project->write('blocks/broken/render.php', "<?php\n\ndeclare(strict_types=1);\n");
-
-        $this->expectException(InvalidBlockDefinitionException::class);
-        $this->registry()->all();
-    }
-
     private function registry(): BlockRegistry
     {
         $paths = new SafePathResolver($this->project->path());

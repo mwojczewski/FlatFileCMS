@@ -14,27 +14,14 @@ final readonly class AdminUserManager
         private PasswordHasher $passwords,
     ) {}
 
-    public function create(
-        User $actor,
-        string $email,
-        string $password,
-        string $confirmation,
-        string $firstName = '',
-        string $lastName = '',
-    ): User {
-        $this->validateProfile($firstName, $lastName);
+    public function create(User $actor, string $email, string $password, string $confirmation): User
+    {
         if ($password !== $confirmation) {
             throw new InvalidArgumentException('Password confirmation does not match.');
         }
         $this->passwordPolicy->validate($password);
 
-        return $this->users->create(
-            $email,
-            $this->passwords->hash($password),
-            Role::Admin,
-            $firstName,
-            $lastName,
-        );
+        return $this->users->create($email, $this->passwords->hash($password), Role::Admin);
     }
 
     public function update(
@@ -44,17 +31,12 @@ final readonly class AdminUserManager
         bool $enabled,
         string $password,
         string $confirmation,
-        ?string $firstName = null,
-        ?string $lastName = null,
     ): User {
         $user = $this->adminVisibleTo($id, $actor);
-        if ($user->id() === $actor->id()) {
-            throw new InvalidArgumentException('Własnym kontem możesz zarządzać wyłącznie w sekcji Konto.');
+        if ($user->id() === $actor->id() && !$enabled) {
+            throw new InvalidArgumentException('You cannot disable your own account.');
         }
-        if ($firstName !== null && $lastName !== null) {
-            $this->validateProfile($firstName, $lastName);
-        }
-        $this->users->update($user, $email, $enabled, $firstName, $lastName);
+        $this->users->update($user, $email, $enabled);
         if ($password !== '' || $confirmation !== '') {
             if ($password !== $confirmation) {
                 throw new InvalidArgumentException('Password confirmation does not match.');
@@ -83,12 +65,5 @@ final readonly class AdminUserManager
         }
 
         return $user;
-    }
-
-    private function validateProfile(string $firstName, string $lastName): void
-    {
-        if (trim($firstName) === '' || trim($lastName) === '') {
-            throw new InvalidArgumentException('First name and last name are required.');
-        }
     }
 }

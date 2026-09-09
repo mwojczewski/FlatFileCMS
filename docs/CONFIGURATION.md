@@ -42,10 +42,32 @@ fallback. Both switches belong to the environment because the useful choice
 depends on the server and deployment mode and because reading `setup.yml`
 itself uses these caches.
 
+`PUBLIC_HTML_CACHE_ENABLED` enables the full-page cache for anonymous public
+HTML requests. It never applies to administration, API, media, redirects,
+errors, non-GET requests or requests carrying the configured administrator
+session cookie. Cache keys include the resolved locale, public content path,
+canonical query parameters, content generation and `APP_RELEASE`.
+
+`APP_RELEASE` must change with every deployment that can affect rendered
+output, for example to the deployed Git commit SHA or build identifier. This
+immediately moves all requests to a new cache namespace, covering changes to
+PHP code, templates, block definitions and frontend assets. Successful CMS
+writes to pages or configuration rotate the shared content generation and
+therefore invalidate every locale atomically. Set
+`PUBLIC_HTML_CACHE_ENABLED=0` to bypass both reads and writes. The cache is
+disabled when the switch is absent; enabling it makes `APP_RELEASE` required.
+
 `MAIL_TRANSPORT` currently accepts only `smtp`. `MAIL_ENCRYPTION` accepts
 `none`, `starttls` or `smtps`; production deployments should use the mode
 required by their provider and keep SMTP credentials exclusively in the
 environment. `MAIL_FROM_ADDRESS` is required when password recovery is used.
+
+`CLOUDFLARE_BEACON_TOKEN` optionally enables the public Cloudflare Web
+Analytics beacon. When non-empty, the shared public HTML document template
+adds Cloudflare's module script immediately before `</body>` and safely embeds
+the configured token in `data-cf-beacon`. It is a public site tag, not the
+private `CLOUDFLARE_API_TOKEN` used by the administrator analytics dashboard.
+Changing the beacon token also changes the public HTML cache namespace.
 
 ## `config/setup.yml`
 
@@ -60,7 +82,6 @@ the admin application.
 | Upload policy | `media.maxUploadBytes`, `media.allowedMimeTypes`, `media.stripMetadata` |
 | Media transforms | `media.transformations.enabled`, `quality`, `maxWidth`, `maxHeight`, `maxPixels`, `media.formats` |
 | Generated media cache | `media.cache.enabled` |
-| Browser and device icons | `site.icons.svg`, `ico`, `png32`, `png16`, `appleTouch`, `appleTouchPrecomposed`, `manifest` |
 
 `site.url` is the sole canonical site URL. There is no `APP_URL` environment
 override. Media processing has no environment override either; copying the

@@ -22,12 +22,6 @@ user creation, password recovery, media upload/deletion, navigation writes and
 global configuration writes are also recorded. Authentication failures
 intentionally omit secrets and submitted passwords.
 
-Failed panel sign-ins include a normalized reason (`unknown_email`,
-`invalid_password`, `account_disabled` or `invalid_second_factor`). They are
-also written as warnings to the application log visible in the admin log view.
-The submitted password, WebAuthn response, challenge and credential material
-are never logged.
-
 Retention, archival and off-host collection remain deployment policy. Operators
 may ship completed daily files after midnight, but must never expose
 `storage/audit/` through the web server. Deleting audit files is intentionally
