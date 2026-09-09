@@ -25,6 +25,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Authenticator::class)]
 #[CoversClass(PasswordChanger::class)]
 #[CoversClass(UserRepository::class)]
+#[CoversClass(User::class)]
 final class AuthenticationTest extends TestCase
 {
     private TemporaryProject $project;
@@ -135,12 +136,76 @@ final class AuthenticationTest extends TestCase
         $actor = $users->create('actor@example.test', $hasher->hash('Valid!Password1'), Role::Admin);
         $manager = new AdminUserManager($users, new PasswordPolicy(), $hasher);
 
-        $created = $manager->create($actor, 'new@example.test', 'Valid!Password2', 'Valid!Password2');
-        $updated = $manager->update($actor, $created->id(), 'edited@example.test', false, '', '');
+        $created = $manager->create(
+            $actor,
+            'new@example.test',
+            'Valid!Password2',
+            'Valid!Password2',
+            'Anna',
+            'Nowak',
+        );
+        $updated = $manager->update(
+            $actor,
+            $created->id(),
+            'edited@example.test',
+            false,
+            '',
+            '',
+            'Anna Maria',
+            'Kowalska',
+        );
 
         self::assertSame(Role::Admin, $created->role());
+        self::assertSame('Anna Nowak', $created->displayName());
+        self::assertMatchesRegularExpression('/^[0-9a-f-]{36}$/', $created->publicId());
         self::assertSame('edited@example.test', $updated->email());
+        self::assertSame('Anna Maria Kowalska', $updated->displayName());
+        self::assertSame('AK', $updated->initials());
         self::assertFalse($updated->enabled());
+    }
+
+    public function testUserProfileIsRequiredForPanelManagedAccounts(): void
+    {
+        [$users] = $this->repositories();
+        $hasher = new PasswordHasher();
+        $actor = $users->create('actor@example.test', $hasher->hash('Valid!Password1'), Role::Admin);
+        $manager = new AdminUserManager($users, new PasswordPolicy(), $hasher);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $manager->create($actor, 'new@example.test', 'Valid!Password2', 'Valid!Password2');
+    }
+
+    public function testSchemaInstallerAddsProfileColumnsToExistingDatabase(): void
+    {
+        $database = (new Database($this->project->path('storage/database/legacy.sqlite')))->connection();
+        $database->exec(<<<'SQL'
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL COLLATE NOCASE UNIQUE,
+    password_hash TEXT NOT NULL,
+    role TEXT NOT NULL,
+    enabled INTEGER NOT NULL DEFAULT 1,
+    webauthn_user_handle BLOB NOT NULL UNIQUE,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    password_changed_at TEXT NOT NULL
+)
+SQL);
+        $database->prepare(<<<'SQL'
+INSERT INTO users (email, password_hash, role, enabled, webauthn_user_handle, created_at, updated_at, password_changed_at)
+VALUES ('legacy@example.test', 'hash', 'ROLE_ADMIN', 1, :handle, 'now', 'now', 'now')
+SQL)->execute(['handle' => random_bytes(32)]);
+
+        (new SchemaInstaller($database))->install();
+        $user = (new UserRepository($database))->findByEmail('legacy@example.test');
+
+        self::assertNotNull($user);
+        self::assertSame('', $user->firstName());
+        self::assertSame('', $user->lastName());
+        self::assertSame('legacy@example.test', $user->displayName());
+        self::assertSame('L', $user->initials());
+        self::assertMatchesRegularExpression('/^[0-9a-f-]{36}$/', $user->publicId());
+        self::assertSame($user->id(), (new UserRepository($database))->getByPublicId($user->publicId())->id());
     }
 
     public function testAdminUserManagerCannotDeleteSelfOrTechnicalSuperadmin(): void

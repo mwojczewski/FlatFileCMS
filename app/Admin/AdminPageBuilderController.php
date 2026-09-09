@@ -12,11 +12,15 @@ use FlatFileCms\Auth\User;
 use FlatFileCms\Blocks\BlockDefinition;
 use FlatFileCms\Blocks\BlockRegistry;
 use FlatFileCms\Blocks\BlockValidationException;
+use FlatFileCms\Blocks\BlockValidator;
 use FlatFileCms\Blocks\InvalidBlockDefinitionException;
 use FlatFileCms\Blocks\ValidationError;
+use FlatFileCms\Collections\CollectionRepository;
 use FlatFileCms\Config\LanguageRepository;
 use FlatFileCms\Content\InvalidContentException;
 use FlatFileCms\Content\PageBlockManager;
+use FlatFileCms\Content\PageRepository;
+use FlatFileCms\Content\PageRouteIndex;
 use FlatFileCms\Domain\Content\PageIdentity;
 use FlatFileCms\Domain\Localization\LanguageConfig;
 use FlatFileCms\Http\HttpException;
@@ -25,6 +29,13 @@ use FlatFileCms\Http\Response;
 use FlatFileCms\Infrastructure\Filesystem\FileRevision;
 use FlatFileCms\Infrastructure\Filesystem\FilesystemException;
 use FlatFileCms\Infrastructure\Filesystem\RevisionConflictException;
+use FlatFileCms\Media\MediaRepository;
+use FlatFileCms\Media\MediaUrlGenerator;
+use FlatFileCms\Rendering\AssetCollector;
+use FlatFileCms\Rendering\BlockRenderer;
+use FlatFileCms\Rendering\MarkdownRenderer;
+use FlatFileCms\Rendering\PartialRenderer;
+use FlatFileCms\Rendering\RenderContext;
 use FlatFileCms\Support\ContentData;
 use InvalidArgumentException;
 
@@ -34,10 +45,19 @@ final readonly class AdminPageBuilderController
         private Authenticator $authenticator,
         private CsrfTokenManager $csrf,
         private LanguageRepository $languages,
+        private PageRepository $pages,
+        private CollectionRepository $collections,
         private PageBlockManager $manager,
         private BlockRegistry $registry,
+        private BlockValidator $validator,
         private BlockFormDataMapper $dataMapper,
         private BlockFormRenderer $forms,
+        private BlockRenderer $renderer,
+        private AssetCollector $assets,
+        private MarkdownRenderer $markdown,
+        private PartialRenderer $partials,
+        private MediaRepository $media,
+        private MediaUrlGenerator $mediaUrls,
         private AdminView $views,
         private AdminLayout $layout,
         private AuditLogger $audit,
@@ -53,8 +73,16 @@ final readonly class AdminPageBuilderController
         } catch (InvalidArgumentException | InvalidContentException | FilesystemException $exception) {
             throw new HttpException(404, 'PAGE_NOT_FOUND', 'Page not found.', previous: $exception);
         }
-        $viewBlocks = [];
         $languages = $this->languages->get();
+        $routeIndex = PageRouteIndex::build(
+            $this->pages->all($languages),
+            $languages,
+            $this->collections->all($languages),
+        );
+        $localizedPath = $routeIndex->pathFor($identity, $languages->default());
+        $localePrefix = $languages->isMultilingual() ? '/' . $languages->default() : '';
+        $previewUrl = $localizedPath === '' ? ($localePrefix === '' ? '/' : $localePrefix . '/') : $localePrefix . '/' . $localizedPath;
+        $viewBlocks = [];
         foreach ($blocks as $position => $block) {
             $id = ContentData::string($block['id'] ?? null, 'block.id');
             $type = ContentData::string($block['type'] ?? null, 'block.type');
@@ -63,12 +91,22 @@ final readonly class AdminPageBuilderController
                 throw new HttpException(422, 'BLOCK_STATE_INVALID', 'Block enabled state is invalid.');
             }
             $definition = $this->registry->get($type);
+            $data = ContentData::map($block['data'] ?? [], 'block.data');
             $viewBlocks[] = [
                 'id' => $id,
                 'type' => $type,
                 'enabled' => $enabled,
                 'position' => $position + 1,
                 'name' => $this->localized($definition->name(), $languages, $type),
+                'fields' => $this->forms->render($definition, $languages, $data),
+                'preview' => $this->renderPreviewDocument(
+                    $definition,
+                    $data,
+                    $identity,
+                    $id,
+                    $previewUrl,
+                    $languages,
+                ),
             ];
         }
         $content = $this->views->render('builder/index', [
@@ -76,6 +114,7 @@ final readonly class AdminPageBuilderController
             'blocks' => $viewBlocks,
             'revision' => $editable->revision(),
             'csrfToken' => $this->csrf->token(),
+            'previewUrl' => $previewUrl,
         ]);
 
         return $this->page('Bloki strony', $content, scripts: true);
@@ -106,7 +145,7 @@ final readonly class AdminPageBuilderController
         return $this->page('Wybierz blok', $this->views->render('builder/picker', [
             'identity' => $identity,
             'cards' => $cards,
-        ]));
+        ]), scripts: true);
     }
 
     public function preview(Request $request): Response
@@ -218,6 +257,44 @@ final readonly class AdminPageBuilderController
             throw $this->conflict($exception);
         } catch (InvalidArgumentException | InvalidContentException | FilesystemException $exception) {
             throw new HttpException(422, 'BLOCK_UPDATE_INVALID', $exception->getMessage(), previous: $exception);
+        }
+    }
+
+    public function renderPreview(Request $request): Response
+    {
+        $this->requireUser();
+        try {
+            $this->validateCsrf($request);
+            $identity = $this->bodyIdentity($request);
+            $id = $this->bodyId($request);
+            $languages = $this->languages->get();
+            $definition = $this->bodyDefinition($request);
+            $data = $this->dataMapper->map($definition, $request->parsedBody()['data'] ?? [], $languages);
+            $routeIndex = PageRouteIndex::build(
+                $this->pages->all($languages),
+                $languages,
+                $this->collections->all($languages),
+            );
+            $localizedPath = $routeIndex->pathFor($identity, $languages->default());
+            $localePrefix = $languages->isMultilingual() ? '/' . $languages->default() : '';
+            $previewUrl = $localizedPath === ''
+                ? ($localePrefix === '' ? '/' : $localePrefix . '/')
+                : $localePrefix . '/' . $localizedPath;
+
+            return Response::json([
+                'preview' => $this->renderPreviewDocument(
+                    $definition,
+                    $data,
+                    $identity,
+                    $id,
+                    $previewUrl,
+                    $languages,
+                ),
+            ]);
+        } catch (BlockValidationException $exception) {
+            throw $this->validationException($exception);
+        } catch (InvalidArgumentException | InvalidContentException | FilesystemException $exception) {
+            throw new HttpException(422, 'BLOCK_PREVIEW_INVALID', $exception->getMessage(), previous: $exception);
         }
     }
 
@@ -371,6 +448,49 @@ final readonly class AdminPageBuilderController
         ]);
 
         return $this->page($title, $content, scripts: true);
+    }
+
+    /** @param array<string, mixed> $data */
+    private function renderPreviewDocument(
+        BlockDefinition $definition,
+        array $data,
+        PageIdentity $identity,
+        string $id,
+        string $previewUrl,
+        LanguageConfig $languages,
+    ): string {
+        $normalized = $this->validator->validate($definition, $data, $languages, $identity);
+        $localized = $this->validator->localize(
+            $definition,
+            $normalized,
+            $languages->default(),
+            $languages,
+            $identity,
+        );
+        $localized['_block_id'] = $id;
+        $localized['_page_id'] = $identity->value();
+        $localized['_return_path'] = $previewUrl;
+        $context = new RenderContext(
+            $languages->default(),
+            $this->markdown,
+            $this->partials,
+            $identity,
+            $this->media,
+            $this->mediaUrls,
+        );
+        $html = $this->renderer->render($definition->type(), $localized, $context);
+        $asset = $this->assets->collect([['type' => $definition->type()]]);
+        $styles = '<link rel="stylesheet" href="/assets/css/typography.css">'
+            . '<link rel="stylesheet" href="/assets/css/site.css">';
+        foreach ($asset->styles() as $style) {
+            $styles .= '<link rel="stylesheet" href="' . AdminView::escape($style) . '">';
+        }
+
+        return '<!doctype html><html lang="' . AdminView::escape($languages->default()) . '"><head><meta charset="utf-8">'
+            . '<meta name="viewport" content="width=device-width,initial-scale=1"><base href="/">' . $styles
+            . '<style>html{background:#fff}body{min-width:0;background:#fff;overflow-x:hidden}'
+            . 'body>*{margin-block:0!important}.site-header,.site-footer{display:none!important}</style></head><body>'
+            . $html . '</body></html>';
     }
 
     private function queryDefinition(Request $request): BlockDefinition

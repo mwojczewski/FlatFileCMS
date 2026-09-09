@@ -57,6 +57,8 @@ final readonly class AdminLayout
             'content' => $content,
             'active' => $active,
             'email' => $user?->email() ?? '',
+            'displayName' => $user?->displayName() ?? 'Administrator',
+            'accountInitials' => $user?->initials() ?? 'A',
             'csrfToken' => $this->csrf->token(),
         ]);
 
