@@ -1,15 +1,13 @@
 main:
-  -
-    label:
+  - label:
       pl: Architektura
       en: Architecture
     link:
       type: url
-      url: '/#architektura'
+      url: "/#architektura"
     target: _self
     children: {}
-  -
-    label:
+  - label:
       pl: Dokumentacja
       en: Docs
     link:
@@ -17,8 +15,7 @@ main:
       collection: documentation
     target: _self
     children: {}
-  -
-    label:
+  - label:
       pl: API
       en: API
     link:
@@ -26,8 +23,7 @@ main:
       url: /api/docs
     target: _blank
     children: {}
-  -
-    label:
+  - label:
       pl: Insights
       en: Insights
     link:
@@ -35,8 +31,7 @@ main:
       collection: insights
     target: _self
     children: {}
-  -
-    label:
+  - label:
       pl: Kontakt
       en: Contact
     link:
@@ -45,26 +40,23 @@ main:
     target: _self
     children: {}
 footer:
-  -
-    label:
+  - label:
       pl: Architektura
       en: Architecture
     link:
       type: url
-      url: '/#architektura'
+      url: "/#architektura"
     target: _self
     children: {}
-  -
-    label:
-      pl: 'Status API'
+  - label:
+      pl: "Status API"
       en: API
     link:
       type: url
       url: /api/docs
     target: _blank
     children: {}
-  -
-    label:
+  - label:
       pl: Panel
       en: Panel
     link:
@@ -72,8 +64,7 @@ footer:
       url: /admin
     target: _self
     children: {}
-  -
-    label:
+  - label:
       pl: Kontakt
       en: Contact
     link:

@@ -365,6 +365,10 @@ tbody tr:hover {
   background: var(--admin-accent);
 }
 
+svg {
+  vertical-align: middle;
+}
+
 @media (max-width: 920px) {
   .admin-sidebar {
     box-shadow: 1rem 0 3rem rgb(23 35 31 / 16%);
@@ -419,4 +423,3 @@ tbody tr:hover {
     padding: 0 0.35rem;
   }
 }
-

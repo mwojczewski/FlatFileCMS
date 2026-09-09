@@ -1,7 +1,8 @@
 schemaVersion: 1
 enabled: true
 layout: default
-title: { pl: Serwis jest chwilowo niedostępny, en: Service temporarily unavailable }
+title:
+  { pl: Serwis jest chwilowo niedostępny, en: Service temporarily unavailable }
 seo: {}
 blocks:
   - id: 0199a123-5030-7000-8000-000000000001
@@ -9,6 +10,10 @@ blocks:
     enabled: true
     data:
       title: { pl: Zaraz wracamy, en: We will be back soon }
-      content: { pl: Trwają prace techniczne albo serwis jest przeciążony. Spróbuj ponownie później., en: Maintenance is in progress or the service is overloaded. Please try again later. }
+      content:
+        {
+          pl: Trwają prace techniczne albo serwis jest przeciążony. Spróbuj ponownie później.,
+          en: Maintenance is in progress or the service is overloaded. Please try again later.,
+        }
       buttonLabel: { pl: Spróbuj ponownie, en: Try again }
       buttonUrl: /

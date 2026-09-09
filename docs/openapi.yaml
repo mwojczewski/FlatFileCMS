@@ -36,12 +36,12 @@ paths:
       operationId: getHealth
       summary: Check application health
       responses:
-        '200':
+        "200":
           description: The application is operational.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Health'
+                $ref: "#/components/schemas/Health"
               example:
                 status: ok
                 application: FlatFile CMS
@@ -51,7 +51,7 @@ paths:
       operationId: headHealth
       summary: Check application availability without a response body
       responses:
-        '200':
+        "200":
           description: The application is operational.
 
   /api/v1/pages:
@@ -61,30 +61,30 @@ paths:
       summary: Get the homepage
       description: This route intentionally returns the homepage, not a list of pages.
       parameters:
-        - $ref: '#/components/parameters/Language'
-        - $ref: '#/components/parameters/IfNoneMatch'
-        - $ref: '#/components/parameters/IfModifiedSince'
+        - $ref: "#/components/parameters/Language"
+        - $ref: "#/components/parameters/IfNoneMatch"
+        - $ref: "#/components/parameters/IfModifiedSince"
       responses:
-        '200':
-          $ref: '#/components/responses/Page'
-        '304':
-          $ref: '#/components/responses/NotModified'
-        '400':
-          $ref: '#/components/responses/LanguageNotAvailable'
-        '404':
-          $ref: '#/components/responses/PageNotFound'
+        "200":
+          $ref: "#/components/responses/Page"
+        "304":
+          $ref: "#/components/responses/NotModified"
+        "400":
+          $ref: "#/components/responses/LanguageNotAvailable"
+        "404":
+          $ref: "#/components/responses/PageNotFound"
     head:
       tags: [Pages]
       operationId: headHomepage
       summary: Get homepage metadata without a response body
       parameters:
-        - $ref: '#/components/parameters/Language'
+        - $ref: "#/components/parameters/Language"
       responses:
-        '200':
+        "200":
           description: Homepage metadata.
           headers:
-            ETag: { $ref: '#/components/headers/ETag' }
-            Last-Modified: { $ref: '#/components/headers/LastModified' }
+            ETag: { $ref: "#/components/headers/ETag" }
+            Last-Modified: { $ref: "#/components/headers/LastModified" }
 
   /api/v1/pages/{path}:
     get:
@@ -95,34 +95,34 @@ paths:
         The path may contain multiple segments, for example `offer/websites`.
         It does not include a locale prefix; the `lang` parameter selects the language.
       parameters:
-        - $ref: '#/components/parameters/ContentPath'
-        - $ref: '#/components/parameters/Language'
-        - $ref: '#/components/parameters/IfNoneMatch'
-        - $ref: '#/components/parameters/IfModifiedSince'
+        - $ref: "#/components/parameters/ContentPath"
+        - $ref: "#/components/parameters/Language"
+        - $ref: "#/components/parameters/IfNoneMatch"
+        - $ref: "#/components/parameters/IfModifiedSince"
       responses:
-        '200':
-          $ref: '#/components/responses/Page'
-        '304':
-          $ref: '#/components/responses/NotModified'
-        '400':
-          $ref: '#/components/responses/LanguageNotAvailable'
-        '404':
-          $ref: '#/components/responses/PageNotFound'
+        "200":
+          $ref: "#/components/responses/Page"
+        "304":
+          $ref: "#/components/responses/NotModified"
+        "400":
+          $ref: "#/components/responses/LanguageNotAvailable"
+        "404":
+          $ref: "#/components/responses/PageNotFound"
     head:
       tags: [Pages]
       operationId: headPage
       summary: Get page metadata without a response body
       parameters:
-        - $ref: '#/components/parameters/ContentPath'
-        - $ref: '#/components/parameters/Language'
+        - $ref: "#/components/parameters/ContentPath"
+        - $ref: "#/components/parameters/Language"
       responses:
-        '200':
+        "200":
           description: Page metadata.
           headers:
-            ETag: { $ref: '#/components/headers/ETag' }
-            Last-Modified: { $ref: '#/components/headers/LastModified' }
-        '404':
-          $ref: '#/components/responses/PageNotFound'
+            ETag: { $ref: "#/components/headers/ETag" }
+            Last-Modified: { $ref: "#/components/headers/LastModified" }
+        "404":
+          $ref: "#/components/responses/PageNotFound"
 
   /api/v1/navigation:
     get:
@@ -130,32 +130,32 @@ paths:
       operationId: getNavigation
       summary: Get all navigation menus
       parameters:
-        - $ref: '#/components/parameters/Language'
-        - $ref: '#/components/parameters/IfNoneMatch'
-        - $ref: '#/components/parameters/IfModifiedSince'
+        - $ref: "#/components/parameters/Language"
+        - $ref: "#/components/parameters/IfNoneMatch"
+        - $ref: "#/components/parameters/IfModifiedSince"
       responses:
-        '200':
+        "200":
           description: Localized navigation menus.
           headers:
-            ETag: { $ref: '#/components/headers/ETag' }
-            Last-Modified: { $ref: '#/components/headers/LastModified' }
-            Cache-Control: { $ref: '#/components/headers/CacheControl' }
+            ETag: { $ref: "#/components/headers/ETag" }
+            Last-Modified: { $ref: "#/components/headers/LastModified" }
+            Cache-Control: { $ref: "#/components/headers/CacheControl" }
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Navigation'
-        '304':
-          $ref: '#/components/responses/NotModified'
-        '400':
-          $ref: '#/components/responses/LanguageNotAvailable'
+                $ref: "#/components/schemas/Navigation"
+        "304":
+          $ref: "#/components/responses/NotModified"
+        "400":
+          $ref: "#/components/responses/LanguageNotAvailable"
     head:
       tags: [Navigation]
       operationId: headNavigation
       summary: Get navigation metadata without a response body
       parameters:
-        - $ref: '#/components/parameters/Language'
+        - $ref: "#/components/parameters/Language"
       responses:
-        '200':
+        "200":
           description: Navigation metadata.
 
   /api/v1/config:
@@ -165,32 +165,32 @@ paths:
       summary: Get the public website configuration
       description: Returns only the explicit public projection, never the raw setup.yml file.
       parameters:
-        - $ref: '#/components/parameters/Language'
-        - $ref: '#/components/parameters/IfNoneMatch'
-        - $ref: '#/components/parameters/IfModifiedSince'
+        - $ref: "#/components/parameters/Language"
+        - $ref: "#/components/parameters/IfNoneMatch"
+        - $ref: "#/components/parameters/IfModifiedSince"
       responses:
-        '200':
+        "200":
           description: Public configuration and language information.
           headers:
-            ETag: { $ref: '#/components/headers/ETag' }
-            Last-Modified: { $ref: '#/components/headers/LastModified' }
-            Cache-Control: { $ref: '#/components/headers/CacheControl' }
+            ETag: { $ref: "#/components/headers/ETag" }
+            Last-Modified: { $ref: "#/components/headers/LastModified" }
+            Cache-Control: { $ref: "#/components/headers/CacheControl" }
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PublicConfiguration'
-        '304':
-          $ref: '#/components/responses/NotModified'
-        '400':
-          $ref: '#/components/responses/LanguageNotAvailable'
+                $ref: "#/components/schemas/PublicConfiguration"
+        "304":
+          $ref: "#/components/responses/NotModified"
+        "400":
+          $ref: "#/components/responses/LanguageNotAvailable"
     head:
       tags: [Configuration]
       operationId: headPublicConfiguration
       summary: Get configuration metadata without a response body
       parameters:
-        - $ref: '#/components/parameters/Language'
+        - $ref: "#/components/parameters/Language"
       responses:
-        '200':
+        "200":
           description: Public configuration metadata.
 
   /api/v1/collections/{path}:
@@ -202,30 +202,30 @@ paths:
         Returns collection items with pagination. Additional query parameters
         act as filters; only filters declared by the collection are applied.
       parameters:
-        - $ref: '#/components/parameters/ContentPath'
-        - $ref: '#/components/parameters/Language'
-        - $ref: '#/components/parameters/PageNumber'
-        - $ref: '#/components/parameters/IfNoneMatch'
-        - $ref: '#/components/parameters/IfModifiedSince'
+        - $ref: "#/components/parameters/ContentPath"
+        - $ref: "#/components/parameters/Language"
+        - $ref: "#/components/parameters/PageNumber"
+        - $ref: "#/components/parameters/IfNoneMatch"
+        - $ref: "#/components/parameters/IfModifiedSince"
       responses:
-        '200':
+        "200":
           description: Collection with its items and pagination metadata.
           headers:
-            ETag: { $ref: '#/components/headers/ETag' }
-            Last-Modified: { $ref: '#/components/headers/LastModified' }
-            Cache-Control: { $ref: '#/components/headers/CacheControl' }
+            ETag: { $ref: "#/components/headers/ETag" }
+            Last-Modified: { $ref: "#/components/headers/LastModified" }
+            Cache-Control: { $ref: "#/components/headers/CacheControl" }
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CollectionResponse'
-        '304':
-          $ref: '#/components/responses/NotModified'
-        '400':
+                $ref: "#/components/schemas/CollectionResponse"
+        "304":
+          $ref: "#/components/responses/NotModified"
+        "400":
           description: Invalid language, page number, or filter.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
               examples:
                 invalidQuery:
                   value:
@@ -237,12 +237,12 @@ paths:
                     error:
                       code: LANGUAGE_NOT_AVAILABLE
                       message: Language is not available
-        '404':
+        "404":
           description: The collection does not exist or is not public.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
               example:
                 error:
                   code: COLLECTION_NOT_FOUND
@@ -252,13 +252,13 @@ paths:
       operationId: headCollection
       summary: Get collection metadata without a response body
       parameters:
-        - $ref: '#/components/parameters/ContentPath'
-        - $ref: '#/components/parameters/Language'
-        - $ref: '#/components/parameters/PageNumber'
+        - $ref: "#/components/parameters/ContentPath"
+        - $ref: "#/components/parameters/Language"
+        - $ref: "#/components/parameters/PageNumber"
       responses:
-        '200':
+        "200":
           description: Collection metadata.
-        '404':
+        "404":
           description: The collection does not exist or is not public.
 
 components:
@@ -324,25 +324,25 @@ components:
     Page:
       description: Localized and normalized page.
       headers:
-        ETag: { $ref: '#/components/headers/ETag' }
-        Last-Modified: { $ref: '#/components/headers/LastModified' }
-        Cache-Control: { $ref: '#/components/headers/CacheControl' }
+        ETag: { $ref: "#/components/headers/ETag" }
+        Last-Modified: { $ref: "#/components/headers/LastModified" }
+        Cache-Control: { $ref: "#/components/headers/CacheControl" }
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Page'
+            $ref: "#/components/schemas/Page"
     NotModified:
       description: The resource has not changed; the response has no body.
       headers:
-        ETag: { $ref: '#/components/headers/ETag' }
-        Last-Modified: { $ref: '#/components/headers/LastModified' }
-        Cache-Control: { $ref: '#/components/headers/CacheControl' }
+        ETag: { $ref: "#/components/headers/ETag" }
+        Last-Modified: { $ref: "#/components/headers/LastModified" }
+        Cache-Control: { $ref: "#/components/headers/CacheControl" }
     LanguageNotAvailable:
       description: The selected language is not active.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           example:
             error:
               code: LANGUAGE_NOT_AVAILABLE
@@ -352,7 +352,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           example:
             error:
               code: PAGE_NOT_FOUND
@@ -394,12 +394,12 @@ components:
           type: string
           example: Offer
         seo:
-          $ref: '#/components/schemas/Seo'
+          $ref: "#/components/schemas/Seo"
         blocks:
           type: array
           description: Enabled blocks normalized according to their block.yml definitions.
           items:
-            $ref: '#/components/schemas/Block'
+            $ref: "#/components/schemas/Block"
 
     Block:
       type: object
@@ -438,13 +438,13 @@ components:
       required: [collection, items, pagination, filters]
       properties:
         collection:
-          $ref: '#/components/schemas/Collection'
+          $ref: "#/components/schemas/Collection"
         items:
           type: array
           items:
-            $ref: '#/components/schemas/CollectionItem'
+            $ref: "#/components/schemas/CollectionItem"
         pagination:
-          $ref: '#/components/schemas/Pagination'
+          $ref: "#/components/schemas/Pagination"
         filters:
           type: object
           additionalProperties:
@@ -459,7 +459,7 @@ components:
         url: { type: string, example: /en/news }
         layout: { type: string, example: collection }
         title: { type: string, example: News }
-        seo: { $ref: '#/components/schemas/Seo' }
+        seo: { $ref: "#/components/schemas/Seo" }
       additionalProperties: true
 
     CollectionItem:
@@ -495,7 +495,7 @@ components:
           additionalProperties:
             type: array
             items:
-              $ref: '#/components/schemas/NavigationItem'
+              $ref: "#/components/schemas/NavigationItem"
 
     NavigationItem:
       type: object
@@ -506,7 +506,7 @@ components:
         children:
           type: array
           items:
-            $ref: '#/components/schemas/NavigationItem'
+            $ref: "#/components/schemas/NavigationItem"
       additionalProperties: true
 
     PublicConfiguration:

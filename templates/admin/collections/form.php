@@ -42,13 +42,20 @@ $filters = json_encode($data['filters'] ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPE
             <p>Źródłem pozostają bezpośrednie katalogi potomne.</p>
         </div>
         <div class="settings-grid">
-            <div class="technical-path"><span>Ścieżka techniczna</span><code><?= $escape($identity->value()) ?></code>
+            <div class="technical-path">
+                <span>Ścieżka techniczna</span>
+                <code><?= $escape($identity->value()) ?></code>
             </div>
             <label>Layout<select name="layout"><?php foreach ($layouts as $layout): ?>
                         <option value="<?= $escape($layout) ?>" <?= ($data['layout'] ?? 'collection') === $layout ? ' selected' : '' ?>><?= $escape($layout) ?></option><?php endforeach; ?>
                 </select></label>
-            <label class="check toggle-card"><input type="checkbox" name="enabled" value="1" <?= ($data['enabled'] ?? true) === true ? ' checked' : '' ?>><span><strong>Kolekcja dostępna
-                        publicznie</strong><small>Wyłączenie ukrywa endpoint API i widok HTML.</small></span></label>
+            <label class="check toggle-card">
+                <input type="checkbox" name="enabled" value="1" <?= ($data['enabled'] ?? true) === true ? ' checked' : '' ?>>
+                <span>
+                    <strong>Kolekcja dostępna publicznie</strong>
+                    <small>Wyłączenie ukrywa endpoint API i widok HTML.</small>
+                </span>
+            </label>
         </div>
     </section>
     <section class="form-section">
@@ -62,14 +69,21 @@ $filters = json_encode($data['filters'] ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPE
         <div class="locale-grid"><?php foreach ($languages->languages() as $locale => $name): ?>
                 <fieldset class="form-card locale-card">
                     <legend><?= $escape($name) ?> <code><?= $escape($locale) ?></code></legend>
-                    <label>Tytuł kolekcji<input name="title[<?= $escape($locale) ?>]"
-                            value="<?= $escape($title[$locale] ?? '') ?>" <?= $locale === $languages->default() ? ' required' : '' ?>></label>
-                    <label>Publiczny slug<input name="slug[<?= $escape($locale) ?>]"
-                            value="<?= $escape($slug[$locale] ?? '') ?>" <?= $locale === $languages->default() ? ' required' : '' ?>></label>
-                    <label>Tytuł SEO<input name="seo_title[<?= $escape($locale) ?>]"
-                            value="<?= $escape($seoTitle[$locale] ?? '') ?>"></label>
-                    <label>Opis SEO<textarea name="seo_description[<?= $escape($locale) ?>]"
-                            maxlength="500"><?= $escape($seoDescription[$locale] ?? '') ?></textarea></label>
+                    <label>Tytuł kolekcji
+                        <input name="title[<?= $escape($locale) ?>]" value="<?= $escape($title[$locale] ?? '') ?>"
+                            <?= $locale === $languages->default() ? ' required' : '' ?>>
+                    </label>
+                    <label>Publiczny slug
+                        <input name="slug[<?= $escape($locale) ?>]" value="<?= $escape($slug[$locale] ?? '') ?>"
+                            <?= $locale === $languages->default() ? ' required' : '' ?>>
+                    </label>
+                    <label>Tytuł SEO
+                        <input name="seo_title[<?= $escape($locale) ?>]" value="<?= $escape($seoTitle[$locale] ?? '') ?>">
+                    </label>
+                    <label>Opis SEO
+                        <textarea name="seo_description[<?= $escape($locale) ?>]" maxlength="500"><?= $escape($seoDescription[$locale] ?? '') ?>
+                                                                                            </textarea>
+                    </label>
                 </fieldset>
             <?php endforeach; ?>
         </div>
@@ -83,19 +97,26 @@ $filters = json_encode($data['filters'] ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPE
             <p>Filtry pozostają rozszerzalną listą definicji.</p>
         </div>
         <div class="settings-grid">
-            <label>Pole sortowania<input name="sort_field"
-                    value="<?= $escape(is_string($sort['field'] ?? null) ? $sort['field'] : 'date') ?>"
-                    required></label>
-            <label>Kierunek<select name="sort_direction">
+            <label>Pole sortowania
+                <input name="sort_field"
+                    value="<?= $escape(is_string($sort['field'] ?? null) ? $sort['field'] : 'date') ?>" required>
+            </label>
+            <label>Kierunek
+                <select name="sort_direction">
                     <option value="desc" <?= ($sort['direction'] ?? 'desc') === 'desc' ? ' selected' : '' ?>>Malejąco
                     </option>
                     <option value="asc" <?= ($sort['direction'] ?? '') === 'asc' ? ' selected' : '' ?>>Rosnąco</option>
-                </select></label>
-            <label>Elementów na stronę<input type="number" name="per_page" min="1" max="100"
-                    value="<?= (int) ($pagination['perPage'] ?? 12) ?>" required></label>
+                </select>
+            </label>
+            <label>Elementów na stronę
+                <input type="number" name="per_page" min="1" max="100"
+                    value="<?= (int) ($pagination['perPage'] ?? 12) ?>" required>
+            </label>
         </div>
-        <label>Filtry (JSON)<textarea name="filters" class="code-textarea"
-                spellcheck="false"><?= $escape($filters) ?></textarea></label>
+        <label>Filtry (JSON)
+            <textarea name="filters" class="code-textarea" spellcheck="false"><?= $escape($filters) ?>
+            </textarea>
+        </label>
         <p class="hint">Przykład: <code>[{"parameter":"category","field":"category","allowedValues":["news"]}]</code>
         </p>
     </section>
@@ -108,15 +129,29 @@ $filters = json_encode($data['filters'] ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPE
         </div>
         <fieldset class="form-card seo-card">
             <legend>SEO wspólne</legend>
-            <label>Canonical URL<input name="canonical" value="<?= $escape($canonical) ?>"
-                    placeholder="/ścieżka lub https://example.com/ścieżka"></label>
-            <div class="robots-grid"><label class="check"><input type="checkbox" name="robots_index" value="1"
-                        <?= ($robots['index'] ?? true) === true ? ' checked' : '' ?>><span><strong>Pozwól
-                            indeksować</strong></span></label><label class="check"><input type="checkbox"
-                        name="robots_follow" value="1" <?= ($robots['follow'] ?? true) === true ? ' checked' : '' ?>><span><strong>Pozwól śledzić linki</strong></span></label></div>
+            <label>Canonical URL
+                <input name="canonical" value="<?= $escape($canonical) ?>"
+                    placeholder="/ścieżka lub https://example.com/ścieżka">
+            </label>
+            <div class="robots-grid">
+                <label class="check">
+                    <input type="checkbox" name="robots_index" value="1" <?= ($robots['index'] ?? true) === true ? ' checked' : '' ?>>
+                    <span>
+                        <strong>Pozwól indeksować</strong>
+                    </span>
+                </label>
+                <label class="check">
+                    <input type="checkbox" name="robots_follow" value="1" <?= ($robots['follow'] ?? true) === true ? ' checked' : '' ?>>
+                    <span><strong>Pozwól śledzić linki</strong></span>
+                </label>
+            </div>
         </fieldset>
     </section>
-    <div class="actions form-actions"><span class="form-actions-context">Zmiany dotyczą:
-            <?= $escape($identity->value()) ?></span><a class="button secondary" href="/admin/pages">Anuluj</a><button
-            type="submit">Zapisz kolekcję</button></div>
+    <div class="actions form-actions">
+        <span class="form-actions-context">
+            Zmiany dotyczą: <?= $escape($identity->value()) ?>
+        </span>
+        <a class="button secondary" href="/admin/pages">Anuluj</a>
+        <button type="submit">Zapisz kolekcję</button>
+    </div>
 </form>

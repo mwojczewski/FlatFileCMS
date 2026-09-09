@@ -9,6 +9,10 @@ blocks:
     enabled: true
     data:
       title: { pl: Zwolnij na chwilę, en: Please slow down }
-      content: { pl: Otrzymaliśmy zbyt wiele żądań. Spróbuj ponownie za moment., en: We received too many requests. Try again in a moment. }
+      content:
+        {
+          pl: Otrzymaliśmy zbyt wiele żądań. Spróbuj ponownie za moment.,
+          en: We received too many requests. Try again in a moment.,
+        }
       buttonLabel: { pl: Wróć na stronę główną, en: Return to homepage }
       buttonUrl: /

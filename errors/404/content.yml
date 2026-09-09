@@ -9,6 +9,10 @@ blocks:
     enabled: true
     data:
       title: { pl: Nie znaleźliśmy tej strony, en: We could not find this page }
-      content: { pl: Adres może być nieaktualny albo zawierać literówkę., en: The address may be outdated or contain a typo. }
+      content:
+        {
+          pl: Adres może być nieaktualny albo zawierać literówkę.,
+          en: The address may be outdated or contain a typo.,
+        }
       buttonLabel: { pl: Wróć na stronę główną, en: Return to homepage }
       buttonUrl: /
