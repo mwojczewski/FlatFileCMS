@@ -26,8 +26,10 @@ use FlatFileCms\Media\MediaConfig;
 use FlatFileCms\Media\MediaTypes;
 use FlatFileCms\Navigation\NavigationManager;
 use FlatFileCms\Rendering\LayoutRegistry;
+use FlatFileCms\Seo\SiteIconGenerator;
 use InvalidArgumentException;
 use JsonException;
+use RuntimeException;
 
 final readonly class AdminSettingsController
 {
@@ -44,6 +46,7 @@ final readonly class AdminSettingsController
         private AdminView $views,
         private AdminLayout $layout,
         private AuditLogger $audit,
+        private SiteIconGenerator $siteIcons,
     ) {}
 
     public function navigation(Request $request): Response
@@ -131,6 +134,7 @@ final readonly class AdminSettingsController
             'formats' => ['webp', 'avif'],
             'llms' => $llms,
             'security' => $security,
+            'manifest' => $this->siteIcons->manifest(),
             'csrfToken' => $this->csrf->token(),
         ]);
 
@@ -144,11 +148,24 @@ final readonly class AdminSettingsController
             $this->validateCsrf($request);
             $body = $request->parsedBody();
             $languages = $this->languages->get();
+            $icons = $this->siteIcons($body);
+            if (($body['generate_site_assets'] ?? null) === '1') {
+                $icons = [...$icons, ...$this->siteIcons->generate($request->file('site_icon_source'), [
+                    'name' => $body['manifest_name'] ?? null,
+                    'short_name' => $body['manifest_short_name'] ?? null,
+                    'description' => $body['manifest_description'] ?? '',
+                    'start_url' => $body['manifest_start_url'] ?? '/',
+                    'scope' => $body['manifest_scope'] ?? '/',
+                    'display' => $body['manifest_display'] ?? 'standalone',
+                    'theme_color' => $body['manifest_theme_color'] ?? '#168761',
+                    'background_color' => $body['manifest_background_color'] ?? '#ffffff',
+                ])];
+            }
             $input = new GlobalConfigurationInput(
                 $this->requiredString($body['site_name'] ?? null, 'Site name'),
                 $this->requiredString($body['site_url'] ?? null, 'Site URL'),
                 $this->requiredString($body['default_layout'] ?? null, 'Default layout'),
-                $this->siteIcons($body),
+                $icons,
                 $this->localizedBody($body['seo_title_suffix'] ?? null, $languages),
                 $this->localizedBody($body['seo_description'] ?? null, $languages),
                 $this->optionalBodyString($body['seo_og_image'] ?? null),
@@ -172,7 +189,7 @@ final readonly class AdminSettingsController
             return Response::redirect('/admin/settings?saved=1', 303);
         } catch (RevisionConflictException $exception) {
             throw new HttpException(409, 'CONFIG_REVISION_CONFLICT', 'Configuration changed in another session.', previous: $exception);
-        } catch (InvalidArgumentException | InvalidContentException | JsonException $exception) {
+        } catch (InvalidArgumentException | InvalidContentException | JsonException | RuntimeException $exception) {
             throw new HttpException(422, 'CONFIG_INVALID', $exception->getMessage(), previous: $exception);
         }
     }

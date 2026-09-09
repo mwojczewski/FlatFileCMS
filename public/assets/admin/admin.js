@@ -123,6 +123,24 @@ if (firstInvalid instanceof HTMLElement) {
   firstInvalid.focus({ preventScroll: true });
 }
 
+const siteIconSource = document.querySelector("[data-site-icon-source]");
+const siteIconPreview = document.querySelector("[data-site-icon-preview]");
+if (siteIconSource instanceof HTMLInputElement && siteIconPreview instanceof HTMLImageElement) {
+  let previewUrl = null;
+  siteIconSource.addEventListener("change", () => {
+    if (previewUrl !== null) URL.revokeObjectURL(previewUrl);
+    const file = siteIconSource.files?.[0];
+    if (!file) {
+      siteIconPreview.hidden = true;
+      previewUrl = null;
+      return;
+    }
+    previewUrl = URL.createObjectURL(file);
+    siteIconPreview.src = previewUrl;
+    siteIconPreview.hidden = false;
+  });
+}
+
 const pageSearch = document.querySelector("[data-page-search]");
 if (pageSearch instanceof HTMLInputElement) {
   const pageRows = [...document.querySelectorAll("[data-page-row]")];

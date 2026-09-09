@@ -18,6 +18,19 @@ final readonly class BlockFormRenderer
             . '</div>';
     }
 
+    /** @param array<string, mixed> $data */
+    public function renderInspector(BlockDefinition $definition, LanguageConfig $languages, array $data): string
+    {
+        $panels = ['content' => '', 'appearance' => ''];
+        foreach ($definition->fields() as $name => $field) {
+            $panel = ($field->settings()['panel'] ?? 'content') === 'appearance' ? 'appearance' : 'content';
+            $panels[$panel] .= $this->field($field, $languages, $data[$name] ?? null, 'data[' . $name . ']', 0);
+        }
+
+        return $this->panelFields('content', $panels['content'])
+            . $this->panelFields('appearance', $panels['appearance']);
+    }
+
     /**
      * @param array<string, FieldDefinition> $definitions
      * @param array<string, mixed> $values
@@ -36,6 +49,18 @@ final readonly class BlockFormRenderer
         }
 
         return $html;
+    }
+
+    private function panelFields(string $panel, string $fields): string
+    {
+        $empty = $panel === 'appearance'
+            ? 'Ten blok nie udostępnia dodatkowych ustawień wyglądu.'
+            : 'Ten blok nie zawiera pól treści.';
+
+        return '<div class="block-inspector-fields generated-fields block-panel-fields" data-block-panel-fields="' . $panel . '"'
+            . ($panel === 'content' ? '' : ' hidden') . '>'
+            . ($fields === '' ? '<p class="block-panel-empty">' . $empty . '</p>' : $fields)
+            . '</div>';
     }
 
     private function field(

@@ -33,6 +33,7 @@ fields:
       en: Image
   alignment:
     type: select
+    panel: appearance
     required: true
     translatable: false
     options:

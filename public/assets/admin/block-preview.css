@@ -1,0 +1,18 @@
+html {
+  background: #fff;
+}
+
+body {
+  min-width: 0;
+  overflow-x: hidden;
+  background: #fff;
+}
+
+body > * {
+  margin-block: 0 !important;
+}
+
+.site-header,
+.site-footer {
+  display: none !important;
+}

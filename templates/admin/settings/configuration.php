@@ -13,7 +13,7 @@ $json = static fn(array $value): string => json_encode($value, JSON_PRETTY_PRINT
     <a href="#media-settings"><span aria-hidden="true">▧</span><span><strong>Multimedia</strong><small>Upload i obrazy</small></span></a>
     <a href="#text-files"><span aria-hidden="true">≡</span><span><strong>Pliki tekstowe</strong><small>LLM i security.txt</small></span></a>
 </nav>
-<form class="stack crud-form" method="post" action="/admin/settings">
+<form class="stack crud-form" method="post" action="/admin/settings" enctype="multipart/form-data">
     <input type="hidden" name="_csrf" value="<?= $escape($csrfToken) ?>"><input type="hidden" name="revision"
         value="<?= $escape($document->revision()->value()) ?>">
     <?php require __DIR__ . '/sections/site.php'; ?>

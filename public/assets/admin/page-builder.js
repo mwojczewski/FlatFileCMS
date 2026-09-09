@@ -213,6 +213,9 @@ const orderForm = document.querySelector("[data-order-form]");
 const orderFields = document.querySelector("[data-order-fields]");
 const orderSubmit = document.querySelector("[data-order-submit]");
 const orderMessage = document.querySelector("[data-order-message]");
+let mutationQueue = Promise.resolve();
+let orderSaveTimer = null;
+let orderDirty = false;
 let dragged = null;
 let dragGhost = null;
 let dragPointer = null;
@@ -243,8 +246,60 @@ function synchronizeOrder() {
     orderSubmit.disabled = false;
   }
   if (orderMessage instanceof HTMLElement) {
-    orderMessage.textContent = "Kolejność została zmieniona";
+    orderMessage.textContent = "Niezapisane zmiany kolejności";
   }
+  orderDirty = true;
+}
+
+function updateRevision(revision) {
+  if (typeof revision !== "string" || revision === "") return;
+  document.querySelectorAll('input[name="revision"]').forEach((input) => {
+    if (input instanceof HTMLInputElement) input.value = revision;
+  });
+}
+
+function enqueueMutation(callback) {
+  mutationQueue = mutationQueue.then(callback, callback);
+  return mutationQueue;
+}
+
+async function sendMutation(form) {
+  const response = await fetch(form.action, {
+    method: "POST",
+    body: new FormData(form),
+    credentials: "same-origin",
+    headers: { Accept: "application/json" },
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok || payload.saved !== true) {
+    throw new Error(typeof payload.message === "string" ? payload.message : "Nie udało się zapisać zmian.");
+  }
+  updateRevision(payload.revision);
+  return payload;
+}
+
+function persistOrder() {
+  if (!(orderForm instanceof HTMLFormElement) || !orderDirty) return;
+  orderDirty = false;
+  if (orderMessage instanceof HTMLElement) orderMessage.textContent = "Zapisuję kolejność…";
+  enqueueMutation(() => sendMutation(orderForm)).then(() => {
+    if (orderDirty) {
+      persistOrder();
+      return;
+    }
+    if (orderSubmit instanceof HTMLButtonElement) orderSubmit.disabled = true;
+    if (orderMessage instanceof HTMLElement) orderMessage.textContent = "Kolejność zapisana automatycznie";
+    if (liveState instanceof HTMLElement) liveState.textContent = "Wszystkie zmiany zapisane";
+  }).catch(() => {
+    orderDirty = true;
+    if (orderSubmit instanceof HTMLButtonElement) orderSubmit.disabled = false;
+    if (orderMessage instanceof HTMLElement) orderMessage.textContent = "Nie udało się zapisać — spróbuj ponownie";
+  });
+}
+
+function scheduleOrderSave() {
+  if (orderSaveTimer !== null) window.clearTimeout(orderSaveTimer);
+  orderSaveTimer = window.setTimeout(persistOrder, 350);
 }
 
 function moveDraggedAt(clientX, clientY) {
@@ -331,6 +386,7 @@ builderList?.addEventListener("dragend", () => {
     window.cancelAnimationFrame(autoScrollFrame);
     autoScrollFrame = null;
   }
+  if (orderDirty) scheduleOrderSave();
 });
 
 builderList?.addEventListener("dragover", (event) => {
@@ -347,7 +403,11 @@ builderList?.addEventListener("dragover", (event) => {
 
 document.addEventListener("dragover", updateDragPointer, { passive: true });
 
-orderForm?.addEventListener("submit", synchronizeOrder);
+orderForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  synchronizeOrder();
+  persistOrder();
+});
 
 const inspector = document.querySelector("[data-block-inspector]");
 const inspectorTitle = document.querySelector("[data-inspector-title]");
@@ -447,6 +507,37 @@ document.addEventListener("click", (event) => {
     selectBlock(edit.dataset.blockEdit);
     return;
   }
+  const move = event.target.closest("[data-block-move]");
+  if (move instanceof HTMLButtonElement) {
+    const item = move.closest("[data-block-id]");
+    const direction = Number.parseInt(move.dataset.blockMove ?? "0", 10);
+    if (item instanceof HTMLElement && builderList) {
+      const sibling = direction < 0 ? item.previousElementSibling : item.nextElementSibling;
+      if (sibling instanceof HTMLElement) {
+        if (direction < 0) builderList.insertBefore(item, sibling);
+        else builderList.insertBefore(sibling, item);
+        synchronizeOrder();
+        scheduleOrderSave();
+        item.focus({ preventScroll: true });
+      }
+    }
+    return;
+  }
+  const inspectorTab = event.target.closest("[data-inspector-tab]");
+  if (inspectorTab instanceof HTMLButtonElement) {
+    const form = inspectorTab.closest("[data-block-form]");
+    const panel = inspectorTab.dataset.inspectorTab;
+    form?.querySelectorAll("[data-inspector-tab]").forEach((tab) => {
+      const selected = tab === inspectorTab;
+      tab.classList.toggle("active", selected);
+      tab.setAttribute("aria-selected", String(selected));
+    });
+    form?.querySelectorAll("[data-block-panel-fields]").forEach((fields) => {
+      fields.hidden = fields.getAttribute("data-block-panel-fields") !== panel;
+    });
+    window.CmsMarkdownEditors?.refresh(form);
+    return;
+  }
   const item = event.target.closest("[data-block-select]");
   if (item instanceof HTMLElement && !event.target.closest("form, button, a")) {
     selectBlock(item.dataset.blockSelect);
@@ -523,6 +614,41 @@ document.querySelectorAll("[data-block-form]").forEach((form) => {
   form.addEventListener("input", schedule);
   form.addEventListener("change", schedule);
   form.addEventListener("cms:content-added", schedule);
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const status = form.querySelector("[data-block-preview-status]");
+    if (status instanceof HTMLElement) status.textContent = "Zapisuję…";
+    enqueueMutation(() => sendMutation(form)).then(() => {
+      if (status instanceof HTMLElement) status.textContent = "Blok zapisany";
+      if (liveState instanceof HTMLElement) liveState.textContent = "Wszystkie zmiany zapisane";
+    }).catch(() => {
+      if (status instanceof HTMLElement) status.textContent = "Błąd zapisu — sprawdź pola";
+      if (liveState instanceof HTMLElement) liveState.textContent = "Nie udało się zapisać zmian";
+    });
+  });
+  const visibility = form.querySelector("[data-block-visibility]");
+  if (visibility instanceof HTMLInputElement) {
+    visibility.addEventListener("change", () => {
+      const item = document.querySelector(`[data-block-id="${CSS.escape(form.dataset.blockForm ?? "")}"]`);
+      const label = form.querySelector("[data-block-visibility-label]");
+      const previous = !visibility.checked;
+      const toggleForm = item?.querySelector("form[action$='/toggle']");
+      if (!(toggleForm instanceof HTMLFormElement)) return;
+      visibility.disabled = true;
+      enqueueMutation(() => sendMutation(toggleForm)).then(() => {
+        const enabled = visibility.checked;
+        item?.classList.toggle("disabled", !enabled);
+        const badge = item?.querySelector(".block-visibility");
+        badge?.classList.toggle("is-visible", enabled);
+        if (badge instanceof HTMLElement) badge.lastChild.textContent = enabled ? "Widoczny" : "Ukryty";
+        if (label instanceof HTMLElement) label.textContent = enabled ? "Blok widoczny" : "Blok ukryty";
+        if (liveState instanceof HTMLElement) liveState.textContent = "Wszystkie zmiany zapisane";
+      }).catch(() => {
+        visibility.checked = previous;
+        if (liveState instanceof HTMLElement) liveState.textContent = "Nie udało się zmienić widoczności";
+      }).finally(() => { visibility.disabled = false; });
+    });
+  }
 });
 
 const blockSearch = document.querySelector("[data-block-search]");

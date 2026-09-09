@@ -117,6 +117,7 @@ use FlatFileCms\Rendering\PartialRegistry;
 use FlatFileCms\Rendering\PartialRenderer;
 use FlatFileCms\Rendering\SiteController;
 use FlatFileCms\Seo\SeoResolver;
+use FlatFileCms\Seo\SiteIconGenerator;
 use FlatFileCms\Seo\SitemapController;
 use FlatFileCms\Seo\SiteTextController;
 use Psr\Log\LoggerInterface;
@@ -372,6 +373,13 @@ $container->set(
     static fn(Container $container): MediaInspector => new MediaInspector($container->get(SvgSanitizer::class)),
 );
 $container->set(RasterImageProcessor::class, static fn(): RasterImageProcessor => new RasterImageProcessor());
+$container->set(
+    SiteIconGenerator::class,
+    static fn(Container $container): SiteIconGenerator => new SiteIconGenerator(
+        $container->get(Environment::class)->projectRoot(),
+        $container->get(RasterImageProcessor::class),
+    ),
+);
 $container->set(MediaUrlGenerator::class, static fn(): MediaUrlGenerator => new MediaUrlGenerator());
 $container->set(
     MediaRepository::class,
@@ -725,6 +733,7 @@ $container->set(
         $container->get(AdminView::class),
         $container->get(AdminLayout::class),
         $container->get(AuditLogger::class),
+        $container->get(SiteIconGenerator::class),
     ),
 );
 $container->set(

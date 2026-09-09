@@ -98,7 +98,7 @@ final readonly class AdminPageBuilderController
                 'enabled' => $enabled,
                 'position' => $position + 1,
                 'name' => $this->localized($definition->name(), $languages, $type),
-                'fields' => $this->forms->render($definition, $languages, $data),
+                'fields' => $this->forms->renderInspector($definition, $languages, $data),
                 'preview' => $this->renderPreviewDocument(
                     $definition,
                     $data,
@@ -242,7 +242,7 @@ final readonly class AdminPageBuilderController
             $block = $this->manager->block($identity, $id);
             $definition = $this->registry->get(ContentData::string($block['type'] ?? null, 'block.type'));
             $data = $this->dataMapper->map($definition, $request->parsedBody()['data'] ?? [], $languages);
-            $this->manager->update($identity, $id, $data, $this->bodyRevision($request), $languages);
+            $updated = $this->manager->update($identity, $id, $data, $this->bodyRevision($request), $languages);
             $this->audit->log(
                 'block.updated',
                 $actor->id(),
@@ -250,7 +250,7 @@ final readonly class AdminPageBuilderController
                 $request->clientIp(),
             );
 
-            return $this->redirect($identity, 'updated');
+            return $this->mutationResponse($request, $identity, 'updated', $updated->revision());
         } catch (BlockValidationException $exception) {
             throw $this->validationException($exception);
         } catch (RevisionConflictException $exception) {
@@ -330,7 +330,12 @@ final readonly class AdminPageBuilderController
                 }
                 $order[] = $id;
             }
-            $this->manager->reorder($identity, $order, $this->bodyRevision($request), $this->languages->get());
+            $updated = $this->manager->reorder(
+                $identity,
+                $order,
+                $this->bodyRevision($request),
+                $this->languages->get(),
+            );
             $this->audit->log(
                 'block.moved',
                 $actor->id(),
@@ -339,7 +344,7 @@ final readonly class AdminPageBuilderController
                 ['order' => $order],
             );
 
-            return $this->redirect($identity, 'reordered');
+            return $this->mutationResponse($request, $identity, 'reordered', $updated->revision());
         } catch (RevisionConflictException $exception) {
             throw $this->conflict($exception);
         } catch (InvalidArgumentException | InvalidContentException | FilesystemException $exception) {
@@ -356,7 +361,7 @@ final readonly class AdminPageBuilderController
             $id = $this->bodyId($request);
             $revision = $this->bodyRevision($request);
             $languages = $this->languages->get();
-            match ($operation) {
+            $updated = match ($operation) {
                 'duplicate' => $this->manager->duplicate($identity, $id, $revision, $languages),
                 'toggle' => $this->manager->toggle($identity, $id, $revision, $languages),
                 'delete' => $this->manager->delete($identity, $id, $revision, $languages),
@@ -375,12 +380,29 @@ final readonly class AdminPageBuilderController
                 ['operation' => $operation],
             );
 
-            return $this->redirect($identity, $operation);
+            return $this->mutationResponse($request, $identity, $operation, $updated->revision());
         } catch (RevisionConflictException $exception) {
             throw $this->conflict($exception);
         } catch (InvalidArgumentException | InvalidContentException | FilesystemException $exception) {
             throw new HttpException(422, 'BLOCK_OPERATION_INVALID', $exception->getMessage(), previous: $exception);
         }
+    }
+
+    private function mutationResponse(
+        Request $request,
+        PageIdentity $identity,
+        string $status,
+        FileRevision $revision,
+    ): Response {
+        if (str_contains($request->header('accept') ?? '', 'application/json')) {
+            return Response::json([
+                'saved' => true,
+                'revision' => $revision->value(),
+                'status' => $status,
+            ]);
+        }
+
+        return $this->redirect($identity, $status);
     }
 
     /**
@@ -488,8 +510,7 @@ final readonly class AdminPageBuilderController
 
         return '<!doctype html><html lang="' . AdminView::escape($languages->default()) . '"><head><meta charset="utf-8">'
             . '<meta name="viewport" content="width=device-width,initial-scale=1"><base href="/">' . $styles
-            . '<style>html{background:#fff}body{min-width:0;background:#fff;overflow-x:hidden}'
-            . 'body>*{margin-block:0!important}.site-header,.site-footer{display:none!important}</style></head><body>'
+            . '<link rel="stylesheet" href="/assets/admin/block-preview.css?v=18.0.0"></head><body>'
             . $html . '</body></html>';
     }
 

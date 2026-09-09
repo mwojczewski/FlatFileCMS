@@ -62,4 +62,32 @@ final class BlockFormRendererTest extends TestCase
         self::assertStringContainsString('value="/en/documentation/getting-started"', $html);
         self::assertStringNotContainsString('type="url"', $html);
     }
+
+    public function testInspectorSeparatesContentAndAppearanceFields(): void
+    {
+        $definition = new BlockDefinition(
+            'hero',
+            ['pl' => 'Hero'],
+            [],
+            null,
+            [
+                'title' => new FieldDefinition('title', 'text', true, false, ['label' => ['pl' => 'Tytuł']]),
+                'alignment' => new FieldDefinition('alignment', 'text', true, false, ['label' => ['pl' => 'Wyrównanie'], 'panel' => 'appearance']),
+            ],
+            '/blocks/hero',
+            '/blocks/hero/render.php',
+            1,
+        );
+
+        $html = (new BlockFormRenderer())->renderInspector(
+            $definition,
+            new LanguageConfig('pl', ['pl' => 'Polski']),
+            ['title' => 'Start', 'alignment' => 'center'],
+        );
+
+        self::assertStringContainsString('data-block-panel-fields="content"', $html);
+        self::assertStringContainsString('data-block-panel-fields="appearance" hidden', $html);
+        self::assertStringContainsString('name="data[title]"', $html);
+        self::assertStringContainsString('name="data[alignment]"', $html);
+    }
 }

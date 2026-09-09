@@ -1,0 +1,96 @@
+/* Collapsible desktop sidebar */
+.sidebar-collapse {
+  display: none;
+}
+
+@media (min-width: 921px) {
+  .admin-shell,
+  .admin-brand-copy,
+  .nav-copy,
+  .sidebar-status,
+  .sidebar-account {
+    transition: 180ms ease;
+    transition-property: grid-template-columns, padding, margin, opacity;
+  }
+  .admin-brand {
+    position: relative;
+  }
+  .sidebar-collapse {
+    position: absolute;
+    z-index: 2;
+    top: 1.5rem;
+    right: -0.75rem;
+    display: grid;
+    width: 1.5rem;
+    height: 1.5rem;
+    min-width: 1.5rem;
+    min-height: 1.5rem;
+    padding: 0;
+    place-items: center;
+    border: 1px solid var(--admin-line);
+    border-radius: 50%;
+    color: var(--admin-muted);
+    background: var(--admin-surface);
+    box-shadow: 0 2px 8px rgb(23 35 31 / 8%);
+  }
+  .sidebar-collapse:hover {
+    color: var(--admin-accent-dark);
+    background: var(--admin-accent-soft);
+    box-shadow: 0 2px 8px rgb(23 35 31 / 10%);
+  }
+  .sidebar-collapse svg {
+    width: 0.85rem;
+    height: 0.85rem;
+    transition: transform 180ms ease;
+  }
+  .admin-shell.sidebar-collapsed {
+    grid-template-columns: 4.75rem minmax(0, 1fr);
+  }
+  .sidebar-collapsed .admin-brand {
+    justify-content: center;
+    padding-inline: 0.75rem;
+  }
+  .sidebar-collapsed .admin-brand > a {
+    justify-content: center;
+  }
+  .sidebar-collapsed .admin-brand-copy,
+  .sidebar-collapsed .nav-copy,
+  .sidebar-collapsed .navigation-label,
+  .sidebar-collapsed .sidebar-status > span:last-child,
+  .sidebar-collapsed .account-copy,
+  .sidebar-collapsed .sidebar-account form {
+    display: none;
+  }
+  .sidebar-collapsed .sidebar-collapse svg {
+    transform: rotate(180deg);
+  }
+  .sidebar-collapsed .admin-navigation {
+    padding-inline: 0.65rem;
+  }
+  .sidebar-collapsed .admin-navigation a {
+    grid-template-columns: 1fr;
+    padding-inline: 0.45rem;
+  }
+  .sidebar-collapsed .nav-icon {
+    margin-inline: auto;
+  }
+  .sidebar-collapsed .navigation-label-secondary {
+    display: block;
+    height: 1px;
+    margin: 1rem 0.3rem;
+    padding: 0;
+    overflow: hidden;
+    border-top: 1px solid var(--admin-line);
+    color: transparent;
+  }
+  .sidebar-collapsed .sidebar-status {
+    justify-content: center;
+    margin-inline: 0.8rem;
+  }
+  .sidebar-collapsed .sidebar-account {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    padding-inline: 0.75rem;
+  }
+}
+

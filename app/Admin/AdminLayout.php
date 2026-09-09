@@ -10,7 +10,22 @@ use FlatFileCms\Http\Response;
 
 final readonly class AdminLayout
 {
-    private const string ASSET_VERSION = '17.5.4';
+    private const string ASSET_VERSION = '18.0.0';
+
+    private const array ADMIN_STYLESHEETS = [
+        '/assets/admin/admin-analytics.css',
+        '/assets/admin/admin-pages.css',
+        '/assets/admin/admin-builder.css',
+        '/assets/admin/admin-core.css',
+        '/assets/admin/admin-shell.css',
+        '/assets/admin/admin-navigation.css',
+        '/assets/admin/admin-settings.css',
+        '/assets/admin/admin-forms.css',
+        '/assets/admin/admin-tree.css',
+        '/assets/admin/admin-system.css',
+        '/assets/admin/admin-account.css',
+        '/assets/admin/admin-auth.css',
+    ];
 
     public function __construct(
         private Authenticator $authenticator,
@@ -66,7 +81,7 @@ final readonly class AdminLayout
             $this->views->render('layout/document', [
                 'title' => $title,
                 'csrfToken' => $this->csrf->token(),
-                'styles' => $styles . $this->stylesheet('/assets/admin/admin.css'),
+                'styles' => $styles . $this->stylesheets(self::ADMIN_STYLESHEETS),
                 'scripts' => $this->script('/assets/admin/admin.js') . $scripts,
                 'bodyClass' => $authenticated ? 'admin-body' : 'auth-body',
                 'body' => $body,
@@ -89,6 +104,12 @@ final readonly class AdminLayout
     private function stylesheet(string $path): string
     {
         return "<link rel=\"stylesheet\" href=\"{$path}?v=" . self::ASSET_VERSION . "\">";
+    }
+
+    /** @param list<string> $paths */
+    private function stylesheets(array $paths): string
+    {
+        return implode('', array_map($this->stylesheet(...), $paths));
     }
 
     private function script(string $path): string

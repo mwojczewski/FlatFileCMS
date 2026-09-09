@@ -33,6 +33,8 @@ $enabledCount = count(array_filter($blocks, static fn(array $block): bool => $bl
                         <span class="builder-preview-type"><?= $escape($block['name']) ?></span>
                         <span class="block-visibility <?= $block['enabled'] ? 'is-visible' : '' ?>"><i aria-hidden="true"></i><?= $block['enabled'] ? 'Widoczny' : 'Ukryty' ?></span>
                         <div class="block-actions">
+                            <button type="button" class="icon-button builder-action-move" data-block-move="-1" aria-label="Przenieś blok wyżej" title="Przenieś wyżej">↑</button>
+                            <button type="button" class="icon-button builder-action-move" data-block-move="1" aria-label="Przenieś blok niżej" title="Przenieś niżej">↓</button>
                             <button type="button" class="icon-button builder-action-edit" data-block-edit="<?= $escape($block['id']) ?>" aria-label="Edytuj blok" title="Edytuj blok"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4z"/></svg></button>
                             <?php foreach ($actions as [$url, $fixedLabel, $class]): $label = $fixedLabel ?? ($block['enabled'] ? 'Ukryj blok' : 'Pokaż blok'); ?>
                                 <form method="post" action="<?= $url ?>"<?= $class === 'builder-action-remove' ? ' data-confirm="Usunąć ten blok bezpowrotnie?"' : '' ?>><input type="hidden" name="_csrf" value="<?= $escape($csrfToken) ?>"><input type="hidden" name="identity" value="<?= $escape($identity->value()) ?>"><input type="hidden" name="id" value="<?= $escape($block['id']) ?>"><input type="hidden" name="revision" value="<?= $escape($revision->value()) ?>"><button type="submit" class="icon-button <?= $class ?>" aria-label="<?= $escape($label) ?>" title="<?= $escape($label) ?>">
@@ -61,8 +63,18 @@ $enabledCount = count(array_filter($blocks, static fn(array $block): bool => $bl
                 <input type="hidden" name="type" value="<?= $escape($block['type']) ?>">
                 <input type="hidden" name="id" value="<?= $escape($block['id']) ?>">
                 <input type="hidden" name="revision" value="<?= $escape($revision->value()) ?>">
-                <nav class="block-inspector-tabs" aria-label="Sekcje ustawień"><span class="active">Treść</span><span>Wygląd</span><span>Widoczność</span></nav>
-                <div class="block-inspector-fields"><?= $block['fields'] ?></div>
+                <nav class="block-inspector-tabs" aria-label="Sekcje ustawień" role="tablist">
+                    <button type="button" class="active" data-inspector-tab="content" role="tab" aria-selected="true">Treść</button>
+                    <button type="button" data-inspector-tab="appearance" role="tab" aria-selected="false">Wygląd</button>
+                    <button type="button" data-inspector-tab="visibility" role="tab" aria-selected="false">Widoczność</button>
+                </nav>
+                <?= $block['fields'] ?>
+                <div class="block-inspector-fields block-panel-fields block-visibility-panel" data-block-panel-fields="visibility" hidden>
+                    <div class="field">
+                        <div class="field-heading"><span>Widoczność bloku</span><small>Ukryty blok pozostaje zapisany w treści strony, ale nie jest renderowany publicznie.</small></div>
+                        <label class="switch"><input type="checkbox" data-block-visibility<?= $block['enabled'] ? ' checked' : '' ?>><span data-block-visibility-label><?= $block['enabled'] ? 'Blok widoczny' : 'Blok ukryty' ?></span></label>
+                    </div>
+                </div>
                 <footer class="block-inspector-actions"><span data-block-preview-status>Podgląd aktualny</span><button type="submit">Zapisz blok</button></footer>
             </form>
         <?php endforeach; ?>

@@ -184,6 +184,18 @@ final class BlockRegistry
                     $this->localizedUiText($definition[$uiField], $path . '.' . $name . '.' . $uiField);
                 }
             }
+            if (isset($definition['panel'])) {
+                $panel = ContentData::string($definition['panel'], $path . '.' . $name . '.panel');
+                if (!\in_array($panel, ['content', 'appearance'], true)) {
+                    throw new InvalidArgumentException(\sprintf('Field "%s" uses unknown editor panel "%s".', $name, $panel));
+                }
+            }
+            $panel = $definition['panel'] ?? 'content';
+            if (!\is_string($panel) || !\in_array($panel, ['content', 'appearance'], true)) {
+                throw new InvalidArgumentException(
+                    \sprintf('Field "%s" uses an invalid editor panel.', $name),
+                );
+            }
 
             $fields[$name] = $fieldDefinition;
         }
