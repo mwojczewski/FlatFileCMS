@@ -33,6 +33,7 @@ final readonly class ConfigurationManager
             'name' => $input->siteName,
             'url' => rtrim($input->siteUrl, '/'),
             'defaultLayout' => $input->defaultLayout,
+            'icons' => $input->siteIcons,
         ]];
         $seo = $this->mapping($current['seo'] ?? []);
         $current['seo'] = [...$seo, ...[

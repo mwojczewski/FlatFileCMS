@@ -5,190 +5,173 @@ slug:
   pl: tworzenie-wlasnych-blokow
   en: creating-custom-blocks
 title:
-  pl: 'Tworzenie własnych bloków w FlatFile CMS'
-  en: 'Creating custom blocks in FlatFile CMS'
-date: '2026-09-04'
+  pl: "Tworzenie własnych bloków w FlatFile CMS"
+  en: "Creating custom blocks in FlatFile CMS"
+date: "2026-09-04"
 order: 2
 category: blocks
 excerpt:
-  pl: 'Kompletny przewodnik po strukturze pakietu bloku, kontrakcie block.yml, polach, tłumaczeniach, rendererze PHP, mediach, assetach i Page Builderze.'
-  en: 'A complete guide to block package structure, the block.yml contract, fields, translations, the PHP renderer, media, assets and Page Builder.'
+  pl: "Kompletny przewodnik po strukturze pakietu bloku, kontrakcie block.yml, polach, tłumaczeniach, rendererze PHP, mediach, assetach i Page Builderze."
+  en: "A complete guide to block package structure, the block.yml contract, fields, translations, the PHP renderer, media, assets and Page Builder."
 seo:
   title:
-    pl: 'Tworzenie własnych bloków w FlatFile CMS — tutorial techniczny'
-    en: 'Creating custom blocks in FlatFile CMS — technical tutorial'
+    pl: "Tworzenie własnych bloków w FlatFile CMS - tutorial techniczny"
+    en: "Creating custom blocks in FlatFile CMS - technical tutorial"
   description:
-    pl: 'Zbuduj własny blok FlatFile CMS od scaffoldu i schematu YAML po bezpieczny renderer PHP, responsywne media, assety i walidację.'
-    en: 'Build a custom FlatFile CMS block from scaffolding and its YAML schema to a safe PHP renderer, responsive media, assets and validation.'
+    pl: "Zbuduj własny blok FlatFile CMS od scaffoldu i schematu YAML po bezpieczny renderer PHP, responsywne media, assety i walidację."
+    en: "Build a custom FlatFile CMS block from scaffolding and its YAML schema to a safe PHP renderer, responsive media, assets and validation."
   robots:
     index: true
     follow: true
   openGraph: {}
   twitter: {}
   jsonLd:
-    '@context': 'https://schema.org'
-    '@type': TechArticle
-    headline: 'Creating custom blocks in FlatFile CMS'
-    dateModified: '2026-09-04'
+    "@context": "https://schema.org"
+    "@type": TechArticle
+    headline: "Creating custom blocks in FlatFile CMS"
+    dateModified: "2026-09-04"
 blocks:
-  -
-    id: 01a06830-3003-7401-8401-000000000001
+  - id: 01a06830-3003-7401-8401-000000000001
     type: docs-hero
     enabled: true
     data:
       breadcrumb:
-        pl: 'Dokumentacja / 03 / System bloków'
-        en: 'Documentation / 03 / Block system'
+        pl: "Dokumentacja / 03 / System bloków"
+        en: "Documentation / 03 / Block system"
       title:
-        pl: 'Tworzenie własnych bloków'
-        en: 'Creating custom blocks'
+        pl: "Tworzenie własnych bloków"
+        en: "Creating custom blocks"
       lead:
-        pl: 'Od pustego katalogu do komponentu dostępnego w Page Builderze — z zamkniętym kontraktem danych, tłumaczeniami, bezpiecznym PHP, mediami oraz assetami publikowanymi tylko wtedy, gdy są potrzebne.'
-        en: 'From an empty directory to a component available in Page Builder — with a closed data contract, translations, safe PHP, media and assets published only when needed.'
+        pl: "Od pustego katalogu do komponentu dostępnego w Page Builderze - z zamkniętym kontraktem danych, tłumaczeniami, bezpiecznym PHP, mediami oraz assetami publikowanymi tylko wtedy, gdy są potrzebne."
+        en: "From an empty directory to a component available in Page Builder - with a closed data contract, translations, safe PHP, media and assets published only when needed."
       level: średniozaawansowany
       reading_time:
-        pl: 'około 45 minut'
-        en: 'about 45 minutes'
-      updated: '2026-09-04'
+        pl: "około 45 minut"
+        en: "about 45 minutes"
+      updated: "2026-09-04"
       topics:
-        -
-          label:
+        - label:
             pl: block.yml
             en: block.yml
-        -
-          label:
+        - label:
             pl: PHP
             en: PHP
-        -
-          label:
+        - label:
             pl: Walidacja
             en: Validation
-        -
-          label:
+        - label:
             pl: Lokalizacja
             en: Localization
-        -
-          label:
+        - label:
             pl: Media
             en: Media
-        -
-          label:
-            pl: 'Page Builder'
-            en: 'Page Builder'
-  -
-    id: 01a06830-3003-7402-8402-000000000002
+        - label:
+            pl: "Page Builder"
+            en: "Page Builder"
+  - id: 01a06830-3003-7402-8402-000000000002
     type: docs-toc
     enabled: true
     data:
       title:
-        pl: 'Plan budowy bloku'
-        en: 'Block-building plan'
+        pl: "Plan budowy bloku"
+        en: "Block-building plan"
       intro:
-        pl: 'Zaczniemy od granicy między kodem dewelopera a treścią redaktora. Następnie zdefiniujemy schemat, przejdziemy przez typy pól, napiszemy renderer i sprawdzimy cały cykl życia komponentu.'
-        en: 'We begin with the boundary between developer code and editor content. Then we define the schema, examine field types, write the renderer and verify the complete component lifecycle.'
+        pl: "Zaczniemy od granicy między kodem dewelopera a treścią redaktora. Następnie zdefiniujemy schemat, przejdziemy przez typy pól, napiszemy renderer i sprawdzimy cały cykl życia komponentu."
+        en: "We begin with the boundary between developer code and editor content. Then we define the schema, examine field types, write the renderer and verify the complete component lifecycle."
       items:
-        -
-          number: '01'
+        - number: "01"
           title:
-            pl: 'Model bloku'
-            en: 'Block model'
+            pl: "Model bloku"
+            en: "Block model"
           description:
-            pl: 'Pakiet deweloperski i automatyczne odkrywanie.'
-            en: 'Developer package and automatic discovery.'
+            pl: "Pakiet deweloperski i automatyczne odkrywanie."
+            en: "Developer package and automatic discovery."
           url:
-            pl: '/pl/dokumentacja/tworzenie-wlasnych-blokow#model-bloku'
-            en: '/en/documentation/creating-custom-blocks#model-bloku'
-        -
-          number: '02'
+            pl: "/pl/dokumentacja/tworzenie-wlasnych-blokow#model-bloku"
+            en: "/en/documentation/creating-custom-blocks#model-bloku"
+        - number: "02"
           title:
             pl: Scaffold
             en: Scaffold
           description:
-            pl: 'Bezpieczne wygenerowanie struktury startowej.'
-            en: 'Safely generating the initial structure.'
+            pl: "Bezpieczne wygenerowanie struktury startowej."
+            en: "Safely generating the initial structure."
           url:
-            pl: '/pl/dokumentacja/tworzenie-wlasnych-blokow#scaffold'
-            en: '/en/documentation/creating-custom-blocks#scaffold'
-        -
-          number: '03'
+            pl: "/pl/dokumentacja/tworzenie-wlasnych-blokow#scaffold"
+            en: "/en/documentation/creating-custom-blocks#scaffold"
+        - number: "03"
           title:
-            pl: 'Kontrakt pól'
-            en: 'Field contract'
+            pl: "Kontrakt pól"
+            en: "Field contract"
           description:
-            pl: 'Typy, reguły, tłumaczenia i repeatery.'
-            en: 'Types, rules, translations and repeaters.'
+            pl: "Typy, reguły, tłumaczenia i repeatery."
+            en: "Types, rules, translations and repeaters."
           url:
-            pl: '/pl/dokumentacja/tworzenie-wlasnych-blokow#developer-experience'
-            en: '/en/documentation/creating-custom-blocks#developer-experience'
-        -
-          number: '04'
+            pl: "/pl/dokumentacja/tworzenie-wlasnych-blokow#developer-experience"
+            en: "/en/documentation/creating-custom-blocks#developer-experience"
+        - number: "04"
           title:
-            pl: 'Renderer PHP'
-            en: 'PHP renderer'
+            pl: "Renderer PHP"
+            en: "PHP renderer"
           description:
-            pl: 'Znormalizowane dane i ograniczony RenderContext.'
-            en: 'Normalized data and the constrained RenderContext.'
+            pl: "Znormalizowane dane i ograniczony RenderContext."
+            en: "Normalized data and the constrained RenderContext."
           url:
-            pl: '/pl/dokumentacja/tworzenie-wlasnych-blokow#renderer'
-            en: '/en/documentation/creating-custom-blocks#renderer'
-        -
-          number: '05'
+            pl: "/pl/dokumentacja/tworzenie-wlasnych-blokow#renderer"
+            en: "/en/documentation/creating-custom-blocks#renderer"
+        - number: "05"
           title:
-            pl: 'Media i assety'
-            en: 'Media and assets'
+            pl: "Media i assety"
+            en: "Media and assets"
           description:
-            pl: 'Obrazy, warianty, CSS, JavaScript i fingerprinting.'
-            en: 'Images, variants, CSS, JavaScript and fingerprinting.'
+            pl: "Obrazy, warianty, CSS, JavaScript i fingerprinting."
+            en: "Images, variants, CSS, JavaScript and fingerprinting."
           url:
-            pl: '/pl/dokumentacja/tworzenie-wlasnych-blokow#media-assets'
-            en: '/en/documentation/creating-custom-blocks#media-assets'
-        -
-          number: '06'
+            pl: "/pl/dokumentacja/tworzenie-wlasnych-blokow#media-assets"
+            en: "/en/documentation/creating-custom-blocks#media-assets"
+        - number: "06"
           title:
-            pl: 'Instancja bloku'
-            en: 'Block instance'
+            pl: "Instancja bloku"
+            en: "Block instance"
           description:
-            pl: 'content.yml, UUID v7 i operacje Page Buildera.'
-            en: 'content.yml, UUID v7 and Page Builder operations.'
+            pl: "content.yml, UUID v7 i operacje Page Buildera."
+            en: "content.yml, UUID v7 and Page Builder operations."
           url:
-            pl: '/pl/dokumentacja/tworzenie-wlasnych-blokow#instancja'
-            en: '/en/documentation/creating-custom-blocks#instancja'
-        -
-          number: '07'
+            pl: "/pl/dokumentacja/tworzenie-wlasnych-blokow#instancja"
+            en: "/en/documentation/creating-custom-blocks#instancja"
+        - number: "07"
           title:
             pl: Testowanie
             en: Testing
           description:
-            pl: 'Walidacja pakietu, strony i publicznego HTML.'
-            en: 'Package, page and public HTML validation.'
+            pl: "Walidacja pakietu, strony i publicznego HTML."
+            en: "Package, page and public HTML validation."
           url:
-            pl: '/pl/dokumentacja/tworzenie-wlasnych-blokow#testowanie'
-            en: '/en/documentation/creating-custom-blocks#testowanie'
-        -
-          number: '08'
+            pl: "/pl/dokumentacja/tworzenie-wlasnych-blokow#testowanie"
+            en: "/en/documentation/creating-custom-blocks#testowanie"
+        - number: "08"
           title:
             pl: Diagnostyka
             en: Troubleshooting
           description:
-            pl: 'Najczęstsze błędy i ich właściwa warstwa.'
-            en: 'Common failures and their correct layer.'
+            pl: "Najczęstsze błędy i ich właściwa warstwa."
+            en: "Common failures and their correct layer."
           url:
-            pl: '/pl/dokumentacja/tworzenie-wlasnych-blokow#diagnostyka-bloku'
-            en: '/en/documentation/creating-custom-blocks#diagnostyka-bloku'
-  -
-    id: 01a06830-3003-7403-8403-000000000003
+            pl: "/pl/dokumentacja/tworzenie-wlasnych-blokow#diagnostyka-bloku"
+            en: "/en/documentation/creating-custom-blocks#diagnostyka-bloku"
+  - id: 01a06830-3003-7403-8403-000000000003
     type: technical-table
     enabled: true
     data:
       eyebrow:
-        pl: 'Anatomia pakietu'
-        en: 'Package anatomy'
+        pl: "Anatomia pakietu"
+        en: "Package anatomy"
       title:
-        pl: 'Jeden katalog, pięć jasno określonych ról.'
-        en: 'One directory, five clearly defined roles.'
+        pl: "Jeden katalog, pięć jasno określonych ról."
+        en: "One directory, five clearly defined roles."
       intro:
-        pl: 'Rejestr skanuje bezpośrednie podkatalogi `blocks/`. Tylko dwa pliki są obowiązkowe; pozostałe rozszerzają prezentację i doświadczenie edytora.'
-        en: 'The registry scans direct subdirectories of `blocks/`. Only two files are required; the others extend presentation and the editor experience.'
+        pl: "Rejestr skanuje bezpośrednie podkatalogi `blocks/`. Tylko dwa pliki są obowiązkowe; pozostałe rozszerzają prezentację i doświadczenie edytora."
+        en: "The registry scans direct subdirectories of `blocks/`. Only two files are required; the others extend presentation and the editor experience."
       column_1:
         pl: Plik
         en: File
@@ -202,73 +185,67 @@ blocks:
         pl: Odbiorca
         en: Consumer
       rows:
-        -
-          cell_1:
+        - cell_1:
             pl: block.yml
             en: block.yml
           cell_2:
             pl: Wymagany
             en: Required
           cell_3:
-            pl: 'Definiuje metadane, pola i reguły walidacji.'
-            en: 'Defines metadata, fields and validation rules.'
+            pl: "Definiuje metadane, pola i reguły walidacji."
+            en: "Defines metadata, fields and validation rules."
           cell_4:
-            pl: 'Registry i Page Builder'
-            en: 'Registry and Page Builder'
-        -
-          cell_1:
+            pl: "Registry i Page Builder"
+            en: "Registry and Page Builder"
+        - cell_1:
             pl: render.php
             en: render.php
           cell_2:
             pl: Wymagany
             en: Required
           cell_3:
-            pl: 'Zamienia zlokalizowane dane na fragment HTML.'
-            en: 'Converts localized data into an HTML fragment.'
+            pl: "Zamienia zlokalizowane dane na fragment HTML."
+            en: "Converts localized data into an HTML fragment."
           cell_4:
             pl: BlockRenderer
             en: BlockRenderer
-        -
-          cell_1:
+        - cell_1:
             pl: style.css
             en: style.css
           cell_2:
             pl: Opcjonalny
             en: Optional
           cell_3:
-            pl: 'Zawiera style ograniczone klasą komponentu.'
-            en: 'Contains styles scoped with the component class.'
+            pl: "Zawiera style ograniczone klasą komponentu."
+            en: "Contains styles scoped with the component class."
           cell_4:
             pl: AssetCollector
             en: AssetCollector
-        -
-          cell_1:
+        - cell_1:
             pl: script.js
             en: script.js
           cell_2:
             pl: Opcjonalny
             en: Optional
           cell_3:
-            pl: 'Dodaje progresywne zachowanie w przeglądarce.'
-            en: 'Adds progressive browser behaviour.'
+            pl: "Dodaje progresywne zachowanie w przeglądarce."
+            en: "Adds progressive browser behaviour."
           cell_4:
             pl: AssetCollector
             en: AssetCollector
-        -
-          cell_1:
+        - cell_1:
             pl: preview.webp
             en: preview.webp
           cell_2:
             pl: Opcjonalny
             en: Optional
           cell_3:
-            pl: 'Pokazuje podgląd komponentu w pickerze bloków.'
-            en: 'Shows a component preview in the block picker.'
+            pl: "Pokazuje podgląd komponentu w pickerze bloków."
+            en: "Shows a component preview in the block picker."
           cell_4:
-            pl: 'Panel administratora'
-            en: 'Admin panel'
-  -
-    id: 01a06830-3003-7404-8404-000000000004
+            pl: "Panel administratora"
+            en: "Admin panel"
+  - id: 01a06830-3003-7404-8404-000000000004
     type: article-content
     enabled: true
     data:
@@ -307,10 +284,9 @@ blocks:
 
           Changing `block.yml` affects validation of every existing instance. Removing a field, changing its type or making it required can invalidate previously correct pages. Treat the schema as a public contract: incompatible changes require a content migration in the same release.
       note:
-        pl: 'Nie zapisuj logiki biznesowej w `content.yml`. YAML przechowuje dane instancji, a zachowanie komponentu należy do wersjonowanego pakietu bloku.'
-        en: 'Do not store business logic in `content.yml`. YAML stores instance data; component behaviour belongs to the versioned block package.'
-  -
-    id: 01a06830-3003-7405-8405-000000000005
+        pl: "Nie zapisuj logiki biznesowej w `content.yml`. YAML przechowuje dane instancji, a zachowanie komponentu należy do wersjonowanego pakietu bloku."
+        en: "Do not store business logic in `content.yml`. YAML stores instance data; component behaviour belongs to the versioned block package."
+  - id: 01a06830-3003-7405-8405-000000000005
     type: article-content
     enabled: true
     data:
@@ -325,7 +301,7 @@ blocks:
           php bin/cms block:create feature-card --with-assets
           ```
 
-          Bez `--with-assets` powstaną tylko obowiązkowe `block.yml` i `render.php`. Z opcją CLI doda również `style.css` oraz `script.js`. Polecenie odrzuci niepoprawny slug i istniejący katalog — nigdy celowo nie nadpisuje pakietu.
+          Bez `--with-assets` powstaną tylko obowiązkowe `block.yml` i `render.php`. Z opcją CLI doda również `style.css` oraz `script.js`. Polecenie odrzuci niepoprawny slug i istniejący katalog - nigdy celowo nie nadpisuje pakietu.
 
           Operacja jest odporna na częściowy zapis. `BlockScaffolder` zakłada blokadę na katalogu `blocks/`, tworzy prywatny katalog tymczasowy z losową nazwą, zapisuje do niego komplet plików, ustawia prawa i dopiero na końcu publikuje cały pakiet przez zmianę nazwy katalogu. Awaria po drugim pliku nie pozostawia półgotowego typu widocznego dla rejestru.
 
@@ -341,7 +317,7 @@ blocks:
           └── script.js
           ```
 
-          Pliki pakietu wersjonuj razem. Nie przesyłaj samego renderera bez odpowiadającego mu schematu — w czasie wdrożenia rejestr może wtedy odczytać kontrakt niezgodny z kodem.
+          Pliki pakietu wersjonuj razem. Nie przesyłaj samego renderera bez odpowiadającego mu schematu - w czasie wdrożenia rejestr może wtedy odczytać kontrakt niezgodny z kodem.
         en: |-
           ## 3. Generate a safe scaffold
 
@@ -369,22 +345,21 @@ blocks:
 
           Version the package files together. Do not deploy the renderer without its matching schema: the registry could otherwise read a contract that does not match the code.
       note:
-        pl: 'Scaffold tworzy pliki z bezpiecznymi wartościami początkowymi. Od tego momentu są zwykłym kodem źródłowym i podlegają przeglądowi, testom oraz wdrożeniu.'
-        en: 'The scaffold creates files with safe initial values. From then on they are ordinary source code subject to review, testing and deployment.'
-  -
-    id: 01a06830-3003-7406-8406-000000000006
+        pl: "Scaffold tworzy pliki z bezpiecznymi wartościami początkowymi. Od tego momentu są zwykłym kodem źródłowym i podlegają przeglądowi, testom oraz wdrożeniu."
+        en: "The scaffold creates files with safe initial values. From then on they are ordinary source code subject to review, testing and deployment."
+  - id: 01a06830-3003-7406-8406-000000000006
     type: code-showcase
     enabled: true
     data:
       eyebrow:
-        pl: 'Zamknięty kontrakt danych'
-        en: 'Closed data contract'
+        pl: "Zamknięty kontrakt danych"
+        en: "Closed data contract"
       title:
-        pl: 'Schemat jest jednocześnie dokumentacją, walidatorem i formularzem.'
-        en: 'The schema is documentation, validator and form at once.'
+        pl: "Schemat jest jednocześnie dokumentacją, walidatorem i formularzem."
+        en: "The schema is documentation, validator and form at once."
       description:
-        pl: 'Przykładowa karta funkcji pokazuje pola tłumaczalne, wybór z allowlisty oraz repeater. Każdy klucz danych nieobecny w `fields` zostanie odrzucony.'
-        en: 'This feature-card example demonstrates translatable fields, an allowlisted choice and a repeater. Every data key absent from `fields` is rejected.'
+        pl: "Przykładowa karta funkcji pokazuje pola tłumaczalne, wybór z allowlisty oraz repeater. Każdy klucz danych nieobecny w `fields` zostanie odrzucony."
+        en: "This feature-card example demonstrates translatable fields, an allowlisted choice and a repeater. Every data key absent from `fields` is rejected."
       filename: blocks/feature-card/block.yml
       code: |-
         schemaVersion: 1
@@ -420,24 +395,19 @@ blocks:
                 translatable: true
                 maxLength: 100
       bullets:
-        -
-          text:
-            pl: '`schemaVersion: 1` jawnie wersjonuje format definicji.'
-            en: '`schemaVersion: 1` explicitly versions the definition format.'
-        -
-          text:
-            pl: '`translatable` określa kształt wartości zapisanej w YAML.'
-            en: '`translatable` determines the shape stored in YAML.'
-        -
-          text:
-            pl: '`options` jest allowlistą, a nie podpowiedzią interfejsu.'
-            en: '`options` is an allowlist, not merely a UI suggestion.'
-        -
-          text:
-            pl: 'Repeater waliduje każdy element rekurencyjnie.'
-            en: 'The repeater validates every item recursively.'
-  -
-    id: 01a06830-3003-7407-8407-000000000007
+        - text:
+            pl: "`schemaVersion: 1` jawnie wersjonuje format definicji."
+            en: "`schemaVersion: 1` explicitly versions the definition format."
+        - text:
+            pl: "`translatable` określa kształt wartości zapisanej w YAML."
+            en: "`translatable` determines the shape stored in YAML."
+        - text:
+            pl: "`options` jest allowlistą, a nie podpowiedzią interfejsu."
+            en: "`options` is an allowlist, not merely a UI suggestion."
+        - text:
+            pl: "Repeater waliduje każdy element rekurencyjnie."
+            en: "The repeater validates every item recursively."
+  - id: 01a06830-3003-7407-8407-000000000007
     type: article-content
     enabled: true
     data:
@@ -484,22 +454,21 @@ blocks:
 
           `image` and `file` reference a file in the current page directory. They are not arbitrary paths or public URLs. `repeater` is a list of mappings and is the only type allowed to declare nested `fields`.
       note:
-        pl: 'Wybierz najbardziej precyzyjny typ. Pole `text` przechowujące URL lub datę omija walidację, którą silnik już oferuje.'
-        en: 'Choose the most precise type. A `text` field storing a URL or date bypasses validation already provided by the engine.'
-  -
-    id: 01a06830-3003-7408-8408-000000000008
+        pl: "Wybierz najbardziej precyzyjny typ. Pole `text` przechowujące URL lub datę omija walidację, którą silnik już oferuje."
+        en: "Choose the most precise type. A `text` field storing a URL or date bypasses validation already provided by the engine."
+  - id: 01a06830-3003-7408-8408-000000000008
     type: technical-table
     enabled: true
     data:
       eyebrow:
-        pl: 'Referencja pól'
-        en: 'Field reference'
+        pl: "Referencja pól"
+        en: "Field reference"
       title:
-        pl: 'Typ, wartość, reguły i właściwe użycie.'
-        en: 'Type, value, rules and correct usage.'
+        pl: "Typ, wartość, reguły i właściwe użycie."
+        en: "Type, value, rules and correct usage."
       intro:
-        pl: 'Ta tabela jest skrótem do projektowania schematu. Walidacja definicji uruchamia się przy pierwszym użyciu rejestru, zanim dane trafią do renderera.'
-        en: 'This table is a schema-design shortcut. Definition validation runs when the registry is first used, before data reaches the renderer.'
+        pl: "Ta tabela jest skrótem do projektowania schematu. Walidacja definicji uruchamia się przy pierwszym użyciu rejestru, zanim dane trafią do renderera."
+        en: "This table is a schema-design shortcut. Definition validation runs when the registry is first used, before data reaches the renderer."
       column_1:
         pl: Typ
         en: Type
@@ -513,112 +482,103 @@ blocks:
         pl: Zastosowanie
         en: Use
       rows:
-        -
-          cell_1:
-            pl: 'text / textarea'
-            en: 'text / textarea'
+        - cell_1:
+            pl: "text / textarea"
+            en: "text / textarea"
           cell_2:
             pl: String
             en: String
           cell_3:
-            pl: 'minLength i maxLength'
-            en: 'minLength and maxLength'
+            pl: "minLength i maxLength"
+            en: "minLength and maxLength"
           cell_4:
-            pl: 'Tekst bez formatowania'
-            en: 'Unformatted text'
-        -
-          cell_1:
+            pl: "Tekst bez formatowania"
+            en: "Unformatted text"
+        - cell_1:
             pl: markdown
             en: markdown
           cell_2:
-            pl: 'String Markdown'
-            en: 'Markdown string'
+            pl: "String Markdown"
+            en: "Markdown string"
           cell_3:
-            pl: 'minLength i maxLength'
-            en: 'minLength and maxLength'
+            pl: "minLength i maxLength"
+            en: "minLength and maxLength"
           cell_4:
-            pl: 'Dłuższa treść redakcyjna'
-            en: 'Rich editorial content'
-        -
-          cell_1:
-            pl: 'number / boolean'
-            en: 'number / boolean'
+            pl: "Dłuższa treść redakcyjna"
+            en: "Rich editorial content"
+        - cell_1:
+            pl: "number / boolean"
+            en: "number / boolean"
           cell_2:
-            pl: 'Liczba lub bool'
-            en: 'Number or bool'
+            pl: "Liczba lub bool"
+            en: "Number or bool"
           cell_3:
-            pl: 'min, max oraz integer'
-            en: 'min, max and integer'
+            pl: "min, max oraz integer"
+            en: "min, max and integer"
           cell_4:
-            pl: 'Parametry i przełączniki'
-            en: 'Parameters and switches'
-        -
-          cell_1:
-            pl: 'select / multiselect'
-            en: 'select / multiselect'
+            pl: "Parametry i przełączniki"
+            en: "Parameters and switches"
+        - cell_1:
+            pl: "select / multiselect"
+            en: "select / multiselect"
           cell_2:
-            pl: 'Wartość lub lista'
-            en: 'Value or list'
+            pl: "Wartość lub lista"
+            en: "Value or list"
           cell_3:
-            pl: 'options oraz limity listy'
-            en: 'options and list limits'
+            pl: "options oraz limity listy"
+            en: "options and list limits"
           cell_4:
-            pl: 'Zamknięte warianty'
-            en: 'Closed variants'
-        -
-          cell_1:
-            pl: 'url / email'
-            en: 'url / email'
+            pl: "Zamknięte warianty"
+            en: "Closed variants"
+        - cell_1:
+            pl: "url / email"
+            en: "url / email"
           cell_2:
-            pl: 'Sformatowany string'
-            en: 'Formatted string'
+            pl: "Sformatowany string"
+            en: "Formatted string"
           cell_3:
-            pl: 'Ścisły format'
-            en: 'Strict format'
+            pl: "Ścisły format"
+            en: "Strict format"
           cell_4:
-            pl: 'Linki i dane kontaktowe'
-            en: 'Links and contact data'
-        -
-          cell_1:
-            pl: 'date / datetime / color'
-            en: 'date / datetime / color'
+            pl: "Linki i dane kontaktowe"
+            en: "Links and contact data"
+        - cell_1:
+            pl: "date / datetime / color"
+            en: "date / datetime / color"
           cell_2:
-            pl: 'Sformatowany string'
-            en: 'Formatted string'
+            pl: "Sformatowany string"
+            en: "Formatted string"
           cell_3:
-            pl: 'Kalendarz lub wzorzec'
-            en: 'Calendar or pattern'
+            pl: "Kalendarz lub wzorzec"
+            en: "Calendar or pattern"
           cell_4:
-            pl: 'Metadane prezentacyjne'
-            en: 'Presentation metadata'
-        -
-          cell_1:
-            pl: 'image / file'
-            en: 'image / file'
+            pl: "Metadane prezentacyjne"
+            en: "Presentation metadata"
+        - cell_1:
+            pl: "image / file"
+            en: "image / file"
           cell_2:
-            pl: 'Mapa z src'
-            en: 'Mapping with src'
+            pl: "Mapa z src"
+            en: "Mapping with src"
           cell_3:
-            pl: 'Bezpieczna ścieżka i istnienie'
-            en: 'Safe path and existence'
+            pl: "Bezpieczna ścieżka i istnienie"
+            en: "Safe path and existence"
           cell_4:
-            pl: 'Media lokalne strony'
-            en: 'Page-local media'
-        -
-          cell_1:
+            pl: "Media lokalne strony"
+            en: "Page-local media"
+        - cell_1:
             pl: repeater
             en: repeater
           cell_2:
-            pl: 'Lista map'
-            en: 'List of mappings'
+            pl: "Lista map"
+            en: "List of mappings"
           cell_3:
-            pl: 'fields i limity elementów'
-            en: 'fields and item limits'
+            pl: "fields i limity elementów"
+            en: "fields and item limits"
           cell_4:
-            pl: 'Powtarzalne struktury'
-            en: 'Repeatable structures'
-  -
-    id: 01a06830-3003-7409-8409-000000000009
+            pl: "Powtarzalne struktury"
+            en: "Repeatable structures"
+  - id: 01a06830-3003-7409-8409-000000000009
     type: article-content
     enabled: true
     data:
@@ -689,10 +649,9 @@ blocks:
 
           Deep schemas are technically possible, but design them sparingly. If an editor has to navigate three nested lists, the component probably combines several responsibilities and should be split.
       note:
-        pl: 'Tłumaczenie jest regułą kontraktu, nie dekoracją panelu. Renderer otrzymuje już wartość wybraną dla bieżącego locale.'
-        en: 'Translation is a contract rule, not admin-panel decoration. The renderer receives a value already selected for the active locale.'
-  -
-    id: 01a06830-3003-7410-8410-000000000010
+        pl: "Tłumaczenie jest regułą kontraktu, nie dekoracją panelu. Renderer otrzymuje już wartość wybraną dla bieżącego locale."
+        en: "Translation is a contract rule, not admin-panel decoration. The renderer receives a value already selected for the active locale."
+  - id: 01a06830-3003-7410-8410-000000000010
     type: article-content
     enabled: true
     data:
@@ -730,7 +689,7 @@ blocks:
 
           ## 9. Nie duplikuj logiki lokalizacji
 
-          Jeżeli `title` jest tłumaczalny, `$data['title']` w rendererze jest już stringiem dla bieżącego locale — nie mapą z `pl` i `en`. To samo dotyczy tłumaczalnych pól wewnątrz repeatera oraz `alt` obrazu. Kod `$data['title'][$context->locale()]` byłby więc błędem warstwy.
+          Jeżeli `title` jest tłumaczalny, `$data['title']` w rendererze jest już stringiem dla bieżącego locale - nie mapą z `pl` i `en`. To samo dotyczy tłumaczalnych pól wewnątrz repeatera oraz `alt` obrazu. Kod `$data['title'][$context->locale()]` byłby więc błędem warstwy.
         en: |-
           ## 8. Render only validated data
 
@@ -763,12 +722,11 @@ blocks:
 
           ## 9. Do not duplicate localization logic
 
-          If `title` is translatable, `$data['title']` in the renderer is already a string for the active locale — not a `pl`/`en` mapping. The same applies to translatable repeater fields and image `alt`. Code such as `$data['title'][$context->locale()]` therefore violates the layer contract.
+          If `title` is translatable, `$data['title']` in the renderer is already a string for the active locale - not a `pl`/`en` mapping. The same applies to translatable repeater fields and image `alt`. Code such as `$data['title'][$context->locale()]` therefore violates the layer contract.
       note:
-        pl: 'Walidacja danych nie zastępuje kodowania kontekstowego. Poprawny string nadal musi przejść przez `escape()`, `url()` albo właściwy helper mediów.'
-        en: 'Data validation does not replace contextual encoding. A valid string must still pass through `escape()`, `url()` or the appropriate media helper.'
-  -
-    id: 01a06830-3003-7411-8411-000000000011
+        pl: "Walidacja danych nie zastępuje kodowania kontekstowego. Poprawny string nadal musi przejść przez `escape()`, `url()` albo właściwy helper mediów."
+        en: "Data validation does not replace contextual encoding. A valid string must still pass through `escape()`, `url()` or the appropriate media helper."
+  - id: 01a06830-3003-7411-8411-000000000011
     type: article-content
     enabled: true
     data:
@@ -867,10 +825,9 @@ blocks:
           });
           ```
       note:
-        pl: '`blocks/<type>/style.css` jest źródłem deweloperskim. `public/assets/blocks/...` zawiera wygenerowaną, odtwarzalną kopię runtime i nie powinien być edytowany ręcznie.'
-        en: '`blocks/<type>/style.css` is developer source. `public/assets/blocks/...` contains a generated reproducible runtime copy and should not be edited manually.'
-  -
-    id: 01a06830-3003-7412-8412-000000000012
+        pl: "`blocks/<type>/style.css` jest źródłem deweloperskim. `public/assets/blocks/...` zawiera wygenerowaną, odtwarzalną kopię runtime i nie powinien być edytowany ręcznie."
+        en: "`blocks/<type>/style.css` is developer source. `public/assets/blocks/...` contains a generated reproducible runtime copy and should not be edited manually."
+  - id: 01a06830-3003-7412-8412-000000000012
     type: article-content
     enabled: true
     data:
@@ -897,19 +854,19 @@ blocks:
                       en: SHA-256 revisions
           ```
 
-          `id` musi być UUID v7 zapisanym małymi znakami i unikalnym na stronie. `type` wskazuje nazwę katalogu pakietu. `enabled` kontroluje publikację, a `data` musi dokładnie odpowiadać `fields`. Nie dodawaj komentarzy konfiguracyjnych jako dodatkowych kluczy bloku — nieznane właściwości są odrzucane.
+          `id` musi być UUID v7 zapisanym małymi znakami i unikalnym na stronie. `type` wskazuje nazwę katalogu pakietu. `enabled` kontroluje publikację, a `data` musi dokładnie odpowiadać `fields`. Nie dodawaj komentarzy konfiguracyjnych jako dodatkowych kluczy bloku - nieznane właściwości są odrzucane.
 
           Blok wyłączony nadal podlega pełnej walidacji, lecz jest pomijany w publicznym HTML i API. Dzięki temu ukrycie komponentu nie staje się sposobem na przechowywanie danych niezgodnych z bieżącym kontraktem.
 
           ## 13. Używaj Page Buildera jako klienta schematu
 
-          Po dodaniu pakietu pojawia się on automatycznie w pickerze `/admin/pages/builder?path=<identity>`. Formularz nie jest zapisany w bloku — `BlockFormRenderer` buduje kontrolki na podstawie typów i reguł. Języki pochodzą z `config/languages.yml`, więc komponent nie zakłada na stałe pary PL/EN.
+          Po dodaniu pakietu pojawia się on automatycznie w pickerze `/admin/pages/builder?path=<identity>`. Formularz nie jest zapisany w bloku - `BlockFormRenderer` buduje kontrolki na podstawie typów i reguł. Języki pochodzą z `config/languages.yml`, więc komponent nie zakłada na stałe pary PL/EN.
 
           Administrator może dodać, edytować, duplikować, włączać, wyłączać, przeciągać i usuwać instancje. Duplikowanie generuje nowy UUID v7. Formularze Markdown korzystają z lokalnego EasyMDE, a podgląd klienta jest sanitizowany niezależnie od serwerowego renderera CommonMark.
 
           Każdy formularz niesie rewizję SHA-256 `content.yml`. Zapis pobiera blokadę strony, ponownie odczytuje dokument i zwraca HTTP 409, jeśli ktoś zapisał nowszą wersję. Dopiero kompletna walidacja strony oraz wszystkich bloków poprzedza atomową zmianę pliku.
 
-          `preview.webp`, jeśli istnieje, jest udostępniany wyłącznie przez uwierzytelniony endpoint przyjmujący typ bloku — panel nie przyjmuje dowolnej ścieżki pliku.
+          `preview.webp`, jeśli istnieje, jest udostępniany wyłącznie przez uwierzytelniony endpoint przyjmujący typ bloku - panel nie przyjmuje dowolnej ścieżki pliku.
         en: |-
           ## 12. Add an instance to a page
 
@@ -945,10 +902,9 @@ blocks:
 
           When present, `preview.webp` is served only through an authenticated endpoint receiving a block type; the panel never accepts an arbitrary file path.
       note:
-        pl: 'Panel zarządza instancjami i treścią. Definicja, renderer oraz assety pozostają niezmiennie własnością dewelopera.'
-        en: 'The panel manages instances and content. The definition, renderer and assets remain developer-owned.'
-  -
-    id: 01a06830-3003-7413-8413-000000000013
+        pl: "Panel zarządza instancjami i treścią. Definicja, renderer oraz assety pozostają niezmiennie własnością dewelopera."
+        en: "The panel manages instances and content. The definition, renderer and assets remain developer-owned."
+  - id: 01a06830-3003-7413-8413-000000000013
     type: article-content
     enabled: true
     data:
@@ -984,7 +940,7 @@ blocks:
           php bin/cms release:check
           ```
 
-          Ta kontrola skanuje wszystkie strony i kolekcje, ładuje definicje, weryfikuje layouty oraz waliduje każdą instancję — także wyłączoną. Wydanie z `[FAIL]` nie jest gotowe do przełączenia ruchu.
+          Ta kontrola skanuje wszystkie strony i kolekcje, ładuje definicje, weryfikuje layouty oraz waliduje każdą instancję - także wyłączoną. Wydanie z `[FAIL]` nie jest gotowe do przełączenia ruchu.
 
           ## 15. Wdróż pakiet atomowo na poziomie wydania
 
@@ -1021,7 +977,7 @@ blocks:
           php bin/cms release:check
           ```
 
-          This check scans every page and collection, loads definitions, verifies layouts and validates every instance — including disabled ones. A release containing `[FAIL]` is not ready to receive traffic.
+          This check scans every page and collection, loads definitions, verifies layouts and validates every instance - including disabled ones. A release containing `[FAIL]` is not ready to receive traffic.
 
           ## 15. Deploy the package atomically at release level
 
@@ -1029,120 +985,111 @@ blocks:
 
           After changing a schema, check all existing instances before publishing code. The safest order for an incompatible change is to prepare a YAML migration, run it against a content copy, execute `release:check`, and only then switch to the complete release.
       note:
-        pl: 'Test samego `render.php` nie wystarcza. Najważniejsze błędy powstają na granicach schematu, lokalizacji, mediów i publikacji assetów.'
-        en: 'Testing `render.php` alone is insufficient. The most important failures occur at schema, localization, media and asset-publication boundaries.'
-  -
-    id: 01a06830-3003-7414-8414-000000000014
+        pl: "Test samego `render.php` nie wystarcza. Najważniejsze błędy powstają na granicach schematu, lokalizacji, mediów i publikacji assetów."
+        en: "Testing `render.php` alone is insufficient. The most important failures occur at schema, localization, media and asset-publication boundaries."
+  - id: 01a06830-3003-7414-8414-000000000014
     type: diagnostic-table
     enabled: true
     data:
       anchor: diagnostyka-bloku
       eyebrow:
-        pl: '16 / Diagnostyka'
-        en: '16 / Troubleshooting'
+        pl: "16 / Diagnostyka"
+        en: "16 / Troubleshooting"
       title:
-        pl: 'Znajdź warstwę, zanim zmienisz kod.'
-        en: 'Find the layer before changing code.'
+        pl: "Znajdź warstwę, zanim zmienisz kod."
+        en: "Find the layer before changing code."
       intro:
-        pl: 'Komunikat widoczny przy zapisie albo renderowaniu zwykle wskazuje granicę, która odrzuciła dane. Zacznij od kontraktu i ścieżki błędu.'
-        en: 'A message shown during saving or rendering usually identifies the boundary that rejected data. Begin with the contract and error path.'
+        pl: "Komunikat widoczny przy zapisie albo renderowaniu zwykle wskazuje granicę, która odrzuciła dane. Zacznij od kontraktu i ścieżki błędu."
+        en: "A message shown during saving or rendering usually identifies the boundary that rejected data. Begin with the contract and error path."
       rows:
-        -
-          layer:
+        - layer:
             pl: Registry
             en: Registry
           problem:
-            pl: 'Typ bloku nie pojawia się w pickerze'
-            en: 'Block type does not appear in the picker'
+            pl: "Typ bloku nie pojawia się w pickerze"
+            en: "Block type does not appear in the picker"
           cause:
-            pl: 'Niepoprawna nazwa katalogu, brak wymaganego pliku, symlink albo błędny schemat.'
-            en: 'Invalid directory name, missing required file, symlink or invalid schema.'
+            pl: "Niepoprawna nazwa katalogu, brak wymaganego pliku, symlink albo błędny schemat."
+            en: "Invalid directory name, missing required file, symlink or invalid schema."
           check:
-            pl: 'Sprawdź slug katalogu, zwykłe pliki `block.yml` i `render.php` oraz `schemaVersion: 1`.'
-            en: 'Check the directory slug, regular `block.yml` and `render.php` files, and `schemaVersion: 1`.'
-        -
-          layer:
+            pl: "Sprawdź slug katalogu, zwykłe pliki `block.yml` i `render.php` oraz `schemaVersion: 1`."
+            en: "Check the directory slug, regular `block.yml` and `render.php` files, and `schemaVersion: 1`."
+        - layer:
             pl: Schema
             en: Schema
           problem:
-            pl: 'Zapis zwraca UNKNOWN_FIELD'
-            en: 'Save returns UNKNOWN_FIELD'
+            pl: "Zapis zwraca UNKNOWN_FIELD"
+            en: "Save returns UNKNOWN_FIELD"
           cause:
-            pl: 'Dane zawierają klucz nieobecny w definicji lub stary klucz po refaktorze.'
-            en: 'Data contains a key absent from the definition or an old key left after refactoring.'
+            pl: "Dane zawierają klucz nieobecny w definicji lub stary klucz po refaktorze."
+            en: "Data contains a key absent from the definition or an old key left after refactoring."
           check:
-            pl: 'Porównaj dokładnie `data` z `fields`; usuń albo jawnie zmigruj stary klucz.'
-            en: 'Compare `data` with `fields` exactly; remove or explicitly migrate the old key.'
-        -
-          layer:
+            pl: "Porównaj dokładnie `data` z `fields`; usuń albo jawnie zmigruj stary klucz."
+            en: "Compare `data` with `fields` exactly; remove or explicitly migrate the old key."
+        - layer:
             pl: Lokalizacja
             en: Localization
           problem:
-            pl: 'Brak wymaganej translacji'
-            en: 'Required translation is missing'
+            pl: "Brak wymaganej translacji"
+            en: "Required translation is missing"
           cause:
-            pl: 'Pole tłumaczalne nie ma wartości dla jednego z aktywnych języków.'
-            en: 'A translatable field has no value for one of the enabled languages.'
+            pl: "Pole tłumaczalne nie ma wartości dla jednego z aktywnych języków."
+            en: "A translatable field has no value for one of the enabled languages."
           check:
-            pl: 'Sprawdź `config/languages.yml` oraz każdy wymagany mapping locale w instancji.'
-            en: 'Check `config/languages.yml` and every required locale mapping in the instance.'
-        -
-          layer:
+            pl: "Sprawdź `config/languages.yml` oraz każdy wymagany mapping locale w instancji."
+            en: "Check `config/languages.yml` and every required locale mapping in the instance."
+        - layer:
             pl: Media
             en: Media
           problem:
             pl: MEDIA_NOT_FOUND
             en: MEDIA_NOT_FOUND
           cause:
-            pl: '`src` nie wskazuje istniejącego pliku w katalogu bieżącej strony.'
-            en: '`src` does not reference an existing file in the current page directory.'
+            pl: "`src` nie wskazuje istniejącego pliku w katalogu bieżącej strony."
+            en: "`src` does not reference an existing file in the current page directory."
           check:
-            pl: 'Umieść plik obok `content.yml` i zapisz samą bezpieczną nazwę względną.'
-            en: 'Place the file next to `content.yml` and store only its safe relative name.'
-        -
-          layer:
+            pl: "Umieść plik obok `content.yml` i zapisz samą bezpieczną nazwę względną."
+            en: "Place the file next to `content.yml` and store only its safe relative name."
+        - layer:
             pl: Renderer
             en: Renderer
           problem:
-            pl: 'Błąd typu lub niezdefiniowany indeks'
-            en: 'Type error or undefined index'
+            pl: "Błąd typu lub niezdefiniowany indeks"
+            en: "Type error or undefined index"
           cause:
-            pl: 'Kod renderera zakłada inne dane niż aktualny schemat lub nie obsługuje pola opcjonalnego.'
-            en: 'Renderer code assumes data different from the current schema or does not handle an optional field.'
+            pl: "Kod renderera zakłada inne dane niż aktualny schemat lub nie obsługuje pola opcjonalnego."
+            en: "Renderer code assumes data different from the current schema or does not handle an optional field."
           check:
             pl: "Zsynchronizuj renderer ze schematem i dla opcji stosuj `$data['field'] ?? wartość`."
             en: "Synchronize renderer and schema; use `$data['field'] ?? value` for optional fields."
-        -
-          layer:
+        - layer:
             pl: Assety
             en: Assets
           problem:
-            pl: 'CSS lub JS zwraca 403'
-            en: 'CSS or JavaScript returns 403'
+            pl: "CSS lub JS zwraca 403"
+            en: "CSS or JavaScript returns 403"
           cause:
-            pl: 'Serwer WWW nie może przejść przez katalog publicznego assetu lub odczytać `.htaccess`.'
-            en: 'The web server cannot traverse the public asset directory or read `.htaccess`.'
+            pl: "Serwer WWW nie może przejść przez katalog publicznego assetu lub odczytać `.htaccess`."
+            en: "The web server cannot traverse the public asset directory or read `.htaccess`."
           check:
-            pl: 'Sprawdź pełne `namei -l`, katalogi `0755`, pliki `0644` oraz log Apache.'
-            en: 'Check full `namei -l`, `0755` directories, `0644` files and the Apache error log.'
-        -
-          layer:
+            pl: "Sprawdź pełne `namei -l`, katalogi `0755`, pliki `0644` oraz log Apache."
+            en: "Check full `namei -l`, `0755` directories, `0644` files and the Apache error log."
+        - layer:
             pl: Współbieżność
             en: Concurrency
           problem:
-            pl: 'Page Builder zwraca HTTP 409'
-            en: 'Page Builder returns HTTP 409'
+            pl: "Page Builder zwraca HTTP 409"
+            en: "Page Builder returns HTTP 409"
           cause:
-            pl: 'Formularz zawiera starszą rewizję niż aktualny `content.yml`.'
-            en: 'The form contains an older revision than the current `content.yml`.'
+            pl: "Formularz zawiera starszą rewizję niż aktualny `content.yml`."
+            en: "The form contains an older revision than the current `content.yml`."
           check:
-            pl: 'Odśwież stronę, ponownie zastosuj zmianę i zapisz na aktualnej rewizji.'
-            en: 'Refresh the page, reapply the change and save against the current revision.'
+            pl: "Odśwież stronę, ponownie zastosuj zmianę i zapisz na aktualnej rewizji."
+            en: "Refresh the page, reapply the change and save against the current revision."
       note:
-        pl: 'Nie obchodź walidatora przez ręczne osłabienie schematu. Najpierw ustal, czy błąd leży w definicji, instancji, pliku medium czy rendererze.'
-        en: 'Do not bypass validation by weakening the schema. First determine whether the fault belongs to the definition, instance, media file or renderer.'
-  -
-    id: 01a06830-3003-7415-8415-000000000015
+        pl: "Nie obchodź walidatora przez ręczne osłabienie schematu. Najpierw ustal, czy błąd leży w definicji, instancji, pliku medium czy rendererze."
+        en: "Do not bypass validation by weakening the schema. First determine whether the fault belongs to the definition, instance, media file or renderer."
+  - id: 01a06830-3003-7415-8415-000000000015
     type: article-content
     enabled: true
     data:
@@ -1187,25 +1134,24 @@ blocks:
 
           A finished block is a small closed module: it has explicit input, validation, a safe HTML projection and assets loaded on demand. That predictability matters more than the number of options exposed to an editor.
       note:
-        pl: 'Jeśli kontraktu bloku nie da się wyjaśnić jednym zdaniem, prawdopodobnie warto podzielić komponent na dwa prostsze typy.'
-        en: 'If the block contract cannot be explained in one sentence, consider splitting the component into two simpler types.'
-  -
-    id: 01a06830-3003-7416-8416-000000000016
+        pl: "Jeśli kontraktu bloku nie da się wyjaśnić jednym zdaniem, prawdopodobnie warto podzielić komponent na dwa prostsze typy."
+        en: "If the block contract cannot be explained in one sentence, consider splitting the component into two simpler types."
+  - id: 01a06830-3003-7416-8416-000000000016
     type: call-to-action
     enabled: true
     data:
       eyebrow:
-        pl: 'Następny tutorial'
-        en: 'Next tutorial'
+        pl: "Następny tutorial"
+        en: "Next tutorial"
       title:
-        pl: 'Teraz uporządkuj całą strukturę treści.'
-        en: 'Now organize the complete content structure.'
+        pl: "Teraz uporządkuj całą strukturę treści."
+        en: "Now organize the complete content structure."
       description:
-        pl: 'Kolejny rozdział wyjaśni stabilne tożsamości stron, lokalizowane slugi, kolekcje, dziedziczenie tras i kontrakty plików YAML.'
-        en: 'The next chapter explains stable page identities, localized slugs, collections, route ancestry and YAML file contracts.'
+        pl: "Kolejny rozdział wyjaśni stabilne tożsamości stron, lokalizowane slugi, kolekcje, dziedziczenie tras i kontrakty plików YAML."
+        en: "The next chapter explains stable page identities, localized slugs, collections, route ancestry and YAML file contracts."
       button_label:
-        pl: 'Przejdź do struktury treści'
-        en: 'Continue to content structure'
+        pl: "Przejdź do struktury treści"
+        en: "Continue to content structure"
       button_url:
         pl: /pl/dokumentacja/struktura-tresci
         en: /en/documentation/content-structure

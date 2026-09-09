@@ -148,6 +148,7 @@ final readonly class AdminSettingsController
                 $this->requiredString($body['site_name'] ?? null, 'Site name'),
                 $this->requiredString($body['site_url'] ?? null, 'Site URL'),
                 $this->requiredString($body['default_layout'] ?? null, 'Default layout'),
+                $this->siteIcons($body),
                 $this->localizedBody($body['seo_title_suffix'] ?? null, $languages),
                 $this->localizedBody($body['seo_description'] ?? null, $languages),
                 $this->optionalBodyString($body['seo_og_image'] ?? null),
@@ -366,6 +367,35 @@ final readonly class AdminSettingsController
         $value = trim($value);
 
         return $value === '' ? null : $value;
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     * @return array<string, string>
+     */
+    private function siteIcons(array $body): array
+    {
+        $fields = [
+            'svg' => 'site_icon_svg',
+            'ico' => 'site_icon_ico',
+            'png32' => 'site_icon_png_32',
+            'png16' => 'site_icon_png_16',
+            'appleTouch' => 'site_apple_touch_icon',
+            'appleTouchPrecomposed' => 'site_apple_touch_icon_precomposed',
+            'manifest' => 'site_web_manifest',
+        ];
+        $icons = [];
+        foreach ($fields as $name => $field) {
+            if (!\array_key_exists($field, $body)) {
+                continue;
+            }
+            $value = $this->optionalBodyString($body[$field] ?? null);
+            if ($value !== null) {
+                $icons[$name] = $value;
+            }
+        }
+
+        return $icons;
     }
 
     /** @return array<string, mixed> */

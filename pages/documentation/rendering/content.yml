@@ -5,190 +5,173 @@ slug:
   pl: renderowanie
   en: rendering
 title:
-  pl: 'Rendering — od YAML do HTML'
-  en: 'Rendering — from YAML to HTML'
-date: '2026-09-07'
+  pl: "Rendering - od YAML do HTML"
+  en: "Rendering - from YAML to HTML"
+date: "2026-09-07"
 order: 4
 category: rendering
 excerpt:
-  pl: 'Techniczny przewodnik po całym potoku SSR — od routingu i PageViewModel przez renderery bloków i layout aż po media, assety oraz cache HTTP.'
-  en: 'A technical guide to the complete SSR pipeline — from routing and PageViewModel through block renderers and layout to media, assets and HTTP caching.'
+  pl: "Techniczny przewodnik po całym potoku SSR - od routingu i PageViewModel przez renderery bloków i layout aż po media, assety oraz cache HTTP."
+  en: "A technical guide to the complete SSR pipeline - from routing and PageViewModel through block renderers and layout to media, assets and HTTP caching."
 seo:
   title:
-    pl: 'Rendering w FlatFile CMS — kompletny tutorial od YAML do HTML'
-    en: 'Rendering in FlatFile CMS — complete YAML-to-HTML tutorial'
+    pl: "Rendering w FlatFile CMS - kompletny tutorial od YAML do HTML"
+    en: "Rendering in FlatFile CMS - complete YAML-to-HTML tutorial"
   description:
-    pl: 'Poznaj pipeline SSR, PageViewModel, RenderContext, layouty, partiale, obrazy, assety bloków oraz ETag i Last-Modified.'
-    en: 'Learn the SSR pipeline, PageViewModel, RenderContext, layouts, partials, images, block assets, ETag and Last-Modified.'
+    pl: "Poznaj pipeline SSR, PageViewModel, RenderContext, layouty, partiale, obrazy, assety bloków oraz ETag i Last-Modified."
+    en: "Learn the SSR pipeline, PageViewModel, RenderContext, layouts, partials, images, block assets, ETag and Last-Modified."
   robots:
     index: true
     follow: true
   openGraph: {}
   twitter: {}
   jsonLd:
-    '@context': 'https://schema.org'
-    '@type': TechArticle
-    headline: 'Rendering in FlatFile CMS — from YAML to HTML'
-    dateModified: '2026-09-07'
+    "@context": "https://schema.org"
+    "@type": TechArticle
+    headline: "Rendering in FlatFile CMS - from YAML to HTML"
+    dateModified: "2026-09-07"
 blocks:
-  -
-    id: 01a06d50-5005-7501-8501-000000000001
+  - id: 01a06d50-5005-7501-8501-000000000001
     type: docs-hero
     enabled: true
     data:
       breadcrumb:
-        pl: 'Dokumentacja / 05 / Rendering'
-        en: 'Documentation / 05 / Rendering'
+        pl: "Dokumentacja / 05 / Rendering"
+        en: "Documentation / 05 / Rendering"
       title:
-        pl: 'Rendering — od YAML do HTML'
-        en: 'Rendering — from YAML to HTML'
+        pl: "Rendering - od YAML do HTML"
+        en: "Rendering - from YAML to HTML"
       lead:
-        pl: 'Prześledź jedno żądanie od publicznego URL-a, przez indeks tras i PageViewModel, aż do bezpiecznego HTML-a, responsywnych obrazów, fingerprintowanych assetów i odpowiedzi 304.'
-        en: 'Trace one request from its public URL through the route index and PageViewModel to safe HTML, responsive images, fingerprinted assets and a 304 response.'
+        pl: "Prześledź jedno żądanie od publicznego URL-a, przez indeks tras i PageViewModel, aż do bezpiecznego HTML-a, responsywnych obrazów, fingerprintowanych assetów i odpowiedzi 304."
+        en: "Trace one request from its public URL through the route index and PageViewModel to safe HTML, responsive images, fingerprinted assets and a 304 response."
       level: zaawansowany
       reading_time:
-        pl: 'około 45 minut'
-        en: 'about 45 minutes'
-      updated: '2026-09-07'
+        pl: "około 45 minut"
+        en: "about 45 minutes"
+      updated: "2026-09-07"
       topics:
-        -
-          label:
+        - label:
             pl: SSR
             en: SSR
-        -
-          label:
+        - label:
             pl: PageViewModel
             en: PageViewModel
-        -
-          label:
+        - label:
             pl: RenderContext
             en: RenderContext
-        -
-          label:
+        - label:
             pl: Layouty
             en: Layouts
-        -
-          label:
+        - label:
             pl: Media
             en: Media
-        -
-          label:
-            pl: 'Cache HTTP'
-            en: 'HTTP cache'
-  -
-    id: 01a06d50-5005-7502-8502-000000000002
+        - label:
+            pl: "Cache HTTP"
+            en: "HTTP cache"
+  - id: 01a06d50-5005-7502-8502-000000000002
     type: docs-toc
     enabled: true
     data:
       title:
-        pl: 'Mapa potoku renderowania'
-        en: 'Rendering pipeline map'
+        pl: "Mapa potoku renderowania"
+        en: "Rendering pipeline map"
       intro:
-        pl: 'Każdy etap ma wąską odpowiedzialność. Dzięki temu źródłowy YAML, normalizację danych, HTML i cache można testować osobno.'
-        en: 'Every stage has a narrow responsibility. Source YAML, data normalization, HTML and caching can therefore be tested independently.'
+        pl: "Każdy etap ma wąską odpowiedzialność. Dzięki temu źródłowy YAML, normalizację danych, HTML i cache można testować osobno."
+        en: "Every stage has a narrow responsibility. Source YAML, data normalization, HTML and caching can therefore be tested independently."
       items:
-        -
-          number: '01'
+        - number: "01"
           title:
-            pl: 'Granica żądania'
-            en: 'Request boundary'
+            pl: "Granica żądania"
+            en: "Request boundary"
           description:
-            pl: 'Locale, ścieżka i wybór zasobu.'
-            en: 'Locale, path and resource selection.'
+            pl: "Locale, ścieżka i wybór zasobu."
+            en: "Locale, path and resource selection."
           url:
-            pl: '/pl/dokumentacja/renderowanie#zadanie'
-            en: '/en/documentation/rendering#zadanie'
-        -
-          number: '02'
+            pl: "/pl/dokumentacja/renderowanie#zadanie"
+            en: "/en/documentation/rendering#zadanie"
+        - number: "02"
           title:
-            pl: 'Model widoku'
-            en: 'View model'
+            pl: "Model widoku"
+            en: "View model"
           description:
-            pl: 'Jedna reprezentacja dla SSR i API.'
-            en: 'One representation for SSR and API.'
+            pl: "Jedna reprezentacja dla SSR i API."
+            en: "One representation for SSR and API."
           url:
-            pl: '/pl/dokumentacja/renderowanie#model-widoku'
-            en: '/en/documentation/rendering#model-widoku'
-        -
-          number: '03'
+            pl: "/pl/dokumentacja/renderowanie#model-widoku"
+            en: "/en/documentation/rendering#model-widoku"
+        - number: "03"
           title:
-            pl: 'Bloki i layout'
-            en: 'Blocks and layout'
+            pl: "Bloki i layout"
+            en: "Blocks and layout"
           description:
-            pl: 'Normalizacja, fragmenty HTML i dokument.'
-            en: 'Normalization, HTML fragments and document.'
+            pl: "Normalizacja, fragmenty HTML i dokument."
+            en: "Normalization, HTML fragments and document."
           url:
-            pl: '/pl/dokumentacja/renderowanie#bloki'
-            en: '/en/documentation/rendering#bloki'
-        -
-          number: '04'
+            pl: "/pl/dokumentacja/renderowanie#bloki"
+            en: "/en/documentation/rendering#bloki"
+        - number: "04"
           title:
-            pl: 'Bezpieczny kontekst'
-            en: 'Safe context'
+            pl: "Bezpieczny kontekst"
+            en: "Safe context"
           description:
-            pl: 'Escaping, Markdown, adresy i partiale.'
-            en: 'Escaping, Markdown, URLs and partials.'
+            pl: "Escaping, Markdown, adresy i partiale."
+            en: "Escaping, Markdown, URLs and partials."
           url:
-            pl: '/pl/dokumentacja/renderowanie#kontekst'
-            en: '/en/documentation/rendering#kontekst'
-        -
-          number: '05'
+            pl: "/pl/dokumentacja/renderowanie#kontekst"
+            en: "/en/documentation/rendering#kontekst"
+        - number: "05"
           title:
-            pl: 'Media i assety'
-            en: 'Media and assets'
+            pl: "Media i assety"
+            en: "Media and assets"
           description:
-            pl: 'Warianty obrazów i zasoby komponentów.'
-            en: 'Image variants and component resources.'
+            pl: "Warianty obrazów i zasoby komponentów."
+            en: "Image variants and component resources."
           url:
-            pl: '/pl/dokumentacja/renderowanie#media-assety'
-            en: '/en/documentation/rendering#media-assety'
-        -
-          number: '06'
+            pl: "/pl/dokumentacja/renderowanie#media-assety"
+            en: "/en/documentation/rendering#media-assety"
+        - number: "06"
           title:
-            pl: 'Cache HTTP'
-            en: 'HTTP cache'
+            pl: "Cache HTTP"
+            en: "HTTP cache"
           description:
-            pl: 'ETag, Last-Modified i odpowiedź 304.'
-            en: 'ETag, Last-Modified and the 304 response.'
+            pl: "ETag, Last-Modified i odpowiedź 304."
+            en: "ETag, Last-Modified and the 304 response."
           url:
-            pl: '/pl/dokumentacja/renderowanie#cache-http'
-            en: '/en/documentation/rendering#cache-http'
-        -
-          number: '07'
+            pl: "/pl/dokumentacja/renderowanie#cache-http"
+            en: "/en/documentation/rendering#cache-http"
+        - number: "07"
           title:
             pl: Kolekcje
             en: Collections
           description:
-            pl: 'Renderowanie listy po wykonaniu query.'
-            en: 'Rendering a list after executing its query.'
+            pl: "Renderowanie listy po wykonaniu query."
+            en: "Rendering a list after executing its query."
           url:
-            pl: '/pl/dokumentacja/renderowanie#kolekcje'
-            en: '/en/documentation/rendering#kolekcje'
-        -
-          number: '08'
+            pl: "/pl/dokumentacja/renderowanie#kolekcje"
+            en: "/en/documentation/rendering#kolekcje"
+        - number: "08"
           title:
             pl: Diagnostyka
             en: Troubleshooting
           description:
-            pl: 'Lokalizowanie usterki warstwa po warstwie.'
-            en: 'Locating a fault layer by layer.'
+            pl: "Lokalizowanie usterki warstwa po warstwie."
+            en: "Locating a fault layer by layer."
           url:
-            pl: '/pl/dokumentacja/renderowanie#diagnostyka-renderingu'
-            en: '/en/documentation/rendering#diagnostyka-renderingu'
-  -
-    id: 01a06d50-5005-7503-8503-000000000003
+            pl: "/pl/dokumentacja/renderowanie#diagnostyka-renderingu"
+            en: "/en/documentation/rendering#diagnostyka-renderingu"
+  - id: 01a06d50-5005-7503-8503-000000000003
     type: technical-table
     enabled: true
     data:
       eyebrow:
-        pl: 'Pipeline SSR'
-        en: 'SSR pipeline'
+        pl: "Pipeline SSR"
+        en: "SSR pipeline"
       title:
-        pl: 'HTML jest wynikiem kontrolowanego łańcucha transformacji.'
-        en: 'HTML is the result of a controlled transformation chain.'
+        pl: "HTML jest wynikiem kontrolowanego łańcucha transformacji."
+        en: "HTML is the result of a controlled transformation chain."
       intro:
-        pl: 'Każda warstwa otrzymuje zweryfikowane dane i przekazuje wynik o bardziej konkretnej postaci. Templatka nie czyta YAML-a samodzielnie.'
-        en: 'Every layer receives validated data and forwards a more concrete result. A template never reads YAML directly.'
+        pl: "Każda warstwa otrzymuje zweryfikowane dane i przekazuje wynik o bardziej konkretnej postaci. Templatka nie czyta YAML-a samodzielnie."
+        en: "Every layer receives validated data and forwards a more concrete result. A template never reads YAML directly."
       column_1:
         pl: Etap
         en: Stage
@@ -202,86 +185,79 @@ blocks:
         pl: Odpowiedzialność
         en: Responsibility
       rows:
-        -
-          cell_1:
+        - cell_1:
             pl: Routing
             en: Routing
           cell_2:
-            pl: 'URL i języki'
-            en: 'URL and languages'
+            pl: "URL i języki"
+            en: "URL and languages"
           cell_3:
-            pl: 'Locale i tożsamość'
-            en: 'Locale and identity'
+            pl: "Locale i tożsamość"
+            en: "Locale and identity"
           cell_4:
-            pl: 'Rozpoznanie strony lub kolekcji'
-            en: 'Resolve a page or collection'
-        -
-          cell_1:
+            pl: "Rozpoznanie strony lub kolekcji"
+            en: "Resolve a page or collection"
+        - cell_1:
             pl: Repozytoria
             en: Repositories
           cell_2:
-            pl: 'Pliki YAML'
-            en: 'YAML files'
+            pl: "Pliki YAML"
+            en: "YAML files"
           cell_3:
-            pl: 'Modele domenowe'
-            en: 'Domain models'
+            pl: "Modele domenowe"
+            en: "Domain models"
           cell_4:
-            pl: 'Parsowanie, kontrakty i indeks'
-            en: 'Parsing, contracts and index'
-        -
-          cell_1:
+            pl: "Parsowanie, kontrakty i indeks"
+            en: "Parsing, contracts and index"
+        - cell_1:
             pl: ViewModel
             en: ViewModel
           cell_2:
-            pl: 'Strona i locale'
-            en: 'Page and locale'
+            pl: "Strona i locale"
+            en: "Page and locale"
           cell_3:
-            pl: 'Dane prezentacyjne'
-            en: 'Presentation data'
+            pl: "Dane prezentacyjne"
+            en: "Presentation data"
           cell_4:
-            pl: 'Fallbacki, SEO, bloki i media'
-            en: 'Fallbacks, SEO, blocks and media'
-        -
-          cell_1:
+            pl: "Fallbacki, SEO, bloki i media"
+            en: "Fallbacks, SEO, blocks and media"
+        - cell_1:
             pl: Bloki
             en: Blocks
           cell_2:
-            pl: 'Data i RenderContext'
-            en: 'Data and RenderContext'
+            pl: "Data i RenderContext"
+            en: "Data and RenderContext"
           cell_3:
-            pl: 'Fragmenty HTML'
-            en: 'HTML fragments'
+            pl: "Fragmenty HTML"
+            en: "HTML fragments"
           cell_4:
-            pl: 'Semantyka komponentów'
-            en: 'Component semantics'
-        -
-          cell_1:
+            pl: "Semantyka komponentów"
+            en: "Component semantics"
+        - cell_1:
             pl: Layout
             en: Layout
           cell_2:
-            pl: 'ViewModel, content i assety'
-            en: 'ViewModel, content and assets'
+            pl: "ViewModel, content i assety"
+            en: "ViewModel, content and assets"
           cell_3:
-            pl: 'Dokument HTML'
-            en: 'HTML document'
+            pl: "Dokument HTML"
+            en: "HTML document"
           cell_4:
-            pl: 'Head, nawigacja i szkielet'
-            en: 'Head, navigation and shell'
-        -
-          cell_1:
+            pl: "Head, nawigacja i szkielet"
+            en: "Head, navigation and shell"
+        - cell_1:
             pl: HTTP
             en: HTTP
           cell_2:
-            pl: 'HTML i mtimes'
-            en: 'HTML and mtimes'
+            pl: "HTML i mtimes"
+            en: "HTML and mtimes"
           cell_3:
-            pl: '200 albo 304'
-            en: '200 or 304'
+            pl: "200 albo 304"
+            en: "200 or 304"
           cell_4:
-            pl: 'Walidatory cache'
-            en: 'Cache validators'
-  -
-    id: 01a06d50-5005-7504-8504-000000000004
+            pl: "Walidatory cache"
+            en: "Cache validators"
+  - id: 01a06d50-5005-7504-8504-000000000004
     type: article-content
     enabled: true
     data:
@@ -300,7 +276,7 @@ blocks:
 
           Jedno żądanie korzysta ze spójnego obrazu treści: listy stron, kolekcji, indeksu tras, konfiguracji witryny i nawigacji dla locale. Renderer nie wykonuje własnego routingu ani nie wyszukuje sąsiadów w filesystemie.
 
-          Rozdzielenie ułatwia testy. Trasy sprawdzisz na modelach domenowych, fabrykę ViewModel na stronie i locale, a renderer na gotowych danych. Błędu publicznego adresu nie naprawiaj w render.php — tam tożsamość jest już rozstrzygnięta.
+          Rozdzielenie ułatwia testy. Trasy sprawdzisz na modelach domenowych, fabrykę ViewModel na stronie i locale, a renderer na gotowych danych. Błędu publicznego adresu nie naprawiaj w render.php - tam tożsamość jest już rozstrzygnięta.
         en: |-
           ## 1. Start at the public request
 
@@ -314,12 +290,11 @@ blocks:
 
           One request uses a consistent content snapshot: pages, collections, route index, site configuration and locale-specific navigation. A renderer performs neither routing nor ad hoc filesystem searches for neighboring resources.
 
-          This makes tests focused. Test routes on domain models, the ViewModel factory on a page and locale, and renderers on prepared data. Never repair a public-address defect inside render.php—identity has already been resolved there.
+          This makes tests focused. Test routes on domain models, the ViewModel factory on a page and locale, and renderers on prepared data. Never repair a public-address defect inside render.php-identity has already been resolved there.
       note:
-        pl: 'Gdy URL jest błędny, zacznij od konfiguracji locale, slugów przodków i indeksu tras — nie od HTML-a komponentu.'
-        en: 'When a URL is wrong, start with locale configuration, ancestor slugs and the route index—not component HTML.'
-  -
-    id: 01a06d50-5005-7505-8505-000000000005
+        pl: "Gdy URL jest błędny, zacznij od konfiguracji locale, slugów przodków i indeksu tras - nie od HTML-a komponentu."
+        en: "When a URL is wrong, start with locale configuration, ancestor slugs and the route index-not component HTML."
+  - id: 01a06d50-5005-7505-8505-000000000005
     type: article-content
     enabled: true
     data:
@@ -354,10 +329,9 @@ blocks:
 
           A component knows neither the language list nor its default. The same render.php supports every locale, and translation rules do not spread across templates. Technical fields explicitly declared non-localized by the contract are the exception.
       note:
-        pl: 'Jeśli SSR i API pokazują inne dane, szukaj obejścia wspólnej fabryki ViewModel albo dodatkowej transformacji w jednym adapterze.'
-        en: 'If SSR and API expose different data, look for a bypass of the shared ViewModel factory or an extra transformation in one adapter.'
-  -
-    id: 01a06d50-5005-7506-8506-000000000006
+        pl: "Jeśli SSR i API pokazują inne dane, szukaj obejścia wspólnej fabryki ViewModel albo dodatkowej transformacji w jednym adapterze."
+        en: "If SSR and API expose different data, look for a bypass of the shared ViewModel factory or an extra transformation in one adapter."
+  - id: 01a06d50-5005-7506-8506-000000000006
     type: article-content
     enabled: true
     data:
@@ -418,22 +392,21 @@ blocks:
 
           A layout receives page, seo, content, navigation, assets and context. It creates doctype, head, shared header and footer, and embeds ready content. It should neither localize blocks again nor read YAML.
       note:
-        pl: 'Layout odpowiada za dokument, partial za współdzielony fragment, a blok za edytowalny komponent treści.'
-        en: 'A layout owns the document, a partial owns a shared fragment, and a block owns an editable content component.'
-  -
-    id: 01a06d50-5005-7507-8507-000000000007
+        pl: "Layout odpowiada za dokument, partial za współdzielony fragment, a blok za edytowalny komponent treści."
+        en: "A layout owns the document, a partial owns a shared fragment, and a block owns an editable content component."
+  - id: 01a06d50-5005-7507-8507-000000000007
     type: code-showcase
     enabled: true
     data:
       eyebrow:
-        pl: 'Layout PHP'
-        en: 'PHP layout'
+        pl: "Layout PHP"
+        en: "PHP layout"
       title:
-        pl: 'Layout składa dokument bez ponownego przetwarzania treści.'
-        en: 'A layout composes the document without reprocessing content.'
+        pl: "Layout składa dokument bez ponownego przetwarzania treści."
+        en: "A layout composes the document without reprocessing content."
       description:
-        pl: 'content zawiera wyrenderowane bloki, a assets — publiczne adresy zasobów wymaganych przez użyte typy.'
-        en: 'content contains rendered blocks, while assets contains public resource URLs required by used types.'
+        pl: "content zawiera wyrenderowane bloki, a assets - publiczne adresy zasobów wymaganych przez użyte typy."
+        en: "content contains rendered blocks, while assets contains public resource URLs required by used types."
       filename: templates/layouts/default.php
       code: |-
         <!doctype html>
@@ -454,32 +427,28 @@ blocks:
         </body>
         </html>
       bullets:
-        -
-          text:
-            pl: 'content jest zaufanym wynikiem rendererów i nie wymaga ponownego escape.'
-            en: 'content is trusted renderer output and must not be escaped again.'
-        -
-          text:
-            pl: 'Zwykłe wartości atrybutów nadal przechodzą przez bezpieczny helper.'
-            en: 'Plain attribute values still pass through a safe helper.'
-        -
-          text:
-            pl: 'Partial otrzymuje jawne dane zamiast kontenera aplikacji.'
-            en: 'A partial receives explicit data instead of the application container.'
-  -
-    id: 01a06d50-5005-7508-8508-000000000008
+        - text:
+            pl: "content jest zaufanym wynikiem rendererów i nie wymaga ponownego escape."
+            en: "content is trusted renderer output and must not be escaped again."
+        - text:
+            pl: "Zwykłe wartości atrybutów nadal przechodzą przez bezpieczny helper."
+            en: "Plain attribute values still pass through a safe helper."
+        - text:
+            pl: "Partial otrzymuje jawne dane zamiast kontenera aplikacji."
+            en: "A partial receives explicit data instead of the application container."
+  - id: 01a06d50-5005-7508-8508-000000000008
     type: technical-table
     enabled: true
     data:
       eyebrow:
-        pl: 'API szablonu'
-        en: 'Template API'
+        pl: "API szablonu"
+        en: "Template API"
       title:
-        pl: 'RenderContext udostępnia mały zestaw bezpiecznych operacji.'
-        en: 'RenderContext exposes a small set of safe operations.'
+        pl: "RenderContext udostępnia mały zestaw bezpiecznych operacji."
+        en: "RenderContext exposes a small set of safe operations."
       intro:
-        pl: 'Szablon dostaje funkcje prezentacyjne zamiast infrastruktury. Argumenty są walidowane w jednym miejscu.'
-        en: 'A template receives presentation helpers rather than infrastructure. Arguments are validated centrally.'
+        pl: "Szablon dostaje funkcje prezentacyjne zamiast infrastruktury. Argumenty są walidowane w jednym miejscu."
+        en: "A template receives presentation helpers rather than infrastructure. Arguments are validated centrally."
       column_1:
         pl: Metoda
         en: Method
@@ -493,86 +462,79 @@ blocks:
         pl: Wynik
         en: Result
       rows:
-        -
-          cell_1:
+        - cell_1:
             pl: escape
             en: escape
           cell_2:
-            pl: 'Tekst i atrybut HTML'
-            en: 'HTML text and attributes'
+            pl: "Tekst i atrybut HTML"
+            en: "HTML text and attributes"
           cell_3:
-            pl: 'Skalar tekstowy'
-            en: 'Text scalar'
+            pl: "Skalar tekstowy"
+            en: "Text scalar"
           cell_4:
-            pl: 'Encje HTML'
-            en: 'HTML entities'
-        -
-          cell_1:
+            pl: "Encje HTML"
+            en: "HTML entities"
+        - cell_1:
             pl: markdown
             en: markdown
           cell_2:
-            pl: 'Pole Markdown'
-            en: 'Markdown field'
+            pl: "Pole Markdown"
+            en: "Markdown field"
           cell_3:
-            pl: 'HTML usuwany i niebezpieczne linki blokowane'
-            en: 'HTML stripped and unsafe links blocked'
+            pl: "HTML usuwany i niebezpieczne linki blokowane"
+            en: "HTML stripped and unsafe links blocked"
           cell_4:
-            pl: 'Bezpieczny HTML'
-            en: 'Safe HTML'
-        -
-          cell_1:
-            pl: 'asset / url'
-            en: 'asset / url'
+            pl: "Bezpieczny HTML"
+            en: "Safe HTML"
+        - cell_1:
+            pl: "asset / url"
+            en: "asset / url"
           cell_2:
-            pl: 'Adres zasobu lub link'
-            en: 'Resource address or link'
+            pl: "Adres zasobu lub link"
+            en: "Resource address or link"
           cell_3:
-            pl: 'Ścieżka od korzenia albo poprawny URL'
-            en: 'Root-relative path or valid URL'
+            pl: "Ścieżka od korzenia albo poprawny URL"
+            en: "Root-relative path or valid URL"
           cell_4:
-            pl: 'Bezpieczny adres'
-            en: 'Safe address'
-        -
-          cell_1:
+            pl: "Bezpieczny adres"
+            en: "Safe address"
+        - cell_1:
             pl: image
             en: image
           cell_2:
-            pl: 'Pojedynczy img'
-            en: 'Single img'
+            pl: "Pojedynczy img"
+            en: "Single img"
           cell_3:
-            pl: 'Format, geometria i allowlista atrybutów'
-            en: 'Format, geometry and attribute allowlist'
+            pl: "Format, geometria i allowlista atrybutów"
+            en: "Format, geometry and attribute allowlist"
           cell_4:
-            pl: 'Znacznik img'
-            en: 'img element'
-        -
-          cell_1:
+            pl: "Znacznik img"
+            en: "img element"
+        - cell_1:
             pl: picture
             en: picture
           cell_2:
-            pl: 'Responsywne srcset'
-            en: 'Responsive srcset'
+            pl: "Responsywne srcset"
+            en: "Responsive srcset"
           cell_3:
-            pl: 'Szerokości 1–8192; cover wymaga proporcji'
-            en: 'Widths 1–8192; cover requires ratio'
+            pl: "Szerokości 1–8192; cover wymaga proporcji"
+            en: "Widths 1–8192; cover requires ratio"
           cell_4:
-            pl: 'Znacznik picture'
-            en: 'picture element'
-        -
-          cell_1:
+            pl: "Znacznik picture"
+            en: "picture element"
+        - cell_1:
             pl: partial
             en: partial
           cell_2:
-            pl: 'Wspólny fragment'
-            en: 'Shared fragment'
+            pl: "Wspólny fragment"
+            en: "Shared fragment"
           cell_3:
-            pl: 'Nazwa z rejestru i jawne dane'
-            en: 'Registry name and explicit data'
+            pl: "Nazwa z rejestru i jawne dane"
+            en: "Registry name and explicit data"
           cell_4:
-            pl: 'Przechwycony HTML'
-            en: 'Captured HTML'
-  -
-    id: 01a06d50-5005-7509-8509-000000000009
+            pl: "Przechwycony HTML"
+            en: "Captured HTML"
+  - id: 01a06d50-5005-7509-8509-000000000009
     type: article-content
     enabled: true
     data:
@@ -583,7 +545,7 @@ blocks:
 
           escape koduje tekst dla węzła HTML albo cytowanego atrybutu. Nie jest filtrem dla JavaScriptu, CSS-u czy fragmentu URL. Adresy przekazuj do url albo asset, a dane JavaScript serializuj bezpiecznym mechanizmem.
 
-          Nie escapuj drugi raz wyniku markdown, image, picture ani partial — są to gotowe fragmenty zbudowane przez zaufane helpery. Nigdy jednak nie wypisuj surowego pola data, nawet gdy panel walidował typ. Walidacja struktury nie zastępuje kodowania dla kontekstu wyjściowego.
+          Nie escapuj drugi raz wyniku markdown, image, picture ani partial - są to gotowe fragmenty zbudowane przez zaufane helpery. Nigdy jednak nie wypisuj surowego pola data, nawet gdy panel walidował typ. Walidacja struktury nie zastępuje kodowania dla kontekstu wyjściowego.
 
           ## 8. Markdown jest kontrolowanym formatem
 
@@ -601,7 +563,7 @@ blocks:
 
           escape encodes text for an HTML node or quoted attribute. It is not a filter for JavaScript, CSS or a URL fragment. Pass addresses to url or asset and serialize JavaScript data through a safe mechanism.
 
-          Do not escape markdown, image, picture or partial results a second time—they are ready fragments built by trusted helpers. Never emit a raw data field, however, even if the admin validated its type. Structural validation does not replace output-context encoding.
+          Do not escape markdown, image, picture or partial results a second time-they are ready fragments built by trusted helpers. Never emit a raw data field, however, even if the admin validated its type. Structural validation does not replace output-context encoding.
 
           ## 8. Markdown is a controlled format
 
@@ -615,10 +577,9 @@ blocks:
 
           RenderContext knows locale, page identity and prepared media, but exposes no DI, PDO, session, request, SMTP, secrets or unrestricted filesystem. A renderer remains a deterministic function of data and helpers. Current time, randomness or an external API would break this property.
       note:
-        pl: 'Walidacja mówi, czy wartość pasuje do kontraktu. Escaping mówi, czy można ją bezpiecznie umieścić w konkretnym miejscu dokumentu. Potrzebujesz obu.'
-        en: 'Validation says whether a value fits the contract. Escaping says whether it can safely enter a specific document context. You need both.'
-  -
-    id: 01a06d50-5005-7510-8510-000000000010
+        pl: "Walidacja mówi, czy wartość pasuje do kontraktu. Escaping mówi, czy można ją bezpiecznie umieścić w konkretnym miejscu dokumentu. Potrzebujesz obu."
+        en: "Validation says whether a value fits the contract. Escaping says whether it can safely enter a specific document context. You need both."
+  - id: 01a06d50-5005-7510-8510-000000000010
     type: article-content
     enabled: true
     data:
@@ -665,10 +626,9 @@ blocks:
 
           The output directory is a reproducible runtime artifact. Never edit a hashed file. Changing CSS creates a new URL, so older HTML still targets exactly the version against which it was generated.
       note:
-        pl: 'Gdy asset zwraca 403, sprawdź reguły serwera i WAF dla /assets/. Sam chmod 0644 przy katalogach 0755 może być prawidłowy.'
-        en: 'When an asset returns 403, inspect server and WAF rules for /assets/. Chmod 0644 with 0755 directories may already be correct.'
-  -
-    id: 01a06d50-5005-7511-8511-000000000011
+        pl: "Gdy asset zwraca 403, sprawdź reguły serwera i WAF dla /assets/. Sam chmod 0644 przy katalogach 0755 może być prawidłowy."
+        en: "When an asset returns 403, inspect server and WAF rules for /assets/. Chmod 0644 with 0755 directories may already be correct."
+  - id: 01a06d50-5005-7511-8511-000000000011
     type: article-content
     enabled: true
     data:
@@ -703,10 +663,9 @@ blocks:
 
           The admin and error pages use no-store. Public HTML and JSON can use revalidation because their validators derive from stable representations.
       note:
-        pl: 'Odpowiedź 304 nie zawiera nowej strony — potwierdza, że reprezentacja zachowana przez klienta nadal jest aktualna.'
-        en: "A 304 response contains no new page—it confirms that the client's stored representation remains current."
-  -
-    id: 01a06d50-5005-7512-8512-000000000012
+        pl: "Odpowiedź 304 nie zawiera nowej strony - potwierdza, że reprezentacja zachowana przez klienta nadal jest aktualna."
+        en: "A 304 response contains no new page-it confirms that the client's stored representation remains current."
+  - id: 01a06d50-5005-7512-8512-000000000012
     type: article-content
     enabled: true
     data:
@@ -741,120 +700,111 @@ blocks:
 
           Do not rely solely on one huge HTML snapshot. Small assertions identify a broken responsibility more clearly: missing escaping, incorrect localized URL, duplicated CSS or an invalid 304.
       note:
-        pl: 'Testy powinny udowadniać granice pipeline, a nie utrwalać przypadkowe białe znaki wygenerowanego dokumentu.'
-        en: 'Tests should prove pipeline boundaries rather than preserve incidental whitespace in the generated document.'
-  -
-    id: 01a06d50-5005-7513-8513-000000000013
+        pl: "Testy powinny udowadniać granice pipeline, a nie utrwalać przypadkowe białe znaki wygenerowanego dokumentu."
+        en: "Tests should prove pipeline boundaries rather than preserve incidental whitespace in the generated document."
+  - id: 01a06d50-5005-7513-8513-000000000013
     type: diagnostic-table
     enabled: true
     data:
       anchor: diagnostyka-renderingu
       eyebrow:
-        pl: '16 / Diagnostyka'
-        en: '16 / Troubleshooting'
+        pl: "16 / Diagnostyka"
+        en: "16 / Troubleshooting"
       title:
-        pl: 'Diagnozuj od wejścia pipeline do odpowiedzi HTTP.'
-        en: 'Diagnose from pipeline input toward the HTTP response.'
+        pl: "Diagnozuj od wejścia pipeline do odpowiedzi HTTP."
+        en: "Diagnose from pipeline input toward the HTTP response."
       intro:
-        pl: 'Ten sam objaw może mieć źródło w trasie, danych, rendererze, assetach lub cache. Znajdź pierwszą warstwę, na której wynik jest błędny.'
-        en: 'The same symptom may originate in routing, data, a renderer, assets or cache. Find the earliest layer where output becomes wrong.'
+        pl: "Ten sam objaw może mieć źródło w trasie, danych, rendererze, assetach lub cache. Znajdź pierwszą warstwę, na której wynik jest błędny."
+        en: "The same symptom may originate in routing, data, a renderer, assets or cache. Find the earliest layer where output becomes wrong."
       rows:
-        -
-          layer:
+        - layer:
             pl: Routing
             en: Routing
           problem:
-            pl: 'Istniejący plik zwraca 404'
-            en: 'An existing file returns 404'
+            pl: "Istniejący plik zwraca 404"
+            en: "An existing file returns 404"
           cause:
-            pl: 'URL wynika z locale i slugów, nie z nazwy katalogu.'
-            en: 'URL derives from locale and slugs, not the directory name.'
+            pl: "URL wynika z locale i slugów, nie z nazwy katalogu."
+            en: "URL derives from locale and slugs, not the directory name."
           check:
-            pl: 'Sprawdź locale, slugi przodków i PageRouteIndex.'
-            en: 'Check locale, ancestor slugs and PageRouteIndex.'
-        -
-          layer:
+            pl: "Sprawdź locale, slugi przodków i PageRouteIndex."
+            en: "Check locale, ancestor slugs and PageRouteIndex."
+        - layer:
             pl: ViewModel
             en: ViewModel
           problem:
-            pl: 'Tekst jest w złym języku'
-            en: 'Text is in the wrong language'
+            pl: "Tekst jest w złym języku"
+            en: "Text is in the wrong language"
           cause:
-            pl: 'Fallback albo surowa mapa dotarła do renderera.'
-            en: 'Fallback or a raw map reached the renderer.'
+            pl: "Fallback albo surowa mapa dotarła do renderera."
+            en: "Fallback or a raw map reached the renderer."
           check:
-            pl: 'Porównaj content.yml z przetworzonym data i locale kontekstu.'
-            en: 'Compare content.yml with processed data and context locale.'
-        -
-          layer:
+            pl: "Porównaj content.yml z przetworzonym data i locale kontekstu."
+            en: "Compare content.yml with processed data and context locale."
+        - layer:
             pl: Renderer
             en: Renderer
           problem:
-            pl: 'Strona urywa się na bloku'
-            en: 'Page stops at a block'
+            pl: "Strona urywa się na bloku"
+            en: "Page stops at a block"
           cause:
-            pl: 'Wyjątek, błąd PHP lub niewłaściwy typ danych.'
-            en: 'Exception, PHP error or wrong data type.'
+            pl: "Wyjątek, błąd PHP lub niewłaściwy typ danych."
+            en: "Exception, PHP error or wrong data type."
           check:
-            pl: 'Sprawdź log, definition.yml i pierwszy brakujący render.php.'
-            en: 'Inspect log, definition.yml and the first missing render.php.'
-        -
-          layer:
+            pl: "Sprawdź log, definition.yml i pierwszy brakujący render.php."
+            en: "Inspect log, definition.yml and the first missing render.php."
+        - layer:
             pl: Layout
             en: Layout
           problem:
-            pl: 'Brak nawigacji lub head'
-            en: 'Navigation or head is missing'
+            pl: "Brak nawigacji lub head"
+            en: "Navigation or head is missing"
           cause:
-            pl: 'Inny layout lub brak danych partiala.'
-            en: 'Different layout or missing partial data.'
+            pl: "Inny layout lub brak danych partiala."
+            en: "Different layout or missing partial data."
           check:
-            pl: 'Sprawdź pole layout, rejestr i argumenty partial.'
-            en: 'Check layout field, registry and partial arguments.'
-        -
-          layer:
+            pl: "Sprawdź pole layout, rejestr i argumenty partial."
+            en: "Check layout field, registry and partial arguments."
+        - layer:
             pl: Assety
             en: Assets
           problem:
-            pl: 'HTML działa bez stylów'
-            en: 'HTML works without styles'
+            pl: "HTML działa bez stylów"
+            en: "HTML works without styles"
           cause:
-            pl: 'Brak publikacji, odpowiedź 403/404 lub pominięty typ.'
-            en: 'No publication, 403/404 response or omitted type.'
+            pl: "Brak publikacji, odpowiedź 403/404 lub pominięty typ."
+            en: "No publication, 403/404 response or omitted type."
           check:
-            pl: 'Otwórz fingerprintowany URL i sprawdź reguły /assets/ oraz źródłowy CSS.'
-            en: 'Open the fingerprinted URL and inspect /assets/ rules and source CSS.'
-        -
-          layer:
+            pl: "Otwórz fingerprintowany URL i sprawdź reguły /assets/ oraz źródłowy CSS."
+            en: "Open the fingerprinted URL and inspect /assets/ rules and source CSS."
+        - layer:
             pl: Media
             en: Media
           problem:
-            pl: 'Oryginał działa, wariant nie'
-            en: 'Original works but variant fails'
+            pl: "Oryginał działa, wariant nie"
+            en: "Original works but variant fails"
           cause:
-            pl: 'Format, wymiar lub geometria nie spełnia kontraktu.'
-            en: 'Format, dimension or geometry violates the contract.'
+            pl: "Format, wymiar lub geometria nie spełnia kontraktu."
+            en: "Format, dimension or geometry violates the contract."
           check:
-            pl: 'Sprawdź MIME, zakres 1–8192 oraz wymagania cover.'
-            en: 'Check MIME, range 1–8192 and cover requirements.'
-        -
-          layer:
-            pl: 'Cache HTTP'
-            en: 'HTTP cache'
+            pl: "Sprawdź MIME, zakres 1–8192 oraz wymagania cover."
+            en: "Check MIME, range 1–8192 and cover requirements."
+        - layer:
+            pl: "Cache HTTP"
+            en: "HTTP cache"
           problem:
-            pl: 'Po wdrożeniu widać starą wersję'
-            en: 'Old version remains after deployment'
+            pl: "Po wdrożeniu widać starą wersję"
+            en: "Old version remains after deployment"
           cause:
-            pl: 'Zależność nie zmieniła walidatora, CDN zachował odpowiedź albo pliku nie wdrożono.'
-            en: 'A dependency did not change the validator, CDN retained a response or file was not deployed.'
+            pl: "Zależność nie zmieniła walidatora, CDN zachował odpowiedź albo pliku nie wdrożono."
+            en: "A dependency did not change the validator, CDN retained a response or file was not deployed."
           check:
-            pl: 'Porównaj ETag, Last-Modified, HTML oraz mtime źródeł.'
-            en: 'Compare ETag, Last-Modified, HTML and source mtimes.'
+            pl: "Porównaj ETag, Last-Modified, HTML oraz mtime źródeł."
+            en: "Compare ETag, Last-Modified, HTML and source mtimes."
       note:
-        pl: 'Testuj odpowiedź origin oraz odpowiedź przez CDN. To dwie osobne warstwy i mogą zwracać różne nagłówki.'
-        en: 'Test the origin response and the response through CDN. They are separate layers and may return different headers.'
-  -
-    id: 01a06d50-5005-7514-8514-000000000014
+        pl: "Testuj odpowiedź origin oraz odpowiedź przez CDN. To dwie osobne warstwy i mogą zwracać różne nagłówki."
+        en: "Test the origin response and the response through CDN. They are separate layers and may return different headers."
+  - id: 01a06d50-5005-7514-8514-000000000014
     type: article-content
     enabled: true
     data:
@@ -903,25 +853,24 @@ blocks:
 
           A good pipeline hides no magic in templates. Data is resolved, validated and localized earlier, while a renderer performs small, predictable presentation work.
       note:
-        pl: 'Najlepszy renderer jest nudny — bierze gotowe dane, używa bezpiecznych helperów i emituje semantyczny HTML bez skutków ubocznych.'
-        en: 'The best renderer is boring—it consumes ready data, uses safe helpers and emits semantic HTML without side effects.'
-  -
-    id: 01a06d50-5005-7515-8515-000000000015
+        pl: "Najlepszy renderer jest nudny - bierze gotowe dane, używa bezpiecznych helperów i emituje semantyczny HTML bez skutków ubocznych."
+        en: "The best renderer is boring-it consumes ready data, uses safe helpers and emits semantic HTML without side effects."
+  - id: 01a06d50-5005-7515-8515-000000000015
     type: call-to-action
     enabled: true
     data:
       eyebrow:
-        pl: 'Następny tutorial'
-        en: 'Next tutorial'
+        pl: "Następny tutorial"
+        en: "Next tutorial"
       title:
-        pl: 'Poznaj publiczne API treści.'
-        en: 'Explore the public content API.'
+        pl: "Poznaj publiczne API treści."
+        en: "Explore the public content API."
       description:
-        pl: 'Kolejny rozdział pokaże endpointy, format odpowiedzi, filtrowanie kolekcji, błędy, walidatory HTTP i bezpieczną integrację klienta.'
-        en: 'The next chapter covers endpoints, response shapes, collection filtering, errors, HTTP validators and safe client integration.'
+        pl: "Kolejny rozdział pokaże endpointy, format odpowiedzi, filtrowanie kolekcji, błędy, walidatory HTTP i bezpieczną integrację klienta."
+        en: "The next chapter covers endpoints, response shapes, collection filtering, errors, HTTP validators and safe client integration."
       button_label:
-        pl: 'Przejdź do API'
-        en: 'Continue to the API'
+        pl: "Przejdź do API"
+        en: "Continue to the API"
       button_url:
         pl: /pl/dokumentacja/api
         en: /en/documentation/api

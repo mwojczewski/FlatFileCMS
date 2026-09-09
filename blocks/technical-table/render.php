@@ -20,7 +20,8 @@ declare(strict_types=1);
             <?php foreach ($data['rows'] as $row): ?>
                 <div class="technical-table__row" role="row">
                     <?php for ($column = 1; $column <= 4; ++$column): ?>
-                        <<?= $column === 1 ? 'strong' : 'span' ?> role="cell" data-label="<?= $context->escape($data['column_' . $column]) ?>"><?= $context->escape($row['cell_' . $column]) ?></<?= $column === 1 ? 'strong' : 'span' ?>>
+                        <<?= $column === 1 ? 'strong' : 'span' ?> role="cell"
+                            data-label="<?= $context->escape($data['column_' . $column]) ?>"><?= $context->escape($row['cell_' . $column]) ?></<?= $column === 1 ? 'strong' : 'span' ?>>
                     <?php endfor; ?>
                 </div>
             <?php endforeach; ?>

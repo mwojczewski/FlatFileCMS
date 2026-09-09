@@ -215,6 +215,10 @@ const orderSubmit = document.querySelector("[data-order-submit]");
 const orderMessage = document.querySelector("[data-order-message]");
 let dragged = null;
 let dragGhost = null;
+let dragPointer = null;
+let autoScrollFrame = null;
+const autoScrollEdge = 120;
+const autoScrollMaximum = 20;
 
 function synchronizeOrder() {
   if (!builderList || !orderFields) {
@@ -243,13 +247,67 @@ function synchronizeOrder() {
   }
 }
 
+function moveDraggedAt(clientX, clientY) {
+  if (!(dragged instanceof Element) || !builderList) {
+    return;
+  }
+  const pointerTarget = document.elementFromPoint(clientX, clientY);
+  const target = pointerTarget?.closest("[data-block-id]");
+  if (!(target instanceof Element) || target === dragged || !builderList.contains(target)) {
+    return;
+  }
+  const rectangle = target.getBoundingClientRect();
+  const after = clientY > rectangle.top + rectangle.height / 2;
+  const reference = after ? target.nextSibling : target;
+  if (reference === dragged || (!after && dragged.nextSibling === target)) {
+    return;
+  }
+  builderList.insertBefore(dragged, reference);
+  synchronizeOrder();
+}
+
+function autoScrollVelocity(clientY) {
+  const edge = Math.min(autoScrollEdge, window.innerHeight * 0.22);
+  if (clientY < edge) {
+    return -autoScrollMaximum * (1 - Math.max(0, clientY) / edge);
+  }
+  const lowerEdge = window.innerHeight - edge;
+  if (clientY > lowerEdge) {
+    return autoScrollMaximum * (1 - Math.max(0, window.innerHeight - clientY) / edge);
+  }
+  return 0;
+}
+
+function autoScrollBuilder() {
+  autoScrollFrame = null;
+  if (!(dragged instanceof Element) || dragPointer === null) {
+    return;
+  }
+  const velocity = autoScrollVelocity(dragPointer.y);
+  if (velocity === 0) {
+    return;
+  }
+  window.scrollBy(0, velocity);
+  moveDraggedAt(dragPointer.x, dragPointer.y);
+  autoScrollFrame = window.requestAnimationFrame(autoScrollBuilder);
+}
+
+function updateDragPointer(event) {
+  if (!(dragged instanceof Element)) {
+    return;
+  }
+  dragPointer = { x: event.clientX, y: event.clientY };
+  if (autoScrollFrame === null && autoScrollVelocity(event.clientY) !== 0) {
+    autoScrollFrame = window.requestAnimationFrame(autoScrollBuilder);
+  }
+}
+
 builderList?.addEventListener("dragstart", (event) => {
   if (!(event.target instanceof Element)) {
     return;
   }
   dragged = event.target.closest("[data-block-id]");
   dragged?.classList.add("dragging");
-  builderList.classList.add("is-sorting");
   if (dragged instanceof HTMLElement && event.dataTransfer) {
     event.dataTransfer.effectAllowed = "move";
     event.dataTransfer.setData("text/plain", dragged.dataset.blockId ?? "");
@@ -268,22 +326,26 @@ builderList?.addEventListener("dragend", () => {
   dragGhost?.remove();
   dragGhost = null;
   dragged = null;
+  dragPointer = null;
+  if (autoScrollFrame !== null) {
+    window.cancelAnimationFrame(autoScrollFrame);
+    autoScrollFrame = null;
+  }
 });
 
 builderList?.addEventListener("dragover", (event) => {
   event.preventDefault();
+  updateDragPointer(event);
   if (!(dragged instanceof Element) || !(event.target instanceof Element)) {
     return;
   }
-  const target = event.target.closest("[data-block-id]");
-  if (!(target instanceof Element) || target === dragged || !builderList) {
-    return;
-  }
-  const rectangle = target.getBoundingClientRect();
-  const after = event.clientY > rectangle.top + rectangle.height / 2;
-  builderList.insertBefore(dragged, after ? target.nextSibling : target);
-  synchronizeOrder();
+  // Safari cancels native dragging when the source changes its height during
+  // dragstart. Collapse previews only after the browser has started the drag.
+  builderList.classList.add("is-sorting");
+  moveDraggedAt(event.clientX, event.clientY);
 });
+
+document.addEventListener("dragover", updateDragPointer, { passive: true });
 
 orderForm?.addEventListener("submit", synchronizeOrder);
 

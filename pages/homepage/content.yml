@@ -2,12 +2,12 @@ schemaVersion: 1
 enabled: true
 layout: default
 title:
-  pl: FlatFile CMS — nowoczesny CMS w PHP
-  en: FlatFile CMS — a modern CMS built with PHP
+  pl: FlatFile CMS - nowoczesny CMS w PHP
+  en: FlatFile CMS - a modern CMS built with PHP
 seo:
   title:
-    pl: FlatFile CMS — treść pod kontrolą, kod bez kompromisów
-    en: FlatFile CMS — content under control, code without compromise
+    pl: FlatFile CMS - treść pod kontrolą, kod bez kompromisów
+    en: FlatFile CMS - content under control, code without compromise
   description:
     pl: Nowoczesny, bezpieczny i szybki flat-file CMS oparty na PHP 8.5, YAML, SSR i publicznym API.
     en: A modern, secure and fast flat-file CMS powered by PHP 8.5, YAML, SSR and a public API.
@@ -35,8 +35,8 @@ blocks:
         pl: Treść pod kontrolą. Kod bez kompromisów.
         en: Content under control. Code without compromise.
       lead:
-        pl: FlatFile CMS łączy prostotę plików YAML z bezpiecznym panelem administracyjnym, renderowaniem po stronie serwera i gotowym API — bez ciężkiej bazy danych.
-        en: FlatFile CMS combines the simplicity of YAML files with a secure admin panel, server-side rendering and a ready-to-use API — without a heavy database.
+        pl: FlatFile CMS łączy prostotę plików YAML z bezpiecznym panelem administracyjnym, renderowaniem po stronie serwera i gotowym API - bez ciężkiej bazy danych.
+        en: FlatFile CMS combines the simplicity of YAML files with a secure admin panel, server-side rendering and a ready-to-use API - without a heavy database.
       primary_label:
         pl: Poznaj możliwości
         en: Explore features

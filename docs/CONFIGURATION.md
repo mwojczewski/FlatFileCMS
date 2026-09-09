@@ -60,6 +60,7 @@ the admin application.
 | Upload policy | `media.maxUploadBytes`, `media.allowedMimeTypes`, `media.stripMetadata` |
 | Media transforms | `media.transformations.enabled`, `quality`, `maxWidth`, `maxHeight`, `maxPixels`, `media.formats` |
 | Generated media cache | `media.cache.enabled` |
+| Browser and device icons | `site.icons.svg`, `ico`, `png32`, `png16`, `appleTouch`, `appleTouchPrecomposed`, `manifest` |
 
 `site.url` is the sole canonical site URL. There is no `APP_URL` environment
 override. Media processing has no environment override either; copying the

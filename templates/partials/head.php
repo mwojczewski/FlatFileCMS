@@ -7,6 +7,7 @@ $assets = $data['assets'];
 $robots = $seo['robots'];
 $openGraph = $seo['openGraph'];
 $twitter = $seo['twitter'];
+$icons = is_array($seo['icons'] ?? null) ? $seo['icons'] : [];
 ?>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,6 +16,13 @@ $twitter = $seo['twitter'];
 <meta name="robots"
     content="<?= $robots['index'] ? 'index' : 'noindex' ?>,<?= $robots['follow'] ? 'follow' : 'nofollow' ?>">
 <link rel="canonical" href="<?= $context->escape($seo['canonical']) ?>">
+<?php if (is_string($icons['svg'] ?? null)): ?><link rel="icon" href="<?= $context->escape($icons['svg']) ?>" type="image/svg+xml"><?php endif; ?>
+<?php if (is_string($icons['ico'] ?? null)): ?><link rel="icon" href="<?= $context->escape($icons['ico']) ?>" sizes="any"><?php endif; ?>
+<?php if (is_string($icons['png32'] ?? null)): ?><link rel="icon" href="<?= $context->escape($icons['png32']) ?>" type="image/png" sizes="32x32"><?php endif; ?>
+<?php if (is_string($icons['png16'] ?? null)): ?><link rel="icon" href="<?= $context->escape($icons['png16']) ?>" type="image/png" sizes="16x16"><?php endif; ?>
+<?php if (is_string($icons['appleTouch'] ?? null)): ?><link rel="apple-touch-icon" href="<?= $context->escape($icons['appleTouch']) ?>" sizes="180x180"><?php endif; ?>
+<?php if (is_string($icons['appleTouchPrecomposed'] ?? null)): ?><link rel="apple-touch-icon-precomposed" href="<?= $context->escape($icons['appleTouchPrecomposed']) ?>" sizes="180x180"><?php endif; ?>
+<?php if (is_string($icons['manifest'] ?? null)): ?><link rel="manifest" href="<?= $context->escape($icons['manifest']) ?>"><?php endif; ?>
 <meta property="og:title" content="<?= $context->escape($openGraph['title']) ?>">
 <meta property="og:description" content="<?= $context->escape($openGraph['description']) ?>">
 <meta property="og:url" content="<?= $context->escape($openGraph['url']) ?>">

@@ -5,7 +5,7 @@ declare(strict_types=1);
 $locale = $context->locale();
 $anchor = $data['anchor'] ?? '';
 ?>
-<section class="diagnostic-table"<?= $anchor !== '' ? ' id="' . $context->escape($anchor) . '"' : '' ?>>
+<section class="diagnostic-table" <?= $anchor !== '' ? ' id="' . $context->escape($anchor) . '"' : '' ?>>
     <div class="container">
         <header class="diagnostic-table__heading">
             <p><?= $context->escape($data['eyebrow']) ?></p>
@@ -19,15 +19,21 @@ $anchor = $data['anchor'] ?? '';
                 <div class="diagnostic-table__row diagnostic-table__row--head" role="row">
                     <span role="columnheader"><?= $locale === 'pl' ? 'Warstwa' : 'Layer' ?></span>
                     <span role="columnheader"><?= $locale === 'pl' ? 'Problem / objaw' : 'Problem / symptom' ?></span>
-                    <span role="columnheader"><?= $locale === 'pl' ? 'Prawdopodobna przyczyna' : 'Likely cause' ?></span>
+                    <span
+                        role="columnheader"><?= $locale === 'pl' ? 'Prawdopodobna przyczyna' : 'Likely cause' ?></span>
                     <span role="columnheader"><?= $locale === 'pl' ? 'Co sprawdzić' : 'What to check' ?></span>
                 </div>
                 <?php foreach ($data['rows'] as $row): ?>
                     <div class="diagnostic-table__row" role="row">
-                        <strong role="cell" data-label="<?= $locale === 'pl' ? 'Warstwa' : 'Layer' ?>"><?= $context->escape($row['layer']) ?></strong>
-                        <span role="cell" data-label="<?= $locale === 'pl' ? 'Problem / objaw' : 'Problem / symptom' ?>"><?= $context->escape($row['problem']) ?></span>
-                        <span role="cell" data-label="<?= $locale === 'pl' ? 'Przyczyna' : 'Cause' ?>"><?= $context->escape($row['cause']) ?></span>
-                        <div role="cell" data-label="<?= $locale === 'pl' ? 'Co sprawdzić' : 'What to check' ?>"><?= $context->markdown($row['check']) ?></div>
+                        <strong role="cell"
+                            data-label="<?= $locale === 'pl' ? 'Warstwa' : 'Layer' ?>"><?= $context->escape($row['layer']) ?></strong>
+                        <span role="cell"
+                            data-label="<?= $locale === 'pl' ? 'Problem / objaw' : 'Problem / symptom' ?>"><?= $context->escape($row['problem']) ?></span>
+                        <span role="cell"
+                            data-label="<?= $locale === 'pl' ? 'Przyczyna' : 'Cause' ?>"><?= $context->escape($row['cause']) ?></span>
+                        <div role="cell" data-label="<?= $locale === 'pl' ? 'Co sprawdzić' : 'What to check' ?>">
+                            <?= $context->markdown($row['check']) ?>
+                        </div>
                     </div>
                 <?php endforeach; ?>
             </div>

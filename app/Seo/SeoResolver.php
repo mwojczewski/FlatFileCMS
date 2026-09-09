@@ -111,6 +111,7 @@ final readonly class SeoResolver
             'openGraph' => $openGraph,
             'twitter' => $twitter,
             'jsonLd' => $pageSeo['jsonLd'] ?? $global['jsonLd'] ?? [],
+            'icons' => $this->map($site['icons'] ?? []),
         ];
     }
 

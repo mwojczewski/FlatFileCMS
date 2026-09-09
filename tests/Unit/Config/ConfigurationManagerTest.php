@@ -7,6 +7,7 @@ namespace FlatFileCms\Tests\Unit\Config;
 use FlatFileCms\Config\ConfigurationManager;
 use FlatFileCms\Config\ConfigurationRepository;
 use FlatFileCms\Config\GlobalConfigurationInput;
+use FlatFileCms\Content\InvalidContentException;
 use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
 use FlatFileCms\Rendering\LayoutRegistry;
 use FlatFileCms\Support\ContentData;
@@ -48,9 +49,11 @@ YAML);
         $updated = $this->manager->update($this->input(), $current->revision());
         $data = $updated->data();
         $site = ContentData::map($data['site'] ?? null, 'site');
+        $icons = ContentData::map($site['icons'] ?? null, 'site.icons');
         $seo = ContentData::map($data['seo'] ?? null, 'seo');
 
         self::assertSame('Example', $site['name']);
+        self::assertSame('/assets/icons/favicon.svg', $icons['svg']);
         self::assertSame(['preserved' => true], $data['custom']);
         self::assertSame(['pl' => 'Opis', 'en' => 'Description'], $seo['description']);
     }
@@ -64,12 +67,23 @@ YAML);
         $this->manager->update($input, $current->revision());
     }
 
-    private function input(string $defaultLayout = 'default'): GlobalConfigurationInput
+    public function testItRejectsUnsafeSiteIconHrefBeforeWriting(): void
+    {
+        $current = $this->manager->editable();
+        $input = $this->input(icons: ['svg' => 'javascript:alert(1)']);
+
+        $this->expectException(InvalidContentException::class);
+        $this->manager->update($input, $current->revision());
+    }
+
+    /** @param array<string, string>|null $icons */
+    private function input(string $defaultLayout = 'default', ?array $icons = null): GlobalConfigurationInput
     {
         return new GlobalConfigurationInput(
             'Example',
             'https://example.com',
             $defaultLayout,
+            $icons ?? ['svg' => '/assets/icons/favicon.svg', 'appleTouchPrecomposed' => '/apple-touch-icon-precomposed.png'],
             ['pl' => 'Example', 'en' => 'Example'],
             ['pl' => 'Opis', 'en' => 'Description'],
             null,

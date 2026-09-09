@@ -38,6 +38,8 @@ $level = $levelLabels[$data['level']][$locale] ?? $data['level'];
         </aside>
     </div>
     <div class="container docs-hero__topics">
-        <?php foreach ($data['topics'] as $topic): ?><span><?= $context->escape($topic['label']) ?></span><?php endforeach; ?>
+        <?php foreach ($data['topics'] as $topic): ?>
+            <span><?= $context->escape($topic['label']) ?></span>
+        <?php endforeach; ?>
     </div>
 </header>

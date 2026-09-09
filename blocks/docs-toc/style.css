@@ -12,7 +12,9 @@
 .docs-toc__heading > p {
   margin: 0;
   color: #0d6348;
-  font: 700 0.65rem ui-monospace, monospace;
+  font:
+    700 0.65rem ui-monospace,
+    monospace;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -57,7 +59,9 @@
 }
 .docs-toc li a > span {
   color: #0d6348;
-  font: 650 0.65rem ui-monospace, monospace;
+  font:
+    650 0.65rem ui-monospace,
+    monospace;
 }
 .docs-toc li strong {
   display: block;

@@ -5,190 +5,173 @@ slug:
   pl: struktura-tresci
   en: content-structure
 title:
-  pl: 'Struktura treści i routing w FlatFile CMS'
-  en: 'Content structure and routing in FlatFile CMS'
-date: '2026-09-05'
+  pl: "Struktura treści i routing w FlatFile CMS"
+  en: "Content structure and routing in FlatFile CMS"
+date: "2026-09-05"
 order: 3
 category: content-structure
 excerpt:
-  pl: 'Techniczny przewodnik po tożsamościach stron, kontraktach content.yml, lokalizowanych slugach, hierarchii tras, kolekcjach i bezpiecznych operacjach na drzewie treści.'
-  en: 'A technical guide to page identities, content.yml contracts, localized slugs, route hierarchy, collections and safe content-tree operations.'
+  pl: "Techniczny przewodnik po tożsamościach stron, kontraktach content.yml, lokalizowanych slugach, hierarchii tras, kolekcjach i bezpiecznych operacjach na drzewie treści."
+  en: "A technical guide to page identities, content.yml contracts, localized slugs, route hierarchy, collections and safe content-tree operations."
 seo:
   title:
-    pl: 'Struktura treści i routing FlatFile CMS — kompletny tutorial'
-    en: 'FlatFile CMS content structure and routing — complete tutorial'
+    pl: "Struktura treści i routing FlatFile CMS - kompletny tutorial"
+    en: "FlatFile CMS content structure and routing - complete tutorial"
   description:
-    pl: 'Naucz się projektować strony, hierarchie i kolekcje FlatFile CMS oraz bezpiecznie zarządzać lokalizowanymi trasami i plikami YAML.'
-    en: 'Learn to design FlatFile CMS pages, hierarchies and collections and safely manage localized routes and YAML files.'
+    pl: "Naucz się projektować strony, hierarchie i kolekcje FlatFile CMS oraz bezpiecznie zarządzać lokalizowanymi trasami i plikami YAML."
+    en: "Learn to design FlatFile CMS pages, hierarchies and collections and safely manage localized routes and YAML files."
   robots:
     index: true
     follow: true
   openGraph: {}
   twitter: {}
   jsonLd:
-    '@context': 'https://schema.org'
-    '@type': TechArticle
-    headline: 'Content structure and routing in FlatFile CMS'
-    dateModified: '2026-09-05'
+    "@context": "https://schema.org"
+    "@type": TechArticle
+    headline: "Content structure and routing in FlatFile CMS"
+    dateModified: "2026-09-05"
 blocks:
-  -
-    id: 01a06d50-4004-7401-8401-000000000001
+  - id: 01a06d50-4004-7401-8401-000000000001
     type: docs-hero
     enabled: true
     data:
       breadcrumb:
-        pl: 'Dokumentacja / 04 / Struktura treści'
-        en: 'Documentation / 04 / Content structure'
+        pl: "Dokumentacja / 04 / Struktura treści"
+        en: "Documentation / 04 / Content structure"
       title:
-        pl: 'Struktura treści i routing'
-        en: 'Content structure and routing'
+        pl: "Struktura treści i routing"
+        en: "Content structure and routing"
       lead:
-        pl: 'Jak katalogi stają się stabilnymi tożsamościami, slugi budują wielojęzyczne URL-e, a kolekcje zamieniają bezpośrednie dzieci w filtrowane i paginowane zestawy — bez utraty bezpieczeństwa zapisu.'
-        en: 'How directories become stable identities, slugs build multilingual URLs and collections turn direct children into filtered, paginated sets without sacrificing write safety.'
+        pl: "Jak katalogi stają się stabilnymi tożsamościami, slugi budują wielojęzyczne URL-e, a kolekcje zamieniają bezpośrednie dzieci w filtrowane i paginowane zestawy - bez utraty bezpieczeństwa zapisu."
+        en: "How directories become stable identities, slugs build multilingual URLs and collections turn direct children into filtered, paginated sets without sacrificing write safety."
       level: średniozaawansowany
       reading_time:
-        pl: 'około 40 minut'
-        en: 'about 40 minutes'
-      updated: '2026-09-05'
+        pl: "około 40 minut"
+        en: "about 40 minutes"
+      updated: "2026-09-05"
       topics:
-        -
-          label:
+        - label:
             pl: content.yml
             en: content.yml
-        -
-          label:
+        - label:
             pl: Routing
             en: Routing
-        -
-          label:
+        - label:
             pl: Lokalizacja
             en: Localization
-        -
-          label:
+        - label:
             pl: Kolekcje
             en: Collections
-        -
-          label:
+        - label:
             pl: Paginacja
             en: Pagination
-        -
-          label:
-            pl: 'Bezpieczny zapis'
-            en: 'Safe writes'
-  -
-    id: 01a06d50-4004-7402-8402-000000000002
+        - label:
+            pl: "Bezpieczny zapis"
+            en: "Safe writes"
+  - id: 01a06d50-4004-7402-8402-000000000002
     type: docs-toc
     enabled: true
     data:
       title:
-        pl: 'Mapa modelu treści'
-        en: 'Content-model map'
+        pl: "Mapa modelu treści"
+        en: "Content-model map"
       intro:
-        pl: 'Najpierw oddzielimy wewnętrzną tożsamość od publicznego adresu. Potem zbudujemy stronę, trasę wielojęzyczną, hierarchię i kolekcję, a na końcu prześledzimy bezpieczne operacje panelu.'
-        en: 'First we separate internal identity from public address. Then we build a page, multilingual route, hierarchy and collection before tracing safe administration operations.'
+        pl: "Najpierw oddzielimy wewnętrzną tożsamość od publicznego adresu. Potem zbudujemy stronę, trasę wielojęzyczną, hierarchię i kolekcję, a na końcu prześledzimy bezpieczne operacje panelu."
+        en: "First we separate internal identity from public address. Then we build a page, multilingual route, hierarchy and collection before tracing safe administration operations."
       items:
-        -
-          number: '01'
+        - number: "01"
           title:
             pl: Tożsamość
             en: Identity
           description:
-            pl: 'Katalog techniczny jako trwały klucz strony.'
-            en: 'Technical directory as the stable page key.'
+            pl: "Katalog techniczny jako trwały klucz strony."
+            en: "Technical directory as the stable page key."
           url:
-            pl: '/pl/dokumentacja/struktura-tresci#tozsamosc'
-            en: '/en/documentation/content-structure#tozsamosc'
-        -
-          number: '02'
+            pl: "/pl/dokumentacja/struktura-tresci#tozsamosc"
+            en: "/en/documentation/content-structure#tozsamosc"
+        - number: "02"
           title:
-            pl: 'Kontrakt strony'
-            en: 'Page contract'
+            pl: "Kontrakt strony"
+            en: "Page contract"
           description:
-            pl: 'Metadane, SEO, atrybuty i lista bloków.'
-            en: 'Metadata, SEO, attributes and the block list.'
+            pl: "Metadane, SEO, atrybuty i lista bloków."
+            en: "Metadata, SEO, attributes and the block list."
           url:
-            pl: '/pl/dokumentacja/struktura-tresci#developer-experience'
-            en: '/en/documentation/content-structure#developer-experience'
-        -
-          number: '03'
+            pl: "/pl/dokumentacja/struktura-tresci#developer-experience"
+            en: "/en/documentation/content-structure#developer-experience"
+        - number: "03"
           title:
-            pl: 'Routing językowy'
-            en: 'Localized routing'
+            pl: "Routing językowy"
+            en: "Localized routing"
           description:
-            pl: 'Prefiksy locale, fallbacki i slugi przodków.'
-            en: 'Locale prefixes, fallbacks and ancestor slugs.'
+            pl: "Prefiksy locale, fallbacki i slugi przodków."
+            en: "Locale prefixes, fallbacks and ancestor slugs."
           url:
-            pl: '/pl/dokumentacja/struktura-tresci#routing'
-            en: '/en/documentation/content-structure#routing'
-        -
-          number: '04'
+            pl: "/pl/dokumentacja/struktura-tresci#routing"
+            en: "/en/documentation/content-structure#routing"
+        - number: "04"
           title:
             pl: Kolekcje
             en: Collections
           description:
-            pl: 'pagination.yml i wybór bezpośrednich dzieci.'
-            en: 'pagination.yml and direct-child selection.'
+            pl: "pagination.yml i wybór bezpośrednich dzieci."
+            en: "pagination.yml and direct-child selection."
           url:
-            pl: '/pl/dokumentacja/struktura-tresci#kolekcje'
-            en: '/en/documentation/content-structure#kolekcje'
-        -
-          number: '05'
+            pl: "/pl/dokumentacja/struktura-tresci#kolekcje"
+            en: "/en/documentation/content-structure#kolekcje"
+        - number: "05"
           title:
-            pl: 'Query kolekcji'
-            en: 'Collection query'
+            pl: "Query kolekcji"
+            en: "Collection query"
           description:
-            pl: 'Sortowanie, filtry, allowlisty i paginacja.'
-            en: 'Sorting, filters, allowlists and pagination.'
+            pl: "Sortowanie, filtry, allowlisty i paginacja."
+            en: "Sorting, filters, allowlists and pagination."
           url:
-            pl: '/pl/dokumentacja/struktura-tresci#query-kolekcji'
-            en: '/en/documentation/content-structure#query-kolekcji'
-        -
-          number: '06'
+            pl: "/pl/dokumentacja/struktura-tresci#query-kolekcji"
+            en: "/en/documentation/content-structure#query-kolekcji"
+        - number: "06"
           title:
             pl: Panel
             en: Admin
           description:
-            pl: 'Tworzenie, edycja, przenoszenie i usuwanie.'
-            en: 'Creating, editing, moving and deleting.'
+            pl: "Tworzenie, edycja, przenoszenie i usuwanie."
+            en: "Creating, editing, moving and deleting."
           url:
-            pl: '/pl/dokumentacja/struktura-tresci#panel'
-            en: '/en/documentation/content-structure#panel'
-        -
-          number: '07'
+            pl: "/pl/dokumentacja/struktura-tresci#panel"
+            en: "/en/documentation/content-structure#panel"
+        - number: "07"
           title:
-            pl: 'Spójność zapisu'
-            en: 'Write integrity'
+            pl: "Spójność zapisu"
+            en: "Write integrity"
           description:
-            pl: 'Rewizje, blokady, walidacja i atomowa publikacja.'
-            en: 'Revisions, locks, validation and atomic publication.'
+            pl: "Rewizje, blokady, walidacja i atomowa publikacja."
+            en: "Revisions, locks, validation and atomic publication."
           url:
-            pl: '/pl/dokumentacja/struktura-tresci#spojnosc'
-            en: '/en/documentation/content-structure#spojnosc'
-        -
-          number: '08'
+            pl: "/pl/dokumentacja/struktura-tresci#spojnosc"
+            en: "/en/documentation/content-structure#spojnosc"
+        - number: "08"
           title:
             pl: Diagnostyka
             en: Troubleshooting
           description:
-            pl: 'Konflikty tras i typowe błędy struktury.'
-            en: 'Route collisions and common structure errors.'
+            pl: "Konflikty tras i typowe błędy struktury."
+            en: "Route collisions and common structure errors."
           url:
-            pl: '/pl/dokumentacja/struktura-tresci#diagnostyka-struktury'
-            en: '/en/documentation/content-structure#diagnostyka-struktury'
-  -
-    id: 01a06d50-4004-7403-8403-000000000003
+            pl: "/pl/dokumentacja/struktura-tresci#diagnostyka-struktury"
+            en: "/en/documentation/content-structure#diagnostyka-struktury"
+  - id: 01a06d50-4004-7403-8403-000000000003
     type: technical-table
     enabled: true
     data:
       eyebrow:
-        pl: 'Warstwy modelu'
-        en: 'Model layers'
+        pl: "Warstwy modelu"
+        en: "Model layers"
       title:
-        pl: 'Ta sama treść ma kilka różnych identyfikatorów.'
-        en: 'The same content has several different identifiers.'
+        pl: "Ta sama treść ma kilka różnych identyfikatorów."
+        en: "The same content has several different identifiers."
       intro:
-        pl: 'Pomylenie katalogu, slugu i pełnej trasy prowadzi do kruchych linków. Każda wartość ma własną odpowiedzialność i inny cykl życia.'
-        en: 'Confusing a directory, slug and full route creates fragile links. Each value has its own responsibility and lifecycle.'
+        pl: "Pomylenie katalogu, slugu i pełnej trasy prowadzi do kruchych linków. Każda wartość ma własną odpowiedzialność i inny cykl życia."
+        en: "Confusing a directory, slug and full route creates fragile links. Each value has its own responsibility and lifecycle."
       column_1:
         pl: Pojęcie
         en: Concept
@@ -202,73 +185,67 @@ blocks:
         pl: Stabilność
         en: Stability
       rows:
-        -
-          cell_1:
-            pl: 'Tożsamość techniczna'
-            en: 'Technical identity'
+        - cell_1:
+            pl: "Tożsamość techniczna"
+            en: "Technical identity"
           cell_2:
             pl: documentation/content-structure
             en: documentation/content-structure
           cell_3:
-            pl: 'Wskazuje katalog i zasób wewnątrz CMS-a.'
-            en: 'Identifies the directory and CMS resource.'
+            pl: "Wskazuje katalog i zasób wewnątrz CMS-a."
+            en: "Identifies the directory and CMS resource."
           cell_4:
             pl: Stabilna
             en: Stable
-        -
-          cell_1:
-            pl: 'Slug lokalny'
-            en: 'Local slug'
+        - cell_1:
+            pl: "Slug lokalny"
+            en: "Local slug"
           cell_2:
             pl: struktura-tresci
             en: content-structure
           cell_3:
-            pl: 'Określa jeden segment publicznego URL-a.'
-            en: 'Defines one public URL segment.'
+            pl: "Określa jeden segment publicznego URL-a."
+            en: "Defines one public URL segment."
           cell_4:
-            pl: 'Może się zmieniać'
-            en: 'May change'
-        -
-          cell_1:
-            pl: 'Trasa publiczna'
-            en: 'Public route'
+            pl: "Może się zmieniać"
+            en: "May change"
+        - cell_1:
+            pl: "Trasa publiczna"
+            en: "Public route"
           cell_2:
             pl: /pl/dokumentacja/struktura-tresci
             en: /en/documentation/content-structure
           cell_3:
-            pl: 'Łączy locale i slugi całego łańcucha przodków.'
-            en: 'Combines locale and all ancestor slugs.'
+            pl: "Łączy locale i slugi całego łańcucha przodków."
+            en: "Combines locale and all ancestor slugs."
           cell_4:
             pl: Wynikowa
             en: Derived
-        -
-          cell_1:
+        - cell_1:
             pl: Tytuł
             en: Title
           cell_2:
-            pl: 'Struktura treści'
-            en: 'Content structure'
+            pl: "Struktura treści"
+            en: "Content structure"
           cell_3:
-            pl: 'Identyfikuje stronę dla człowieka i interfejsu.'
-            en: 'Identifies the page for people and interfaces.'
+            pl: "Identyfikuje stronę dla człowieka i interfejsu."
+            en: "Identifies the page for people and interfaces."
           cell_4:
             pl: Redakcyjna
             en: Editorial
-        -
-          cell_1:
-            pl: 'UUID bloku'
-            en: 'Block UUID'
+        - cell_1:
+            pl: "UUID bloku"
+            en: "Block UUID"
           cell_2:
-            pl: 'UUID v7'
-            en: 'UUID v7'
+            pl: "UUID v7"
+            en: "UUID v7"
           cell_3:
-            pl: 'Rozróżnia instancje komponentów na stronie.'
-            en: 'Distinguishes component instances on a page.'
+            pl: "Rozróżnia instancje komponentów na stronie."
+            en: "Distinguishes component instances on a page."
           cell_4:
-            pl: 'Stabilna w obrębie strony'
-            en: 'Stable within page'
-  -
-    id: 01a06d50-4004-7404-8404-000000000004
+            pl: "Stabilna w obrębie strony"
+            en: "Stable within page"
+  - id: 01a06d50-4004-7404-8404-000000000004
     type: article-content
     enabled: true
     data:
@@ -277,7 +254,7 @@ blocks:
         pl: |-
           ## 1. Zacznij od drzewa katalogów
 
-          FlatFile CMS traktuje `pages/` jako korzeń modelu treści. Zwykła strona jest katalogiem zawierającym `content.yml`, a kolekcja — katalogiem zawierającym `pagination.yml`. W wersji kontraktu 1 jeden katalog nie może być jednocześnie stroną i kolekcją.
+          FlatFile CMS traktuje `pages/` jako korzeń modelu treści. Zwykła strona jest katalogiem zawierającym `content.yml`, a kolekcja - katalogiem zawierającym `pagination.yml`. W wersji kontraktu 1 jeden katalog nie może być jednocześnie stroną i kolekcją.
 
           ```text
           pages/
@@ -323,22 +300,21 @@ blocks:
 
           With one enabled language the root is `/`. With several enabled languages, routes such as `/pl/` and `/en/` are created, and an unprefixed request is redirected to the default locale.
       note:
-        pl: 'Nazwa katalogu jest kluczem systemowym. Slug jest częścią interfejsu publicznego. Nie używaj tych pojęć zamiennie.'
-        en: 'A directory name is a system key. A slug is part of the public interface. Do not use these terms interchangeably.'
-  -
-    id: 01a06d50-4004-7405-8405-000000000005
+        pl: "Nazwa katalogu jest kluczem systemowym. Slug jest częścią interfejsu publicznego. Nie używaj tych pojęć zamiennie."
+        en: "A directory name is a system key. A slug is part of the public interface. Do not use these terms interchangeably."
+  - id: 01a06d50-4004-7405-8405-000000000005
     type: code-showcase
     enabled: true
     data:
       eyebrow:
-        pl: 'Kontrakt strony'
-        en: 'Page contract'
+        pl: "Kontrakt strony"
+        en: "Page contract"
       title:
-        pl: 'Jeden dokument opisuje metadane, SEO i kolejność bloków.'
-        en: 'One document describes metadata, SEO and block order.'
+        pl: "Jeden dokument opisuje metadane, SEO i kolejność bloków."
+        en: "One document describes metadata, SEO and block order."
       description:
-        pl: 'Pola rdzeniowe są interpretowane przez PageRepository. Dodatkowe wartości najwyższego poziomu pozostają atrybutami strony i mogą zasilać zapytanie kolekcji.'
-        en: 'PageRepository interprets core fields. Additional root-level values remain page attributes and can feed a collection query.'
+        pl: "Pola rdzeniowe są interpretowane przez PageRepository. Dodatkowe wartości najwyższego poziomu pozostają atrybutami strony i mogą zasilać zapytanie kolekcji."
+        en: "PageRepository interprets core fields. Additional root-level values remain page attributes and can feed a collection query."
       filename: pages/documentation/content-structure/content.yml
       code: |-
         schemaVersion: 1
@@ -358,31 +334,26 @@ blocks:
           en: A content-model guide.
         seo:
           title:
-            pl: Struktura treści — tutorial
-            en: Content structure — tutorial
+            pl: Struktura treści - tutorial
+            en: Content structure - tutorial
           robots:
             index: true
             follow: true
         blocks: []
       bullets:
-        -
-          text:
-            pl: '`schemaVersion` wersjonuje kontrakt dokumentu.'
-            en: '`schemaVersion` versions the document contract.'
-        -
-          text:
-            pl: '`enabled` decyduje o publicznej dostępności.'
-            en: '`enabled` controls public availability.'
-        -
-          text:
-            pl: '`layout` wskazuje bezpieczną nazwę z rejestru layoutów.'
-            en: '`layout` selects a safe name from the layout registry.'
-        -
-          text:
-            pl: 'Date, order i category są atrybutami kolekcji.'
-            en: 'Date, order and category are collection attributes.'
-  -
-    id: 01a06d50-4004-7406-8406-000000000006
+        - text:
+            pl: "`schemaVersion` wersjonuje kontrakt dokumentu."
+            en: "`schemaVersion` versions the document contract."
+        - text:
+            pl: "`enabled` decyduje o publicznej dostępności."
+            en: "`enabled` controls public availability."
+        - text:
+            pl: "`layout` wskazuje bezpieczną nazwę z rejestru layoutów."
+            en: "`layout` selects a safe name from the layout registry."
+        - text:
+            pl: "Date, order i category są atrybutami kolekcji."
+            en: "Date, order and category are collection attributes."
+  - id: 01a06d50-4004-7406-8406-000000000006
     type: article-content
     enabled: true
     data:
@@ -391,13 +362,13 @@ blocks:
         pl: |-
           ## 3. Poznaj pola rdzeniowe content.yml
 
-          `PageRepository` wymaga `schemaVersion: 1`, logicznego `enabled`, lokalizowanych `title`, listy `blocks` oraz — poza homepage — lokalizowanych `slug`. `layout` jest opcjonalny; jego brak oznacza layout domyślny z `config/setup.yml`. Podana nazwa musi być bezpiecznym slugiem i istnieć w `templates/layouts/`.
+          `PageRepository` wymaga `schemaVersion: 1`, logicznego `enabled`, lokalizowanych `title`, listy `blocks` oraz - poza homepage - lokalizowanych `slug`. `layout` jest opcjonalny; jego brak oznacza layout domyślny z `config/setup.yml`. Podana nazwa musi być bezpiecznym slugiem i istnieć w `templates/layouts/`.
 
           `seo` jest mapą przekazywaną do warstwy rozwiązywania metadanych. Typowe pola to lokalizowane `title` i `description`, opcjonalny `canonical`, `robots.index`, `robots.follow`, `openGraph`, `twitter` i `jsonLd`. Publiczna warstwa SEO łączy je z ustawieniami witryny zamiast ujawniać surową konfigurację.
 
           `blocks` jest uporządkowaną listą instancji. Kolejność w YAML jest kolejnością renderowania. Każda instancja ma UUID v7, typ, stan i dane zgodne z `block.yml`. System waliduje także bloki wyłączone, lecz nie publikuje ich w HTML ani API.
 
-          Wszystkie nieznane pola najwyższego poziomu nie są automatycznie błędem. Repozytorium zachowuje je jako `attributes`, ponieważ kolekcje potrzebują domenowych metadanych takich jak `date`, `category`, `tags`, `order` czy lokalizowany `excerpt`. To kontrolowane rozszerzenie dotyczy strony jako dokumentu — dane pojedynczego bloku nadal mają kontrakt zamknięty.
+          Wszystkie nieznane pola najwyższego poziomu nie są automatycznie błędem. Repozytorium zachowuje je jako `attributes`, ponieważ kolekcje potrzebują domenowych metadanych takich jak `date`, `category`, `tags`, `order` czy lokalizowany `excerpt`. To kontrolowane rozszerzenie dotyczy strony jako dokumentu - dane pojedynczego bloku nadal mają kontrakt zamknięty.
 
           ## 4. Rozumiej fallback języka domyślnego
 
@@ -407,7 +378,7 @@ blocks:
         en: |-
           ## 3. Learn the core content.yml fields
 
-          `PageRepository` requires `schemaVersion: 1`, boolean `enabled`, localized `title`, a `blocks` list and — except for the homepage — localized `slug`. `layout` is optional; absence selects the default from `config/setup.yml`. A provided name must be a safe slug and exist in `templates/layouts/`.
+          `PageRepository` requires `schemaVersion: 1`, boolean `enabled`, localized `title`, a `blocks` list and - except for the homepage - localized `slug`. `layout` is optional; absence selects the default from `config/setup.yml`. A provided name must be a safe slug and exist in `templates/layouts/`.
 
           `seo` is a mapping passed to the metadata resolution layer. Typical fields include localized `title` and `description`, optional `canonical`, `robots.index`, `robots.follow`, `openGraph`, `twitter` and `jsonLd`. The public SEO layer combines these with site settings rather than exposing raw configuration.
 
@@ -421,10 +392,9 @@ blocks:
 
           This does not mean every language should deliberately publish the same slug. Fallback helps gradual migration, while complete translations provide predictable URLs and metadata. Every supplied locale key must belong to the enabled configuration.
       note:
-        pl: 'Dodatkowe atrybuty umieszczaj na najwyższym poziomie tylko wtedy, gdy opisują stronę jako element kolekcji. Dane prezentacyjne należą do bloków.'
-        en: 'Add custom root attributes only when they describe the page as a collection item. Presentation data belongs inside blocks.'
-  -
-    id: 01a06d50-4004-7407-8407-000000000007
+        pl: "Dodatkowe atrybuty umieszczaj na najwyższym poziomie tylko wtedy, gdy opisują stronę jako element kolekcji. Dane prezentacyjne należą do bloków."
+        en: "Add custom root attributes only when they describe the page as a collection item. Presentation data belongs inside blocks."
+  - id: 01a06d50-4004-7407-8407-000000000007
     type: article-content
     enabled: true
     data:
@@ -433,7 +403,7 @@ blocks:
         pl: |-
           ## 5. Buduj trasę z całego łańcucha przodków
 
-          `PageRouteIndex` nie używa nazw katalogów jako publicznych segmentów. Dla każdego locale przechodzi przez tożsamość strony i rozwiązuje slug każdego przodka — niezależnie od tego, czy przodek jest zwykłą stroną, czy kolekcją.
+          `PageRouteIndex` nie używa nazw katalogów jako publicznych segmentów. Dla każdego locale przechodzi przez tożsamość strony i rozwiązuje slug każdego przodka - niezależnie od tego, czy przodek jest zwykłą stroną, czy kolekcją.
 
           Dla tożsamości `documentation/content-structure` oraz dwóch aktywnych języków wynik wygląda tak:
 
@@ -499,10 +469,9 @@ blocks:
 
           A collection uses `type: collection` and its identity. The URL generator resolves the current path for the active locale. An external link uses `type: url` and a complete HTTP(S) address. Slug changes therefore do not require manually searching navigation.
       note:
-        pl: 'Pełny publiczny URL jest wartością wynikową. Nie duplikuj go w danych, jeśli komponent potrafi wskazać stabilną tożsamość.'
-        en: 'A complete public URL is a derived value. Do not duplicate it in data when a component can reference stable identity.'
-  -
-    id: 01a06d50-4004-7408-8408-000000000008
+        pl: "Pełny publiczny URL jest wartością wynikową. Nie duplikuj go w danych, jeśli komponent potrafi wskazać stabilną tożsamość."
+        en: "A complete public URL is a derived value. Do not duplicate it in data when a component can reference stable identity."
+  - id: 01a06d50-4004-7408-8408-000000000008
     type: article-content
     enabled: true
     data:
@@ -536,7 +505,7 @@ blocks:
               allowedValues: [news, guide]
           ```
 
-          `schemaVersion` musi wynosić 1, `type` — `collection`, a `source` — `children`. Wersja 1 obsługuje wyłącznie aktywne **bezpośrednie dzieci**. Wnuki nie są automatycznie włączane do wyniku. `layout` wskazuje plik z `templates/layouts/`, który otrzymuje już zlokalizowaną kolekcję, elementy, paginację, aktywne filtry, SEO, nawigację i ograniczony `RenderContext`.
+          `schemaVersion` musi wynosić 1, `type` - `collection`, a `source` - `children`. Wersja 1 obsługuje wyłącznie aktywne **bezpośrednie dzieci**. Wnuki nie są automatycznie włączane do wyniku. `layout` wskazuje plik z `templates/layouts/`, który otrzymuje już zlokalizowaną kolekcję, elementy, paginację, aktywne filtry, SEO, nawigację i ograniczony `RenderContext`.
 
           Katalog kolekcji nie ma `content.yml`. Treść i media każdego wpisu pozostają w katalogu odpowiedniej strony potomnej.
 
@@ -601,10 +570,9 @@ blocks:
 
           The collection localizes attributes before serialization and filtering. Use consistent types across the set. If `date` is an ISO date in one item and arbitrary prose in another, textual sorting will not represent chronology.
       note:
-        pl: 'Kolekcja nie jest folderem wyszukującym rekurencyjnie. `source: children` to precyzyjny kontrakt jednego poziomu.'
-        en: 'A collection is not a recursively searching folder. `source: children` is a precise one-level contract.'
-  -
-    id: 01a06d50-4004-7409-8409-000000000009
+        pl: "Kolekcja nie jest folderem wyszukującym rekurencyjnie. `source: children` to precyzyjny kontrakt jednego poziomu."
+        en: "A collection is not a recursively searching folder. `source: children` is a precise one-level contract."
+  - id: 01a06d50-4004-7409-8409-000000000009
     type: article-content
     enabled: true
     data:
@@ -615,7 +583,7 @@ blocks:
 
           `sort.field` może wskazać atrybut dziecka albo pole wbudowane: `id`, `title` lub `modifiedAt`. Kierunek to `asc` albo `desc`. Brakujące wartości trafiają po elementach, które je mają, niezależnie od kierunku; tożsamość jest stabilnym tie-breakerem, więc identyczne wartości nie powodują losowej kolejności między żądaniami.
 
-          Do kolejności dokumentacji najlepiej użyć liczbowego `order` i `asc`. Do bloga — daty ISO `YYYY-MM-DD` i `desc`. `modifiedAt` odzwierciedla mtime pliku, więc może zmienić się podczas operacji deploymentu; nie zastępuje świadomej daty publikacji.
+          Do kolejności dokumentacji najlepiej użyć liczbowego `order` i `asc`. Do bloga - daty ISO `YYYY-MM-DD` i `desc`. `modifiedAt` odzwierciedla mtime pliku, więc może zmienić się podczas operacji deploymentu; nie zastępuje świadomej daty publikacji.
 
           ## 11. Ogranicz filtry allowlistą
 
@@ -661,10 +629,9 @@ blocks:
 
           Requesting a page beyond the final one does not redirect. It reports the requested number and returns an empty item list. This behaviour is predictable for headless clients and does not conceal an invalid parameter through automatic correction.
       note:
-        pl: 'Sortowanie i filtrowanie działają na danych, nie na wizualnym HTML wpisu. Projektuj atrybuty kolekcji jak mały, spójny schemat domenowy.'
+        pl: "Sortowanie i filtrowanie działają na danych, nie na wizualnym HTML wpisu. Projektuj atrybuty kolekcji jak mały, spójny schemat domenowy."
         en: "Sorting and filtering operate on data, not the entry's visual HTML. Design collection attributes as a small consistent domain schema."
-  -
-    id: 01a06d50-4004-7410-8410-000000000010
+  - id: 01a06d50-4004-7410-8410-000000000010
     type: article-content
     enabled: true
     data:
@@ -685,7 +652,7 @@ blocks:
 
           Operacja najpierw waliduje istniejące drzewo, wykonuje zmianę nazwy katalogu, unieważnia indeks plików i waliduje wynik. Jeśli nowa struktura tworzy brakującego przodka, konflikt trasy lub inny błąd, CMS przenosi katalog z powrotem i ponownie unieważnia indeks.
 
-          Usunięcie wymaga wpisania `delete` i jest trwałe. Obejmuje stronę, wszystkich potomków oraz media. Nie ma kosza ani bazy zawierającej kopię YAML — odzyskanie wymaga backupu lub historii systemu wersjonowania.
+          Usunięcie wymaga wpisania `delete` i jest trwałe. Obejmuje stronę, wszystkich potomków oraz media. Nie ma kosza ani bazy zawierającej kopię YAML - odzyskanie wymaga backupu lub historii systemu wersjonowania.
         en: |-
           ## 13. Manage pages through two specialized editors
 
@@ -703,10 +670,9 @@ blocks:
 
           Deletion requires typing `delete` and is permanent. It includes the page, all descendants and media. There is no trash or database copy of YAML; recovery requires a backup or version-control history.
       note:
-        pl: 'Przed usunięciem lub przeniesieniem dużego poddrzewa wykonaj spójny backup `pages/`. Rewizja chroni przed konfliktem, ale nie jest historią wersji.'
-        en: 'Before deleting or moving a large subtree, make a consistent `pages/` backup. A revision protects against conflicts but is not version history.'
-  -
-    id: 01a06d50-4004-7411-8411-000000000011
+        pl: "Przed usunięciem lub przeniesieniem dużego poddrzewa wykonaj spójny backup `pages/`. Rewizja chroni przed konfliktem, ale nie jest historią wersji."
+        en: "Before deleting or moving a large subtree, make a consistent `pages/` backup. A revision protects against conflicts but is not version history."
+  - id: 01a06d50-4004-7411-8411-000000000011
     type: article-content
     enabled: true
     data:
@@ -763,120 +729,111 @@ blocks:
 
           Parsed-YAML cache is keyed by source revision. Even when mtime and size remain unchanged, cache is not accepted without a matching SHA-256. `php bin/cms cache:clear` removes reproducible entries but cannot repair an invalid document structure.
       note:
-        pl: 'HTTP 409 oznacza ochronę nowszej wersji, nie awarię filesystemu. Odśwież dane i świadomie połącz zmiany.'
-        en: 'HTTP 409 means a newer version was protected, not that the filesystem failed. Refresh and deliberately merge the changes.'
-  -
-    id: 01a06d50-4004-7412-8412-000000000012
+        pl: "HTTP 409 oznacza ochronę nowszej wersji, nie awarię filesystemu. Odśwież dane i świadomie połącz zmiany."
+        en: "HTTP 409 means a newer version was protected, not that the filesystem failed. Refresh and deliberately merge the changes."
+  - id: 01a06d50-4004-7412-8412-000000000012
     type: diagnostic-table
     enabled: true
     data:
       anchor: diagnostyka-struktury
       eyebrow:
-        pl: '17 / Diagnostyka'
-        en: '17 / Troubleshooting'
+        pl: "17 / Diagnostyka"
+        en: "17 / Troubleshooting"
       title:
-        pl: 'Najpierw ustal, który kontrakt został naruszony.'
-        en: 'First identify the violated contract.'
+        pl: "Najpierw ustal, który kontrakt został naruszony."
+        en: "First identify the violated contract."
       intro:
-        pl: 'Podobny błąd 404 może wynikać z wyłączenia strony, nieistniejącego przodka albo niewłaściwego locale. Diagnozuj od struktury do publicznej trasy.'
-        en: 'A similar 404 can result from a disabled page, missing ancestor or incorrect locale. Diagnose from structure toward the public route.'
+        pl: "Podobny błąd 404 może wynikać z wyłączenia strony, nieistniejącego przodka albo niewłaściwego locale. Diagnozuj od struktury do publicznej trasy."
+        en: "A similar 404 can result from a disabled page, missing ancestor or incorrect locale. Diagnose from structure toward the public route."
       rows:
-        -
-          layer:
+        - layer:
             pl: Dokument
             en: Document
           problem:
-            pl: 'YAML document is malformed'
-            en: 'YAML document is malformed'
+            pl: "YAML document is malformed"
+            en: "YAML document is malformed"
           cause:
-            pl: 'Błąd składni, alias YAML, niedozwolony tag albo niepoprawny typ korzenia.'
-            en: 'Syntax error, YAML alias, forbidden tag or invalid root type.'
+            pl: "Błąd składni, alias YAML, niedozwolony tag albo niepoprawny typ korzenia."
+            en: "Syntax error, YAML alias, forbidden tag or invalid root type."
           check:
-            pl: 'Sprawdź wcięcia i typy; dokument musi być mapą z prostymi wartościami bez aliasów.'
-            en: 'Check indentation and types; the document must be a mapping of safe values without aliases.'
-        -
-          layer:
+            pl: "Sprawdź wcięcia i typy; dokument musi być mapą z prostymi wartościami bez aliasów."
+            en: "Check indentation and types; the document must be a mapping of safe values without aliases."
+        - layer:
             pl: Tożsamość
             en: Identity
           problem:
-            pl: 'Nie można utworzyć zagnieżdżonej strony'
-            en: 'A nested page cannot be created'
+            pl: "Nie można utworzyć zagnieżdżonej strony"
+            en: "A nested page cannot be created"
           cause:
-            pl: 'Rodzic nie istnieje jako strona lub kolekcja albo segment nie jest slugiem ASCII.'
-            en: 'Parent is not an existing page or collection, or a segment is not an ASCII slug.'
+            pl: "Rodzic nie istnieje jako strona lub kolekcja albo segment nie jest slugiem ASCII."
+            en: "Parent is not an existing page or collection, or a segment is not an ASCII slug."
           check:
-            pl: 'Sprawdź każdy segment tożsamości i obecność `content.yml` albo `pagination.yml` u rodzica.'
+            pl: "Sprawdź każdy segment tożsamości i obecność `content.yml` albo `pagination.yml` u rodzica."
             en: "Check every identity segment and the parent's `content.yml` or `pagination.yml`."
-        -
-          layer:
+        - layer:
             pl: Routing
             en: Routing
           problem:
-            pl: 'Konflikt publicznej trasy'
-            en: 'Public route collision'
+            pl: "Konflikt publicznej trasy"
+            en: "Public route collision"
           cause:
-            pl: 'Dwoje rodzeństwa ma ten sam slug w jednym locale albo strona koliduje z kolekcją.'
-            en: 'Two siblings share a slug in one locale, or a page collides with a collection.'
+            pl: "Dwoje rodzeństwa ma ten sam slug w jednym locale albo strona koliduje z kolekcją."
+            en: "Two siblings share a slug in one locale, or a page collides with a collection."
           check:
-            pl: 'Porównaj wynikowe ścieżki we wszystkich językach, nie tylko nazwy katalogów.'
-            en: 'Compare derived paths in every language, not only directory names.'
-        -
-          layer:
+            pl: "Porównaj wynikowe ścieżki we wszystkich językach, nie tylko nazwy katalogów."
+            en: "Compare derived paths in every language, not only directory names."
+        - layer:
             pl: Widoczność
             en: Visibility
           problem:
-            pl: 'Istniejąca strona zwraca 404'
-            en: 'An existing page returns 404'
+            pl: "Istniejąca strona zwraca 404"
+            en: "An existing page returns 404"
           cause:
-            pl: 'Strona jest wyłączona albo żądanie używa niewłaściwego prefiksu locale lub wynikowej ścieżki.'
-            en: 'The page is disabled, or the request uses the wrong locale prefix or derived path.'
+            pl: "Strona jest wyłączona albo żądanie używa niewłaściwego prefiksu locale lub wynikowej ścieżki."
+            en: "The page is disabled, or the request uses the wrong locale prefix or derived path."
           check:
-            pl: 'Sprawdź `enabled`, aktywne języki, slugi przodków i pełny URL.'
-            en: 'Check `enabled`, enabled languages, ancestor slugs and the complete URL.'
-        -
-          layer:
+            pl: "Sprawdź `enabled`, aktywne języki, slugi przodków i pełny URL."
+            en: "Check `enabled`, enabled languages, ancestor slugs and the complete URL."
+        - layer:
             pl: Kolekcja
             en: Collection
           problem:
-            pl: 'Wpis nie pojawia się na liście'
-            en: 'An entry is absent from the list'
+            pl: "Wpis nie pojawia się na liście"
+            en: "An entry is absent from the list"
           cause:
-            pl: 'Nie jest aktywnym bezpośrednim dzieckiem, nie spełnia filtra albo znajduje się poza stroną paginacji.'
-            en: 'It is not an enabled direct child, does not match a filter or lies outside the requested page.'
+            pl: "Nie jest aktywnym bezpośrednim dzieckiem, nie spełnia filtra albo znajduje się poza stroną paginacji."
+            en: "It is not an enabled direct child, does not match a filter or lies outside the requested page."
           check:
-            pl: 'Sprawdź parent identity, `enabled`, atrybut filtra, sortowanie i parametr `page`.'
-            en: 'Check parent identity, `enabled`, filter attribute, sorting and the `page` parameter.'
-        -
-          layer:
+            pl: "Sprawdź parent identity, `enabled`, atrybut filtra, sortowanie i parametr `page`."
+            en: "Check parent identity, `enabled`, filter attribute, sorting and the `page` parameter."
+        - layer:
             pl: Sortowanie
             en: Sorting
           problem:
-            pl: 'Kolejność wpisów jest zaskakująca'
-            en: 'Entry order is surprising'
+            pl: "Kolejność wpisów jest zaskakująca"
+            en: "Entry order is surprising"
           cause:
-            pl: 'Brakuje pola sortowania, typy są niespójne albo użyto modifiedAt zamiast jawnej daty.'
-            en: 'Sort field is missing, types are inconsistent or modifiedAt was used instead of an explicit date.'
+            pl: "Brakuje pola sortowania, typy są niespójne albo użyto modifiedAt zamiast jawnej daty."
+            en: "Sort field is missing, types are inconsistent or modifiedAt was used instead of an explicit date."
           check:
-            pl: 'Ujednolić atrybut wszystkich dzieci i pamiętać, że brakujące wartości trafiają na koniec.'
-            en: 'Normalize the attribute across children and remember missing values sort last.'
-        -
-          layer:
+            pl: "Ujednolić atrybut wszystkich dzieci i pamiętać, że brakujące wartości trafiają na koniec."
+            en: "Normalize the attribute across children and remember missing values sort last."
+        - layer:
             pl: Współbieżność
             en: Concurrency
           problem:
-            pl: 'Formularz zwraca HTTP 409'
-            en: 'A form returns HTTP 409'
+            pl: "Formularz zwraca HTTP 409"
+            en: "A form returns HTTP 409"
           cause:
-            pl: 'Plik zmienił się po otwarciu formularza.'
-            en: 'The file changed after the form was opened.'
+            pl: "Plik zmienił się po otwarciu formularza."
+            en: "The file changed after the form was opened."
           check:
-            pl: 'Odśwież aktualną rewizję, ponownie zastosuj zmianę i zapisz bez nadpisywania cudzej pracy.'
-            en: 'Refresh the current revision, reapply the change and save without overwriting another edit.'
+            pl: "Odśwież aktualną rewizję, ponownie zastosuj zmianę i zapisz bez nadpisywania cudzej pracy."
+            en: "Refresh the current revision, reapply the change and save without overwriting another edit."
       note:
-        pl: 'Zawsze sprawdzaj wynikową trasę dla każdego aktywnego locale. Poprawna polska ścieżka nie dowodzi, że angielski indeks tras jest wolny od konfliktu.'
-        en: 'Always check the derived route for every enabled locale. A valid Polish path does not prove the English route index is collision-free.'
-  -
-    id: 01a06d50-4004-7413-8413-000000000013
+        pl: "Zawsze sprawdzaj wynikową trasę dla każdego aktywnego locale. Poprawna polska ścieżka nie dowodzi, że angielski indeks tras jest wolny od konfliktu."
+        en: "Always check the derived route for every enabled locale. A valid Polish path does not prove the English route index is collision-free."
+  - id: 01a06d50-4004-7413-8413-000000000013
     type: article-content
     enabled: true
     data:
@@ -923,25 +880,24 @@ blocks:
 
           A well-designed tree separates durable system structure from mutable public language. Content can then evolve while routing remains validatable and predictable.
       note:
-        pl: 'Projektuj strukturę według relacji domenowych, nie według chwilowego wyglądu menu. Nawigacja jest projekcją drzewa, a nie jego właścicielem.'
+        pl: "Projektuj strukturę według relacji domenowych, nie według chwilowego wyglądu menu. Nawigacja jest projekcją drzewa, a nie jego właścicielem."
         en: "Design structure around domain relationships, not the menu's current appearance. Navigation is a projection of the tree, not its owner."
-  -
-    id: 01a06d50-4004-7414-8414-000000000014
+  - id: 01a06d50-4004-7414-8414-000000000014
     type: call-to-action
     enabled: true
     data:
       eyebrow:
-        pl: 'Następny tutorial'
-        en: 'Next tutorial'
+        pl: "Następny tutorial"
+        en: "Next tutorial"
       title:
-        pl: 'Prześledź rendering od YAML do HTML.'
-        en: 'Trace rendering from YAML to HTML.'
+        pl: "Prześledź rendering od YAML do HTML."
+        en: "Trace rendering from YAML to HTML."
       description:
-        pl: 'Kolejny rozdział rozłoży pipeline SSR na repozytoria, ViewModel, lokalizację, renderery bloków, layout, assety oraz cache HTTP.'
-        en: 'The next chapter breaks the SSR pipeline into repositories, ViewModel, localization, block renderers, layout, assets and HTTP caching.'
+        pl: "Kolejny rozdział rozłoży pipeline SSR na repozytoria, ViewModel, lokalizację, renderery bloków, layout, assety oraz cache HTTP."
+        en: "The next chapter breaks the SSR pipeline into repositories, ViewModel, localization, block renderers, layout, assets and HTTP caching."
       button_label:
-        pl: 'Przejdź do renderowania'
-        en: 'Continue to rendering'
+        pl: "Przejdź do renderowania"
+        en: "Continue to rendering"
       button_url:
         pl: /pl/dokumentacja/renderowanie
         en: /en/documentation/rendering

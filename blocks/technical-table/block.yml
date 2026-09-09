@@ -1,6 +1,10 @@
 schemaVersion: 1
 name: { pl: Tabela techniczna, en: Technical table }
-description: { pl: Czterokolumnowa tabela zmieniająca się w karty mobilne., en: A four-column table that becomes mobile cards. }
+description:
+  {
+    pl: Czterokolumnowa tabela zmieniająca się w karty mobilne.,
+    en: A four-column table that becomes mobile cards.,
+  }
 icon: table
 fields:
   eyebrow:

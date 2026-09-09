@@ -7,8 +7,12 @@ $anchor = $data['anchor'] ?? '';
 ?>
 <section class="article-content" <?= $anchor !== '' ? ' id="' . $context->escape($anchor) . '"' : '' ?>>
     <div class="container article-content__grid">
-        <aside>FlatFile CMS<br><span>ENGINEERING NOTES</span></aside>
-        <article><?= $context->markdown($data['content']) ?><?php if (($data['note'] ?? '') !== ''): ?>
+        <aside>
+            FlatFile CMS<br>
+            <span>ENGINEERING NOTES</span>
+        </aside>
+        <article>
+            <?= $context->markdown($data['content']) ?><?php if (($data['note'] ?? '') !== ''): ?>
                 <div class="article-content__note">
                     <strong><?= $locale === 'pl' ? 'Warto zapamiętać' : 'Key takeaway' ?></strong>
                     <p><?= $context->escape($data['note']) ?></p>

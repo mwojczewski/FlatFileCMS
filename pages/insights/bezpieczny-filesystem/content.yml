@@ -53,7 +53,7 @@ blocks:
 
           Najgroźniejsze błędy w systemie plikowym często zaczynają się niewinnie: od sklejenia katalogu z nazwą przesłaną przez formularz. FlatFile CMS rozwiązuje ścieżki względem znanych katalogów bazowych i odrzuca próby wyjścia poza ich granice.
 
-          Dotyczy to stron, konfiguracji, mediów i rendererów. Pakiety bloków są kodem deweloperskim — panel może zarządzać ich danymi, ale nigdy plikami PHP.
+          Dotyczy to stron, konfiguracji, mediów i rendererów. Pakiety bloków są kodem deweloperskim - panel może zarządzać ich danymi, ale nigdy plikami PHP.
 
           ## Zapis musi być atomowy
 
@@ -75,7 +75,7 @@ blocks:
 
           The most dangerous filesystem bugs often begin innocently: by joining a base directory with a name submitted through a form. FlatFile CMS resolves paths against known roots and rejects every attempt to escape their boundaries.
 
-          This applies to pages, configuration, media and renderers. Block packages are developer-owned code — the panel can manage their data, but never their PHP files.
+          This applies to pages, configuration, media and renderers. Block packages are developer-owned code - the panel can manage their data, but never their PHP files.
 
           ## Writes must be atomic
 

@@ -23,7 +23,8 @@ if ($buttonUrl === '/' && $error !== null) {
             <div class="error-message__content"><?= $context->markdown($content) ?></div>
         <?php endif; ?>
         <?php if ($buttonLabel !== '' && $buttonUrl !== ''): ?>
-            <a class="error-message__button" href="<?= $context->url($buttonUrl) ?>"><?= $context->escape($buttonLabel) ?></a>
+            <a class="error-message__button"
+                href="<?= $context->url($buttonUrl) ?>"><?= $context->escape($buttonLabel) ?></a>
         <?php endif; ?>
     </div>
 </section>
