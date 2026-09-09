@@ -247,6 +247,9 @@
 .vital-gauge strong {
   z-index: 1;
   font-size: 1rem;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 .vital-gauge small {
   margin-left: 0.12rem;
