@@ -16,6 +16,7 @@ use FlatFileCms\Auth\Role;
 use FlatFileCms\Auth\User;
 use FlatFileCms\Auth\UserRepository;
 use FlatFileCms\Auth\WebAuthnCredentialRepository;
+use FlatFileCms\Auth\WebAuthnService;
 use FlatFileCms\Infrastructure\Database\Database;
 use FlatFileCms\Infrastructure\Database\SchemaInstaller;
 use FlatFileCms\Tests\Support\TemporaryProject;
@@ -127,6 +128,46 @@ final class AuthenticationTest extends TestCase
 
         $this->expectException(AuthenticationException::class);
         $changer->change($user, 'Wrong!Password1', 'New!Password2', 'New!Password2');
+    }
+
+    public function testWebAuthnOptionsAllowPlatformAuthenticatorsSuchAsFaceId(): void
+    {
+        [$users, $credentials] = $this->repositories();
+        $hasher = new PasswordHasher();
+        $user = $users->create('admin@example.test', $hasher->hash('Valid!Password1'), Role::Admin);
+        $credentials->add($user, 'Face ID', random_bytes(32), 'public-key', 0, ['internal']);
+        $service = new WebAuthnService($credentials, new ArraySessionStore(), 'FlatFile CMS', 'localhost');
+
+        $registration = $service->registrationOptions($user);
+        $publicKey = $registration['publicKey'] ?? null;
+        if (!\is_array($publicKey)) {
+            self::fail('Registration options are missing publicKey data.');
+        }
+        $selection = $publicKey['authenticatorSelection'] ?? null;
+        if (!\is_array($selection)) {
+            self::fail('Registration options are missing authenticatorSelection data.');
+        }
+        self::assertArrayNotHasKey('authenticatorAttachment', $selection);
+
+        $authentication = $service->authenticationOptions($user);
+        $authPublicKey = $authentication['publicKey'] ?? null;
+        if (!\is_array($authPublicKey)) {
+            self::fail('Authentication options are missing publicKey data.');
+        }
+        $allowCredentials = $authPublicKey['allowCredentials'] ?? null;
+        if (!\is_array($allowCredentials) || $allowCredentials === []) {
+            self::fail('Authentication options do not include any allowed credentials.');
+        }
+        $firstCredential = $allowCredentials[0] ?? null;
+        if (!\is_array($firstCredential)) {
+            self::fail('Authentication options are missing the first credential entry.');
+        }
+        $transports = $firstCredential['transports'] ?? [];
+        if (!\is_array($transports)) {
+            self::fail('Authentication options do not include transports for the credential.');
+        }
+        self::assertContains('internal', $transports);
+        self::assertContains('usb', $transports);
     }
 
     public function testAdminUserManagerCreatesAndUpdatesOnlyAdminAccounts(): void
