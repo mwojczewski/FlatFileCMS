@@ -49,7 +49,17 @@ final readonly class AdminPageController
     {
         $this->requireUser();
         $languages = $this->languages->get();
-        /** @var array<string, array{identity: PageIdentity, title: string, enabled: bool, collection: bool, revision: string, modifiedAt: int}> $entries */
+        /**
+         * @var array<string, array{
+         *     identity: PageIdentity,
+         *     title: string,
+         *     enabled: bool,
+         *     collection: bool,
+         *     revision: string,
+         *     modifiedAt: int,
+         *     order: int
+         * }> $entries
+         */
         $entries = [];
         foreach ($this->pages->all($languages) as $page) {
             $entries[$page->identity()->value()] = [
@@ -59,6 +69,7 @@ final readonly class AdminPageController
                 'collection' => false,
                 'revision' => $page->revision()->value(),
                 'modifiedAt' => $page->modifiedAt(),
+                'order' => \is_int($page->attributes()['order'] ?? null) ? $page->attributes()['order'] : 0,
             ];
         }
         foreach ($this->collections->all($languages) as $collection) {
@@ -69,20 +80,12 @@ final readonly class AdminPageController
                 'collection' => true,
                 'revision' => $collection->revision()->value(),
                 'modifiedAt' => $collection->modifiedAt(),
+                'order' => $collection->order(),
             ];
         }
-        uksort($entries, static function (string $left, string $right): int {
-            if ($left === 'homepage') {
-                return -1;
-            }
-            if ($right === 'homepage') {
-                return 1;
-            }
-
-            return $left <=> $right;
-        });
+        $entries = $this->orderedEntries($entries);
         return $this->page('Strony', $this->views->render('pages/index', [
-            'entries' => array_values($entries),
+            'entries' => $entries,
             'csrfToken' => $this->csrf->token(),
             'languageCount' => \count($languages->codes()),
             'languageCodes' => $languages->codes(),
@@ -145,6 +148,76 @@ final readonly class AdminPageController
             $editable,
             $identity,
         )), pageFormScript: true);
+    }
+
+    public function reorder(Request $request): Response
+    {
+        $actor = $this->requireUser();
+
+        try {
+            $this->validateCsrf($request);
+
+            $source = $this->identity(
+                $request->parsedBody()['source'] ?? null,
+            );
+
+            $parentValue = $request->parsedBody()['parent'] ?? '';
+            if (!\is_string($parentValue)) {
+                throw new InvalidArgumentException(
+                    'Parent identity is invalid.',
+                );
+            }
+
+            $positionValue = $request->parsedBody()['position'] ?? null;
+            if (
+                !\is_string($positionValue)
+                || preg_match('/^[0-9]+$/D', $positionValue) !== 1
+            ) {
+                throw new InvalidArgumentException(
+                    'Page position is invalid.',
+                );
+            }
+
+            $destination = $this->manager->reorganize(
+                $source,
+                $parentValue === ''
+                ? null
+                : $this->identity($parentValue),
+                (int) $positionValue,
+                $this->revision(
+                    $request->parsedBody()['revision'] ?? null,
+                ),
+                $this->languages->get(),
+            );
+
+            $this->audit->log(
+                'page.reordered',
+                $actor->id(),
+                "pages/{$destination->value()}",
+                $request->clientIp(),
+                ['from' => $source->value()],
+            );
+
+            return Response::json(['success' => true]);
+        } catch (RevisionConflictException $exception) {
+            throw new HttpException(
+                409,
+                'PAGE_REVISION_CONFLICT',
+                'Page changed in another session.',
+                previous: $exception,
+            );
+        } catch (
+            InvalidArgumentException
+            | InvalidContentException
+            | FilesystemException $exception
+        ) {
+            throw new HttpException(
+                422,
+                'PAGE_REORDER_INVALID',
+                $exception->getMessage(),
+                previous: $exception,
+            );
+        }
     }
 
     public function update(Request $request): Response
@@ -355,12 +428,12 @@ final readonly class AdminPageController
         $routes = PageRouteIndex::build($pages, $languages, $collections);
         foreach ($pages as $page) {
             if ($page->identity()->value() === $parent->value()) {
-                return $prefix . '/' . $routes->pathFor($parent, $languages->default());
+                return "{$prefix}/{$routes->pathFor($parent, $languages->default())}";
             }
         }
         foreach ($collections as $collection) {
             if ($collection->identity()->value() === $parent->value()) {
-                return $prefix . '/' . $routes->collectionPathFor($parent, $languages->default());
+                return "{$prefix}/{$routes->collectionPathFor($parent, $languages->default())}";
             }
         }
 
@@ -381,6 +454,73 @@ final readonly class AdminPageController
         }
 
         return $result;
+    }
+
+    /**
+     * @param array<string, array{
+     *     identity: PageIdentity,
+     *     title: string,
+     *     enabled: bool,
+     *     collection: bool,
+     *     revision: string,
+     *     modifiedAt: int,
+     *     order: int
+     * }> $entries
+     *
+     * @return list<array{
+     *     identity: PageIdentity,
+     *     title: string,
+     *     enabled: bool,
+     *     collection: bool,
+     *     revision: string,
+     *     modifiedAt: int,
+     *     order: int
+     * }>
+     */
+    private function orderedEntries(array $entries): array
+    {
+        $children = [];
+
+        foreach ($entries as $identity => $entry) {
+            $separator = strrpos($identity, '/');
+            $parent = $separator === false
+                ? ''
+                : substr($identity, 0, $separator);
+
+            $children[$parent][] = $entry;
+        }
+
+        foreach ($children as &$siblings) {
+            usort(
+                $siblings,
+                static fn(array $left, array $right): int =>
+                    [
+                        $left['identity']->isHomepage() ? 0 : 1,
+                        $left['order'],
+                        $left['identity']->value(),
+                    ]
+                    <=>
+                    [
+                        $right['identity']->isHomepage() ? 0 : 1,
+                        $right['order'],
+                        $right['identity']->value(),
+                    ],
+            );
+        }
+        unset($siblings);
+
+        $ordered = [];
+
+        $append = static function (string $parent) use (&$append, &$ordered, $children): void {
+            foreach ($children[$parent] ?? [] as $entry) {
+                $ordered[] = $entry;
+                $append($entry['identity']->value());
+            }
+        };
+
+        $append('');
+
+        return $ordered;
     }
 
     private function page(string $title, string $content, bool $pageFormScript = false): Response

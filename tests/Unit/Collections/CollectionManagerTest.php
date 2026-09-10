@@ -43,6 +43,7 @@ slug: { pl: blog, en: journal }
 title: { pl: Blog, en: Journal }
 seo: { title: { pl: Blog, en: Journal }, description: { pl: '', en: '' } }
 sort: { field: date, direction: desc }
+order: 7
 pagination: { perPage: 12 }
 filters: []
 YAML);
@@ -88,5 +89,6 @@ YAML);
         self::assertSame('asc', $updated->sortDirection());
         self::assertSame(24, $updated->perPage());
         self::assertSame('category', $updated->filters()[0]->parameter());
+        self::assertSame(7, $updated->order());
     }
 }

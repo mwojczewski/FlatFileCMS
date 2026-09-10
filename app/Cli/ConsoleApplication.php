@@ -25,8 +25,7 @@ final readonly class ConsoleApplication
         private RuntimePruner $runtimePruner,
         private CloudflareAnalyticsService $analytics,
         private Closure $release,
-    ) {
-    }
+    ) {}
 
     /** @param list<string> $arguments */
     public function run(array $arguments): int
@@ -128,19 +127,11 @@ final readonly class ConsoleApplication
         }
 
         $email ??= throw new InvalidArgumentException('Email argument is required.');
-        $firstName = '';
-        $lastName = '';
-        foreach ($arguments as $argument) {
-            if (str_starts_with($argument, '--first-name=')) {
-                $firstName = substr($argument, 13);
-            } elseif (str_starts_with($argument, '--last-name=')) {
-                $lastName = substr($argument, 12);
-            } else {
-                throw new InvalidArgumentException('Invalid user option. See php bin/cms help.');
-            }
-        }
+
         if (($firstName === '') !== ($lastName === '')) {
-            throw new InvalidArgumentException('First name and last name must be provided together.');
+            throw new InvalidArgumentException(
+                'First name and last name must be provided together.',
+            );
         }
         $password = $this->passwords->read();
         if ($install) {

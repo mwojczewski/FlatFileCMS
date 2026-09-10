@@ -15,8 +15,7 @@ final readonly class PublicMediaController
     public function __construct(
         private MediaRepository $media,
         private MediaVariantService $variants,
-    ) {
-    }
+    ) {}
 
     public function show(Request $request): Response
     {

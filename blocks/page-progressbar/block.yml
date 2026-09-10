@@ -1,0 +1,17 @@
+schemaVersion: 1
+name:
+  pl: Page Progressbar
+  en: Page Progressbar
+description:
+  pl: Prograssbar pokazujący postęp czytania artykułu.
+  en: Progressbar showing the reading progress of an article.
+icon: blocks
+fields:
+  accent:
+    {
+      type: select,
+      required: true,
+      translatable: false,
+      options: [mint, violet, amber],
+      label: { pl: Akcent, en: Accent },
+    }

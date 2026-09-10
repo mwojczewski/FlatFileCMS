@@ -129,6 +129,91 @@ final readonly class PageManager
         });
     }
 
+    public function reorganize(
+        PageIdentity $source,
+        ?PageIdentity $parent,
+        int $position,
+        FileRevision $expectedRevision,
+        LanguageConfig $languages,
+    ): PageIdentity {
+        if ($source->isHomepage()) {
+            throw new InvalidArgumentException('The homepage cannot be moved.');
+        }
+        $sourceValue = $source->value();
+        $separator = strrpos($sourceValue, '/');
+        $name = $separator === false ? $sourceValue : substr($sourceValue, $separator + 1);
+        $destination = PageIdentity::fromString($parent === null ? $name : $parent->value() . '/' . $name);
+        if ($parent !== null && ($parent->value() === $source->value() || str_starts_with($parent->value(), $source->value() . '/'))) {
+            throw new InvalidArgumentException('A page cannot be moved inside its own subtree.');
+        }
+
+        return $this->locks->exclusive(self::TREE_LOCK, function () use ($source, $destination, $parent, $position, $expectedRevision, $languages): PageIdentity {
+            $collections = [];
+            foreach ($this->collections->all($languages) as $collection) {
+                $collections[$collection->identity()->value()] = true;
+            }
+            $sourcePath = $this->treeDocumentPath($source, isset($collections[$source->value()]));
+            $document = $this->yaml->read(FilesystemRoot::Pages, $sourcePath);
+            if (!$document->revision()->equals($expectedRevision)) {
+                throw new RevisionConflictException($expectedRevision, $document->revision());
+            }
+
+            $oldParent = $this->parentIdentity($source);
+            $movedDirectory = $source->value() !== $destination->value();
+            if ($movedDirectory) {
+                $this->directories->move(
+                    FilesystemRoot::Pages,
+                    RelativePath::fromString($source->value()),
+                    RelativePath::fromString($destination->value()),
+                );
+                $this->fileIndex?->invalidate();
+            }
+            try {
+                // Najpierw walidacja struktury po przeniesieniu katalogu.
+                // Na tym etapie żaden order nie został jeszcze zapisany.
+                $this->validateTree($languages);
+
+                $changes = $this->siblingOrderChanges(
+                    $parent,
+                    $destination,
+                    $position,
+                    $languages,
+                );
+
+                if (
+                    ($oldParent?->value() ?? '')
+                    !== ($parent?->value() ?? '')
+                ) {
+                    $oldParentChanges = $this->siblingOrderChanges(
+                        $oldParent,
+                        null,
+                        PHP_INT_MAX,
+                        $languages,
+                    );
+
+                    $changes = [...$changes, ...$oldParentChanges];
+                }
+
+                $this->applyOrderChanges($changes);
+            } catch (Throwable $exception) {
+                if ($movedDirectory) {
+                    $this->directories->move(
+                        FilesystemRoot::Pages,
+                        RelativePath::fromString($destination->value()),
+                        RelativePath::fromString($source->value()),
+                    );
+
+                    $this->fileIndex?->invalidate();
+                }
+
+                throw $exception;
+            }
+
+            return $destination;
+        });
+    }
+
+
     public function delete(PageIdentity $identity, FileRevision $expectedRevision): void
     {
         if ($identity->isHomepage()) {
@@ -259,7 +344,7 @@ final readonly class PageManager
         $pages = array_values(array_filter(
             $this->pages->all($languages),
             static fn(Page $page): bool => $replacedIdentity === null
-            || $page->identity()->value() !== $replacedIdentity->value(),
+                || $page->identity()->value() !== $replacedIdentity->value(),
         ));
         $pages[] = $candidate;
         PageRouteIndex::build($pages, $languages, $this->collections->all($languages));
@@ -282,6 +367,177 @@ final readonly class PageManager
     private function contentPath(PageIdentity $identity): RelativePath
     {
         return RelativePath::fromString($identity->value() . '/content.yml');
+    }
+
+    private function treeDocumentPath(PageIdentity $identity, bool $collection): RelativePath
+    {
+        return RelativePath::fromString($identity->value() . ($collection ? '/pagination.yml' : '/content.yml'));
+    }
+
+    private function parentIdentity(PageIdentity $identity): ?PageIdentity
+    {
+        $value = $identity->value();
+        $separator = strrpos($value, '/');
+
+        return $separator === false ? null : PageIdentity::fromString(substr($value, 0, $separator));
+    }
+
+    /**
+     * @return array<string, array{
+     *     path: RelativePath,
+     *     data: array<string, mixed>
+     * }>
+     */
+    private function siblingOrderChanges(
+        ?PageIdentity $parent,
+        ?PageIdentity $moved,
+        int $position,
+        LanguageConfig $languages,
+    ): array {
+        $items = [];
+        $parentValue = $parent?->value() ?? '';
+
+        foreach ($this->pages->all($languages) as $page) {
+            if (
+                ($this->parentIdentity($page->identity())?->value() ?? '')
+                === $parentValue
+                && !$page->identity()->isHomepage()
+            ) {
+                $items[] = [
+                    'identity' => $page->identity(),
+                    'collection' => false,
+                    'order' => \is_int($page->attributes()['order'] ?? null)
+                        ? $page->attributes()['order']
+                        : 0,
+                ];
+            }
+        }
+
+        foreach ($this->collections->all($languages) as $collection) {
+            if (
+                ($this->parentIdentity($collection->identity())?->value() ?? '')
+                === $parentValue
+            ) {
+                $items[] = [
+                    'identity' => $collection->identity(),
+                    'collection' => true,
+                    'order' => $collection->order(),
+                ];
+            }
+        }
+
+        usort(
+            $items,
+            static fn(array $left, array $right): int =>
+                [$left['order'], $left['identity']->value()]
+                <=>
+                [$right['order'], $right['identity']->value()],
+        );
+
+        if ($moved !== null) {
+            $movedItems = array_values(array_filter(
+                $items,
+                static fn(array $item): bool =>
+                    $item['identity']->value() === $moved->value(),
+            ));
+
+            $items = array_values(array_filter(
+                $items,
+                static fn(array $item): bool =>
+                    $item['identity']->value() !== $moved->value(),
+            ));
+
+            if ($movedItems !== []) {
+                array_splice(
+                    $items,
+                    max(0, min($position, \count($items))),
+                    0,
+                    $movedItems,
+                );
+            }
+        }
+
+        $changes = [];
+
+        foreach ($items as $index => $item) {
+            $path = $this->treeDocumentPath(
+                $item['identity'],
+                $item['collection'],
+            );
+
+            $document = $this->yaml->read(FilesystemRoot::Pages, $path);
+            $data = $document->data();
+
+            if (($data['order'] ?? null) === $index) {
+                continue;
+            }
+
+            $data['order'] = $index;
+
+            $changes[$path->value()] = [
+                'path' => $path,
+                'data' => $data,
+            ];
+        }
+
+        return $changes;
+    }
+
+    /**
+     * @param array<string, array{
+     *     path: RelativePath,
+     *     data: array<string, mixed>
+     * }> $changes
+     */
+    private function applyOrderChanges(array $changes): void
+    {
+        /** @var array<string, array{
+         *     path: RelativePath,
+         *     data: array<string, mixed>
+         * }> $originals
+         */
+        $originals = [];
+
+        try {
+            foreach ($changes as $key => $change) {
+                $document = $this->yaml->read(
+                    FilesystemRoot::Pages,
+                    $change['path'],
+                );
+
+                $originals[$key] = [
+                    'path' => $change['path'],
+                    'data' => $document->data(),
+                ];
+
+                $this->yaml->write(
+                    FilesystemRoot::Pages,
+                    $change['path'],
+                    $change['data'],
+                    $document->revision(),
+                );
+            }
+        } catch (Throwable $exception) {
+            foreach (array_reverse($originals, true) as $original) {
+                try {
+                    $current = $this->yaml->read(
+                        FilesystemRoot::Pages,
+                        $original['path'],
+                    );
+
+                    $this->yaml->write(
+                        FilesystemRoot::Pages,
+                        $original['path'],
+                        $original['data'],
+                        $current->revision(),
+                    );
+                } catch (Throwable) {
+                    // Zachowujemy pierwotny wyjątek.
+                }
+            }
+
+            throw $exception;
+        }
     }
 
     private function assertRevision(EditablePage $page, FileRevision $expected): void

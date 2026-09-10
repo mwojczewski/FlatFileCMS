@@ -27,6 +27,7 @@ final readonly class Collection
         private string $sortDirection,
         private int $perPage,
         private array $filters,
+        private int $order,
         private FileRevision $revision,
         private int $modifiedAt,
     ) {}
@@ -60,6 +61,11 @@ final readonly class Collection
     public function seo(): array
     {
         return $this->seo;
+    }
+
+    public function order(): int
+    {
+        return $this->order;
     }
 
     public function sortField(): string

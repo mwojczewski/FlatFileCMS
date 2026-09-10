@@ -27,6 +27,7 @@ use FlatFileCms\Infrastructure\Database\SchemaInstaller;
 use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
 use FlatFileCms\Tests\Support\TemporaryProject;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
 
@@ -37,12 +38,89 @@ final class ConsoleApplicationTest extends TestCase
     {
         $project = TemporaryProject::create();
         putenv('CMS_PASSWORD=Strong!Password1');
+
+        try {
+            [$application, $repository] = $this->userApplication($project);
+
+            $status = $application->run([
+                'bin/cms',
+                'user:create',
+                'jan@example.test',
+                '--first-name',
+                'Jan',
+                '--last-name',
+                'Kowalski',
+            ]);
+
+            self::assertSame(0, $status);
+
+            $created = $repository->findByEmail('jan@example.test');
+            self::assertNotNull($created);
+            self::assertSame('Jan', $created->firstName());
+            self::assertSame('Kowalski', $created->lastName());
+            self::assertSame(Role::Admin, $created->role());
+        } finally {
+            putenv('CMS_PASSWORD');
+            $project->remove();
+        }
+    }
+
+    /**
+     * @return iterable<string, array{list<string>}>
+     */
+    public static function incompleteNameOptions(): iterable
+    {
+        yield 'only first name' => [
+            [
+                'bin/cms',
+                'user:create',
+                'jan@example.test',
+                '--first-name',
+                'Jan',
+            ],
+        ];
+
+        yield 'only last name' => [
+            [
+                'bin/cms',
+                'user:create',
+                'jan@example.test',
+                '--last-name',
+                'Kowalski',
+            ],
+        ];
+    }
+
+    /** @param list<string> $arguments */
+    #[DataProvider('incompleteNameOptions')]
+    public function testUserCreateRejectsIncompleteName(
+        array $arguments,
+    ): void {
+        $project = TemporaryProject::create();
+        putenv('CMS_PASSWORD=Strong!Password1');
+
+        try {
+            [$application, $repository] = $this->userApplication($project);
+
+            self::assertSame(1, $application->run($arguments));
+            self::assertNull($repository->findByEmail('jan@example.test'));
+        } finally {
+            putenv('CMS_PASSWORD');
+            $project->remove();
+        }
+    }
+
+    /** @return array{ConsoleApplication, UserRepository} */
+    private function userApplication(TemporaryProject $project): array
+    {
         $paths = new SafePathResolver($project->path());
         $database = new Database($project->path('storage/database/test.sqlite'));
         $connection = $database->connection();
         $repository = new UserRepository($connection);
+        $schema = new SchemaInstaller($connection);
+        $schema->install();
         $service = new UserCommandService(
-            new SchemaInstaller($connection),
+            $schema,
             $repository,
             new WebAuthnCredentialRepository($connection),
             new PasswordPolicy(),
@@ -50,7 +128,30 @@ final class ConsoleApplicationTest extends TestCase
             new AuditLogger($paths),
         );
 
-        $application = new ConsoleApplication(
+        return [
+            $this->application($project, $service, $paths),
+            $repository,
+        ];
+    }
+
+    private function application(
+        TemporaryProject $project,
+        UserCommandService $service,
+        SafePathResolver $paths,
+    ): ConsoleApplication {
+        $analyticsConfig = new CloudflareAnalyticsConfig(
+            false,
+            '',
+            '',
+            '',
+            '',
+            '',
+            600,
+            10,
+            'Europe/Warsaw',
+        );
+
+        return new ConsoleApplication(
             new BlockScaffolder($project->path()),
             static fn(): UserCommandService => $service,
             new PasswordReader(),
@@ -60,43 +161,32 @@ final class ConsoleApplicationTest extends TestCase
             new CloudflareAnalyticsService(
                 new CloudflareGraphQlClient(
                     new class implements AnalyticsHttpClient {
-            public function postJson(string $url, array $payload, string $token, int $timeout): string
-            {
-                throw new \RuntimeException('No Cloudflare call expected in this test.');
-            }
+                        public function postJson(
+                            string $url,
+                            array $payload,
+                            string $token,
+                            int $timeout,
+                        ): string {
+                            throw new \RuntimeException(
+                                'No Cloudflare call expected in this test.',
+                            );
+                        }
                     },
-                    new CloudflareAnalyticsConfig(false, '', '', '', '', '', 600, 10, 'Europe/Warsaw'),
+                    $analyticsConfig,
                 ),
-                new CloudflareAnalyticsConfig(false, '', '', '', '', '', 600, 10, 'Europe/Warsaw'),
+                $analyticsConfig,
                 new AnalyticsCache($project->path()),
                 new class extends AbstractLogger {
-            public function log($level, string|\Stringable $message, array $context = []): void
-            {
-            }
+                    public function log(
+                        $level,
+                        string|\Stringable $message,
+                        array $context = [],
+                    ): void {}
                 },
             ),
-            static fn(): object => throw new \RuntimeException('Release check not used.'),
+            static fn(): object => throw new \RuntimeException(
+                'Release check not used.',
+            ),
         );
-
-        $status = $application->run([
-            'bin/cms',
-            'user:create',
-            'jan@example.test',
-            '--first-name',
-            'Jan',
-            '--last-name',
-            'Kowalski',
-        ]);
-
-        self::assertSame(0, $status);
-
-        $created = $repository->findByEmail('jan@example.test');
-        self::assertNotNull($created);
-        self::assertSame('Jan', $created->firstName());
-        self::assertSame('Kowalski', $created->lastName());
-        self::assertSame(Role::Admin, $created->role());
-
-        putenv('CMS_PASSWORD');
-        $project->remove();
     }
 }

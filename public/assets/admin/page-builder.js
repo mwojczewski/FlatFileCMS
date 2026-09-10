@@ -272,7 +272,11 @@ async function sendMutation(form) {
   });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok || payload.saved !== true) {
-    throw new Error(typeof payload.message === "string" ? payload.message : "Nie udało się zapisać zmian.");
+    throw new Error(
+      typeof payload.error?.message === "string"
+        ? payload.error.message
+        : "Nie udało się zapisać zmian.",
+    );
   }
   updateRevision(payload.revision);
   return payload;
@@ -281,20 +285,27 @@ async function sendMutation(form) {
 function persistOrder() {
   if (!(orderForm instanceof HTMLFormElement) || !orderDirty) return;
   orderDirty = false;
-  if (orderMessage instanceof HTMLElement) orderMessage.textContent = "Zapisuję kolejność…";
-  enqueueMutation(() => sendMutation(orderForm)).then(() => {
-    if (orderDirty) {
-      persistOrder();
-      return;
-    }
-    if (orderSubmit instanceof HTMLButtonElement) orderSubmit.disabled = true;
-    if (orderMessage instanceof HTMLElement) orderMessage.textContent = "Kolejność zapisana automatycznie";
-    if (liveState instanceof HTMLElement) liveState.textContent = "Wszystkie zmiany zapisane";
-  }).catch(() => {
-    orderDirty = true;
-    if (orderSubmit instanceof HTMLButtonElement) orderSubmit.disabled = false;
-    if (orderMessage instanceof HTMLElement) orderMessage.textContent = "Nie udało się zapisać — spróbuj ponownie";
-  });
+  if (orderMessage instanceof HTMLElement)
+    orderMessage.textContent = "Zapisuję kolejność…";
+  enqueueMutation(() => sendMutation(orderForm))
+    .then(() => {
+      if (orderDirty) {
+        persistOrder();
+        return;
+      }
+      if (orderSubmit instanceof HTMLButtonElement) orderSubmit.disabled = true;
+      if (orderMessage instanceof HTMLElement)
+        orderMessage.textContent = "Kolejność zapisana automatycznie";
+      if (liveState instanceof HTMLElement)
+        liveState.textContent = "Wszystkie zmiany zapisane";
+    })
+    .catch(() => {
+      orderDirty = true;
+      if (orderSubmit instanceof HTMLButtonElement)
+        orderSubmit.disabled = false;
+      if (orderMessage instanceof HTMLElement)
+        orderMessage.textContent = "Nie udało się zapisać — spróbuj ponownie";
+    });
 }
 
 function scheduleOrderSave() {
@@ -308,7 +319,11 @@ function moveDraggedAt(clientX, clientY) {
   }
   const pointerTarget = document.elementFromPoint(clientX, clientY);
   const target = pointerTarget?.closest("[data-block-id]");
-  if (!(target instanceof Element) || target === dragged || !builderList.contains(target)) {
+  if (
+    !(target instanceof Element) ||
+    target === dragged ||
+    !builderList.contains(target)
+  ) {
     return;
   }
   const rectangle = target.getBoundingClientRect();
@@ -328,7 +343,9 @@ function autoScrollVelocity(clientY) {
   }
   const lowerEdge = window.innerHeight - edge;
   if (clientY > lowerEdge) {
-    return autoScrollMaximum * (1 - Math.max(0, window.innerHeight - clientY) / edge);
+    return (
+      autoScrollMaximum * (1 - Math.max(0, window.innerHeight - clientY) / edge)
+    );
   }
   return 0;
 }
@@ -366,7 +383,9 @@ builderList?.addEventListener("dragstart", (event) => {
   if (dragged instanceof HTMLElement && event.dataTransfer) {
     event.dataTransfer.effectAllowed = "move";
     event.dataTransfer.setData("text/plain", dragged.dataset.blockId ?? "");
-    dragGhost = dragged.querySelector(".builder-preview-toolbar")?.cloneNode(true);
+    dragGhost = dragged
+      .querySelector(".builder-preview-toolbar")
+      ?.cloneNode(true);
     if (dragGhost instanceof HTMLElement) {
       dragGhost.className = "builder-drag-ghost";
       document.body.append(dragGhost);
@@ -418,7 +437,10 @@ const previewRequests = new WeakMap();
 function selectBlock(id) {
   if (!id) return;
   document.querySelectorAll("[data-block-select]").forEach((item) => {
-    item.classList.toggle("selected", item.getAttribute("data-block-select") === id);
+    item.classList.toggle(
+      "selected",
+      item.getAttribute("data-block-select") === id,
+    );
   });
   let selectedForm = null;
   document.querySelectorAll("[data-block-form]").forEach((form) => {
@@ -443,11 +465,16 @@ function setInspectorExpanded(expanded) {
   inspector.classList.toggle("is-expanded", expanded);
   const button = inspector.querySelector("[data-inspector-expand]");
   if (button instanceof HTMLButtonElement) {
-    button.setAttribute("aria-label", expanded ? "Zwęź panel edycji" : "Rozszerz panel edycji");
+    button.setAttribute(
+      "aria-label",
+      expanded ? "Zwęź panel edycji" : "Rozszerz panel edycji",
+    );
     button.title = expanded ? "Zwęź panel edycji" : "Rozszerz panel edycji";
     button.setAttribute("aria-pressed", String(expanded));
   }
-  const visibleForm = inspector.querySelector("[data-block-form]:not([hidden])");
+  const visibleForm = inspector.querySelector(
+    "[data-block-form]:not([hidden])",
+  );
   if (visibleForm instanceof HTMLElement) {
     window.requestAnimationFrame(() =>
       window.CmsMarkdownEditors?.refresh(visibleForm),
@@ -469,10 +496,14 @@ function resizePreviewFrame(frame) {
     const contentHeight = Math.max(body.scrollHeight, root.scrollHeight, 96);
     frame.style.height = `${contentHeight}px`;
     stage.style.height = `${Math.ceil(contentHeight * scale)}px`;
-    body.addEventListener("click", () => selectBlock(frame.dataset.previewFrame));
-    body.querySelectorAll("a, button, input, textarea, select").forEach((element) => {
-      element.addEventListener("click", (event) => event.preventDefault());
-    });
+    body.addEventListener("click", () =>
+      selectBlock(frame.dataset.previewFrame),
+    );
+    body
+      .querySelectorAll("a, button, input, textarea, select")
+      .forEach((element) => {
+        element.addEventListener("click", (event) => event.preventDefault());
+      });
   } catch {
     frame.style.height = "240px";
   }
@@ -485,7 +516,8 @@ document.querySelectorAll("[data-preview-frame]").forEach((frame) => {
     window.setTimeout(() => resizePreviewFrame(frame), 250);
     window.setTimeout(() => resizePreviewFrame(frame), 900);
   });
-  if (frame.contentDocument?.readyState === "complete") resizePreviewFrame(frame);
+  if (frame.contentDocument?.readyState === "complete")
+    resizePreviewFrame(frame);
 });
 
 if (typeof ResizeObserver === "function") {
@@ -495,9 +527,9 @@ if (typeof ResizeObserver === "function") {
       if (frame instanceof HTMLIFrameElement) resizePreviewFrame(frame);
     });
   });
-  document.querySelectorAll("[data-preview-stage]").forEach((stage) =>
-    previewResizeObserver.observe(stage),
-  );
+  document
+    .querySelectorAll("[data-preview-stage]")
+    .forEach((stage) => previewResizeObserver.observe(stage));
 }
 
 document.addEventListener("click", (event) => {
@@ -512,7 +544,8 @@ document.addEventListener("click", (event) => {
     const item = move.closest("[data-block-id]");
     const direction = Number.parseInt(move.dataset.blockMove ?? "0", 10);
     if (item instanceof HTMLElement && builderList) {
-      const sibling = direction < 0 ? item.previousElementSibling : item.nextElementSibling;
+      const sibling =
+        direction < 0 ? item.previousElementSibling : item.nextElementSibling;
       if (sibling instanceof HTMLElement) {
         if (direction < 0) builderList.insertBefore(item, sibling);
         else builderList.insertBefore(sibling, item);
@@ -557,7 +590,10 @@ document.addEventListener("click", (event) => {
 
 inspector?.addEventListener("focusin", (event) => {
   if (!(event.target instanceof Element)) return;
-  if (event.target.closest(".EasyMDEContainer") || event.target.matches("textarea[data-markdown-editor]")) {
+  if (
+    event.target.closest(".EasyMDEContainer") ||
+    event.target.matches("textarea[data-markdown-editor]")
+  ) {
     setInspectorExpanded(true);
   }
 });
@@ -579,8 +615,10 @@ async function refreshBlockPreview(form) {
   previewRequests.get(form)?.abort();
   const controller = new AbortController();
   previewRequests.set(form, controller);
-  if (status instanceof HTMLElement) status.textContent = "Aktualizuję podgląd…";
-  if (liveState instanceof HTMLElement) liveState.textContent = "Aktualizuję podgląd…";
+  if (status instanceof HTMLElement)
+    status.textContent = "Aktualizuję podgląd…";
+  if (liveState instanceof HTMLElement)
+    liveState.textContent = "Aktualizuję podgląd…";
 
   try {
     const response = await fetch("/admin/pages/builder/render-preview", {
@@ -596,11 +634,14 @@ async function refreshBlockPreview(form) {
     }
     frame.srcdoc = payload.preview;
     if (status instanceof HTMLElement) status.textContent = "Podgląd aktualny";
-    if (liveState instanceof HTMLElement) liveState.textContent = "Niezapisane zmiany";
+    if (liveState instanceof HTMLElement)
+      liveState.textContent = "Niezapisane zmiany";
   } catch (error) {
     if (error instanceof DOMException && error.name === "AbortError") return;
-    if (status instanceof HTMLElement) status.textContent = "Uzupełnij poprawnie pola";
-    if (liveState instanceof HTMLElement) liveState.textContent = "Podgląd czeka na poprawne dane";
+    if (status instanceof HTMLElement)
+      status.textContent = "Uzupełnij poprawnie pola";
+    if (liveState instanceof HTMLElement)
+      liveState.textContent = "Podgląd czeka na poprawne dane";
   }
 }
 
@@ -609,7 +650,10 @@ document.querySelectorAll("[data-block-form]").forEach((form) => {
   const schedule = () => {
     const current = previewTimers.get(form);
     if (current) window.clearTimeout(current);
-    previewTimers.set(form, window.setTimeout(() => refreshBlockPreview(form), 350));
+    previewTimers.set(
+      form,
+      window.setTimeout(() => refreshBlockPreview(form), 350),
+    );
   };
   form.addEventListener("input", schedule);
   form.addEventListener("change", schedule);
@@ -618,35 +662,51 @@ document.querySelectorAll("[data-block-form]").forEach((form) => {
     event.preventDefault();
     const status = form.querySelector("[data-block-preview-status]");
     if (status instanceof HTMLElement) status.textContent = "Zapisuję…";
-    enqueueMutation(() => sendMutation(form)).then(() => {
-      if (status instanceof HTMLElement) status.textContent = "Blok zapisany";
-      if (liveState instanceof HTMLElement) liveState.textContent = "Wszystkie zmiany zapisane";
-    }).catch(() => {
-      if (status instanceof HTMLElement) status.textContent = "Błąd zapisu — sprawdź pola";
-      if (liveState instanceof HTMLElement) liveState.textContent = "Nie udało się zapisać zmian";
-    });
+    enqueueMutation(() => sendMutation(form))
+      .then(() => {
+        if (status instanceof HTMLElement) status.textContent = "Blok zapisany";
+        if (liveState instanceof HTMLElement)
+          liveState.textContent = "Wszystkie zmiany zapisane";
+      })
+      .catch(() => {
+        if (status instanceof HTMLElement)
+          status.textContent = "Błąd zapisu — sprawdź pola";
+        if (liveState instanceof HTMLElement)
+          liveState.textContent = "Nie udało się zapisać zmian";
+      });
   });
   const visibility = form.querySelector("[data-block-visibility]");
   if (visibility instanceof HTMLInputElement) {
     visibility.addEventListener("change", () => {
-      const item = document.querySelector(`[data-block-id="${CSS.escape(form.dataset.blockForm ?? "")}"]`);
+      const item = document.querySelector(
+        `[data-block-id="${CSS.escape(form.dataset.blockForm ?? "")}"]`,
+      );
       const label = form.querySelector("[data-block-visibility-label]");
       const previous = !visibility.checked;
       const toggleForm = item?.querySelector("form[action$='/toggle']");
       if (!(toggleForm instanceof HTMLFormElement)) return;
       visibility.disabled = true;
-      enqueueMutation(() => sendMutation(toggleForm)).then(() => {
-        const enabled = visibility.checked;
-        item?.classList.toggle("disabled", !enabled);
-        const badge = item?.querySelector(".block-visibility");
-        badge?.classList.toggle("is-visible", enabled);
-        if (badge instanceof HTMLElement) badge.lastChild.textContent = enabled ? "Widoczny" : "Ukryty";
-        if (label instanceof HTMLElement) label.textContent = enabled ? "Blok widoczny" : "Blok ukryty";
-        if (liveState instanceof HTMLElement) liveState.textContent = "Wszystkie zmiany zapisane";
-      }).catch(() => {
-        visibility.checked = previous;
-        if (liveState instanceof HTMLElement) liveState.textContent = "Nie udało się zmienić widoczności";
-      }).finally(() => { visibility.disabled = false; });
+      enqueueMutation(() => sendMutation(toggleForm))
+        .then(() => {
+          const enabled = visibility.checked;
+          item?.classList.toggle("disabled", !enabled);
+          const badge = item?.querySelector(".block-visibility");
+          badge?.classList.toggle("is-visible", enabled);
+          if (badge instanceof HTMLElement)
+            badge.lastChild.textContent = enabled ? "Widoczny" : "Ukryty";
+          if (label instanceof HTMLElement)
+            label.textContent = enabled ? "Blok widoczny" : "Blok ukryty";
+          if (liveState instanceof HTMLElement)
+            liveState.textContent = "Wszystkie zmiany zapisane";
+        })
+        .catch(() => {
+          visibility.checked = previous;
+          if (liveState instanceof HTMLElement)
+            liveState.textContent = "Nie udało się zmienić widoczności";
+        })
+        .finally(() => {
+          visibility.disabled = false;
+        });
     });
   }
 });

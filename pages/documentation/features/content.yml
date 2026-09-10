@@ -26,6 +26,12 @@ seo:
     headline: 'FlatFile CMS Features'
 blocks:
   -
+    id: 01a08c3a-655d-7b14-ae5a-89ee33ea616c
+    type: page-progressbar
+    enabled: true
+    data:
+      accent: mint
+  -
     id: 01a05e10-1001-7401-8401-000000000001
     type: docs-hero
     enabled: true

@@ -195,7 +195,7 @@ final readonly class AdminPageBuilderController
             $languages = $this->languages->get();
             $definition = $this->bodyDefinition($request);
             $data = $this->dataMapper->map($definition, $request->parsedBody()['data'] ?? [], $languages);
-            $this->manager->add($identity, $definition->type(), $data, $this->bodyRevision($request), $languages);
+            $updated = $this->manager->add($identity, $definition->type(), $data, $this->bodyRevision($request), $languages);
             $this->audit->log(
                 'block.created',
                 $actor->id(),
@@ -204,7 +204,12 @@ final readonly class AdminPageBuilderController
                 ['type' => $definition->type()],
             );
 
-            return $this->redirect($identity, 'created');
+            return $this->mutationResponse(
+                $request,
+                $identity,
+                'created',
+                $updated->revision(),
+            );
         } catch (BlockValidationException $exception) {
             throw $this->validationException($exception);
         } catch (RevisionConflictException $exception) {
@@ -242,7 +247,7 @@ final readonly class AdminPageBuilderController
             $block = $this->manager->block($identity, $id);
             $definition = $this->registry->get(ContentData::string($block['type'] ?? null, 'block.type'));
             $data = $this->dataMapper->map($definition, $request->parsedBody()['data'] ?? [], $languages);
-            $this->manager->update($identity, $id, $data, $this->bodyRevision($request), $languages);
+            $updated = $this->manager->update($identity, $id, $data, $this->bodyRevision($request), $languages);
             $this->audit->log(
                 'block.updated',
                 $actor->id(),
@@ -250,7 +255,12 @@ final readonly class AdminPageBuilderController
                 $request->clientIp(),
             );
 
-            return $this->redirect($identity, 'updated');
+            return $this->mutationResponse(
+                $request,
+                $identity,
+                'updated',
+                $updated->revision(),
+            );
         } catch (BlockValidationException $exception) {
             throw $this->validationException($exception);
         } catch (RevisionConflictException $exception) {
@@ -330,7 +340,7 @@ final readonly class AdminPageBuilderController
                 }
                 $order[] = $id;
             }
-            $this->manager->reorder($identity, $order, $this->bodyRevision($request), $this->languages->get());
+            $updated = $this->manager->reorder($identity, $order, $this->bodyRevision($request), $this->languages->get());
             $this->audit->log(
                 'block.moved',
                 $actor->id(),
@@ -339,7 +349,12 @@ final readonly class AdminPageBuilderController
                 ['order' => $order],
             );
 
-            return $this->redirect($identity, 'reordered');
+            return $this->mutationResponse(
+                $request,
+                $identity,
+                'reordered',
+                $updated->revision(),
+            );
         } catch (RevisionConflictException $exception) {
             throw $this->conflict($exception);
         } catch (InvalidArgumentException | InvalidContentException | FilesystemException $exception) {
@@ -356,7 +371,7 @@ final readonly class AdminPageBuilderController
             $id = $this->bodyId($request);
             $revision = $this->bodyRevision($request);
             $languages = $this->languages->get();
-            match ($operation) {
+            $updated = match ($operation) {
                 'duplicate' => $this->manager->duplicate($identity, $id, $revision, $languages),
                 'toggle' => $this->manager->toggle($identity, $id, $revision, $languages),
                 'delete' => $this->manager->delete($identity, $id, $revision, $languages),
@@ -375,7 +390,12 @@ final readonly class AdminPageBuilderController
                 ['operation' => $operation],
             );
 
-            return $this->redirect($identity, $operation);
+            return $this->mutationResponse(
+                $request,
+                $identity,
+                $operation,
+                $updated->revision(),
+            );
         } catch (RevisionConflictException $exception) {
             throw $this->conflict($exception);
         } catch (InvalidArgumentException | InvalidContentException | FilesystemException $exception) {
@@ -597,6 +617,22 @@ final readonly class AdminPageBuilderController
     private function redirect(PageIdentity $identity, string $status): Response
     {
         return Response::redirect('/admin/pages/builder?path=' . rawurlencode($identity->value()) . '&' . $status . '=1', 303);
+    }
+
+    private function mutationResponse(
+        Request $request,
+        PageIdentity $identity,
+        string $status,
+        FileRevision $revision,
+    ): Response {
+        if (str_contains($request->header('accept') ?? '', 'application/json')) {
+            return Response::json([
+                'saved' => true,
+                'revision' => $revision->value(),
+            ]);
+        }
+
+        return $this->redirect($identity, $status);
     }
 
     private function conflict(RevisionConflictException $exception): HttpException

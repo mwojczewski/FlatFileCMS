@@ -32,6 +32,12 @@ seo:
     dateModified: '2026-09-02'
 blocks:
   -
+    id: 01a08c3a-f270-7cc6-9e65-048762d19890
+    type: page-progressbar
+    enabled: true
+    data:
+      accent: mint
+  -
     id: 01a05ef2-2002-7401-8401-000000000001
     type: docs-hero
     enabled: true

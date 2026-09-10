@@ -150,6 +150,56 @@ YAML);
         );
     }
 
+    public function testItAcceptsConsecutiveBlockUpdatesWithTheLatestRevision(): void
+    {
+        $initial = $this->manager->editable($this->identity);
+        $created = $this->manager->add(
+            $this->identity,
+            'text',
+            ['title' => ['pl' => 'Pierwszy', 'en' => 'First'], 'highlighted' => false],
+            $initial->revision(),
+            $this->languages,
+        );
+        $block = $this->blocks($created->data())[0];
+        $id = ContentData::string($block['id'] ?? null, 'id');
+
+        self::assertFalse($created->revision()->equals($initial->revision()));
+
+        $firstUpdate = $this->manager->update(
+            $this->identity,
+            $id,
+            ['title' => ['pl' => 'Drugi', 'en' => 'Second'], 'highlighted' => false],
+            $created->revision(),
+            $this->languages,
+        );
+
+        self::assertFalse($firstUpdate->revision()->equals($created->revision()));
+
+        $secondUpdate = $this->manager->update(
+            $this->identity,
+            $id,
+            ['title' => ['pl' => 'Trzeci', 'en' => 'Third'], 'highlighted' => true],
+            $firstUpdate->revision(),
+            $this->languages,
+        );
+
+        self::assertFalse($secondUpdate->revision()->equals($firstUpdate->revision()));
+
+        $updatedBlock = $this->manager->block($this->identity, $id);
+        $updatedData = ContentData::map($updatedBlock['data'] ?? null, 'data');
+        self::assertSame(['pl' => 'Trzeci', 'en' => 'Third'], $updatedData['title']);
+        self::assertTrue($updatedData['highlighted']);
+
+        $this->expectException(RevisionConflictException::class);
+        $this->manager->update(
+            $this->identity,
+            $id,
+            ['title' => ['pl' => 'Nieaktualny', 'en' => 'Stale'], 'highlighted' => false],
+            $created->revision(),
+            $this->languages,
+        );
+    }
+
     public function testInvalidBlockDataIsNeverWritten(): void
     {
         $before = $this->manager->editable($this->identity);

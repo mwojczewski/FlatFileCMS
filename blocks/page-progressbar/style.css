@@ -1,0 +1,36 @@
+.block-page-progressbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  transform-origin: 0 50%;
+  animation: scaleProgress auto linear;
+  animation-timeline: scroll(root);
+}
+
+.block-page-progressbar__content {
+  background: #1ac58b;
+  margin: 0;
+  height: 0.5rem;
+}
+
+.block-page-progressbar__content.progressbar__accent--violet {
+  background: #7968dc;
+}
+
+.block-page-progressbar__content.progressbar__accent--amber {
+  background: #e29c32;
+}
+
+@keyframes scaleProgress {
+  0% {
+    transform: scaleX(0);
+  }
+  99.9% {
+    height: 0.5rem;
+  }
+  100% {
+    transform: scaleX(1);
+    height: 0rem;
+  }
+}

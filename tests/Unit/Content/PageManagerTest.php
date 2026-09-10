@@ -18,6 +18,8 @@ use FlatFileCms\Domain\Localization\LanguageConfig;
 use FlatFileCms\Infrastructure\Filesystem\AtomicFileWriter;
 use FlatFileCms\Infrastructure\Filesystem\DirectoryOperator;
 use FlatFileCms\Infrastructure\Filesystem\FileLockManager;
+use FlatFileCms\Infrastructure\Filesystem\FilesystemRoot;
+use FlatFileCms\Infrastructure\Filesystem\RelativePath;
 use FlatFileCms\Infrastructure\Filesystem\RevisionConflictException;
 use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
 use FlatFileCms\Infrastructure\Yaml\YamlFileCache;
@@ -25,6 +27,8 @@ use FlatFileCms\Infrastructure\Yaml\YamlFileRepository;
 use FlatFileCms\Infrastructure\Yaml\YamlParser;
 use FlatFileCms\Rendering\LayoutRegistry;
 use FlatFileCms\Tests\Support\TemporaryProject;
+use FlatFileCms\Tests\Support\TestContentFactory;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -47,6 +51,10 @@ title:
 seo: { }
 blocks: []
 YAML);
+        $this->project->write(
+            'templates/layouts/collection.php',
+            '<?php declare(strict_types=1);',
+        );
         $this->manager = $this->manager();
     }
 
@@ -143,6 +151,118 @@ YAML);
         self::assertDirectoryDoesNotExist($this->project->path('pages/offer'));
     }
 
+    public function testItReordersPagesWithinTheSameParent(): void
+    {
+        $firstIdentity = PageIdentity::fromString('first');
+        $secondIdentity = PageIdentity::fromString('second');
+
+        $this->manager->create(
+            $firstIdentity,
+            $this->metadata('Pierwsza', 'pierwsza'),
+            $this->languages,
+        );
+
+        $second = $this->manager->create(
+            $secondIdentity,
+            $this->metadata('Druga', 'druga'),
+            $this->languages,
+        );
+
+        $this->manager->reorganize(
+            $secondIdentity,
+            null,
+            0,
+            $second->revision(),
+            $this->languages,
+        );
+
+        self::assertSame(
+            0,
+            $this->documentOrder('second/content.yml'),
+        );
+
+        self::assertSame(
+            1,
+            $this->documentOrder('first/content.yml'),
+        );
+    }
+
+    public function testItMovesACollectionUnderAPage(): void
+    {
+        $parent = PageIdentity::fromString('documentation');
+
+        $this->manager->create(
+            $parent,
+            $this->metadata('Dokumentacja', 'dokumentacja'),
+            $this->languages,
+        );
+
+        $this->writeCollection('articles', 'Artykuły', 0);
+
+        $yaml = TestContentFactory::yaml($this->project);
+        $collection = $yaml->read(
+            FilesystemRoot::Pages,
+            RelativePath::fromString('articles/pagination.yml'),
+        );
+
+        $destination = $this->manager->reorganize(
+            PageIdentity::fromString('articles'),
+            $parent,
+            0,
+            $collection->revision(),
+            $this->languages,
+        );
+
+        self::assertSame(
+            'documentation/articles',
+            $destination->value(),
+        );
+
+        self::assertFileDoesNotExist(
+            $this->project->path('pages/articles/pagination.yml'),
+        );
+
+        self::assertFileExists(
+            $this->project->path(
+                'pages/documentation/articles/pagination.yml',
+            ),
+        );
+
+        self::assertSame(
+            0,
+            $this->documentOrder(
+                'documentation/articles/pagination.yml',
+            ),
+        );
+    }
+
+    public function testItRejectsMovingAPageIntoItsOwnDescendant(): void
+    {
+        $parent = PageIdentity::fromString('documentation');
+
+        $created = $this->manager->create(
+            $parent,
+            $this->metadata('Dokumentacja', 'dokumentacja'),
+            $this->languages,
+        );
+
+        $this->manager->create(
+            PageIdentity::fromString('documentation/api'),
+            $this->metadata('API', 'api'),
+            $this->languages,
+        );
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->manager->reorganize(
+            $parent,
+            PageIdentity::fromString('documentation/api'),
+            0,
+            $created->revision(),
+            $this->languages,
+        );
+    }
+
     private function manager(): PageManager
     {
         $paths = new SafePathResolver($this->project->path());
@@ -180,5 +300,43 @@ YAML);
             true,
             true,
         );
+    }
+
+    private function writeCollection(
+        string $identity,
+        string $title,
+        int $order,
+    ): void {
+        $this->project->write(
+            "pages/{$identity}/pagination.yml",
+            <<<YAML
+schemaVersion: 1
+type: collection
+source: children
+enabled: true
+layout: collection
+slug: { pl: {$identity} }
+title: { pl: {$title} }
+seo: {}
+sort: { field: date, direction: desc }
+pagination: { perPage: 10 }
+filters: []
+order: {$order}
+YAML,
+        );
+    }
+
+    private function documentOrder(
+        string $path,
+    ): int {
+        $document = TestContentFactory::yaml($this->project)->read(
+            FilesystemRoot::Pages,
+            RelativePath::fromString($path),
+        );
+
+        $order = $document->data()['order'] ?? null;
+        self::assertIsInt($order);
+
+        return $order;
     }
 }
