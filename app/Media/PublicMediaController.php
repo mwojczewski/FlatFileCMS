@@ -15,7 +15,8 @@ final readonly class PublicMediaController
     public function __construct(
         private MediaRepository $media,
         private MediaVariantService $variants,
-    ) {}
+    ) {
+    }
 
     public function show(Request $request): Response
     {
@@ -78,8 +79,7 @@ final readonly class PublicMediaController
         $filename = array_pop($segments);
         $fingerprint = array_pop($segments);
         if (
-            !\is_string($fingerprint)
-            || $filename === ''
+            $filename === ''
             || preg_match('/^[a-f0-9]{16}$/D', $fingerprint) !== 1
         ) {
             throw new InvalidArgumentException('Media fingerprint is invalid.');

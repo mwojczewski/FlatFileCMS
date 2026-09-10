@@ -19,7 +19,8 @@ final readonly class WebAuthnService
         private SessionStore $session,
         private string $rpName,
         private string $rpId,
-    ) {}
+    ) {
+    }
 
     /** @return array<string, mixed> */
     public function registrationOptions(User $user): array
@@ -36,7 +37,7 @@ final readonly class WebAuthnService
             120,
             'discouraged',
             'preferred',
-            true,
+            null,
             $existing,
         );
 
@@ -80,7 +81,7 @@ final readonly class WebAuthnService
             static fn(WebAuthnCredential $credential): string => $credential->credentialId(),
             $credentials,
         );
-        $options = $this->server()->getGetArgs($ids, 120, true, true, true, false, false, 'preferred');
+        $options = $this->server()->getGetArgs($ids, 120, true, true, true, true, true, 'preferred');
 
         return $this->rememberOptions($options, 'authenticate');
     }
