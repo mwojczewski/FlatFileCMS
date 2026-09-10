@@ -6,6 +6,11 @@ namespace FlatFileCms\Support;
 
 final class UuidV7
 {
+    public static function isValid(string $value): bool
+    {
+        return preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/D', $value) === 1;
+    }
+
     public static function generate(): string
     {
         $milliseconds = (int) floor(microtime(true) * 1000);

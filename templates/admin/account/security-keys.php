@@ -1,3 +1,75 @@
-<div class="toolbar crud-toolbar"><div><p class="eyebrow">U2F / WebAuthn</p><p class="lead">Klucze są opcjonalnym drugim składnikiem logowania.</p></div><a class="button secondary" href="/admin/security">Wróć do konta</a></div>
-<div class="table-wrap crud-table"><table><thead><tr><th>Klucz</th><th></th></tr></thead><tbody><?php if ($credentials === []): ?><tr><td colspan="2" class="table-empty">Brak zarejestrowanych kluczy.</td></tr><?php endif; ?><?php foreach ($credentials as $credential): ?><tr><td class="page-cell"><strong><?= $escape($credential->name()) ?></strong><small>ID: <?= $credential->id() ?></small></td><td><form method="post" action="/admin/account/security-keys/delete" data-confirm="Usunąć klucz bezpieczeństwa?"><input type="hidden" name="_csrf" value="<?= $escape($csrfToken) ?>"><input type="hidden" name="id" value="<?= $credential->id() ?>"><button type="submit" class="button compact danger-text">Usuń</button></form></td></tr><?php endforeach; ?></tbody></table></div>
-<section class="form-section security-key-form"><div class="section-heading"><div><p class="eyebrow">Nowy klucz</p><h2>Dodaj YubiKey lub passkey</h2></div></div><form data-webauthn-register><label>Nazwa klucza<input name="key_name" maxlength="80" required value="YubiKey"></label><label>Aktualne hasło<input type="password" name="current_password" required autocomplete="current-password"></label><button type="submit">Dodaj klucz</button></form><p class="error" data-auth-error></p></section>
+<div class="form-page-header">
+    <div>
+        <p class="eyebrow">Drugi składnik logowania</p>
+        <h2>Klucze bezpieczeństwa</h2>
+        <p class="lead">Passkey lub klucz sprzętowy chroni konto nawet po przejęciu hasła.</p>
+    </div>
+    <div class="form-page-actions"><a class="button secondary" href="/admin/security">Wróć do konta</a></div>
+</div>
+<section class="security-keys-summary">
+    <span class="security-status-icon <?= $credentials === [] ? '' : 'is-active' ?>"
+        aria-hidden="true"><?= $credentials === [] ? '!' : '✓' ?></span>
+    <div><strong><?= $credentials === [] ? 'Brak dodatkowego składnika' : 'Konto chronione kluczem' ?></strong>
+        <p><?= $credentials === [] ? 'Zarejestruj pierwszy klucz, aby włączyć uwierzytelnianie dwuskładnikowe.' : 'Aktywne klucze: ' . count($credentials) . '. Każdy z nich może potwierdzić logowanie.' ?>
+        </p>
+    </div>
+</section>
+<div class="table-wrap crud-table security-keys-table">
+    <table>
+        <thead>
+            <tr>
+                <th>Klucz</th>
+                <th>Rodzaj</th>
+                <th class="page-actions-column" aria-label="Akcje"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if ($credentials === []): ?>
+                <tr>
+                    <td colspan="3" class="table-empty">Brak zarejestrowanych kluczy.</td>
+                </tr><?php endif; ?>
+            <?php foreach ($credentials as $credential): ?>
+                <tr>
+                    <td>
+                        <div class="security-key-identity">
+                            <span aria-hidden="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-usb-drive" viewBox="0 0 16 16">
+                                    <path
+                                        d="M6 .5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4H6zM7 1v1h1V1zm2 0v1h1V1zM6 5a1 1 0 0 0-1 1v8.5A1.5 1.5 0 0 0 6.5 16h4a1.5 1.5 0 0 0 1.5-1.5V6a1 1 0 0 0-1-1zm0 1h5v8.5a.5.5 0 0 1-.5.5h-4a.5.5 0 0 1-.5-.5z">
+                                    </path>
+                                </svg>
+                            </span>
+                            <span class="page-cell">
+                                <strong><?= $escape($credential->name()) ?></strong>
+                                <small>Klucz nr <?= $credential->id() ?></small>
+                            </span>
+                        </div>
+                    </td>
+                    <td><span
+                            class="page-kind"><?= $credential->transports() === [] ? 'Passkey / WebAuthn' : $escape(implode(', ', $credential->transports())) ?></span>
+                    </td>
+                    <td class="page-actions-column">
+                        <form method="post" action="/admin/account/security-keys/delete"
+                            data-confirm="Usunąć klucz bezpieczeństwa?"><input type="hidden" name="_csrf"
+                                value="<?= $escape($csrfToken) ?>"><input type="hidden" name="id"
+                                value="<?= $credential->id() ?>"><button type="submit"
+                                class="button compact danger-text">Usuń</button></form>
+                    </td>
+                </tr><?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
+<section class="form-section security-key-form">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">Nowy klucz</p>
+            <h2>Dodaj passkey lub klucz sprzętowy</h2>
+        </div>
+        <p>Przeglądarka poprosi o użycie urządzenia po potwierdzeniu hasła.</p>
+    </div>
+    <form data-webauthn-register><label>Nazwa klucza<input name="key_name" maxlength="80" required
+                value="Mój klucz"></label><label>Aktualne hasło<input type="password" name="current_password" required
+                autocomplete="current-password"></label><button type="submit">Zarejestruj klucz</button></form>
+    <p class="error" data-auth-error role="alert" aria-live="assertive"></p>
+</section>

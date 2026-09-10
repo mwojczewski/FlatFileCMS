@@ -6,7 +6,9 @@ declare(strict_types=1);
     <div class="container">
         <div class="section-heading">
             <div>
-                <p class="section-kicker section-kicker--dark"><span></span><?= $context->escape($data['eyebrow']) ?>
+                <p class="section-kicker section-kicker--dark">
+                    <span></span>
+                    <?= $context->escape($data['eyebrow']) ?>
                 </p>
                 <h2><?= $context->escape($data['title']) ?></h2>
             </div>

@@ -7,13 +7,18 @@ $queryUrl = static function (int $page) use ($collection, $filters): string {
 
     return $collection['url'] . '?' . http_build_query($query, encoding_type: PHP_QUERY_RFC3986);
 };
-?>
-<!doctype html>
-<html lang="<?= $context->escape($collection['locale']) ?>">
-<head>
-    <?= $context->partial('head', ['seo' => $seo, 'assets' => $assets]) ?>
-</head>
-<body>
+
+$documentLocale = $collection['locale'];
+$documentBody = static function () use (
+    $context,
+    $navigation,
+    $localizedUrls,
+    $collection,
+    $items,
+    $pagination,
+    $queryUrl,
+): void {
+    ?>
     <?= $context->partial('navigation', ['menus' => $navigation, 'localizedUrls' => $localizedUrls]) ?>
     <main id="main-content" class="collection container">
         <h1><?= $context->escape($collection['title']) ?></h1>
@@ -40,6 +45,8 @@ $queryUrl = static function (int $page) use ($collection, $filters): string {
             </nav>
         <?php endif; ?>
     </main>
-    <?= $context->partial('footer') ?>
-</body>
-</html>
+    <?= $context->partial('footer', ['menus' => $navigation]) ?>
+    <?php
+};
+
+require dirname(__DIR__) . '/document.php';

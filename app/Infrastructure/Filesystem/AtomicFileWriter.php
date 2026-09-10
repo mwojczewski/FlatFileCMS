@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Infrastructure\Filesystem;
 
+use Closure;
+
 final readonly class AtomicFileWriter
 {
     public function __construct(
         private SafePathResolver $pathResolver,
         private FileLockManager $lockManager,
+        private ?Closure $publicCacheInvalidator = null,
     ) {}
 
     public function write(
@@ -81,6 +84,9 @@ final readonly class AtomicFileWriter
 
             if (!rename($temporaryPath, $targetPath)) {
                 throw new FilesystemException('Unable to atomically replace the destination file.');
+            }
+            if ($root !== FilesystemRoot::Storage) {
+                $this->publicCacheInvalidator?->__invoke();
             }
         } finally {
             if (file_exists($temporaryPath)) {

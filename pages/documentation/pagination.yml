@@ -10,11 +10,14 @@ title:
   en: Documentation
 seo:
   title:
-    pl: Dokumentacja FlatFile CMS
-    en: FlatFile CMS documentation
+    pl: 'Dokumentacja FlatFile CMS'
+    en: 'FlatFile CMS documentation'
   description:
-    pl: Techniczne tutoriale prowadzące od instalacji FlatFile CMS przez bloki, model treści, rendering i API aż po bezpieczeństwo oraz wdrożenie.
-    en: Technical tutorials covering FlatFile CMS from installation through blocks, content modelling, rendering and the API to security and deployment.
+    pl: 'Techniczne tutoriale prowadzące od instalacji FlatFile CMS przez bloki, model treści, rendering i API aż po bezpieczeństwo oraz wdrożenie.'
+    en: 'Technical tutorials covering FlatFile CMS from installation through blocks, content modelling, rendering and the API to security and deployment.'
+  robots:
+    index: true
+    follow: true
 source: children
 sort:
   field: order
@@ -22,15 +25,15 @@ sort:
 pagination:
   perPage: 12
 filters:
-  - parameter: category
+  -
+    parameter: category
     field: category
     allowedValues:
-      [
-        getting-started,
-        blocks,
-        content-structure,
-        rendering,
-        api,
-        security,
-        deployment,
-      ]
+      - getting-started
+      - blocks
+      - content-structure
+      - rendering
+      - api
+      - security
+      - deployment
+order: 1

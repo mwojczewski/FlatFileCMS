@@ -58,6 +58,8 @@ final readonly class AdminLayout
             'content' => $content,
             'active' => $active,
             'email' => $user?->email() ?? '',
+            'displayName' => $user?->displayName() ?? 'Administrator',
+            'accountInitials' => $user?->initials() ?? 'A',
             'csrfToken' => $this->csrf->token(),
         ]);
 
@@ -80,7 +82,7 @@ final readonly class AdminLayout
                 'Permissions-Policy' => 'camera=(), geolocation=(), microphone=()',
                 'Content-Security-Policy' => "default-src 'self'; base-uri 'none'; frame-ancestors 'none'; "
                     . "form-action 'self'; object-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; "
-                    . "script-src 'self'; connect-src 'self'",
+                    . "script-src 'self' https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com;",
             ],
         );
     }

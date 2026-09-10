@@ -77,6 +77,22 @@ object-bearing entries are discarded. Neither variable controls media
 variants; media transformation and media-cache behavior belongs to
 `config/setup.yml`.
 
+## Public HTML cache
+
+Public pages may be stored below `storage/cache/html/`. PHP-serialized entries
+contain rendered HTML, its modification timestamp and a SHA-256 content hash
+used as the ETag. The hash is verified when reading an entry. Hashed cache keys
+separate releases, content generations, locales, routes and canonical query
+parameters. The administration, API and media route groups never call the
+public HTML cache.
+
+Successful writes outside `storage/`, as well as page-directory creation,
+moves and deletion, rotate `storage/cache/html-generation` under an
+exclusive lock. This invalidates every language without synchronously deleting
+old entries. A changed `APP_RELEASE` similarly invalidates output affected by a
+code deployment. Old generations are disposable and removed by normal cache
+pruning.
+
 `php bin/cms cache:clear` removes every generated entry below
 `storage/cache/`, regardless of the cache mechanism that created it. The fixed
 cache root and its root `.gitkeep` file are preserved; the command accepts no

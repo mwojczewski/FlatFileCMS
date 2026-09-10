@@ -32,3 +32,19 @@ fields:
       maxLength: 600,
       label: { pl: Notatka, en: Note },
     }
+  bookmarkTitle:
+    {
+      type: text,
+      required: false,
+      translatable: true,
+      maxLength: 20,
+      label: { pl: Tytuł zakładki, en: Bookmark title },
+    }
+  bookmarkDescription:
+    {
+      type: text,
+      required: false,
+      translatable: true,
+      maxLength: 26,
+      label: { pl: Opis zakładki, en: Bookmark description },
+    }

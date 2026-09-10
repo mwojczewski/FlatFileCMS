@@ -1,23 +1,16 @@
 <?php
 
 declare(strict_types=1);
-?>
-<!doctype html>
-<html lang="<?= $context->escape($page->locale()) ?>">
 
-<head>
-    <?= $context->partial('head', ['page' => $page, 'seo' => $seo, 'assets' => $assets]) ?>
-</head>
-
-<body>
+$documentLocale = $page->locale();
+$documentBody = static function () use ($context, $page, $navigation, $content): void {
+    ?>
     <?= $context->partial('navigation', ['menus' => $navigation, 'localizedUrls' => $page->localizedUrls()]) ?>
     <main id="main-content">
         <?= $content ?>
     </main>
     <?= $context->partial('footer', ['menus' => $navigation]) ?>
-    <?php foreach ($assets->scripts() as $script): ?>
-        <script src="<?= $context->asset($script) ?>" defer></script>
-    <?php endforeach; ?>
-</body>
+    <?php
+};
 
-</html>
+require dirname(__DIR__) . '/document.php';

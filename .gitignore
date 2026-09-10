@@ -85,3 +85,6 @@ Thumbs.db
 # block assets
 /public/assets/blocks/*
 !/public/assets/blocks/.gitkeep
+
+# Runtime block creation lock
+/blocks/.cms-block-create.lock

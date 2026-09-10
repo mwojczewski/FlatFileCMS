@@ -7,11 +7,11 @@ $locale = $collection['locale'];
 $queryUrl = static function (int $page) use ($collection, $filters): string {
     return $collection['url'] . '?' . http_build_query([...$filters, 'page' => $page], encoding_type: PHP_QUERY_RFC3986);
 };
-?>
-<!doctype html>
-<html lang="<?= $context->escape($collection['locale']) ?>">
 
-<head><?= $context->partial('head', ['seo' => $seo, 'assets' => $assets]) ?>
+$documentLocale = $collection['locale'];
+$documentBodyClass = 'insights-page';
+$documentHead = static function (): void {
+    ?>
     <style>
         .insights__hero {
             padding: 11rem 0 6rem;
@@ -58,6 +58,10 @@ $queryUrl = static function (int $page) use ($collection, $filters): string {
             font: 600 .7rem ui-monospace, monospace
         }
 
+        .insights__list article svg {
+            vertical-align: middle;
+        }
+
         .insights__list article p {
             color: #0E5D44;
             font: 650 .64rem ui-monospace, monospace;
@@ -96,9 +100,20 @@ $queryUrl = static function (int $page) use ($collection, $filters): string {
             }
         }
     </style>
-</head>
+    <?php
+};
 
-<body class="insights-page">
+$documentBody = static function () use (
+    $context,
+    $navigation,
+    $localizedUrls,
+    $collection,
+    $items,
+    $pagination,
+    $queryUrl,
+    $locale,
+): void {
+    ?>
     <?= $context->partial('navigation', ['menus' => $navigation, 'localizedUrls' => $localizedUrls]) ?>
     <main id="main-content" class="insights">
         <header class="insights__hero">
@@ -110,27 +125,38 @@ $queryUrl = static function (int $page) use ($collection, $filters): string {
                 </div>
             </div>
         </header>
-        <section class="container insights__list"><?php if ($items === []): ?>
+        <section class="container insights__list">
+            <?php if ($items === []): ?>
                 <p><?= $locale === 'pl' ? 'Brak artykułów.' : 'No articles found.' ?></p>
-            <?php else: ?>     <?php foreach ($items as $index => $item): ?>
+            <?php else: ?>
+                <?php foreach ($items as $index => $item): ?>
                     <article><span>0<?= $context->escape((string) ($index + 1)) ?></span>
                         <div>
                             <p>ENGINEERING NOTE</p>
                             <h2><a href="<?= $context->escape($item['url']) ?>"><?= $context->escape($item['title']) ?></a></h2>
                             <a href="<?= $context->escape($item['url']) ?>"><?= $locale === 'pl' ? 'Czytaj artykuł' : 'Read article' ?>
-                                →</a>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-arrow-right" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd"
+                                        d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8" />
+                                </svg></a>
                         </div>
-                    </article><?php endforeach; ?><?php endif; ?><?php if ($pagination['totalPages'] > 1): ?>
+                    </article>
+                <?php endforeach; ?>
+            <?php endif; ?>
+            <?php if ($pagination['totalPages'] > 1): ?>
                 <nav class="pagination" aria-label="Pagination"><?php if ($pagination['page'] > 1): ?><a rel="prev"
                             href="<?= $context->escape($queryUrl($pagination['page'] - 1)) ?>"><?= $locale === 'pl' ? 'Poprzednia' : 'Previous' ?></a><?php endif; ?><span><?= $pagination['page'] ?>
                         /
                         <?= $pagination['totalPages'] ?></span><?php if ($pagination['page'] < $pagination['totalPages']): ?><a
                             rel="next"
                             href="<?= $context->escape($queryUrl($pagination['page'] + 1)) ?>"><?= $locale === 'pl' ? 'Następna' : 'Next' ?></a><?php endif; ?>
-                </nav><?php endif; ?>
+                </nav>
+            <?php endif; ?>
         </section>
     </main>
     <?= $context->partial('footer', ['menus' => $navigation]) ?>
-</body>
+    <?php
+};
 
-</html>
+require dirname(__DIR__) . '/document.php';

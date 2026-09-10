@@ -105,13 +105,13 @@
   border-radius: 50%;
   background: #34554a;
 }
-.terminal__bar span:first-child {
+.terminal__bar span.close {
   background: #ff6b65;
 }
-.terminal__bar span:nth-child(2) {
+.terminal__bar span.maximize {
   background: #ffc85a;
 }
-.terminal__bar span:nth-child(3) {
+.terminal__bar span.minimize {
   background: #43df88;
 }
 .terminal__bar code {
@@ -160,6 +160,7 @@
   letter-spacing: 0.09em;
 }
 .terminal__status b {
+  position: relative;
   display: inline-block;
   width: 0.42rem;
   height: 0.42rem;
@@ -167,6 +168,26 @@
   border-radius: 50%;
   background: #57f0b6;
   box-shadow: 0 0 12px #57f0b6;
+}
+.terminal__status b::after {
+  content: "";
+  top: calc(50% - 0.29rem);
+  left: calc(50% - 0.29rem);
+  position: absolute;
+  background-color: rgb(87, 240, 182);
+  border-radius: 50px;
+  width: 0.58rem;
+  height: 0.58rem;
+  opacity: 0.75;
+  animation: 1.75s cubic-bezier(0, 0, 0.2, 1) infinite ping;
+}
+
+@keyframes ping {
+  75%,
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
 }
 @media (max-width: 850px) {
   .tech-hero__grid {

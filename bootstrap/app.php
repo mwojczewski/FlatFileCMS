@@ -71,6 +71,7 @@ use FlatFileCms\Forms\ContactFormService;
 use FlatFileCms\Http\ApiErrorResponder;
 use FlatFileCms\Http\ErrorHandler;
 use FlatFileCms\Http\HtmlResponseFactory;
+use FlatFileCms\Http\PublicHtmlCache;
 use FlatFileCms\Http\Router;
 use FlatFileCms\Http\TrustedProxyResolver;
 use FlatFileCms\Http\WebErrorRenderer;
@@ -298,10 +299,27 @@ $container->set(
     ),
 );
 $container->set(
+    PublicHtmlCache::class,
+    static function (Container $container): PublicHtmlCache {
+        $environment = $container->get(Environment::class);
+        $enabled = $environment->boolean('PUBLIC_HTML_CACHE_ENABLED', false);
+
+        return new PublicHtmlCache(
+            $container->get(SafePathResolver::class),
+            $enabled,
+            ($enabled ? $environment->get('APP_RELEASE') : $environment->get('APP_RELEASE', 'disabled'))
+                . ':' . hash('sha256', $environment->get('CLOUDFLARE_BEACON_TOKEN', '')),
+        );
+    },
+);
+$container->set(
     AtomicFileWriter::class,
     static fn(Container $container): AtomicFileWriter => new AtomicFileWriter(
         $container->get(SafePathResolver::class),
         $container->get(FileLockManager::class),
+        static function () use ($container): void {
+            $container->get(PublicHtmlCache::class)->invalidate();
+        },
     ),
 );
 $container->set(
@@ -492,6 +510,9 @@ $container->set(
     DirectoryOperator::class,
     static fn(Container $container): DirectoryOperator => new DirectoryOperator(
         $container->get(SafePathResolver::class),
+        static function () use ($container): void {
+            $container->get(PublicHtmlCache::class)->invalidate();
+        },
     ),
 );
 $container->set(LocalizedDataResolver::class, static fn(): LocalizedDataResolver => new LocalizedDataResolver());
@@ -641,10 +662,19 @@ $container->set(
         $container->get(Authenticator::class),
         $container->get(CsrfTokenManager::class),
         $container->get(LanguageRepository::class),
+        $container->get(PageRepository::class),
+        $container->get(CollectionRepository::class),
         $container->get(PageBlockManager::class),
         $container->get(BlockRegistry::class),
+        $container->get(BlockValidator::class),
         $container->get(BlockFormDataMapper::class),
         $container->get(BlockFormRenderer::class),
+        $container->get(BlockRenderer::class),
+        $container->get(AssetCollector::class),
+        $container->get(MarkdownRenderer::class),
+        $container->get(PartialRenderer::class),
+        $container->get(MediaRepository::class),
+        $container->get(MediaUrlGenerator::class),
         $container->get(AdminView::class),
         $container->get(AdminLayout::class),
         $container->get(AuditLogger::class),
@@ -856,6 +886,7 @@ $container->set(
         $container->get(PartialRenderer::class),
         $container->get(MediaRepository::class),
         $container->get(MediaUrlGenerator::class),
+        $container->get(Environment::class)->get('CLOUDFLARE_BEACON_TOKEN', ''),
     ),
 );
 $container->set(
@@ -865,6 +896,7 @@ $container->set(
         $container->get(OutputBuffer::class),
         $container->get(MarkdownRenderer::class),
         $container->get(PartialRenderer::class),
+        $container->get(Environment::class)->get('CLOUDFLARE_BEACON_TOKEN', ''),
     ),
 );
 $container->set(HtmlResponseFactory::class, static fn(): HtmlResponseFactory => new HtmlResponseFactory());
@@ -893,6 +925,7 @@ $container->set(
         $container->get(PageRenderer::class),
         $container->get(CollectionRenderer::class),
         $container->get(HtmlResponseFactory::class),
+        $container->get(PublicHtmlCache::class),
     ),
 );
 $container->set(

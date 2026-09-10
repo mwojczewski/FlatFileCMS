@@ -35,10 +35,17 @@
   const destinations = readData("navigation-destinations");
   const localeEntries = Object.entries(languageData.items ?? {});
   const defaultLocale = languageData.default ?? localeEntries[0]?.[0] ?? "pl";
+  const menuCount = document.querySelector("[data-navigation-menu-count]");
+  const itemCount = document.querySelector("[data-navigation-item-count]");
+  const revision = document.querySelector("[data-navigation-revision]");
+  const saveState = document.querySelector("[data-navigation-save-state]");
   let dragged = null;
   let editedItem = null;
   let editedDraft = null;
   let discardEditedItem = null;
+  let saveTimer = null;
+  let saving = false;
+  let saveAgain = false;
 
   const normalizeItem = (raw = {}) => {
     const link = raw.link && typeof raw.link === "object" ? raw.link : null;
@@ -67,10 +74,32 @@
     items: Array.isArray(items) ? items.map(normalizeItem) : [],
   }));
 
-  const element = (name, className = "", text = "") => {
+  const element = (name, className = "", text = "", html = "") => {
     const node = document.createElement(name);
     if (className) node.className = className;
-    if (text) node.textContent = text;
+    if (html) node.innerHTML = html;
+    else if (text) node.textContent = text;
+    return node;
+  };
+
+  const countItems = (items) =>
+    items.reduce((total, item) => total + 1 + countItems(item.children), 0);
+
+  const kindIcon = (type) => {
+    const node = element("span", `navigation-kind-icon is-${type}`);
+    node.setAttribute("aria-hidden", "true");
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("fill", "none");
+    svg.setAttribute("stroke", "currentColor");
+    svg.setAttribute("stroke-width", "1.8");
+    svg.innerHTML =
+      type === "page"
+        ? '<path d="M6 2h8l5 5v15H6z"/><path d="M14 2v6h5M9 13h6M9 17h4"/>'
+        : type === "collection"
+          ? '<rect x="3" y="5" width="14" height="14" rx="2"/><path d="M7 2h12a2 2 0 0 1 2 2v12"/>'
+          : '<path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.1 1"/><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.1-1"/>';
+    node.append(svg);
     return node;
   };
 
@@ -82,12 +111,15 @@
   };
 
   const icons = {
-    up: '<path d="m18 15-6-6-6 6"/>',
-    down: '<path d="m6 9 6 6 6-6"/>',
-    outdent: '<path d="M9 18h10M9 12h10M9 6h10M5 8l-4 4 4 4"/>',
-    edit: '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4z"/>',
-    addChild: '<path d="M5 4v6a4 4 0 0 0 4 4h10"/><path d="m16 11 3 3-3 3"/><path d="M12 18v4m-2-2h4"/>',
-    remove: '<path d="M3 6h18M8 6V4h8v2m-9 0 1 15h8l1-15M10 11v6m4-6v6"/>',
+    up: '<path fill-rule="evenodd" d="M8 10a.5.5 0 0 0 .5-.5V3.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 3.707V9.5a.5.5 0 0 0 .5.5m-7 2.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5"/>',
+    down: '<path fill-rule="evenodd" d="M1 3.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5M8 6a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 .708-.708L7.5 12.293V6.5A.5.5 0 0 1 8 6"/>',
+    outdent:
+      '<path fill-rule="evenodd" d="M13 8a.5.5 0 0 0-.5-.5H5.707l2.147-2.146a.5.5 0 1 0-.708-.708l-3 3a.5.5 0 0 0 0 .708l3 3a.5.5 0 0 0 .708-.708L5.707 8.5H12.5A.5.5 0 0 0 13 8"/><path fill-rule="evenodd" d="M3.5 4a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 1 0v-7a.5.5 0 0 0-.5-.5"/>',
+    edit: '<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>',
+    addChild:
+      '<path fill-rule="evenodd" d="M3 8a.5.5 0 0 1 .5-.5h6.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H3.5A.5.5 0 0 1 3 8"/><path fill-rule="evenodd" d="M12.5 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5"/>',
+    remove:
+      '<path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>',
   };
 
   const iconButton = (label, icon, action, modifier = "") => {
@@ -100,18 +132,33 @@
     node.setAttribute("aria-label", label);
     node.title = label;
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("viewBox", "0 0 24 24");
-    svg.setAttribute("width", "18");
-    svg.setAttribute("height", "18");
-    svg.setAttribute("fill", "none");
-    svg.setAttribute("stroke", "currentColor");
-    svg.setAttribute("stroke-width", "2");
-    svg.setAttribute("stroke-linecap", "round");
-    svg.setAttribute("stroke-linejoin", "round");
+    svg.setAttribute("viewBox", "0 0 16 16");
+    svg.setAttribute("width", "16px");
+    svg.setAttribute("height", "16px");
+    svg.setAttribute("fill", "currentColor");
+    // svg.setAttribute("stroke", "currentColor");
+    // svg.setAttribute("stroke-width", "2");
+    // svg.setAttribute("stroke-linecap", "round");
+    // svg.setAttribute("stroke-linejoin", "round");
     svg.setAttribute("aria-hidden", "true");
     svg.innerHTML = icons[icon];
     node.append(svg);
     return node;
+  };
+
+  const actionsMenu = (actions, label = "Działania") => {
+    const menu = element("details", "navigation-actions-menu");
+    const trigger = element("summary", "", "•••");
+    trigger.setAttribute("aria-label", label);
+    trigger.title = label;
+    actions.querySelectorAll(".navigation-action").forEach((action) => {
+      const actionLabel = action.getAttribute("aria-label");
+      if (actionLabel)
+        action.append(element("span", "navigation-action-label", actionLabel));
+    });
+    actions.classList.add("navigation-actions-popover");
+    menu.append(trigger, actions);
+    return menu;
   };
 
   const input = (label, value, onInput, options = {}) => {
@@ -275,30 +322,70 @@
 
   const renderItem = (item, items, index, depth, parentContext) => {
     const card = element("article", "navigation-item");
+    card.draggable = true;
     card.style.setProperty("--navigation-depth", String(depth));
     const row = element("div", "navigation-item-row");
-    const handle = element("span", "drag-handle", "⋮⋮");
-    handle.draggable = true;
+    const handle = element(
+      "span",
+      "drag-handle",
+      "",
+      '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-grip-vertical" viewBox="0 0 16 16"><path d="M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0M7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0M7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/></svg>',
+    );
     handle.tabIndex = 0;
     handle.setAttribute("role", "button");
     handle.setAttribute("aria-label", "Przeciągnij, aby zmienić kolejność");
     handle.title = "Przeciągnij, aby zmienić kolejność";
-    handle.addEventListener("dragstart", () => {
-      dragged = { items, index, item };
+    card.addEventListener("dragstart", (event) => {
+      if (
+        event.target instanceof Element &&
+        event.target.closest(
+          ".navigation-item-actions, .navigation-actions-menu",
+        )
+      ) {
+        event.preventDefault();
+        return;
+      }
+      dragged = { items, item, card };
       card.classList.add("dragging");
+      if (event.dataTransfer) {
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", "navigation-item");
+      }
     });
-    handle.addEventListener("dragend", () => {
+    card.addEventListener("dragend", () => {
       dragged = null;
       card.classList.remove("dragging");
       editor
         .querySelectorAll(".drag-over")
         .forEach((node) => node.classList.remove("drag-over"));
+      render(true);
     });
     card.addEventListener("dragover", (event) => {
       event.preventDefault();
       event.stopPropagation();
-      if (dragged && !containsItem(dragged.item, item))
-        card.classList.add("drag-over");
+      if (!dragged || containsItem(dragged.item, item)) return;
+      editor
+        .querySelectorAll(".drag-over")
+        .forEach((node) => node.classList.toggle("drag-over", node === card));
+      card.classList.add("drag-over");
+      if (dragged.items !== items || dragged.item === item) return;
+
+      const currentIndex = items.indexOf(dragged.item);
+      const targetIndex = items.indexOf(item);
+      if (currentIndex < 0 || targetIndex < 0) return;
+      const rectangle = card.getBoundingClientRect();
+      const after = event.clientY > rectangle.top + rectangle.height / 2;
+      let destinationIndex = targetIndex + (after ? 1 : 0);
+      if (currentIndex < destinationIndex) destinationIndex -= 1;
+      if (destinationIndex === currentIndex) return;
+
+      items.splice(currentIndex, 1);
+      items.splice(destinationIndex, 0, dragged.item);
+      card.parentElement?.insertBefore(
+        dragged.card,
+        after ? card.nextSibling : card,
+      );
+      sync();
     });
     card.addEventListener("dragleave", (event) => {
       if (
@@ -312,15 +399,14 @@
       event.preventDefault();
       event.stopPropagation();
       card.classList.remove("drag-over");
-      if (!dragged || (dragged.items === items && dragged.index === index))
-        return;
+      if (!dragged || dragged.items === items) return;
       if (containsItem(dragged.item, item)) return;
-      const moved = removeFrom(dragged.items, dragged.index);
-      let destinationIndex = index;
-      if (dragged.items === items && dragged.index < index)
-        destinationIndex -= 1;
+      const sourceIndex = dragged.items.indexOf(dragged.item);
+      if (sourceIndex < 0) return;
+      const moved = removeFrom(dragged.items, sourceIndex);
+      const destinationIndex = items.indexOf(item);
       items.splice(destinationIndex, 0, moved);
-      render();
+      render(true);
     });
 
     const summary = element("div", "navigation-item-summary");
@@ -336,7 +422,7 @@
           "up",
           () => {
             [items[index - 1], items[index]] = [items[index], items[index - 1]];
-            render();
+            render(true);
           },
           "navigation-action-move",
         ),
@@ -348,32 +434,49 @@
           "down",
           () => {
             [items[index], items[index + 1]] = [items[index + 1], items[index]];
-            render();
+            render(true);
           },
           "navigation-action-move",
         ),
       );
     if (parentContext)
       actions.append(
-        iconButton("Wysuń o jeden poziom", "outdent", () => {
-          const moved = removeFrom(items, index);
-          parentContext.items.splice(parentContext.index + 1, 0, moved);
-          render();
-        }, "navigation-action-structure"),
+        iconButton(
+          "Wysuń o jeden poziom",
+          "outdent",
+          () => {
+            const moved = removeFrom(items, index);
+            parentContext.items.splice(parentContext.index + 1, 0, moved);
+            render(true);
+          },
+          "navigation-action-structure",
+        ),
       );
-    actions.append(iconButton("Edytuj pozycję", "edit", () => openDialog(item), "navigation-action-edit"));
+    actions.append(
+      iconButton(
+        "Edytuj pozycję",
+        "edit",
+        () => openDialog(item),
+        "navigation-action-edit",
+      ),
+    );
     if (depth < 8)
       actions.append(
-        iconButton("Dodaj pozycję podrzędną", "addChild", () => {
-          const child = normalizeItem({ label: { [defaultLocale]: "" } });
-          item.children.push(child);
-          render();
-          openDialog(child, () => {
-            const childIndex = item.children.indexOf(child);
-            if (childIndex >= 0) item.children.splice(childIndex, 1);
+        iconButton(
+          "Dodaj pozycję podrzędną",
+          "addChild",
+          () => {
+            const child = normalizeItem({ label: { [defaultLocale]: "" } });
+            item.children.push(child);
             render();
-          });
-        }, "navigation-action-add"),
+            openDialog(child, () => {
+              const childIndex = item.children.indexOf(child);
+              if (childIndex >= 0) item.children.splice(childIndex, 1);
+              render(true);
+            });
+          },
+          "navigation-action-add",
+        ),
       );
     actions.append(
       iconButton(
@@ -382,13 +485,13 @@
         () => {
           if (window.confirm("Usunąć tę pozycję wraz z jej dziećmi?")) {
             removeFrom(items, index);
-            render();
+            render(true);
           }
         },
         "navigation-action-remove",
       ),
     );
-    row.append(handle, summary, actions);
+    row.append(handle, kindIcon(item.type), summary, actionsMenu(actions));
     card.append(row);
 
     if (item.children.length > 0) {
@@ -431,8 +534,64 @@
     );
   };
 
-  const render = () => {
+  const setSaveState = (state, label) => {
+    if (!(saveState instanceof HTMLElement)) return;
+    saveState.dataset.state = state;
+    const text = saveState.querySelector("span");
+    if (text) text.textContent = label;
+  };
+
+  const save = async () => {
+    if (!(revision instanceof HTMLInputElement)) return;
+    if (saving) {
+      saveAgain = true;
+      return;
+    }
+    saving = true;
+    setSaveState("saving", "Zapisywanie…");
+    sync();
+    try {
+      const response = await fetch(form.action, {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: new FormData(form),
+      });
+      const data = await response.json();
+      if (!response.ok || typeof data.revision !== "string") {
+        throw new Error(
+          data.error?.message ?? "Nie udało się zapisać nawigacji.",
+        );
+      }
+      revision.value = data.revision;
+      setSaveState("saved", "Wszystkie zmiany zapisane");
+    } catch (error) {
+      setSaveState(
+        "error",
+        error instanceof Error ? error.message : "Błąd zapisu",
+      );
+    } finally {
+      saving = false;
+      if (saveAgain) {
+        saveAgain = false;
+        void save();
+      }
+    }
+  };
+
+  const queueSave = () => {
+    window.clearTimeout(saveTimer);
+    setSaveState("pending", "Zmiany oczekują na zapis");
+    saveTimer = window.setTimeout(() => void save(), 450);
+  };
+
+  const render = (shouldSave = false) => {
     editor.replaceChildren();
+    if (menuCount instanceof HTMLElement)
+      menuCount.textContent = String(menus.length);
+    if (itemCount instanceof HTMLElement)
+      itemCount.textContent = String(
+        menus.reduce((total, menu) => total + countItems(menu.items), 0),
+      );
     menus.forEach((menu, menuIndex) => {
       const section = element("section", "form-section navigation-menu");
       const heading = element("div", "section-heading navigation-menu-heading");
@@ -441,16 +600,23 @@
         element("p", "eyebrow", "Menu"),
         element("h2", "", menu.name),
       );
+      title.append(
+        element(
+          "span",
+          "navigation-menu-count",
+          `${countItems(menu.items)} pozycji`,
+        ),
+      );
       const menuActions = element("div", "actions");
       menuActions.append(
         button("Dodaj pozycję", () => {
           const item = normalizeItem({ label: { [defaultLocale]: "" } });
           menu.items.push(item);
-          render();
+          render(false);
           openDialog(item, () => {
             const itemIndex = menu.items.indexOf(item);
             if (itemIndex >= 0) menu.items.splice(itemIndex, 1);
-            render();
+            render(true);
           });
         }),
       );
@@ -461,13 +627,13 @@
             () => {
               if (window.confirm("Usunąć całe menu?")) {
                 menus.splice(menuIndex, 1);
-                render();
+                render(true);
               }
             },
             "button compact danger-text",
           ),
         );
-      heading.append(title, menuActions);
+      heading.append(title, actionsMenu(menuActions, "Działania menu"));
       section.append(
         heading,
         input(
@@ -476,6 +642,7 @@
           (value) => {
             menu.name = value;
             sync();
+            queueSave();
           },
           { required: true, pattern: "[a-z][a-z0-9_-]*" },
         ),
@@ -490,6 +657,7 @@
       editor.append(section);
     });
     sync();
+    if (shouldSave) queueSave();
   };
 
   document
@@ -500,7 +668,7 @@
       while (menus.some((menu) => menu.name === name))
         name = `menu-${++suffix}`;
       menus.push({ name, items: [] });
-      render();
+      render(true);
     });
   dialogForm.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -518,7 +686,7 @@
     editedDraft = null;
     discardEditedItem = null;
     dialog.close();
-    render();
+    render(true);
   });
   document
     .querySelectorAll("[data-navigation-dialog-close]")

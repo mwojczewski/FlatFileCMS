@@ -14,6 +14,7 @@ final readonly class CollectionRenderer
         private OutputBuffer $buffer,
         private MarkdownRenderer $markdown,
         private PartialRenderer $partials,
+        private ?string $cloudflareBeaconToken = null,
     ) {}
 
     /** @param array<string, list<array<string, mixed>>> $navigation */
@@ -23,6 +24,7 @@ final readonly class CollectionRenderer
             $view->locale(),
             $this->markdown,
             $this->partials,
+            cloudflareBeaconToken: $this->cloudflareBeaconToken,
         );
         $template = $this->layouts->get($view->layout());
         $collection = $view->collection();
