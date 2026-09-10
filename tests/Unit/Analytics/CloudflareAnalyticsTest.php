@@ -42,27 +42,53 @@ final class CloudflareAnalyticsTest extends TestCase
             {
                 $this->payloads[] = $payload;
                 if (\count($this->payloads) === 1) {
-                    return json_encode(['data' => ['viewer' => ['accounts' => [[
-                        'current' => [['count' => 120, 'sum' => ['visits' => 60]]],
-                        'previous' => [['count' => 100, 'sum' => ['visits' => 50]]],
-                        'series' => [['count' => 120, 'sum' => ['visits' => 60], 'dimensions' => ['date' => '2026-09-08']]],
-                        'topPages' => [['count' => 80, 'sum' => ['visits' => 40], 'dimensions' => ['requestPath' => '/']]],
-                        'countries' => [['count' => 70, 'sum' => ['visits' => 35], 'dimensions' => ['countryName' => 'PL']]],
-                        'devices' => [], 'browsers' => [], 'systems' => [],
-                    ]], 'zones' => [[
-                        'totals' => [['count' => 200, 'sum' => ['edgeResponseBytes' => 1048576]]],
-                        'cache' => [['count' => 150, 'dimensions' => ['cacheStatus' => 'HIT']]],
-                    ]]]]], JSON_THROW_ON_ERROR);
+                    return json_encode([
+                        'data' => [
+                            'viewer' => [
+                                'accounts' => [
+                                    [
+                                        'current' => [['count' => 120, 'sum' => ['visits' => 60]]],
+                                        'previous' => [['count' => 100, 'sum' => ['visits' => 50]]],
+                                        'series' => [['count' => 120, 'sum' => ['visits' => 60], 'dimensions' => ['date' => '2026-09-08']]],
+                                        'topPages' => [['count' => 80, 'sum' => ['visits' => 40], 'dimensions' => ['requestPath' => '/']]],
+                                        'countries' => [['count' => 70, 'sum' => ['visits' => 35], 'dimensions' => ['countryName' => 'PL']]],
+                                        'devices' => [],
+                                        'browsers' => [],
+                                        'systems' => [],
+                                    ],
+                                ],
+                                'zones' => [
+                                    [
+                                        'totals' => [['count' => 200, 'sum' => ['edgeResponseBytes' => 1048576]]],
+                                        'cache' => [['count' => 150, 'dimensions' => ['cacheStatus' => 'HIT']]],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ], JSON_THROW_ON_ERROR);
                 }
 
-                return json_encode(['data' => ['viewer' => ['accounts' => [[
-                    'vitals' => [['count' => 10, 'quantiles' => [
-                        'largestContentfulPaintP75' => 2200,
-                        'interactionToNextPaintP75' => 180,
-                        'cumulativeLayoutShiftP75' => 0.08,
-                    ]]],
-                    'vitalsPages' => [],
-                ]]]]], JSON_THROW_ON_ERROR);
+                return json_encode([
+                    'data' => [
+                        'viewer' => [
+                            'accounts' => [
+                                [
+                                    'vitals' => [
+                                        [
+                                            'count' => 10,
+                                            'quantiles' => [
+                                                'largestContentfulPaintP75' => 2200,
+                                                'interactionToNextPaintP75' => 180,
+                                                'cumulativeLayoutShiftP75' => 0.08,
+                                            ],
+                                        ],
+                                    ],
+                                    'vitalsPages' => [],
+                                ],
+                            ],
+                        ],
+                    ],
+                ], JSON_THROW_ON_ERROR);
             }
         };
         $config = new CloudflareAnalyticsConfig(true, 'secret', 'account', 'zone', 'site', '', 600, 10, 'Europe/Warsaw');
@@ -73,19 +99,76 @@ final class CloudflareAnalyticsTest extends TestCase
             new NullLogger(),
         );
 
+        $refreshed = $service->refresh('7d');
         $result = $service->dashboard('7d');
         $summary = $this->map($result['summary'] ?? null);
         $topPages = $this->rows($result['topPages'] ?? null);
         $topPage = $topPages[0] ?? [];
         $vitals = $this->map($result['vitals'] ?? null);
 
+        self::assertSame('ready', $refreshed['status']);
         self::assertSame('ready', $result['status']);
         self::assertSame(120, $summary['pageViews']);
-        self::assertSame(20.0, $summary['pageViewsChange']);
+        self::assertSame(20, $summary['pageViewsChange']);
         self::assertSame('/', $topPage['label']);
-        self::assertSame(75.0, $summary['cacheHitRatio']);
+        self::assertSame(75, $summary['cacheHitRatio']);
         self::assertSame('good', $vitals['lcpRating']);
         self::assertCount(2, $http->payloads);
+    }
+
+    public function testItUsesCacheForDashboardAndRefreshesExplicitly(): void
+    {
+        $http = new class implements AnalyticsHttpClient {
+            /** @var list<array<string, mixed>> */
+            public array $payloads = [];
+
+            public function postJson(string $url, array $payload, string $token, int $timeout): string
+            {
+                $this->payloads[] = $payload;
+
+                return json_encode([
+                    'data' => [
+                        'viewer' => [
+                            'accounts' => [
+                                [
+                                    'current' => [['count' => 50, 'sum' => ['visits' => 25]]],
+                                    'previous' => [['count' => 40, 'sum' => ['visits' => 18]]],
+                                    'series' => [],
+                                    'topPages' => [],
+                                    'countries' => [],
+                                    'devices' => [],
+                                    'browsers' => [],
+                                    'systems' => [],
+                                ],
+                            ],
+                            'zones' => [
+                                [
+                                    'totals' => [['count' => 50, 'sum' => ['edgeResponseBytes' => 9000]]],
+                                    'cache' => [],
+                                ],
+                            ],
+                        ],
+                    ],
+                ], JSON_THROW_ON_ERROR);
+            }
+        };
+        $config = new CloudflareAnalyticsConfig(true, 'secret', 'account', 'zone', 'site', '', 600, 10, 'Europe/Warsaw');
+        $service = new CloudflareAnalyticsService(
+            new CloudflareGraphQlClient($http, $config),
+            $config,
+            new AnalyticsCache($this->project->path()),
+            new NullLogger(),
+        );
+
+        $refreshed = $service->refresh('7d');
+        self::assertSame('ready', $refreshed['status']);
+        self::assertCount(2, $http->payloads);
+
+        $http->payloads = [];
+        $cached = $service->dashboard('7d');
+        self::assertSame('ready', $cached['status']);
+        self::assertSame('fresh', $cached['cache']);
+        self::assertCount(0, $http->payloads);
     }
 
     public function testItReportsGraphQlErrorsWithoutLeakingToken(): void

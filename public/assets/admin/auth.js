@@ -69,7 +69,7 @@ document
       const options = prepare(
         await request("/admin/security/webauthn/registration/options", {
           password: form.get("current_password"),
-        }),
+        })
       );
       const credential = await navigator.credentials.create(options);
       const transports = credential.response.getTransports

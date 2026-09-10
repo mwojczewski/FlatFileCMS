@@ -5,8 +5,8 @@ slug:
   pl: od-yaml-do-html
   en: from-yaml-to-html
 title:
-  pl: Od YAML do HTML — jedna ścieżka, dwa interfejsy
-  en: From YAML to HTML — one path, two interfaces
+  pl: Od YAML do HTML - jedna ścieżka, dwa interfejsy
+  en: From YAML to HTML - one path, two interfaces
 date: "2026-08-31"
 category: architecture
 excerpt:
@@ -14,8 +14,8 @@ excerpt:
   en: How a shared ViewModel powers SSR and the REST API without synchronization or duplicated logic.
 seo:
   title:
-    pl: Od YAML do HTML — architektura renderowania FlatFile CMS
-    en: From YAML to HTML — the FlatFile CMS rendering architecture
+    pl: Od YAML do HTML - architektura renderowania FlatFile CMS
+    en: From YAML to HTML - the FlatFile CMS rendering architecture
   description:
     pl: Poznaj drogę treści od pliku YAML przez walidację bloków do HTML i REST API.
     en: Follow content from a YAML file through block validation to HTML and the REST API.
@@ -33,8 +33,8 @@ blocks:
         }
       lead:
         {
-          pl: "FlatFile CMS nie zmusza HTML i API do udawania, że są tym samym. Łączy je wcześniej — na poziomie poprawnie złożonego modelu strony.",
-          en: "FlatFile CMS does not force HTML and the API to pretend they are the same. It connects them earlier — through a correctly assembled page model.",
+          pl: "FlatFile CMS nie zmusza HTML i API do udawania, że są tym samym. Łączy je wcześniej - na poziomie poprawnie złożonego modelu strony.",
+          en: "FlatFile CMS does not force HTML and the API to pretend they are the same. It connects them earlier - through a correctly assembled page model.",
         }
       image:
         src: cover.png
@@ -51,7 +51,7 @@ blocks:
         pl: |-
           ## Treść pozostaje zwykłym plikiem
 
-          Punktem wyjścia jest `content.yml`: stabilny kontrakt, który można przeczytać bez specjalistycznego narzędzia, śledzić w Git i bezpiecznie przenosić między środowiskami. To nie format pomocniczy — to źródło prawdy.
+          Punktem wyjścia jest `content.yml`: stabilny kontrakt, który można przeczytać bez specjalistycznego narzędzia, śledzić w Git i bezpiecznie przenosić między środowiskami. To nie format pomocniczy - to źródło prawdy.
 
           Każdy wpis bloku przechodzi przez rejestr definicji. CMS sprawdza typ, wymagane pola, tłumaczenia, reguły długości oraz odwołania do mediów. Dopiero znormalizowane dane trafiają dalej.
 
@@ -73,7 +73,7 @@ blocks:
         en: |-
           ## Content remains an ordinary file
 
-          Everything starts with `content.yml`: a stable contract that can be read without specialist software, tracked in Git and moved safely between environments. It is not an intermediate format — it is the source of truth.
+          Everything starts with `content.yml`: a stable contract that can be read without specialist software, tracked in Git and moved safely between environments. It is not an intermediate format - it is the source of truth.
 
           Every block passes through the definition registry. The CMS checks its type, required fields, translations, length rules and media references before normalized data can move forward.
 

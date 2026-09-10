@@ -1,6 +1,10 @@
 schemaVersion: 1
 name: { pl: Formularz kontaktowy, en: Contact form }
-description: { pl: Konfigurowalny formularz wysyłający wiadomość e-mail., en: Configurable email contact form. }
+description:
+  {
+    pl: Konfigurowalny formularz wysyłający wiadomość e-mail.,
+    en: Configurable email contact form.,
+  }
 icon: mail
 fields:
   eyebrow:
@@ -75,7 +79,11 @@ fields:
         required: false
         translatable: false
         maxLength: 2000
-        label: { pl: Opcje listy (jedna na wiersz), en: Select options (one per line) }
+        label:
+          {
+            pl: Opcje listy (jedna na wiersz),
+            en: Select options (one per line),
+          }
   submit_label:
     type: text
     required: true
@@ -104,7 +112,8 @@ fields:
     type: boolean
     required: false
     translatable: false
-    label: { pl: Wyślij potwierdzenie do nadawcy, en: Send confirmation to sender }
+    label:
+      { pl: Wyślij potwierdzenie do nadawcy, en: Send confirmation to sender }
   confirmation_subject:
     type: text
     required: true

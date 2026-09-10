@@ -16,8 +16,7 @@ final readonly class AdminLayout
         private Authenticator $authenticator,
         private CsrfTokenManager $csrf,
         private AdminView $views,
-    ) {
-    }
+    ) {}
 
     public function render(
         string $title,
@@ -58,6 +57,8 @@ final readonly class AdminLayout
             'content' => $content,
             'active' => $active,
             'email' => $user?->email() ?? '',
+            'displayName' => $user?->displayName() ?? '',
+            'accountInitials' => $user?->initials() ?? '',
             'csrfToken' => $this->csrf->token(),
         ]);
 

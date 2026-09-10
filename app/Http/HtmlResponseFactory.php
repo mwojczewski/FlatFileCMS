@@ -6,10 +6,10 @@ namespace FlatFileCms\Http;
 
 final readonly class HtmlResponseFactory
 {
-    public function cacheable(Request $request, string $html, int $modifiedAt): Response
+    public function cacheable(Request $request, string $html, int $modifiedAt, ?string $contentHash = null): Response
     {
         $response = Response::html($html);
-        $etag = '"' . hash('sha256', $html) . '"';
+        $etag = '"' . ($contentHash ?? hash('sha256', $html)) . '"';
         $headers = [
             ...$response->headers(),
             'ETag' => $etag,

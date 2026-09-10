@@ -18,8 +18,7 @@ final readonly class CloudflareAnalyticsService
         private CloudflareAnalyticsConfig $config,
         private AnalyticsCache $cache,
         private LoggerInterface $logger,
-    ) {
-    }
+    ) {}
 
     /** @return array<string, mixed> */
     public function dashboard(string $requestedRange): array
@@ -39,8 +38,34 @@ final readonly class CloudflareAnalyticsService
             return $cached;
         }
 
+        $stale = $this->cache->readStale($cacheKey);
+        if ($stale !== null) {
+            $stale['cache'] = 'stale';
+            $stale['warning'] = 'Dane z Cloudflare są chwilowo niedostępne. Pokazujemy ostatnią zapisane dane z cache.';
+            return $stale;
+        }
+
+        $result = $this->emptyResult($range, 'empty');
+        $result['warning'] = 'Brak danych w cache. Uruchom cron z komendy php bin/cms cloudflare:analytics:refresh.';
+
+        return $result;
+    }
+
+    /** @return array<string, mixed> */
+    public function refresh(string $requestedRange, bool $allowCacheFallback = false): array
+    {
+        $range = \array_key_exists($requestedRange, self::RANGES) ? $requestedRange : '7d';
+        if (!$this->config->enabled) {
+            return $this->emptyResult($range, 'disabled');
+        }
+        if ($this->config->missing() !== []) {
+            return $this->emptyResult($range, 'unconfigured');
+        }
+
+        $cacheKey = "cloudflare-{$range}";
         try {
             $result = $this->fetch($range);
+            $result['cache'] = 'fresh';
             $this->cache->write($cacheKey, $result);
             return $result;
         } catch (Throwable $exception) {
@@ -49,11 +74,13 @@ final readonly class CloudflareAnalyticsService
                 'message' => $exception->getMessage(),
                 'range' => $range,
             ]);
-            $stale = $this->cache->readStale($cacheKey);
-            if ($stale !== null) {
-                $stale['cache'] = 'stale';
-                $stale['warning'] = 'Nie udało się odświeżyć danych. Pokazujemy ostatnią zapisaną wersję.';
-                return $stale;
+            if ($allowCacheFallback) {
+                $stale = $this->cache->readStale($cacheKey);
+                if ($stale !== null) {
+                    $stale['cache'] = 'stale';
+                    $stale['warning'] = 'Nie udało się odświeżyć danych. Pokazujemy ostatnią zapisaną wersję.';
+                    return $stale;
+                }
             }
 
             $result = $this->emptyResult($range, 'error');

@@ -17,4 +17,11 @@ Options -Indexes
     Header always set X-Frame-Options "DENY"
     Header always set Permissions-Policy "camera=(), geolocation=(), microphone=()"
     Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" "expr=%{HTTPS} == 'on'"
+
+    # Zwykłe assety: 1 godzina
+    Header always set Cache-Control "public, max-age=3600, must-revalidate" "expr=%{REQUEST_URI} =~ m#^/assets/#"
+
+    # Fingerprintowane assety bloków: 1 rok
+    Header always set Cache-Control "public, max-age=31536000, immutable" "expr=%{REQUEST_URI} =~ m#^/assets/blocks/#"
+
 </IfModule>

@@ -1,0 +1,1025 @@
+schemaVersion: 1
+enabled: true
+layout: default
+slug:
+  pl: api
+  en: api
+title:
+  pl: API - od pierwszego żądania do bezpiecznej integracji
+  en: API - from the first request to a safe integration
+date: "2026-09-09"
+order: 6
+category: api
+excerpt:
+  pl: Kompletny tutorial publicznego API FlatFile CMS - endpointy, lokalizacja, strony, kolekcje, media, nawigacja, konfiguracja, cache warunkowy, błędy, OpenAPI i implementacja klienta.
+  en: A complete FlatFile CMS public API tutorial - endpoints, localization, pages, collections, media, navigation, configuration, conditional caching, errors, OpenAPI and client implementation.
+seo:
+  title:
+    pl: Publiczne API FlatFile CMS - kompletny tutorial integracji
+    en: FlatFile CMS Public API - complete integration tutorial
+  description:
+    pl: Naucz się korzystać z read-only API v1, filtrować kolekcje, obsługiwać ETag i błędy oraz budować klienta na podstawie OpenAPI 3.1.
+    en: Learn to use the read-only v1 API, filter collections, handle ETag and errors, and build a client from OpenAPI 3.1.
+  robots: { index: true, follow: true }
+  openGraph: {}
+  twitter: {}
+  jsonLd:
+    "@context": https://schema.org
+    "@type": TechArticle
+    headline: FlatFile CMS Public API - from the first request to a safe integration
+    dateModified: "2026-09-09"
+blocks:
+  - id: 01a06d50-6006-7601-8601-000000000001
+    type: docs-hero
+    enabled: true
+    data:
+      breadcrumb: { pl: Dokumentacja / 06 / API, en: Documentation / 06 / API }
+      title:
+        pl: API - od pierwszego żądania do bezpiecznej integracji
+        en: API - from the first request to a safe integration
+      lead:
+        pl: Zbuduj klienta headless, który pobiera lokalizowane strony i kolekcje, korzysta z gotowych adresów mediów, respektuje kontrakty zapytań i oszczędza transfer dzięki rewalidacji HTTP.
+        en: Build a headless client that fetches localized pages and collections, uses ready media URLs, respects query contracts and saves bandwidth through HTTP revalidation.
+      level: średniozaawansowany
+      reading_time: { pl: około 45 minut, en: about 45 minutes }
+      updated: "2026-09-09"
+      topics:
+        - label: { pl: REST, en: REST }
+        - label: { pl: JSON, en: JSON }
+        - label: { pl: OpenAPI 3.1, en: OpenAPI 3.1 }
+        - label: { pl: Kolekcje, en: Collections }
+        - label: { pl: ETag, en: ETag }
+        - label: { pl: Obsługa błędów, en: Error handling }
+  - id: 01a06d50-6006-7602-8602-000000000002
+    type: docs-toc
+    enabled: true
+    data:
+      title: { pl: Mapa integracji, en: Integration map }
+      intro:
+        pl: Zaczniemy od granic API i wyboru locale, następnie przejdziemy przez wszystkie zasoby, cache, błędy, formalny kontrakt OpenAPI i produkcyjnego klienta.
+        en: We start with API boundaries and locale selection, then cover every resource, caching, errors, the formal OpenAPI contract and a production client.
+      items:
+        - number: "01"
+          title: { pl: Kontrakt API, en: API contract }
+          description:
+            {
+              pl: "Read-only, wersjonowanie i format JSON.",
+              en: "Read-only behavior, versioning and JSON.",
+            }
+          url:
+            {
+              pl: /pl/dokumentacja/api#kontrakt-api,
+              en: /en/documentation/api#kontrakt-api,
+            }
+        - number: "02"
+          title: { pl: Strony, en: Pages }
+          description:
+            {
+              pl: "Homepage, zagnieżdżone trasy, bloki i SEO.",
+              en: "Homepage, nested routes, blocks and SEO.",
+            }
+          url:
+            {
+              pl: /pl/dokumentacja/api#strony-api,
+              en: /en/documentation/api#strony-api,
+            }
+        - number: "03"
+          title: { pl: Kolekcje, en: Collections }
+          description:
+            {
+              pl: "Filtry, sortowanie, paginacja i atrybuty.",
+              en: "Filters, sorting, pagination and attributes.",
+            }
+          url:
+            {
+              pl: /pl/dokumentacja/api#kolekcje-api,
+              en: /en/documentation/api#kolekcje-api,
+            }
+        - number: "04"
+          title: { pl: Nawigacja i config, en: Navigation and config }
+          description:
+            {
+              pl: Publiczne projekcje ustawień witryny.,
+              en: Public projections of website settings.,
+            }
+          url:
+            {
+              pl: /pl/dokumentacja/api#projekcje-api,
+              en: /en/documentation/api#projekcje-api,
+            }
+        - number: "05"
+          title: { pl: Cache warunkowy, en: Conditional cache }
+          description:
+            {
+              pl: "HEAD, ETag, Last-Modified i 304.",
+              en: "HEAD, ETag, Last-Modified and 304.",
+            }
+          url:
+            {
+              pl: /pl/dokumentacja/api#cache-api,
+              en: /en/documentation/api#cache-api,
+            }
+        - number: "06"
+          title: { pl: Błędy, en: Errors }
+          description:
+            {
+              pl: Stabilne kody i decyzje klienta.,
+              en: Stable codes and client decisions.,
+            }
+          url:
+            {
+              pl: /pl/dokumentacja/api#bledy-api,
+              en: /en/documentation/api#bledy-api,
+            }
+        - number: "07"
+          title: { pl: OpenAPI, en: OpenAPI }
+          description:
+            {
+              pl: Specyfikacja 3.1 i dokumentacja Scalar.,
+              en: 3.1 specification and Scalar documentation.,
+            }
+          url:
+            {
+              pl: /pl/dokumentacja/api#openapi,
+              en: /en/documentation/api#openapi,
+            }
+        - number: "08"
+          title: { pl: Klient produkcyjny, en: Production client }
+          description:
+            {
+              pl: "Timeouty, walidacja i strategia retry.",
+              en: "Timeouts, validation and retry strategy.",
+            }
+          url:
+            {
+              pl: /pl/dokumentacja/api#klient-api,
+              en: /en/documentation/api#klient-api,
+            }
+  - id: 01a06d50-6006-7603-8603-000000000003
+    type: technical-table
+    enabled: true
+    data:
+      eyebrow: { pl: API v1, en: API v1 }
+      title:
+        {
+          pl: Sześć publicznych zasobów pokrywa model headless.,
+          en: Six public resources cover the headless model.,
+        }
+      intro:
+        pl: Wszystkie endpointy treści obsługują GET i HEAD. Ścieżka API nie zawiera prefiksu języka; locale wybiera parametr lang.
+        en: Every content endpoint supports GET and HEAD. API paths contain no language prefix; the lang parameter selects locale.
+      column_1: { pl: Endpoint, en: Endpoint }
+      column_2: { pl: Zasób, en: Resource }
+      column_3: { pl: Parametry, en: Parameters }
+      column_4: { pl: Typowy cel, en: Typical use }
+      rows:
+        - cell_1: { pl: /api/v1/health, en: /api/v1/health }
+          cell_2: { pl: Stan runtime, en: Runtime status }
+          cell_3: { pl: Brak, en: None }
+          cell_4:
+            { pl: Health check i monitoring, en: Health check and monitoring }
+        - cell_1: { pl: /api/v1/pages, en: /api/v1/pages }
+          cell_2: { pl: Homepage, en: Homepage }
+          cell_3: { pl: lang, en: lang }
+          cell_4:
+            { pl: Start aplikacji headless, en: Headless application entry }
+        - cell_1: { pl: "/api/v1/pages/{path}", en: "/api/v1/pages/{path}" }
+          cell_2: { pl: Pojedyncza strona, en: Single page }
+          cell_3: { pl: "path, lang", en: "path, lang" }
+          cell_4: { pl: Widok treści i bloków, en: Content and block view }
+        - cell_1:
+            {
+              pl: "/api/v1/collections/{path}",
+              en: "/api/v1/collections/{path}",
+            }
+          cell_2: { pl: Lista wpisów, en: Entry list }
+          cell_3:
+            {
+              pl: "path, lang, page i filtry",
+              en: "path, lang, page and filters",
+            }
+          cell_4:
+            {
+              pl: "Blog, dokumentacja, katalog",
+              en: "Blog, documentation, catalogue",
+            }
+        - cell_1: { pl: /api/v1/navigation, en: /api/v1/navigation }
+          cell_2: { pl: Wszystkie menu, en: All menus }
+          cell_3: { pl: lang, en: lang }
+          cell_4: { pl: Nawigacja klienta, en: Client navigation }
+        - cell_1: { pl: /api/v1/config, en: /api/v1/config }
+          cell_2: { pl: Publiczna konfiguracja, en: Public configuration }
+          cell_3: { pl: lang, en: lang }
+          cell_4: { pl: Branding i języki, en: Branding and languages }
+  - id: 01a06d50-6006-7604-8604-000000000004
+    type: article-content
+    enabled: true
+    data:
+      anchor: kontrakt-api
+      content:
+        pl: |-
+          ## 1. Zrozum granicę publicznego API
+
+          API v1 jest tylko do odczytu i zwraca JSON kodowany jako UTF-8. Klient nigdy nie czyta content.yml, pagination.yml ani block.yml bezpośrednio. Dzięki temu nie musi implementować parsera YAML, fallbacków tłumaczeń, walidacji kontraktów, routingu ani fingerprintów mediów.
+
+          Prefiks /api/v1 jest częścią kontraktu wersji. Zmiany kompatybilne mogą rozszerzać odpowiedzi, dlatego klient powinien ignorować nieznane pola. Zmiana znaczenia istniejącego pola, jego typu albo usunięcie wymagałaby nowej wersji API.
+
+          API udostępnia wyłącznie zasoby opublikowane. Wyłączona strona jest nierozróżnialna od nieistniejącej i zwraca PAGE_NOT_FOUND. Wyłączone bloki są walidowane podczas wczytywania dokumentu, lecz pomijane w reprezentacji publicznej.
+
+          ## 2. Wybieraj locale jawnie
+
+          Parametr lang jest opcjonalny. Bez niego API używa aktywnego języka domyślnego z config/languages.yml. Wartość musi być stringiem i wskazywać aktywny język; w przeciwnym razie odpowiedź ma status 400 oraz kod LANGUAGE_NOT_AVAILABLE.
+
+          ~~~bash
+          curl --fail-with-body +            --header 'Accept: application/json' +            'https://example.com/api/v1/pages?lang=pl'
+          ~~~
+
+          W przeciwieństwie do strony SSR ścieżka API nie ma prefiksu /pl ani /en. Język wpływa jednak na segmenty path. Polska strona może być dostępna jako pages/oferta?lang=pl, a angielska jako pages/services?lang=en. Pole url w odpowiedzi zawiera już publiczny URL witryny z prefiksem locale, jeśli instalacja jest wielojęzyczna.
+
+          ## 3. Nie pomyl homepage z listą stron
+
+          GET /api/v1/pages celowo zwraca homepage. Nie jest indeksem wszystkich stron. Ewentualny przyszły endpoint listy otrzyma osobną trasę, aby nie zmieniać istniejącego kontraktu.
+
+          Health endpoint zwraca status, nazwę aplikacji i numer etapu. Potwierdza działanie runtime, ale nie zastępuje testu konkretnej strony, konfiguracji ani połączeń zależnych od treści.
+        en: |-
+          ## 1. Understand the public API boundary
+
+          API v1 is read-only and returns UTF-8 JSON. A client never reads content.yml, pagination.yml or block.yml directly. It therefore implements neither YAML parsing, translation fallback, contract validation, routing nor media fingerprints.
+
+          The /api/v1 prefix is part of the version contract. Compatible changes may extend responses, so clients should ignore unknown fields. Changing the meaning or type of an existing field, or removing it, would require a new API version.
+
+          The API exposes published resources only. A disabled page is indistinguishable from an absent one and returns PAGE_NOT_FOUND. Disabled blocks are validated while loading the document but omitted from the public representation.
+
+          ## 2. Select locale explicitly
+
+          The lang parameter is optional. Without it, the API uses the active default language from config/languages.yml. The value must be a string identifying an enabled language; otherwise the response has status 400 and code LANGUAGE_NOT_AVAILABLE.
+
+          ~~~bash
+          curl --fail-with-body +            --header 'Accept: application/json' +            'https://example.com/api/v1/pages?lang=en'
+          ~~~
+
+          Unlike an SSR route, the API path contains no /pl or /en prefix. Language still affects path segments. A Polish page may be pages/oferta?lang=pl and its English equivalent pages/services?lang=en. The response url is already the website's public URL with a locale prefix when the installation is multilingual.
+
+          ## 3. Do not confuse the homepage with a page list
+
+          GET /api/v1/pages deliberately returns the homepage. It is not an index of every page. Any future list endpoint gets a separate route to preserve this contract.
+
+          The health endpoint returns status, application name and stage number. It confirms runtime operation but does not replace a probe of a specific page, configuration or content-dependent connection.
+      note:
+        pl: Tożsamość katalogowa strony nie jest parametrem API. path zawsze oznacza lokalizowaną ścieżkę publiczną bez prefiksu języka.
+        en: A page's directory identity is not an API parameter. path always means the localized public path without a language prefix.
+  - id: 01a06d50-6006-7605-8605-000000000005
+    type: code-showcase
+    enabled: true
+    data:
+      eyebrow: { pl: Pierwsze żądanie, en: First request }
+      title:
+        {
+          pl: Pobierz stronę i sprawdź odpowiedź przed użyciem danych.,
+          en: Fetch a page and verify the response before using data.,
+        }
+      description:
+        pl: Minimalny klient sprawdza status, Content-Type oraz podstawowy kształt JSON. Timeout przerywa integrację, która nie może czekać bez końca.
+        en: A minimal client checks status, Content-Type and the basic JSON shape. A timeout stops an integration that cannot wait forever.
+      filename: client.php
+      code: |-
+        <?php
+        declare(strict_types=1);
+
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'GET',
+                'header' => "Accept: application/json\r\n",
+                'timeout' => 5,
+                'ignore_errors' => true,
+            ],
+        ]);
+
+        $body = file_get_contents(
+            'https://example.com/api/v1/pages/services?lang=en',
+            false,
+            $context,
+        );
+
+        if ($body === false) {
+            throw new RuntimeException('API transport failed.');
+        }
+
+        $page = json_decode($body, true, flags: JSON_THROW_ON_ERROR);
+        if (!is_array($page) || !is_string($page['title'] ?? null)) {
+            throw new RuntimeException('Unexpected API response.');
+        }
+      bullets:
+        - text:
+            {
+              pl: W produkcji odczytaj status z klienta HTTP i rozróżnij transport od błędu API.,
+              en: In production read status from the HTTP client and distinguish transport from an API error.,
+            }
+        - text:
+            {
+              pl: Nie wyłączaj walidacji TLS i ustaw krótki timeout połączenia oraz odpowiedzi.,
+              en: Never disable TLS validation; set short connection and response timeouts.,
+            }
+        - text:
+            {
+              pl: "Waliduj pola używane przez aplikację, nawet gdy OpenAPI generuje typy.",
+              en: "Validate fields used by the application even when OpenAPI generates types.",
+            }
+  - id: 01a06d50-6006-7606-8606-000000000006
+    type: article-content
+    enabled: true
+    data:
+      anchor: strony-api
+      content:
+        pl: |-
+          ## 4. Czytaj stronę jako znormalizowany model widoku
+
+          Odpowiedź strony zawiera id, locale, url, layout, title, seo i blocks. Jest to ta sama warstwa prezentacyjna, na której opiera się SSR, ale bez HTML-a. API nie wywołuje strony SSR, a SSR nie odpytuje API przez HTTP - oba adaptery korzystają ze wspólnej PageViewModelFactory.
+
+          ~~~json
+          {
+            "id": "services",
+            "locale": "en",
+            "url": "/en/services",
+            "layout": "default",
+            "title": "Services",
+            "seo": {
+              "title": "Services - Example",
+              "description": "Technical services",
+              "canonical": "https://example.com/en/services",
+              "robots": { "index": true, "follow": true },
+              "openGraph": {},
+              "twitter": {},
+              "jsonLd": {}
+            },
+            "blocks": []
+          }
+          ~~~
+
+          id jest stabilną tożsamością wewnętrzną. url to wyliczona trasa publiczna, layout jest wskazówką prezentacyjną, a title i seo są już zlokalizowane oraz mają zastosowane fallbacki globalne. Klient nie powinien samodzielnie dopisywać suffixu SEO ani konstruować canonicala.
+
+          ## 5. Traktuj blocks jako uporządkowaną sumę typów
+
+          Każdy blok zawiera co najmniej UUID id, string type i mapę data. Kolejność tablicy jest kolejnością redakcyjną. data zależy od definicji danego typu, dlatego klient headless potrzebuje dispatchera po type oraz bezpiecznego fallbacku dla nieznanego komponentu.
+
+          ~~~javascript
+          const renderers = {
+            hero: renderHero,
+            gallery: renderGallery,
+            'article-content': renderArticle
+          };
+
+          for (const block of page.blocks) {
+            const render = renderers[block.type];
+            if (render) render(block.data, block.id);
+          }
+          ~~~
+
+          Nieznany type nie powinien przewracać całej aplikacji. Zaloguj niezgodność kontraktu i pomiń komponent albo pokaż kontrolowany placeholder w środowisku developerskim. Nie renderuj nazw pól jako HTML automatycznie.
+
+          ## 6. Używaj gotowych metadanych mediów
+
+          Pola image i file zachowują lokalny src, ale otrzymują także niezmienny url, mimeType, size oraz fingerprint. Obraz dodatkowo zawiera width i height. Klient używa url bez wyprowadzania ścieżki filesystemu lub własnego hasha.
+
+          URL mediów jest fingerprintowany. Można go długo cache'ować jako immutable, ponieważ zmiana bajtów prowadzi do nowego adresu. width i height pozwalają zarezerwować miejsce w layoucie i ograniczyć CLS przed pobraniem pliku.
+        en: |-
+          ## 4. Read a page as a normalized view model
+
+          A page response contains id, locale, url, layout, title, seo and blocks. This is the same presentation layer used by SSR, but without HTML. API never invokes the SSR page and SSR never requests API over HTTP-both adapters use the shared PageViewModelFactory.
+
+          ~~~json
+          {
+            "id": "services",
+            "locale": "en",
+            "url": "/en/services",
+            "layout": "default",
+            "title": "Services",
+            "seo": {
+              "title": "Services - Example",
+              "description": "Technical services",
+              "canonical": "https://example.com/en/services",
+              "robots": { "index": true, "follow": true },
+              "openGraph": {},
+              "twitter": {},
+              "jsonLd": {}
+            },
+            "blocks": []
+          }
+          ~~~
+
+          id is a stable internal identity. url is the derived public route, layout is a presentation hint, while title and seo are already localized with global fallbacks applied. A client should neither append the SEO suffix nor construct canonical itself.
+
+          ## 5. Treat blocks as an ordered tagged union
+
+          Every block contains at least UUID id, string type and a data map. Array order is editorial order. data depends on the type definition, so a headless client needs a dispatcher by type and a safe fallback for an unknown component.
+
+          ~~~javascript
+          const renderers = {
+            hero: renderHero,
+            gallery: renderGallery,
+            'article-content': renderArticle
+          };
+
+          for (const block of page.blocks) {
+            const render = renderers[block.type];
+            if (render) render(block.data, block.id);
+          }
+          ~~~
+
+          An unknown type should not crash the complete application. Log the contract mismatch and skip the component, or show a controlled development placeholder. Never render field names automatically as HTML.
+
+          ## 6. Use prepared media metadata
+
+          image and file fields retain local src but also receive immutable url, mimeType, size and fingerprint. An image additionally contains width and height. The client uses url without deriving a filesystem path or custom hash.
+
+          Media URLs are fingerprinted. They can be cached as immutable because changing bytes creates a new address. width and height let the layout reserve space and reduce CLS before downloading the file.
+      note:
+        pl: Blocks jest kontraktem danych, nie zdalnym HTML-em. O bezpieczeństwo renderowania w przeglądarce nadal odpowiada klient.
+        en: Blocks is a data contract, not remote HTML. The client remains responsible for safe browser rendering.
+  - id: 01a06d50-6006-7607-8607-000000000007
+    type: article-content
+    enabled: true
+    data:
+      anchor: kolekcje-api
+      content:
+        pl: |-
+          ## 7. Pobieraj kolekcję przez jej publiczną ścieżkę
+
+          Endpoint collections/{path} rozpoznaje lokalizowaną publiczną trasę kolekcji. Odpowiedź ma cztery sekcje: collection, items, pagination oraz filters.
+
+          collection zawiera id, locale, url, layout, title i seo. Każdy item zawiera id, wyliczony url, zlokalizowany title oraz attributes. Atrybuty pochodzą z dodatkowych pól strony, na przykład date, category, excerpt lub order. Pełne blocks wpisu pobierasz dopiero przez endpoint strony wskazany przez url po usunięciu prefiksu locale i przekazaniu właściwego lang.
+
+          ## 8. Traktuj filtr jako część kontraktu kolekcji
+
+          Parametr page musi być dodatnią liczbą całkowitą i numeracja zaczyna się od 1. Tylko filtry zadeklarowane w pagination.yml wpływają na zapytanie. Jeżeli filtr ma allowedValues, wartość spoza listy daje status 400 z INVALID_COLLECTION_QUERY, zamiast cichego pustego wyniku.
+
+          ~~~bash
+          curl --get 'https://example.com/api/v1/collections/blog' +            --data-urlencode 'lang=pl' +            --data-urlencode 'page=2' +            --data-urlencode 'category=tutorial'
+          ~~~
+
+          Odpowiedź pagination podaje page, perPage, totalItems i totalPages. totalPages może być 0 dla pustego zbioru. Nie wyliczaj go ponownie po stronie klienta. filters zawiera faktycznie zastosowane wartości i jest lepszym źródłem stanu interfejsu niż surowy query string.
+
+          ## 9. Rozróżniaj listę od dokumentu
+
+          Element kolekcji jest lekką projekcją do kart i indeksów. Nie zawiera całego modelu strony. To chroni rozmiar odpowiedzi przed mnożeniem ciężkich bloków oraz danych galerii przez perPage.
+
+          Typowy klient pobiera kolekcję dla widoku listy, a następnie pojedynczą stronę po wejściu użytkownika. Prefetch wykonuj selektywnie, z limitem współbieżności i z wykorzystaniem ETag.
+        en: |-
+          ## 7. Fetch a collection by its public path
+
+          collections/{path} resolves a collection's localized public route. The response has four sections: collection, items, pagination and filters.
+
+          collection contains id, locale, url, layout, title and seo. Each item contains id, derived url, localized title and attributes. Attributes come from extra page fields such as date, category, excerpt or order. Fetch an entry's complete blocks through its page endpoint, using the path without locale prefix and passing the correct lang.
+
+          ## 8. Treat filters as part of the collection contract
+
+          page must be a positive integer and numbering starts at 1. Only filters declared in pagination.yml affect the query. When a filter has allowedValues, a value outside the list yields 400 INVALID_COLLECTION_QUERY rather than a silently empty result.
+
+          ~~~bash
+          curl --get 'https://example.com/api/v1/collections/blog' +            --data-urlencode 'lang=en' +            --data-urlencode 'page=2' +            --data-urlencode 'category=tutorial'
+          ~~~
+
+          pagination supplies page, perPage, totalItems and totalPages. totalPages may be 0 for an empty result. Never recalculate it client-side. filters contains the values actually applied and is a better UI-state source than the raw query string.
+
+          ## 9. Distinguish a list item from a document
+
+          A collection item is a lightweight card and index projection. It does not contain the page's complete model. This prevents heavy blocks and galleries from multiplying response size by perPage.
+
+          A typical client fetches the collection for a list view and the individual page after navigation. Prefetch selectively, with a concurrency limit and ETag revalidation.
+      note:
+        pl: Nie zakładaj, że każdy parametr query jest filtrem. Serwer celowo stosuje wyłącznie filtry zadeklarowane przez właściciela kolekcji.
+        en: Do not assume every query parameter is a filter. The server deliberately applies only filters declared by the collection owner.
+  - id: 01a06d50-6006-7608-8608-000000000008
+    type: article-content
+    enabled: true
+    data:
+      anchor: projekcje-api
+      content:
+        pl: |-
+          ## 10. Pobieraj menu z rozstrzygniętymi linkami
+
+          /api/v1/navigation zwraca locale oraz menus. Każde menu jest tablicą zlokalizowanych pozycji, których linki do stron zostały rozwiązane przez PageRouteIndex. Klient nie musi znać tożsamości katalogowej ani slugów przodków.
+
+          Pozycje mogą mieć children i dodatkowe atrybuty kontraktu, na przykład target. Zachowuj kolejność tablic. Gdy budujesz menu dostępne klawiaturą, stan rozwinięcia i ARIA należą do klienta, nie do API.
+
+          ## 11. Używaj tylko publicznej projekcji konfiguracji
+
+          /api/v1/config zwraca locale, defaultLocale, multilingual, languages oraz config. ConfigurationRepository najpierw buduje jawną publicProjection, a dopiero potem lokalizuje ją dla żądanego języka.
+
+          Endpoint nigdy nie zwraca surowego setup.yml. Sekrety, dane SMTP, klucze usług i ścieżki wewnętrzne nie powinny znaleźć się w odpowiedzi nawet wtedy, gdy istnieją w konfiguracji serwera. Publiczna projekcja jest allowlistą, nie filtrem usuwającym kilka znanych sekretów.
+
+          Metadane languages pozwalają zbudować przełącznik języka globalnego. Dla przełączania bieżącej strony używaj jednak adresów wynikających z routingu treści; sam kod locale nie wystarcza, gdy slugi różnią się między językami.
+
+          ## 12. Nie zakładaj CORS bez sprawdzenia wdrożenia
+
+          Kod aplikacji nie emituje automatycznie Access-Control-Allow-Origin dla publicznego API. Klient działający na tej samej domenie nie potrzebuje CORS. Aplikacja na innej domenie wymaga jawnej, możliwie wąskiej konfiguracji originów na serwerze WWW lub warstwie proxy.
+
+          Nie używaj wildcarda z credentials i nie dodawaj nagłówków autoryzacji do read-only API, które ich nie wymaga. Jeżeli frontend może działać same-origin, jest to prostszy i bezpieczniejszy wariant.
+        en: |-
+          ## 10. Fetch menus with resolved links
+
+          /api/v1/navigation returns locale and menus. Every menu is an array of localized items whose page links have already been resolved through PageRouteIndex. A client need not know directory identities or ancestor slugs.
+
+          Items may have children and extra contract attributes such as target. Preserve array order. When building a keyboard-accessible menu, expansion state and ARIA belong to the client, not the API.
+
+          ## 11. Use only the public configuration projection
+
+          /api/v1/config returns locale, defaultLocale, multilingual, languages and config. ConfigurationRepository first builds an explicit publicProjection and only then localizes it for the requested language.
+
+          The endpoint never returns raw setup.yml. Secrets, SMTP details, service keys and internal paths must not appear even when they exist in server configuration. A public projection is an allowlist, not a filter removing a few known secrets.
+
+          languages metadata can build a global language selector. For switching the current page, however, use addresses derived from content routing; a locale code alone is insufficient when slugs differ between languages.
+
+          ## 12. Never assume CORS without checking deployment
+
+          Application code does not automatically emit Access-Control-Allow-Origin for the public API. A same-domain client needs no CORS. An application on another domain requires an explicit, narrow origin configuration at the web server or proxy layer.
+
+          Never combine a wildcard with credentials and do not add authorization headers to a read-only API that does not require them. A same-origin frontend is simpler and safer whenever possible.
+      note:
+        pl: Publiczne API oznacza publiczny odczyt treści, nie publiczny dostęp do całej konfiguracji instalacji.
+        en: Public API means public content reads, not public access to the installation's complete configuration.
+  - id: 01a06d50-6006-7609-8609-000000000009
+    type: article-content
+    enabled: true
+    data:
+      anchor: cache-api
+      content:
+        pl: |-
+          ## 13. Rewaliduj zamiast pobierać bezwarunkowo
+
+          Udane odpowiedzi treści zawierają ETag, Last-Modified oraz Cache-Control: public, max-age=0, must-revalidate. ETag jest SHA-256 dokładnej reprezentacji JSON zamkniętym w cudzysłowie. Last-Modified to najnowszy czas źródła wpływającego na wynik.
+
+          Przy następnym żądaniu wyślij If-None-Match z zachowanym ETag. Serwer akceptuje tag silny, jego wariant W/ oraz wildcard. Gdy tag pasuje, zwraca 304 z pustym body. Gdy If-None-Match jest obecny, ma pierwszeństwo; niepasujący tag prowadzi do 200 bez oceniania If-Modified-Since.
+
+          ~~~bash
+          curl --include +            --header 'If-None-Match: "0123456789abcdef..."' +            'https://example.com/api/v1/pages?lang=pl'
+          ~~~
+
+          Bez ETag klient może wysłać If-Modified-Since w formacie daty HTTP. Poprawna data nie wcześniejsza niż modifiedAt daje 304. Nie używaj lokalnego czasu urządzenia jako wartości - zachowaj nagłówek otrzymany z serwera.
+
+          ## 14. Wykorzystuj HEAD do taniego odczytu metadanych
+
+          Router rejestruje każdą trasę GET również dla HEAD. Uruchamia ten sam handler, a następnie zwraca identyczny status i nagłówki z pustym body. HEAD potwierdza istnienie zasobu lub pobiera walidatory, lecz po stronie serwera nadal może wymagać zbudowania reprezentacji.
+
+          Nie zakładaj więc, że HEAD jest darmowy obliczeniowo. Jego główną korzyścią jest brak transferu body. Do zwykłej rewalidacji często lepszy jest warunkowy GET, który zwróci 304 albo od razu nowe dane.
+
+          ETag strony zmienia się wraz z bajtami JSON. Last-Modified uwzględnia stronę, definicje użytych bloków, media, indeks tras, języki i konfigurację. Dla kolekcji dochodzi wynik zapytania oraz zasoby wpływające na listę.
+        en: |-
+          ## 13. Revalidate instead of fetching unconditionally
+
+          Successful content responses contain ETag, Last-Modified and Cache-Control: public, max-age=0, must-revalidate. ETag is SHA-256 of the exact JSON representation enclosed in quotes. Last-Modified is the newest source time affecting the result.
+
+          On the next request, send If-None-Match with the stored ETag. The server accepts a strong tag, its W/ variant and wildcard. A match returns 304 with an empty body. When If-None-Match is present it takes precedence; a mismatch yields 200 without evaluating If-Modified-Since.
+
+          ~~~bash
+          curl --include +            --header 'If-None-Match: "0123456789abcdef..."' +            'https://example.com/api/v1/pages?lang=en'
+          ~~~
+
+          Without ETag, a client may send If-Modified-Since as an HTTP date. A valid date not earlier than modifiedAt yields 304. Never use the device's local time-retain the header received from the server.
+
+          ## 14. Use HEAD for inexpensive metadata transfer
+
+          The router registers every GET route for HEAD as well. It executes the same handler, then returns identical status and headers with an empty body. HEAD confirms resource existence or obtains validators, although the server may still have to construct the representation.
+
+          HEAD is therefore not necessarily computationally free. Its main benefit is no body transfer. A conditional GET is often better for normal revalidation because it yields either 304 or the new data immediately.
+
+          A page ETag changes with JSON bytes. Last-Modified tracks the page, used block definitions, media, route index, languages and configuration. A collection additionally tracks query results and resources affecting the list.
+      note:
+        pl: Po 304 zachowaj poprzednie body. Pusta odpowiedź nie oznacza pustego zasobu, lecz potwierdzenie aktualności lokalnej kopii.
+        en: After 304 retain the previous body. An empty response does not mean an empty resource; it validates the local copy.
+  - id: 01a06d50-6006-7610-8610-000000000010
+    type: technical-table
+    enabled: true
+    data:
+      eyebrow: { pl: Kontrakt błędów, en: Error contract }
+      title:
+        {
+          pl: Kod błędu prowadzi decyzję klienta.,
+          en: The error code drives the client decision.,
+        }
+      intro:
+        pl: message jest tekstem dla diagnostyki. Logika programu powinna rozpoznawać stabilne code oraz status HTTP.
+        en: message is diagnostic text. Program logic should recognize stable code and HTTP status.
+      column_1: { pl: Status i code, en: Status and code }
+      column_2: { pl: Znaczenie, en: Meaning }
+      column_3: { pl: Reakcja klienta, en: Client action }
+      column_4: { pl: Retry, en: Retry }
+      rows:
+        - cell_1:
+            { pl: 400 LANGUAGE_NOT_AVAILABLE, en: 400 LANGUAGE_NOT_AVAILABLE }
+          cell_2: { pl: Locale nie jest aktywne, en: Locale is not enabled }
+          cell_3:
+            {
+              pl: Wybierz język z /api/v1/config,
+              en: Select a language from /api/v1/config,
+            }
+          cell_4: { pl: Nie bez zmiany danych, en: Not without changing input }
+        - cell_1:
+            {
+              pl: 400 INVALID_COLLECTION_QUERY,
+              en: 400 INVALID_COLLECTION_QUERY,
+            }
+          cell_2:
+            {
+              pl: "Błędna strona, filtr lub wartość",
+              en: "Invalid page, filter or value",
+            }
+          cell_3:
+            {
+              pl: Popraw query według kontraktu,
+              en: Correct query against the contract,
+            }
+          cell_4: { pl: Nie bez korekty, en: Not without correction }
+        - cell_1: { pl: 404 PAGE_NOT_FOUND, en: 404 PAGE_NOT_FOUND }
+          cell_2:
+            {
+              pl: Strona nie istnieje lub jest wyłączona,
+              en: Page is absent or disabled,
+            }
+          cell_3:
+            {
+              pl: Pokaż not found i usuń cache wpisu,
+              en: Show not found and evict entry cache,
+            }
+          cell_4: { pl: Zwykle nie, en: Usually no }
+        - cell_1: { pl: 404 COLLECTION_NOT_FOUND, en: 404 COLLECTION_NOT_FOUND }
+          cell_2:
+            { pl: Kolekcja nie jest publiczna, en: Collection is not public }
+          cell_3: { pl: Sprawdź lokalizowany path, en: Check localized path }
+          cell_4: { pl: Zwykle nie, en: Usually no }
+        - cell_1: { pl: 404 ROUTE_NOT_FOUND, en: 404 ROUTE_NOT_FOUND }
+          cell_2:
+            { pl: Endpoint API nie istnieje, en: API endpoint does not exist }
+          cell_3:
+            {
+              pl: Popraw wersję lub ścieżkę klienta,
+              en: Correct client version or path,
+            }
+          cell_4: { pl: Nie, en: No }
+        - cell_1: { pl: 405 METHOD_NOT_ALLOWED, en: 405 METHOD_NOT_ALLOWED }
+          cell_2:
+            {
+              pl: Użyto metody innej niż GET lub HEAD,
+              en: Method other than GET or HEAD was used,
+            }
+          cell_3:
+            {
+              pl: Popraw metodę; API jest read-only,
+              en: Correct method; API is read-only,
+            }
+          cell_4: { pl: Nie, en: No }
+        - cell_1:
+            { pl: 500 INTERNAL_SERVER_ERROR, en: 500 INTERNAL_SERVER_ERROR }
+          cell_2: { pl: Błąd serwera lub treści, en: Server or content fault }
+          cell_3:
+            {
+              pl: Pokaż fallback i zapisz correlation context,
+              en: Show fallback and log correlation context,
+            }
+          cell_4: { pl: Ograniczony backoff, en: Bounded backoff }
+  - id: 01a06d50-6006-7611-8611-000000000011
+    type: article-content
+    enabled: true
+    data:
+      anchor: bledy-api
+      content:
+        pl: |-
+          ## 15. Parsuj błędy przed danymi sukcesu
+
+          Błąd ma stabilny kształt z error.code i error.message. W trybie produkcyjnym wyjątek serwera nie ujawnia ścieżek filesystemu ani stack trace. Pole debug może pojawić się wyłącznie przy włączonym debug i nie może stać się zależnością klienta.
+
+          ~~~json
+          {
+            "error": {
+              "code": "PAGE_NOT_FOUND",
+              "message": "Page not found"
+            }
+          }
+          ~~~
+
+          Najpierw sprawdź status, później Content-Type i dopiero potem dekoduj oczekiwany wariant odpowiedzi. Nie próbuj interpretować obiektu error jak strony. message może się zmieniać lub zostać przetłumaczone; switch klienta powinien działać na code.
+
+          Błędy 4xx wynikają zwykle z danych wejściowych i automatyczny retry ich nie naprawi. Dla 500 dopuszczalna jest mała liczba prób z wykładniczym backoffem i jitterem, wyłącznie dla operacji GET/HEAD. Ustal budżet czasu, aby awaria CMS-a nie zablokowała całego frontendu.
+
+          ## 16. Odróżnij błąd transportu od odpowiedzi HTTP
+
+          Timeout, błąd DNS, TLS lub zerwane połączenie nie mają JSON-owego code, ponieważ odpowiedź aplikacji nie dotarła. Loguj te przypadki osobno od statusów 4xx/5xx. Dzięki temu monitoring odróżni problem sieciowy od błędnego path i uszkodzonej treści.
+
+          Jeżeli klient posiada ostatnią poprawną, zrewalidowaną kopię publicznej treści, może użyć jej jako kontrolowanego stale fallbacku. Nie zastępuj nią odpowiedzi 404 bez polityki, bo zasób mógł zostać świadomie wycofany.
+        en: |-
+          ## 15. Parse errors before success data
+
+          An error has a stable shape with error.code and error.message. In production a server exception exposes neither filesystem paths nor a stack trace. debug may appear only with debug enabled and must never become a client dependency.
+
+          ~~~json
+          {
+            "error": {
+              "code": "PAGE_NOT_FOUND",
+              "message": "Page not found"
+            }
+          }
+          ~~~
+
+          Check status first, then Content-Type, and only then decode the expected response variant. Never interpret error as a page. message may change or be translated; client switching should use code.
+
+          A 4xx normally results from input and automatic retry cannot repair it. For 500, allow a small attempt count with exponential backoff and jitter, only for GET/HEAD. Set a time budget so a CMS failure cannot stall the complete frontend.
+
+          ## 16. Distinguish a transport error from an HTTP response
+
+          Timeout, DNS, TLS or connection failure has no JSON code because no application response arrived. Log these separately from 4xx/5xx statuses. Monitoring can then distinguish network failure from an invalid path or broken content.
+
+          If a client holds the last valid, revalidated public representation, it may use it as a controlled stale fallback. Do not substitute it for a 404 without policy because the resource may have been intentionally withdrawn.
+      note:
+        pl: Nigdy nie pokazuj użytkownikowi surowego debug ani całego body błędu 500. Zachowaj szczegóły w kontrolowanym logu integracji.
+        en: Never display raw debug or the complete 500 body to a user. Retain details in a controlled integration log.
+  - id: 01a06d50-6006-7612-8612-000000000012
+    type: article-content
+    enabled: true
+    data:
+      anchor: openapi
+      content:
+        pl: |-
+          ## 17. Traktuj OpenAPI jako wykonywalny kontrakt
+
+          Źródłem specyfikacji jest docs/openapi.yaml w wersji OpenAPI 3.1.0. Endpoint /api/openapi.json parsuje YAML po stronie serwera i zwraca pretty-printed JSON z Content-Type application/vnd.oai.openapi+json;version=3.1;charset=UTF-8.
+
+          OpenApiDocument sprawdza co najmniej obecność openapi, info i paths. ETag specyfikacji jest hashem dokładnego JSON-a, Last-Modified pochodzi z pliku YAML, a zgodny If-None-Match zwraca 304. X-Content-Type-Options: nosniff ogranicza błędną interpretację MIME.
+
+          /api/docs osadza interfejs Scalar wskazujący /api/openapi.json. Strona ma robots noindex, CSP ograniczające źródła, no-referrer i nosniff. Skrypt UI jest pobierany z jsDelivr, więc środowisko z restrykcyjnym egress albo offline nadal może używać samej specyfikacji JSON.
+
+          ## 18. Generuj typy, ale weryfikuj semantykę
+
+          Z OpenAPI można generować DTO, klienta TypeScript, modele Kotlin/Swift lub testy kontraktowe. Wygenerowany kod ogranicza literówki w nazwach i typach, ale nie zastępuje reguł domenowych: kolejności blocks, znaczenia locale, strategii 304 ani bezpiecznego renderowania data.
+
+          Po zmianie endpointu aktualizuj jednocześnie router, kontroler, docs/openapi.yaml, testy i dokumentację opisową. CI powinno parsować specyfikację i porównywać przykładowe odpowiedzi z rzeczywistymi testami integracyjnymi.
+
+          Interaktywny panel dokumentacji jest narzędziem developerskim, nie mechanizmem autoryzacji. Publiczne read-only endpointy nie wymagają tokenu. Jeśli w przyszłości powstanie API zapisu, powinno otrzymać osobny model bezpieczeństwa i nie dziedziczyć tej decyzji automatycznie.
+        en: |-
+          ## 17. Treat OpenAPI as an executable contract
+
+          The specification source is docs/openapi.yaml using OpenAPI 3.1.0. /api/openapi.json parses YAML server-side and returns pretty-printed JSON with Content-Type application/vnd.oai.openapi+json;version=3.1;charset=UTF-8.
+
+          OpenApiDocument verifies at least openapi, info and paths. The specification ETag hashes exact JSON, Last-Modified comes from the YAML file, and matching If-None-Match returns 304. X-Content-Type-Options: nosniff limits incorrect MIME interpretation.
+
+          /api/docs embeds Scalar pointing at /api/openapi.json. The page has robots noindex, a source-restricting CSP, no-referrer and nosniff. Its UI script comes from jsDelivr, so a restricted-egress or offline environment can still consume the JSON specification directly.
+
+          ## 18. Generate types but verify semantics
+
+          OpenAPI can generate DTOs, a TypeScript client, Kotlin/Swift models or contract tests. Generated code reduces mistakes in names and types but cannot replace domain rules: blocks order, locale meaning, 304 strategy or safe rendering of data.
+
+          When changing an endpoint, update router, controller, docs/openapi.yaml, tests and narrative documentation together. CI should parse the specification and compare examples against real integration responses.
+
+          The interactive documentation is a developer tool, not an authorization mechanism. Public read-only endpoints require no token. A future write API should receive a separate security model rather than inheriting this decision automatically.
+      note:
+        pl: OpenAPI opisuje interfejs sieciowy. block.yml pozostaje bardziej szczegółowym kontraktem dynamicznych pól data poszczególnych komponentów.
+        en: OpenAPI describes the network interface. block.yml remains the more detailed contract for each component's dynamic data fields.
+  - id: 01a06d50-6006-7613-8613-000000000013
+    type: article-content
+    enabled: true
+    data:
+      anchor: klient-api
+      content:
+        pl: |-
+          ## 19. Zbuduj klienta warstwowo
+
+          Rozdziel transport HTTP, dekodowanie kontraktu i logikę domenową. Transport odpowiada za base URL, TLS, timeouty, nagłówki, status oraz retry. Dekoder rozpoznaje success i error oraz waliduje podstawowe typy. Repozytorium domenowe mapuje stronę lub kolekcję na potrzeby aplikacji.
+
+          Klucz cache powinien obejmować pełny endpoint, znormalizowane parametry query i wariant locale. Zachowuj razem body, ETag oraz Last-Modified. Po 200 atomowo zastąp cały wpis, po 304 zaktualizuj metadane bez kasowania body, a po nieodwracalnym 404 zastosuj politykę usunięcia.
+
+          Ogranicz maksymalny rozmiar odpowiedzi po stronie klienta, mimo że serwer waliduje treść. Ustaw connect timeout i total timeout. Przekierowania dopuszczaj tylko zgodnie z polityką hostów, a certyfikaty TLS zawsze weryfikuj.
+
+          ## 20. Obserwuj integrację bez wycieku treści
+
+          Loguj metodę, zanonimizowany URL lub nazwę zasobu, status, czas, liczbę bajtów, informację cache hit/304 oraz kod błędu. Nie zapisuj bez ograniczeń całych bloków, treści formularzy ani potencjalnie wrażliwej konfiguracji.
+
+          Mierz osobno latency originu, czas dekodowania i renderowania klienta. Wysoki TTFB wskazuje serwer lub sieć; szybki JSON i wolny interfejs wskazuje kod headless. Procent 304 pokazuje skuteczność rewalidacji, ale zbyt wysoki ruch warunkowy może nadal obciążać origin.
+
+          ## 21. Wdróż test konsumencki
+
+          Dla każdego używanego typu bloku przechowuj fixture minimalną i pełną. Testuj nieznane pola, nieznany type, brak opcjonalnego pola, Unicode, pustą kolekcję, ostatnią stronę paginacji, 304, wszystkie stabilne kody błędów i przełączenie locale z innymi slugami.
+
+          Test smoke po wdrożeniu powinien pobrać health, config, homepage w obu językach, jedną stronę z mediami, kolekcję oraz openapi.json. Następnie powtarza żądanie strony z If-None-Match i oczekuje pustego 304.
+        en: |-
+          ## 19. Build the client in layers
+
+          Separate HTTP transport, contract decoding and domain logic. Transport owns base URL, TLS, timeouts, headers, status and retries. The decoder distinguishes success from error and validates basic types. A domain repository maps a page or collection to application needs.
+
+          A cache key should include the complete endpoint, normalized query parameters and locale variant. Store body, ETag and Last-Modified together. On 200 atomically replace the entry, on 304 update metadata without deleting body, and on a terminal 404 apply the eviction policy.
+
+          Limit maximum response size client-side even though the server validates content. Set connect and total timeouts. Permit redirects only according to host policy and always verify TLS certificates.
+
+          ## 20. Observe integration without leaking content
+
+          Log method, anonymized URL or resource name, status, duration, byte count, cache hit/304 and error code. Do not record complete blocks, form content or potentially sensitive configuration without bounds.
+
+          Measure origin latency, decoding and client rendering separately. High TTFB points to server or network; fast JSON with slow UI points to headless code. The 304 ratio shows revalidation effectiveness, although excessive conditional traffic may still load origin.
+
+          ## 21. Add a consumer contract test
+
+          Keep minimal and complete fixtures for every consumed block type. Test unknown fields, unknown type, absent optional fields, Unicode, empty collection, final pagination page, 304, every stable error code and locale switching with different slugs.
+
+          A post-deployment smoke test should fetch health, config, homepage in both languages, one media page, a collection and openapi.json. It then repeats a page request with If-None-Match and expects a bodyless 304.
+      note:
+        pl: Najbardziej odporny klient nie kopiuje modelu CMS-a w ciemno - jawnie mapuje tylko pola potrzebne aplikacji i toleruje kompatybilne rozszerzenia.
+        en: The most resilient client does not mirror the CMS model blindly-it explicitly maps needed fields and tolerates compatible extensions.
+  - id: 01a06d50-6006-7614-8614-000000000014
+    type: diagnostic-table
+    enabled: true
+    data:
+      anchor: diagnostyka-api
+      eyebrow: { pl: 22 / Diagnostyka, en: 22 / Troubleshooting }
+      title:
+        {
+          pl: "Znajdź pierwszą granicę, na której kontrakt przestaje działać.",
+          en: "Find the first boundary where the contract stops working.",
+        }
+      intro:
+        pl: Sprawdzaj kolejno transport, routing, locale, query, reprezentację, cache i renderowanie klienta. Nie zaczynaj od czyszczenia wszystkich cache.
+        en: Check transport, routing, locale, query, representation, cache and client rendering in order. Do not start by purging every cache.
+      rows:
+        - layer: { pl: Transport, en: Transport }
+          problem: { pl: Brak statusu HTTP i JSON, en: No HTTP status or JSON }
+          cause:
+            {
+              pl: "DNS, TLS, timeout lub blokada sieciowa.",
+              en: "DNS, TLS, timeout or network block.",
+            }
+          check:
+            {
+              pl: "Sprawdź połączenie z originem, certyfikat, timeout i log klienta.",
+              en: "Check origin connectivity, certificate, timeout and client log.",
+            }
+        - layer: { pl: Routing, en: Routing }
+          problem: { pl: ROUTE_NOT_FOUND, en: ROUTE_NOT_FOUND }
+          cause:
+            {
+              pl: Błędna wersja lub nazwa endpointu.,
+              en: Wrong version or endpoint name.,
+            }
+          check:
+            {
+              pl: Porównaj URL z /api/openapi.json; /api/v1/pages to homepage.,
+              en: Compare URL with /api/openapi.json; /api/v1/pages is homepage.,
+            }
+        - layer: { pl: Locale, en: Locale }
+          problem: { pl: LANGUAGE_NOT_AVAILABLE, en: LANGUAGE_NOT_AVAILABLE }
+          cause:
+            {
+              pl: Kod języka nie jest aktywny.,
+              en: Language code is not enabled.,
+            }
+          check:
+            {
+              pl: Pobierz languages z /api/v1/config bez parametru lang.,
+              en: Fetch languages from /api/v1/config without lang.,
+            }
+        - layer: { pl: Strona, en: Page }
+          problem:
+            {
+              pl: PAGE_NOT_FOUND mimo istniejącego katalogu,
+              en: PAGE_NOT_FOUND despite an existing directory,
+            }
+          cause:
+            {
+              pl: "Użyto tożsamości katalogowej, złego slugu locale albo strona jest wyłączona.",
+              en: "Directory identity, wrong locale slug or a disabled page was used.",
+            }
+          check:
+            {
+              pl: Sprawdź publiczny path dla wybranego języka bez prefiksu locale.,
+              en: Check the public path for the selected language without locale prefix.,
+            }
+        - layer: { pl: Kolekcja, en: Collection }
+          problem:
+            { pl: INVALID_COLLECTION_QUERY, en: INVALID_COLLECTION_QUERY }
+          cause:
+            {
+              pl: "page nie jest dodatnie albo filtr narusza allowedValues.",
+              en: "page is not positive or a filter violates allowedValues.",
+            }
+          check:
+            {
+              pl: Porównaj query z pagination.yml i zakoduj wartości URL.,
+              en: Compare query with pagination.yml and URL-encode values.,
+            }
+        - layer: { pl: Cache, en: Cache }
+          problem:
+            {
+              pl: 304 prowadzi do pustego ekranu,
+              en: 304 produces a blank screen,
+            }
+          cause:
+            {
+              pl: Klient potraktował puste body jako nową treść.,
+              en: Client treated the empty body as new content.,
+            }
+          check:
+            {
+              pl: Po 304 użyj zachowanego body powiązanego z wysłanym ETag.,
+              en: After 304 use stored body associated with the sent ETag.,
+            }
+        - layer: { pl: Przeglądarka, en: Browser }
+          problem:
+            {
+              pl: Fetch blokowany mimo odpowiedzi curl,
+              en: Fetch blocked despite a successful curl,
+            }
+          cause:
+            {
+              pl: Brak polityki CORS dla innego originu.,
+              en: No CORS policy for a different origin.,
+            }
+          check:
+            {
+              pl: Sprawdź konsolę i nagłówki; skonfiguruj wąską allowlistę originów.,
+              en: Inspect console and headers; configure a narrow origin allowlist.,
+            }
+        - layer: { pl: Komponent, en: Component }
+          problem:
+            {
+              pl: "JSON działa, lecz bloku nie widać",
+              en: "JSON works but a block is absent",
+            }
+          cause:
+            {
+              pl: Klient nie ma renderera dla type albo blok jest disabled.,
+              en: Client lacks a renderer for type or block is disabled.,
+            }
+          check:
+            {
+              pl: Porównaj type z registry klienta i publiczną tablicą blocks.,
+              en: Compare type with the client registry and public blocks array.,
+            }
+      note:
+        pl: Zapisuj nagłówki odpowiedzi razem ze statusem. Bez ETag, Last-Modified i Content-Type diagnoza cache oraz wariantu odpowiedzi jest niepełna.
+        en: Record response headers with status. Without ETag, Last-Modified and Content-Type, cache and representation diagnosis is incomplete.
+  - id: 01a06d50-6006-7615-8615-000000000015
+    type: article-content
+    enabled: true
+    data:
+      anchor: checklista-api
+      content:
+        pl: |-
+          ## 23. Checklista integracji gotowej do produkcji
+
+          Przed uruchomieniem klienta potwierdź:
+
+          1. base URL używa HTTPS i zaufanego certyfikatu;
+          2. ścieżki API nie zawierają prefiksu locale;
+          3. lang pochodzi z aktywnej listy języków;
+          4. klient rozróżnia transport, success JSON i error JSON;
+          5. switch błędów używa code, nie message;
+          6. każdy używany type bloku ma jawny renderer i fallback;
+          7. tekst jest bezpiecznie renderowany w docelowym frameworku;
+          8. media korzystają z gotowego url, width i height;
+          9. filtry kolekcji są URL-encoded i zgodne z allowlistą;
+          10. cache key uwzględnia endpoint, query oraz locale;
+          11. ETag i body są zapisywane atomowo jako para;
+          12. 304 zachowuje poprzednie body;
+          13. retry dotyczy tylko bezpiecznych błędów przejściowych i ma limit;
+          14. CORS jest skonfigurowany tylko wtedy, gdy naprawdę jest potrzebny;
+          15. klient toleruje dodatkowe pola kompatybilnej wersji;
+          16. testy kontraktowe korzystają z aktualnego openapi.json;
+          17. smoke test obejmuje PL, EN, kolekcję, media, błędy i rewalidację.
+
+          API pozostaje małe, ponieważ udostępnia gotowy model prezentacyjny zamiast szczegółów filesystemu. Klient jest odporny wtedy, gdy respektuje tę granicę, traktuje HTTP jako protokół z semantyką i jawnie mapuje dynamiczne bloki.
+        en: |-
+          ## 23. Production-ready integration checklist
+
+          Before launching a client, confirm that:
+
+          1. base URL uses HTTPS and a trusted certificate;
+          2. API paths contain no locale prefix;
+          3. lang comes from the enabled language list;
+          4. the client distinguishes transport, success JSON and error JSON;
+          5. error switching uses code rather than message;
+          6. every consumed block type has an explicit renderer and fallback;
+          7. text is rendered safely in the target framework;
+          8. media uses prepared url, width and height;
+          9. collection filters are URL-encoded and allowed;
+          10. cache key includes endpoint, query and locale;
+          11. ETag and body are stored atomically as a pair;
+          12. 304 retains the previous body;
+          13. retry covers only safe transient failures and is bounded;
+          14. CORS is configured only when genuinely needed;
+          15. the client tolerates additional compatible-version fields;
+          16. contract tests use the current openapi.json;
+          17. smoke testing covers PL, EN, collection, media, errors and revalidation.
+
+          The API stays small because it exposes a prepared presentation model rather than filesystem details. A client is resilient when it respects that boundary, treats HTTP as a semantic protocol and explicitly maps dynamic blocks.
+      note:
+        pl: Kontrakt sieciowy jest częścią produktu. Wdrażaj zmianę API razem ze specyfikacją, testami i kompatybilnym klientem.
+        en: The network contract is part of the product. Release an API change together with its specification, tests and a compatible client.
+  - id: 01a06d50-6006-7616-8616-000000000016
+    type: call-to-action
+    enabled: true
+    data:
+      eyebrow: { pl: Następny tutorial, en: Next tutorial }
+      title:
+        { pl: Zabezpiecz cały stos CMS-a., en: Secure the complete CMS stack. }
+      description:
+        pl: Kolejny rozdział połączy granice zaufania, walidację wejścia, bezpieczny filesystem, sesje, CSRF, uwierzytelnianie, nagłówki i praktykę wdrożeniową.
+        en: The next chapter combines trust boundaries, input validation, filesystem safety, sessions, CSRF, authentication, headers and deployment practice.
+      button_label: { pl: Przejdź do bezpieczeństwa, en: Continue to security }
+      button_url:
+        { pl: /pl/dokumentacja/bezpieczenstwo, en: /en/documentation/security }

@@ -8,7 +8,15 @@ blocks:
     type: error-message
     enabled: true
     data:
-      title: { pl: Nie udało się wyświetlić strony, en: We could not display the page }
-      content: { pl: To problem po naszej stronie. Spróbuj ponownie później., en: The problem is on our side. Please try again later. }
+      title:
+        {
+          pl: Nie udało się wyświetlić strony,
+          en: We could not display the page,
+        }
+      content:
+        {
+          pl: To problem po naszej stronie. Spróbuj ponownie później.,
+          en: The problem is on our side. Please try again later.,
+        }
       buttonLabel: { pl: Wróć na stronę główną, en: Return to homepage }
       buttonUrl: /

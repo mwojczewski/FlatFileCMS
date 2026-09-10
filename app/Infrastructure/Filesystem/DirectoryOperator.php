@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Infrastructure\Filesystem;
 
+use Closure;
 use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -11,7 +12,10 @@ use SplFileInfo;
 
 final readonly class DirectoryOperator
 {
-    public function __construct(private SafePathResolver $paths) {}
+    public function __construct(
+        private SafePathResolver $paths,
+        private ?Closure $publicCacheInvalidator = null,
+    ) {}
 
     public function create(FilesystemRoot $root, RelativePath $path): void
     {
@@ -27,6 +31,7 @@ final readonly class DirectoryOperator
         if (!mkdir($absolutePath, 0o750)) {
             throw new FilesystemException('Unable to create directory.');
         }
+        $this->invalidate($root);
     }
 
     public function move(FilesystemRoot $root, RelativePath $source, RelativePath $destination): void
@@ -47,6 +52,7 @@ final readonly class DirectoryOperator
         if (!rename($sourcePath, $destinationPath)) {
             throw new FilesystemException('Unable to move directory atomically.');
         }
+        $this->invalidate($root);
     }
 
     public function delete(FilesystemRoot $root, RelativePath $path): void
@@ -76,6 +82,14 @@ final readonly class DirectoryOperator
         }
         if (!rmdir($absolutePath)) {
             throw new FilesystemException('Unable to delete page directory.');
+        }
+        $this->invalidate($root);
+    }
+
+    private function invalidate(FilesystemRoot $root): void
+    {
+        if ($root !== FilesystemRoot::Storage) {
+            $this->publicCacheInvalidator?->__invoke();
         }
     }
 

@@ -212,7 +212,16 @@ const builderList = document.querySelector("[data-builder-list]");
 const orderForm = document.querySelector("[data-order-form]");
 const orderFields = document.querySelector("[data-order-fields]");
 const orderSubmit = document.querySelector("[data-order-submit]");
+const orderMessage = document.querySelector("[data-order-message]");
+let mutationQueue = Promise.resolve();
+let orderSaveTimer = null;
+let orderDirty = false;
 let dragged = null;
+let dragGhost = null;
+let dragPointer = null;
+let autoScrollFrame = null;
+const autoScrollEdge = 120;
+const autoScrollMaximum = 20;
 
 function synchronizeOrder() {
   if (!builderList || !orderFields) {
@@ -236,6 +245,116 @@ function synchronizeOrder() {
   if (orderSubmit instanceof HTMLButtonElement) {
     orderSubmit.disabled = false;
   }
+  if (orderMessage instanceof HTMLElement) {
+    orderMessage.textContent = "Niezapisane zmiany kolejności";
+  }
+  orderDirty = true;
+}
+
+function updateRevision(revision) {
+  if (typeof revision !== "string" || revision === "") return;
+  document.querySelectorAll('input[name="revision"]').forEach((input) => {
+    if (input instanceof HTMLInputElement) input.value = revision;
+  });
+}
+
+function enqueueMutation(callback) {
+  mutationQueue = mutationQueue.then(callback, callback);
+  return mutationQueue;
+}
+
+async function sendMutation(form) {
+  const response = await fetch(form.action, {
+    method: "POST",
+    body: new FormData(form),
+    credentials: "same-origin",
+    headers: { Accept: "application/json" },
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok || payload.saved !== true) {
+    throw new Error(typeof payload.message === "string" ? payload.message : "Nie udało się zapisać zmian.");
+  }
+  updateRevision(payload.revision);
+  return payload;
+}
+
+function persistOrder() {
+  if (!(orderForm instanceof HTMLFormElement) || !orderDirty) return;
+  orderDirty = false;
+  if (orderMessage instanceof HTMLElement) orderMessage.textContent = "Zapisuję kolejność…";
+  enqueueMutation(() => sendMutation(orderForm)).then(() => {
+    if (orderDirty) {
+      persistOrder();
+      return;
+    }
+    if (orderSubmit instanceof HTMLButtonElement) orderSubmit.disabled = true;
+    if (orderMessage instanceof HTMLElement) orderMessage.textContent = "Kolejność zapisana automatycznie";
+    if (liveState instanceof HTMLElement) liveState.textContent = "Wszystkie zmiany zapisane";
+  }).catch(() => {
+    orderDirty = true;
+    if (orderSubmit instanceof HTMLButtonElement) orderSubmit.disabled = false;
+    if (orderMessage instanceof HTMLElement) orderMessage.textContent = "Nie udało się zapisać — spróbuj ponownie";
+  });
+}
+
+function scheduleOrderSave() {
+  if (orderSaveTimer !== null) window.clearTimeout(orderSaveTimer);
+  orderSaveTimer = window.setTimeout(persistOrder, 350);
+}
+
+function moveDraggedAt(clientX, clientY) {
+  if (!(dragged instanceof Element) || !builderList) {
+    return;
+  }
+  const pointerTarget = document.elementFromPoint(clientX, clientY);
+  const target = pointerTarget?.closest("[data-block-id]");
+  if (!(target instanceof Element) || target === dragged || !builderList.contains(target)) {
+    return;
+  }
+  const rectangle = target.getBoundingClientRect();
+  const after = clientY > rectangle.top + rectangle.height / 2;
+  const reference = after ? target.nextSibling : target;
+  if (reference === dragged || (!after && dragged.nextSibling === target)) {
+    return;
+  }
+  builderList.insertBefore(dragged, reference);
+  synchronizeOrder();
+}
+
+function autoScrollVelocity(clientY) {
+  const edge = Math.min(autoScrollEdge, window.innerHeight * 0.22);
+  if (clientY < edge) {
+    return -autoScrollMaximum * (1 - Math.max(0, clientY) / edge);
+  }
+  const lowerEdge = window.innerHeight - edge;
+  if (clientY > lowerEdge) {
+    return autoScrollMaximum * (1 - Math.max(0, window.innerHeight - clientY) / edge);
+  }
+  return 0;
+}
+
+function autoScrollBuilder() {
+  autoScrollFrame = null;
+  if (!(dragged instanceof Element) || dragPointer === null) {
+    return;
+  }
+  const velocity = autoScrollVelocity(dragPointer.y);
+  if (velocity === 0) {
+    return;
+  }
+  window.scrollBy(0, velocity);
+  moveDraggedAt(dragPointer.x, dragPointer.y);
+  autoScrollFrame = window.requestAnimationFrame(autoScrollBuilder);
+}
+
+function updateDragPointer(event) {
+  if (!(dragged instanceof Element)) {
+    return;
+  }
+  dragPointer = { x: event.clientX, y: event.clientY };
+  if (autoScrollFrame === null && autoScrollVelocity(event.clientY) !== 0) {
+    autoScrollFrame = window.requestAnimationFrame(autoScrollBuilder);
+  }
 }
 
 builderList?.addEventListener("dragstart", (event) => {
@@ -244,36 +363,306 @@ builderList?.addEventListener("dragstart", (event) => {
   }
   dragged = event.target.closest("[data-block-id]");
   dragged?.classList.add("dragging");
+  if (dragged instanceof HTMLElement && event.dataTransfer) {
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", dragged.dataset.blockId ?? "");
+    dragGhost = dragged.querySelector(".builder-preview-toolbar")?.cloneNode(true);
+    if (dragGhost instanceof HTMLElement) {
+      dragGhost.className = "builder-drag-ghost";
+      document.body.append(dragGhost);
+      event.dataTransfer.setDragImage(dragGhost, 28, 20);
+    }
+  }
 });
 
 builderList?.addEventListener("dragend", () => {
   dragged?.classList.remove("dragging");
+  builderList?.classList.remove("is-sorting");
+  dragGhost?.remove();
+  dragGhost = null;
   dragged = null;
+  dragPointer = null;
+  if (autoScrollFrame !== null) {
+    window.cancelAnimationFrame(autoScrollFrame);
+    autoScrollFrame = null;
+  }
+  if (orderDirty) scheduleOrderSave();
 });
 
 builderList?.addEventListener("dragover", (event) => {
   event.preventDefault();
+  updateDragPointer(event);
   if (!(dragged instanceof Element) || !(event.target instanceof Element)) {
     return;
   }
-  const target = event.target.closest("[data-block-id]");
-  if (!(target instanceof Element) || target === dragged || !builderList) {
-    return;
-  }
-  const rectangle = target.getBoundingClientRect();
-  const after = event.clientY > rectangle.top + rectangle.height / 2;
-  builderList.insertBefore(dragged, after ? target.nextSibling : target);
+  // Safari cancels native dragging when the source changes its height during
+  // dragstart. Collapse previews only after the browser has started the drag.
+  builderList.classList.add("is-sorting");
+  moveDraggedAt(event.clientX, event.clientY);
+});
+
+document.addEventListener("dragover", updateDragPointer, { passive: true });
+
+orderForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
   synchronizeOrder();
+  persistOrder();
 });
 
-orderForm?.addEventListener("submit", synchronizeOrder);
+const inspector = document.querySelector("[data-block-inspector]");
+const inspectorTitle = document.querySelector("[data-inspector-title]");
+const liveState = document.querySelector("[data-editor-live-state]");
+const previewTimers = new WeakMap();
+const previewRequests = new WeakMap();
 
-document.addEventListener("submit", (event) => {
-  if (!(event.target instanceof HTMLFormElement)) {
+function selectBlock(id) {
+  if (!id) return;
+  document.querySelectorAll("[data-block-select]").forEach((item) => {
+    item.classList.toggle("selected", item.getAttribute("data-block-select") === id);
+  });
+  let selectedForm = null;
+  document.querySelectorAll("[data-block-form]").forEach((form) => {
+    const selected = form.getAttribute("data-block-form") === id;
+    form.hidden = !selected;
+    if (selected) selectedForm = form;
+  });
+  if (selectedForm instanceof HTMLFormElement) {
+    if (inspectorTitle instanceof HTMLElement) {
+      inspectorTitle.textContent = selectedForm.dataset.blockName ?? "Blok";
+    }
+    inspector?.classList.add("is-open");
+    if (!selectedForm.querySelector("[data-markdown-editor]")) {
+      inspector?.classList.remove("is-expanded");
+    }
+    window.CmsMarkdownEditors?.refresh(selectedForm);
+  }
+}
+
+function setInspectorExpanded(expanded) {
+  if (!(inspector instanceof HTMLElement)) return;
+  inspector.classList.toggle("is-expanded", expanded);
+  const button = inspector.querySelector("[data-inspector-expand]");
+  if (button instanceof HTMLButtonElement) {
+    button.setAttribute("aria-label", expanded ? "Zwęź panel edycji" : "Rozszerz panel edycji");
+    button.title = expanded ? "Zwęź panel edycji" : "Rozszerz panel edycji";
+    button.setAttribute("aria-pressed", String(expanded));
+  }
+  const visibleForm = inspector.querySelector("[data-block-form]:not([hidden])");
+  if (visibleForm instanceof HTMLElement) {
+    window.requestAnimationFrame(() =>
+      window.CmsMarkdownEditors?.refresh(visibleForm),
+    );
+  }
+}
+
+function resizePreviewFrame(frame) {
+  if (!(frame instanceof HTMLIFrameElement)) return;
+  try {
+    const body = frame.contentDocument?.body;
+    const root = frame.contentDocument?.documentElement;
+    const stage = frame.closest("[data-preview-stage]");
+    if (!body || !root || !(stage instanceof HTMLElement)) return;
+    const virtualWidth = 1440;
+    const scale = Math.min(1, stage.clientWidth / virtualWidth);
+    frame.style.width = `${virtualWidth}px`;
+    frame.style.transform = `scale(${scale})`;
+    const contentHeight = Math.max(body.scrollHeight, root.scrollHeight, 96);
+    frame.style.height = `${contentHeight}px`;
+    stage.style.height = `${Math.ceil(contentHeight * scale)}px`;
+    body.addEventListener("click", () => selectBlock(frame.dataset.previewFrame));
+    body.querySelectorAll("a, button, input, textarea, select").forEach((element) => {
+      element.addEventListener("click", (event) => event.preventDefault());
+    });
+  } catch {
+    frame.style.height = "240px";
+  }
+}
+
+document.querySelectorAll("[data-preview-frame]").forEach((frame) => {
+  if (!(frame instanceof HTMLIFrameElement)) return;
+  frame.addEventListener("load", () => {
+    resizePreviewFrame(frame);
+    window.setTimeout(() => resizePreviewFrame(frame), 250);
+    window.setTimeout(() => resizePreviewFrame(frame), 900);
+  });
+  if (frame.contentDocument?.readyState === "complete") resizePreviewFrame(frame);
+});
+
+if (typeof ResizeObserver === "function") {
+  const previewResizeObserver = new ResizeObserver((entries) => {
+    entries.forEach((entry) => {
+      const frame = entry.target.querySelector("[data-preview-frame]");
+      if (frame instanceof HTMLIFrameElement) resizePreviewFrame(frame);
+    });
+  });
+  document.querySelectorAll("[data-preview-stage]").forEach((stage) =>
+    previewResizeObserver.observe(stage),
+  );
+}
+
+document.addEventListener("click", (event) => {
+  if (!(event.target instanceof Element)) return;
+  const edit = event.target.closest("[data-block-edit]");
+  if (edit instanceof HTMLButtonElement) {
+    selectBlock(edit.dataset.blockEdit);
     return;
   }
-  const message = event.target.dataset.confirm;
-  if (message && !window.confirm(message)) {
-    event.preventDefault();
+  const move = event.target.closest("[data-block-move]");
+  if (move instanceof HTMLButtonElement) {
+    const item = move.closest("[data-block-id]");
+    const direction = Number.parseInt(move.dataset.blockMove ?? "0", 10);
+    if (item instanceof HTMLElement && builderList) {
+      const sibling = direction < 0 ? item.previousElementSibling : item.nextElementSibling;
+      if (sibling instanceof HTMLElement) {
+        if (direction < 0) builderList.insertBefore(item, sibling);
+        else builderList.insertBefore(sibling, item);
+        synchronizeOrder();
+        scheduleOrderSave();
+        item.focus({ preventScroll: true });
+      }
+    }
+    return;
+  }
+  const inspectorTab = event.target.closest("[data-inspector-tab]");
+  if (inspectorTab instanceof HTMLButtonElement) {
+    const form = inspectorTab.closest("[data-block-form]");
+    const panel = inspectorTab.dataset.inspectorTab;
+    form?.querySelectorAll("[data-inspector-tab]").forEach((tab) => {
+      const selected = tab === inspectorTab;
+      tab.classList.toggle("active", selected);
+      tab.setAttribute("aria-selected", String(selected));
+    });
+    form?.querySelectorAll("[data-block-panel-fields]").forEach((fields) => {
+      fields.hidden = fields.getAttribute("data-block-panel-fields") !== panel;
+    });
+    window.CmsMarkdownEditors?.refresh(form);
+    return;
+  }
+  const item = event.target.closest("[data-block-select]");
+  if (item instanceof HTMLElement && !event.target.closest("form, button, a")) {
+    selectBlock(item.dataset.blockSelect);
+  }
+  if (event.target.closest("[data-inspector-close]")) {
+    if (inspector?.classList.contains("is-expanded")) {
+      setInspectorExpanded(false);
+    } else {
+      inspector?.classList.remove("is-open");
+    }
+    return;
+  }
+  if (event.target.closest("[data-inspector-expand]")) {
+    setInspectorExpanded(!inspector?.classList.contains("is-expanded"));
   }
 });
+
+inspector?.addEventListener("focusin", (event) => {
+  if (!(event.target instanceof Element)) return;
+  if (event.target.closest(".EasyMDEContainer") || event.target.matches("textarea[data-markdown-editor]")) {
+    setInspectorExpanded(true);
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && inspector?.classList.contains("is-expanded")) {
+    setInspectorExpanded(false);
+  }
+});
+
+async function refreshBlockPreview(form) {
+  const id = form.dataset.blockForm;
+  const frame = id
+    ? document.querySelector(`[data-preview-frame="${CSS.escape(id)}"]`)
+    : null;
+  const status = form.querySelector("[data-block-preview-status]");
+  if (!(frame instanceof HTMLIFrameElement)) return;
+
+  previewRequests.get(form)?.abort();
+  const controller = new AbortController();
+  previewRequests.set(form, controller);
+  if (status instanceof HTMLElement) status.textContent = "Aktualizuję podgląd…";
+  if (liveState instanceof HTMLElement) liveState.textContent = "Aktualizuję podgląd…";
+
+  try {
+    const response = await fetch("/admin/pages/builder/render-preview", {
+      method: "POST",
+      body: new FormData(form),
+      credentials: "same-origin",
+      headers: { Accept: "application/json" },
+      signal: controller.signal,
+    });
+    const payload = await response.json();
+    if (!response.ok || typeof payload.preview !== "string") {
+      throw new Error("Preview validation failed.");
+    }
+    frame.srcdoc = payload.preview;
+    if (status instanceof HTMLElement) status.textContent = "Podgląd aktualny";
+    if (liveState instanceof HTMLElement) liveState.textContent = "Niezapisane zmiany";
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") return;
+    if (status instanceof HTMLElement) status.textContent = "Uzupełnij poprawnie pola";
+    if (liveState instanceof HTMLElement) liveState.textContent = "Podgląd czeka na poprawne dane";
+  }
+}
+
+document.querySelectorAll("[data-block-form]").forEach((form) => {
+  if (!(form instanceof HTMLFormElement)) return;
+  const schedule = () => {
+    const current = previewTimers.get(form);
+    if (current) window.clearTimeout(current);
+    previewTimers.set(form, window.setTimeout(() => refreshBlockPreview(form), 350));
+  };
+  form.addEventListener("input", schedule);
+  form.addEventListener("change", schedule);
+  form.addEventListener("cms:content-added", schedule);
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const status = form.querySelector("[data-block-preview-status]");
+    if (status instanceof HTMLElement) status.textContent = "Zapisuję…";
+    enqueueMutation(() => sendMutation(form)).then(() => {
+      if (status instanceof HTMLElement) status.textContent = "Blok zapisany";
+      if (liveState instanceof HTMLElement) liveState.textContent = "Wszystkie zmiany zapisane";
+    }).catch(() => {
+      if (status instanceof HTMLElement) status.textContent = "Błąd zapisu — sprawdź pola";
+      if (liveState instanceof HTMLElement) liveState.textContent = "Nie udało się zapisać zmian";
+    });
+  });
+  const visibility = form.querySelector("[data-block-visibility]");
+  if (visibility instanceof HTMLInputElement) {
+    visibility.addEventListener("change", () => {
+      const item = document.querySelector(`[data-block-id="${CSS.escape(form.dataset.blockForm ?? "")}"]`);
+      const label = form.querySelector("[data-block-visibility-label]");
+      const previous = !visibility.checked;
+      const toggleForm = item?.querySelector("form[action$='/toggle']");
+      if (!(toggleForm instanceof HTMLFormElement)) return;
+      visibility.disabled = true;
+      enqueueMutation(() => sendMutation(toggleForm)).then(() => {
+        const enabled = visibility.checked;
+        item?.classList.toggle("disabled", !enabled);
+        const badge = item?.querySelector(".block-visibility");
+        badge?.classList.toggle("is-visible", enabled);
+        if (badge instanceof HTMLElement) badge.lastChild.textContent = enabled ? "Widoczny" : "Ukryty";
+        if (label instanceof HTMLElement) label.textContent = enabled ? "Blok widoczny" : "Blok ukryty";
+        if (liveState instanceof HTMLElement) liveState.textContent = "Wszystkie zmiany zapisane";
+      }).catch(() => {
+        visibility.checked = previous;
+        if (liveState instanceof HTMLElement) liveState.textContent = "Nie udało się zmienić widoczności";
+      }).finally(() => { visibility.disabled = false; });
+    });
+  }
+});
+
+const blockSearch = document.querySelector("[data-block-search]");
+if (blockSearch instanceof HTMLInputElement) {
+  const cards = [...document.querySelectorAll("[data-block-card]")];
+  const empty = document.querySelector("[data-block-library-empty]");
+  blockSearch.addEventListener("input", () => {
+    const query = blockSearch.value.trim().toLocaleLowerCase("pl");
+    let visible = 0;
+    cards.forEach((card) => {
+      const matches = (card.dataset.blockSearchValue ?? "").includes(query);
+      card.hidden = !matches;
+      visible += matches ? 1 : 0;
+    });
+    if (empty instanceof HTMLElement) empty.hidden = visible !== 0;
+  });
+}

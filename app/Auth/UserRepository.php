@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FlatFileCms\Auth;
 
 use DateTimeImmutable;
+use FlatFileCms\Support\UuidV7;
 use PDO;
 use PDOException;
 
@@ -12,16 +13,26 @@ final readonly class UserRepository
 {
     public function __construct(private PDO $database) {}
 
-    public function create(string $email, string $passwordHash, Role $role): User
-    {
+    public function create(
+        string $email,
+        string $passwordHash,
+        Role $role,
+        string $firstName = '',
+        string $lastName = '',
+    ): User {
         $email = $this->normalizeEmail($email);
+        $firstName = $this->normalizeName($firstName);
+        $lastName = $this->normalizeName($lastName);
         $now = (new DateTimeImmutable())->format(DATE_ATOM);
         $handle = random_bytes(32);
         $statement = $this->database->prepare(<<<'SQL'
-INSERT INTO users (email, password_hash, role, enabled, webauthn_user_handle, created_at, updated_at, password_changed_at)
-VALUES (:email, :password_hash, :role, 1, :handle, :created_at, :updated_at, :password_changed_at)
+INSERT INTO users (public_id, email, first_name, last_name, password_hash, role, enabled, webauthn_user_handle, created_at, updated_at, password_changed_at)
+VALUES (:public_id, :email, :first_name, :last_name, :password_hash, :role, 1, :handle, :created_at, :updated_at, :password_changed_at)
 SQL);
+        $statement->bindValue(':public_id', UuidV7::generate());
         $statement->bindValue(':email', $email);
+        $statement->bindValue(':first_name', $firstName);
+        $statement->bindValue(':last_name', $lastName);
         $statement->bindValue(':password_hash', $passwordHash);
         $statement->bindValue(':role', $role->value);
         $statement->bindValue(':handle', $handle, PDO::PARAM_LOB);
@@ -68,6 +79,28 @@ SQL);
         return \is_array($row) ? $this->hydrate($row) : null;
     }
 
+    public function getByPublicId(string $publicId): User
+    {
+        $statement = $this->database->prepare('SELECT * FROM users WHERE public_id = :public_id');
+        $statement->execute(['public_id' => $publicId]);
+        $row = $statement->fetch();
+        if (!\is_array($row)) {
+            throw new UserNotFoundException('User not found.');
+        }
+
+        return $this->hydrate($row);
+    }
+
+    public function getVisibleByPublicId(string $publicId, User $actor): User
+    {
+        $user = $this->getByPublicId($publicId);
+        if ($actor->role() === Role::Admin && $user->role() === Role::Superadmin) {
+            throw new UserNotFoundException('User not found.');
+        }
+
+        return $user;
+    }
+
     /** @return list<User> */
     public function visibleTo(User $actor): array
     {
@@ -108,15 +141,24 @@ SQL);
         $statement->execute(['hash' => $passwordHash, 'changed' => $now, 'updated' => $now, 'id' => $user->id()]);
     }
 
-    public function update(User $user, string $email, bool $enabled): void
-    {
+    public function update(
+        User $user,
+        string $email,
+        bool $enabled,
+        ?string $firstName = null,
+        ?string $lastName = null,
+    ): void {
         $email = $this->normalizeEmail($email);
+        $firstName = $this->normalizeName($firstName ?? $user->firstName());
+        $lastName = $this->normalizeName($lastName ?? $user->lastName());
         $statement = $this->database->prepare(<<<'SQL'
-UPDATE users SET email = :email, enabled = :enabled, updated_at = :updated WHERE id = :id
+UPDATE users SET email = :email, first_name = :first_name, last_name = :last_name, enabled = :enabled, updated_at = :updated WHERE id = :id
 SQL);
         try {
             $statement->execute([
                 'email' => $email,
+                'first_name' => $firstName,
+                'last_name' => $lastName,
                 'enabled' => $enabled ? 1 : 0,
                 'updated' => (new DateTimeImmutable())->format(DATE_ATOM),
                 'id' => $user->id(),
@@ -144,12 +186,18 @@ SQL);
         $role = $row['role'] ?? null;
         $enabled = $row['enabled'] ?? null;
         $handle = $row['webauthn_user_handle'] ?? null;
-        if (!\is_int($id) || !\is_string($email) || !\is_string($hash) || !\is_string($role)
-            || !\is_int($enabled) || !\is_string($handle)) {
+        $firstName = $row['first_name'] ?? '';
+        $lastName = $row['last_name'] ?? '';
+        $publicId = $row['public_id'] ?? '';
+        if (
+            !\is_int($id) || !\is_string($email) || !\is_string($hash) || !\is_string($role)
+            || !\is_int($enabled) || !\is_string($handle) || !\is_string($firstName) || !\is_string($lastName)
+            || !\is_string($publicId) || !UuidV7::isValid($publicId)
+        ) {
             throw new AuthenticationException('Invalid user record.');
         }
 
-        return new User($id, $email, $hash, Role::from($role), $enabled === 1, $handle);
+        return new User($id, $email, $hash, Role::from($role), $enabled === 1, $handle, $firstName, $lastName, $publicId);
     }
 
     private function normalizeEmail(string $email): string
@@ -160,5 +208,15 @@ SQL);
         }
 
         return $email;
+    }
+
+    private function normalizeName(string $name): string
+    {
+        $name = trim(preg_replace('/\s+/u', ' ', $name) ?? $name);
+        if (mb_strlen($name) > 100 || preg_match('/[\x00-\x1F\x7F]/u', $name) === 1) {
+            throw new AuthenticationException('Name is invalid.');
+        }
+
+        return $name;
     }
 }

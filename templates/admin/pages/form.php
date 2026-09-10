@@ -6,7 +6,8 @@ $strings = static function (mixed $value) use ($mapping): array {
     foreach ($mapping($value) as $key => $item)
         if (is_string($key) && is_string($item))
             $result[$key] = $item;
-    return $result; };
+    return $result;
+};
 $homepage = $identity?->isHomepage() ?? false;
 $currentIdentity = $identity?->value() ?? $identityPrefix;
 $enabled = ($data['enabled'] ?? true) === true;
@@ -21,7 +22,21 @@ $canonical = is_string($seo['canonical'] ?? null) ? $seo['canonical'] : '';
 $revision = $editable?->revision()->value();
 $creating = $editable === null;
 ?>
-<form class="stack crud-form" method="post" action="<?= $escape($action) ?>" <?= $creating ? ' data-canonical-suggest data-site-url="' . $escape($siteUrl) . '" data-canonical-base-path="' . $escape($canonicalBasePath) . '"' : '' ?>>
+<div class="form-page-header">
+    <div>
+        <p class="eyebrow"><?= $creating ? 'Nowa zawartość' : 'Ustawienia strony' ?></p>
+        <h2><?= $creating ? 'Utwórz stronę' : $escape($titleValues[$languages->default()] ?? $currentIdentity) ?></h2>
+        <p class="lead">
+            <?= $creating ? 'Zdefiniuj adres, tłumaczenia i widoczność nowej strony.' : 'Edytujesz metadane i ustawienia publikacji strony.' ?>
+        </p>
+    </div>
+    <div class="form-page-actions"><a class="button secondary" href="/admin/pages">Wróć do
+            stron</a><?php if (!$creating): ?><a class="button secondary"
+                href="/admin/media?path=<?= rawurlencode($currentIdentity) ?>">Multimedia</a><a class="button"
+                href="/admin/pages/builder?path=<?= rawurlencode($currentIdentity) ?>">Edytor bloków</a><?php endif; ?>
+    </div>
+</div>
+<form class="stack crud-form editor-form" method="post" action="<?= $escape($action) ?>" <?= $creating ? ' data-canonical-suggest data-site-url="' . $escape($siteUrl) . '" data-canonical-base-path="' . $escape($canonicalBasePath) . '"' : '' ?>>
     <input type="hidden" name="_csrf" value="<?= $escape($csrfToken) ?>"><?php if ($revision !== null): ?><input
             type="hidden" name="revision" value="<?= $escape($revision) ?>"><?php endif; ?>
     <section class="form-section">
@@ -43,7 +58,8 @@ $creating = $editable === null;
             <label>Layout<select name="layout">
                     <option value="">Domyślny z setup.yml</option><?php foreach ($layouts as $layout): ?>
                         <option value="<?= $escape($layout) ?>" <?= $layout === $currentLayout ? ' selected' : '' ?>>
-                            <?= $escape($layout) ?></option><?php endforeach; ?>
+                            <?= $escape($layout) ?>
+                        </option><?php endforeach; ?>
                 </select></label>
             <label class="check toggle-card"><input type="checkbox" name="enabled" value="1" <?= $enabled ? ' checked' : '' ?>><span><strong>Strona dostępna publicznie</strong><small>Wyłączenie ukrywa stronę w publicznym
                         API i renderowaniu HTML.</small></span></label>
@@ -92,8 +108,10 @@ $creating = $editable === null;
                             stronie.</small></span></label></div>
         </fieldset>
     </section>
-    <div class="actions form-actions"><a class="button secondary" href="/admin/pages">Anuluj</a><button
-            type="submit">Zapisz zmiany</button></div>
+    <div class="actions form-actions"><span
+            class="form-actions-context"><?= $creating ? 'Nowa strona nie została jeszcze zapisana' : 'Zmiany dotyczą: ' . $escape($currentIdentity) ?></span><a
+            class="button secondary" href="/admin/pages">Anuluj</a><button
+            type="submit"><?= $creating ? 'Utwórz stronę' : 'Zapisz zmiany' ?></button></div>
 </form>
 <?php if (!$creating && !$homepage && $revision !== null): ?>
     <section class="danger-zone">

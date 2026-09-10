@@ -49,7 +49,7 @@ final readonly class AdminPageController
     {
         $this->requireUser();
         $languages = $this->languages->get();
-        /** @var array<string, array{identity: PageIdentity, title: string, enabled: bool, collection: bool}> $entries */
+        /** @var array<string, array{identity: PageIdentity, title: string, enabled: bool, collection: bool, revision: string, modifiedAt: int}> $entries */
         $entries = [];
         foreach ($this->pages->all($languages) as $page) {
             $entries[$page->identity()->value()] = [
@@ -57,6 +57,8 @@ final readonly class AdminPageController
                 'title' => $page->title($languages->default(), $languages->default()),
                 'enabled' => $page->enabled(),
                 'collection' => false,
+                'revision' => $page->revision()->value(),
+                'modifiedAt' => $page->modifiedAt(),
             ];
         }
         foreach ($this->collections->all($languages) as $collection) {
@@ -65,6 +67,8 @@ final readonly class AdminPageController
                 'title' => $collection->title($languages->default(), $languages->default()),
                 'enabled' => $collection->enabled(),
                 'collection' => true,
+                'revision' => $collection->revision()->value(),
+                'modifiedAt' => $collection->modifiedAt(),
             ];
         }
         uksort($entries, static function (string $left, string $right): int {
@@ -77,7 +81,12 @@ final readonly class AdminPageController
 
             return $left <=> $right;
         });
-        return $this->page('Strony', $this->views->render('pages/index', ['entries' => array_values($entries)]));
+        return $this->page('Strony', $this->views->render('pages/index', [
+            'entries' => array_values($entries),
+            'csrfToken' => $this->csrf->token(),
+            'languageCount' => \count($languages->codes()),
+            'languageCodes' => $languages->codes(),
+        ]));
     }
 
     public function createForm(Request $request): Response
@@ -130,15 +139,12 @@ final readonly class AdminPageController
 
         $languages = $this->languages->get();
 
-        return $this->page('Edycja strony', $this->views->render('pages/edit', [
-            'identity' => $identity,
-            'form' => $this->views->render('pages/form', $this->formData(
-                '/admin/pages/update',
-                $languages,
-                $editable,
-                $identity,
-            )),
-        ]));
+        return $this->page('Edycja strony', $this->views->render('pages/form', $this->formData(
+            '/admin/pages/update',
+            $languages,
+            $editable,
+            $identity,
+        )), pageFormScript: true);
     }
 
     public function update(Request $request): Response

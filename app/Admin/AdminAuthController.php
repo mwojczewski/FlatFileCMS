@@ -130,6 +130,7 @@ final readonly class AdminAuthController
     {
         $user = $this->requireUser();
         return $this->page('Konto', $this->views->render('account/index', [
+            'user' => $user,
             'passwordChanged' => ($request->query()['password_changed'] ?? null) === '1',
             'credentialCount' => \count($this->credentials->forUser($user->id())),
         ]));

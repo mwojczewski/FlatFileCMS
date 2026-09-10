@@ -12,7 +12,9 @@
 .diagnostic-table__heading > p {
   margin: 0;
   color: #0d6348;
-  font: 700 0.65rem ui-monospace, monospace;
+  font:
+    700 0.65rem ui-monospace,
+    monospace;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -49,7 +51,9 @@
 }
 .diagnostic-table__row strong {
   color: #0d6348;
-  font: 700 0.68rem ui-monospace, monospace;
+  font:
+    700 0.68rem ui-monospace,
+    monospace;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -61,14 +65,18 @@
   border-radius: 0.2rem;
   background: #dfe8e4;
   color: #085e40;
-  font: 500 0.86em ui-monospace, monospace;
+  font:
+    500 0.86em ui-monospace,
+    monospace;
 }
 .diagnostic-table__row--head {
   background: #0c1914;
 }
 .diagnostic-table__row--head span {
   color: #c7d5d0;
-  font: 650 0.62rem ui-monospace, monospace;
+  font:
+    650 0.62rem ui-monospace,
+    monospace;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -117,7 +125,9 @@
   .diagnostic-table__row > *::before {
     content: attr(data-label);
     color: #0d6348;
-    font: 700 0.6rem ui-monospace, monospace;
+    font:
+      700 0.6rem ui-monospace,
+      monospace;
     letter-spacing: 0.06em;
     text-transform: uppercase;
   }

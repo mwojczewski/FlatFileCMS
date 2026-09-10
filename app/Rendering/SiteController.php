@@ -17,6 +17,7 @@ use FlatFileCms\Domain\Content\Slug;
 use FlatFileCms\Domain\Localization\LanguageConfig;
 use FlatFileCms\Http\HtmlResponseFactory;
 use FlatFileCms\Http\HttpException;
+use FlatFileCms\Http\PublicHtmlCache;
 use FlatFileCms\Http\Request;
 use FlatFileCms\Http\Response;
 use FlatFileCms\Navigation\NavigationRepository;
@@ -38,6 +39,7 @@ final readonly class SiteController
         private PageRenderer $renderer,
         private CollectionRenderer $collectionRenderer,
         private HtmlResponseFactory $responses,
+        private PublicHtmlCache $htmlCache,
     ) {}
 
     public function homepage(Request $request): Response
@@ -57,6 +59,16 @@ final readonly class SiteController
         [$locale, $contentPath, $redirect] = $this->route($requestedPath, $languages);
         if ($redirect !== null) {
             return Response::redirect($redirect);
+        }
+
+        $cached = $this->htmlCache->get($request, $locale, $contentPath, $request->query());
+        if ($cached !== null) {
+            return $this->responses->cacheable(
+                $request,
+                $cached->html,
+                $cached->modifiedAt,
+                $cached->contentHash,
+            );
         }
 
         $pages = $this->pages->all($languages);
@@ -86,37 +98,39 @@ final readonly class SiteController
             $view = $this->collectionViews->create($result, $locale, $languages, $routes, $configuration);
             $rendered = $this->collectionRenderer->render($view, $navigation->menus());
 
-            return $this->responses->cacheable(
-                $request,
-                $rendered->html(),
-                max(
-                    $result->modifiedAt(),
-                    $rendered->assetsModifiedAt(),
-                    $routes->modifiedAt(),
-                    $languageDocument->modifiedAt(),
-                    $configuration->modifiedAt(),
-                    $navigation->modifiedAt(),
-                ),
-            );
-        }
-
-        $view = $this->pageViews->create($page, $locale, $languages, $routes, $configuration);
-        $rendered = $this->renderer->render($view, $navigation->menus());
-
-        return $this->responses->cacheable(
-            $request,
-            $rendered->html(),
-            max(
-                $page->modifiedAt(),
-                $this->pageViews->blockDefinitionsModifiedAt($page),
-                $this->pageViews->mediaModifiedAt($page),
+            $modifiedAt = max(
+                $result->modifiedAt(),
                 $rendered->assetsModifiedAt(),
                 $routes->modifiedAt(),
                 $languageDocument->modifiedAt(),
                 $configuration->modifiedAt(),
                 $navigation->modifiedAt(),
-            ),
+            );
+            $html = $rendered->html();
+            $contentHash = hash('sha256', $html);
+            $this->htmlCache->put($request, $locale, $contentPath, $request->query(), $html, $modifiedAt);
+
+            return $this->responses->cacheable($request, $html, $modifiedAt, $contentHash);
+        }
+
+        $view = $this->pageViews->create($page, $locale, $languages, $routes, $configuration);
+        $rendered = $this->renderer->render($view, $navigation->menus());
+
+        $modifiedAt = max(
+            $page->modifiedAt(),
+            $this->pageViews->blockDefinitionsModifiedAt($page),
+            $this->pageViews->mediaModifiedAt($page),
+            $rendered->assetsModifiedAt(),
+            $routes->modifiedAt(),
+            $languageDocument->modifiedAt(),
+            $configuration->modifiedAt(),
+            $navigation->modifiedAt(),
         );
+        $html = $rendered->html();
+        $contentHash = hash('sha256', $html);
+        $this->htmlCache->put($request, $locale, $contentPath, $request->query(), $html, $modifiedAt);
+
+        return $this->responses->cacheable($request, $html, $modifiedAt, $contentHash);
     }
 
     /** @return array{string, string, ?string} */

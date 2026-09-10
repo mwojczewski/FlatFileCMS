@@ -13,6 +13,9 @@
   color: #263b34;
   font-size: 0.76rem;
   font-weight: 750;
+  position: sticky;
+  height: fit-content;
+  top: 88px;
 }
 .article-content aside span {
   color: #505a58;
@@ -20,6 +23,7 @@
     550 0.58rem ui-monospace,
     monospace;
   letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 .article-content article {
   color: #33443e;

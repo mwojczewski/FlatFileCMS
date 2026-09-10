@@ -21,6 +21,7 @@ final readonly class PageRenderer
         private PartialRenderer $partials,
         private MediaRepository $media,
         private MediaUrlGenerator $mediaUrls,
+        private ?string $cloudflareBeaconToken = null,
     ) {}
 
     /** @param array<string, list<array<string, mixed>>> $navigation */
@@ -36,6 +37,7 @@ final readonly class PageRenderer
             PageIdentity::fromString($page->id()),
             $this->media,
             $this->mediaUrls,
+            $this->cloudflareBeaconToken,
         );
         $assets = $this->assets->collect($page->blocks());
         $content = '';

@@ -21,6 +21,7 @@ final readonly class RenderContext
         private ?PageIdentity $pageIdentity = null,
         private ?MediaRepository $media = null,
         private ?MediaUrlGenerator $mediaUrls = null,
+        private ?string $cloudflareBeaconToken = null,
     ) {}
 
     public function escape(string|int|float $value): string
@@ -156,6 +157,24 @@ final readonly class RenderContext
     public function locale(): string
     {
         return $this->locale;
+    }
+
+    public function cloudflareBeacon(): string
+    {
+        $token = trim($this->cloudflareBeaconToken ?? '');
+        if ($token === '') {
+            return '';
+        }
+
+        $configuration = json_encode(
+            ['token' => $token],
+            JSON_THROW_ON_ERROR | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT,
+        );
+
+        return \sprintf(
+            '<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon="%s"></script>',
+            $this->escape($configuration),
+        );
     }
 
     /** @param array<string, mixed> $data */

@@ -18,8 +18,7 @@ final readonly class AdminAnalyticsController
         private CloudflareAnalyticsService $analytics,
         private AdminView $views,
         private AdminLayout $layout,
-    ) {
-    }
+    ) {}
 
     public function dashboard(Request $request): Response
     {

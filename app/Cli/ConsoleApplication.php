@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FlatFileCms\Cli;
 
 use Closure;
+use FlatFileCms\Analytics\CloudflareAnalyticsService;
 use FlatFileCms\Auth\Role;
 use InvalidArgumentException;
 use Throwable;
@@ -22,8 +23,10 @@ final readonly class ConsoleApplication
         private CacheClearer $cache,
         private CachePruner $cachePruner,
         private RuntimePruner $runtimePruner,
+        private CloudflareAnalyticsService $analytics,
         private Closure $release,
-    ) {}
+    ) {
+    }
 
     /** @param list<string> $arguments */
     public function run(array $arguments): int
@@ -40,12 +43,13 @@ final readonly class ConsoleApplication
                 'block:create' => $this->createBlock(\array_slice($arguments, 2)),
                 'cache:clear' => $this->clearCache(\array_slice($arguments, 2)),
                 'cache:prune' => $this->pruneCache(\array_slice($arguments, 2)),
+                'cloudflare:analytics:refresh' => $this->refreshCloudflareAnalytics(\array_slice($arguments, 2)),
                 'runtime:prune' => $this->pruneRuntime(\array_slice($arguments, 2)),
                 'database:migrate' => $this->migrateDatabase(\array_slice($arguments, 2)),
                 'release:check' => $this->releaseCheck(\array_slice($arguments, 2)),
-                'install' => $this->createUser($arguments[2] ?? null, Role::Superadmin, install: true),
-                'user:create' => $this->createUser($arguments[2] ?? null, Role::Admin),
-                'user:create-superadmin' => $this->createUser($arguments[2] ?? null, Role::Superadmin),
+                'install' => $this->createUser(\array_slice($arguments, 2), Role::Superadmin, install: true),
+                'user:create' => $this->createUser(\array_slice($arguments, 2), Role::Admin),
+                'user:create-superadmin' => $this->createUser(\array_slice($arguments, 2), Role::Superadmin),
                 'user:password' => $this->changePassword($arguments[2] ?? null),
                 'user:security-keys:clear' => $this->clearSecurityKeys($arguments[2] ?? null),
                 default => $this->unknown($command),
@@ -83,15 +87,53 @@ final readonly class ConsoleApplication
         return 0;
     }
 
-    private function createUser(?string $email, Role $role, bool $install = false): int
+    /** @param list<string> $arguments */
+    private function createUser(array $arguments, Role $role, bool $install = false): int
     {
+        $email = null;
+        $firstName = '';
+        $lastName = '';
+
+        for ($index = 0; $index < \count($arguments); $index++) {
+            $argument = $arguments[$index];
+            if ($argument === '--first-name') {
+                if (!isset($arguments[$index + 1])) {
+                    throw new InvalidArgumentException('The --first-name option requires a value.');
+                }
+                $firstName = $arguments[++$index];
+                continue;
+            }
+            if (str_starts_with($argument, '--first-name=')) {
+                $firstName = substr($argument, \strlen('--first-name='));
+                continue;
+            }
+            if ($argument === '--last-name') {
+                if (!isset($arguments[$index + 1])) {
+                    throw new InvalidArgumentException('The --last-name option requires a value.');
+                }
+                $lastName = $arguments[++$index];
+                continue;
+            }
+            if (str_starts_with($argument, '--last-name=')) {
+                $lastName = substr($argument, \strlen('--last-name='));
+                continue;
+            }
+            if (str_starts_with($argument, '-')) {
+                throw new InvalidArgumentException('Unknown option: ' . $argument);
+            }
+            if ($email !== null) {
+                throw new InvalidArgumentException('Only one email argument is allowed.');
+            }
+            $email = $argument;
+        }
+
         $email ??= throw new InvalidArgumentException('Email argument is required.');
         $password = $this->passwords->read();
         if ($install) {
-            $this->users()->install($email, $password);
+            $this->users()->install($email, $password, $firstName, $lastName);
             $this->output("CMS database installed and first superadmin created.\n");
         } else {
-            $this->users()->create($email, $password, $role);
+            $this->users()->create($email, $password, $role, $firstName, $lastName);
             $this->output(\sprintf("%s created.\n", $role->value));
         }
 
@@ -140,6 +182,24 @@ final readonly class ConsoleApplication
         );
         $prefix = $options['dryRun'] ? 'Cache prune dry run' : 'Cache pruned';
         $this->output(\sprintf("%s. %d file(s), %d byte(s).\n", $prefix, $result->files, $result->bytes));
+
+        return 0;
+    }
+
+    /** @param list<string> $arguments */
+    private function refreshCloudflareAnalytics(array $arguments): int
+    {
+        $range = '7d';
+        if ($arguments !== []) {
+            if (\count($arguments) !== 1 || !\in_array($arguments[0], ['24h', '7d', '30d', '90d'], true)) {
+                throw new InvalidArgumentException('Usage: php bin/cms cloudflare:analytics:refresh [24h|7d|30d|90d]');
+            }
+            $range = $arguments[0];
+        }
+
+        $result = $this->analytics->refresh($range);
+        $status = \is_string($result['status'] ?? null) ? $result['status'] : 'unknown';
+        $this->output(\sprintf("Cloudflare analytics refreshed for %s. Status: %s.\n", $range, $status));
 
         return 0;
     }
@@ -246,15 +306,20 @@ Usage:
   php bin/cms <command> [arguments]
 
 Commands:
-  install <email>                         Install SQLite and create the first superadmin
-  user:create <email>                     Create an admin
-  user:create-superadmin <email>          Create a technical superadmin
+  install <email> [--first-name=NAME] [--last-name=NAME]
+                                          Install SQLite and create the first superadmin
+  user:create <email> [--first-name=NAME] [--last-name=NAME]
+                                          Create an admin
+  user:create-superadmin <email> [--first-name=NAME] [--last-name=NAME]
+                                          Create a technical superadmin
   user:password <email>                   Change a user password
   user:security-keys:clear <email>         Remove all WebAuthn/YubiKey credentials
   block:create <type> [--with-assets]      Create a developer block package
   cache:clear                              Remove all generated cache entries
   cache:prune [--dry-run]                  Remove expired block assets and cache files
     [--assets-older-than=7d] [--cache-older-than=30d]
+  cloudflare:analytics:refresh [24h|7d|30d|90d]
+                                          Refresh Cloudflare analytics cache for dashboard
   runtime:prune [--dry-run]                Remove expired session files
     [--sessions-older-than=1d]
   database:migrate                         Apply authentication database schema changes

@@ -30,7 +30,9 @@ $localizedUrl = static function (string $url) use ($locale): string {
                 <?php } ?>
             </div>
         </div>
-        <div class="site-footer__bottom"><span>&copy; <?= date('Y') ?> FlatFile CMS</span><span>BUILT WITH PHP · YAML ·
-                CARE</span></div>
+        <div class="site-footer__bottom">
+            <span>&copy; <?= date('Y') ?> FlatFile CMS</span>
+            <span>BUILT WITH PHP · YAML · CARE</span>
+        </div>
     </div>
 </footer>

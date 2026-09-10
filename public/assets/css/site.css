@@ -16,6 +16,9 @@ body {
   font-family: Inter, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
+svg {
+  vertical-align: middle;
+}
 .container {
   width: min(calc(100% - 2.5rem), 76rem);
   margin-inline: auto;

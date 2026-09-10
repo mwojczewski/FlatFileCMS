@@ -10,7 +10,7 @@ and the WebAuthn relying-party identity. Then create the first technical
 superadmin:
 
 ```bash
-php bin/cms install root@example.com
+php bin/cms install root@example.com --first-name="Jan" --last-name="Kowalski"
 ```
 
 Passwords are read without placing them in process arguments. For controlled
@@ -19,8 +19,8 @@ non-interactive installation, provide `CMS_PASSWORD` only to that process.
 ## Users and roles
 
 ```bash
-php bin/cms user:create admin@example.com
-php bin/cms user:create-superadmin service@example.com
+php bin/cms user:create admin@example.com --first-name="Anna" --last-name="Nowak"
+php bin/cms user:create-superadmin service@example.com --first-name="Jan" --last-name="Kowalski"
 php bin/cms user:password admin@example.com
 ```
 
@@ -30,6 +30,13 @@ lookups.
 
 `/admin/users` provides CRUD for regular administrator accounts. Admins and
 superadmins can create, edit, enable, disable and delete `ROLE_ADMIN` accounts.
+Panel-managed accounts require a first and last name; the email address remains
+the login identifier. Existing accounts without profile data remain valid and
+fall back to displaying their email address until an administrator updates them.
+Run `php bin/cms database:migrate` after upgrading to add the profile columns.
+The numeric primary key remains internal for compact SQLite relations. Admin URLs
+and forms use a non-sequential UUIDv7 `public_id`, so hidden technical accounts
+cannot be inferred from gaps in visible identifiers.
 The backend never permits creating or modifying a superadmin through HTTP,
 prevents self-disable/self-delete, and makes an admin's direct request for a
 superadmin behave like a missing user. A superadmin is shown only to another

@@ -37,7 +37,7 @@ final readonly class NativeAnalyticsHttpClient implements AnalyticsHttpClient
             throw new AnalyticsException('Cloudflare Analytics jest chwilowo niedostępne.');
         }
 
-        $status = $this->status($http_response_header);
+        $status = $this->status(http_get_last_response_headers() ?? []);
         if ($status < 200 || $status >= 300) {
             throw new AnalyticsException(\sprintf('Cloudflare API zwróciło status HTTP %d.', $status));
         }
