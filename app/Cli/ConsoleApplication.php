@@ -128,6 +128,20 @@ final readonly class ConsoleApplication
         }
 
         $email ??= throw new InvalidArgumentException('Email argument is required.');
+        $firstName = '';
+        $lastName = '';
+        foreach ($arguments as $argument) {
+            if (str_starts_with($argument, '--first-name=')) {
+                $firstName = substr($argument, 13);
+            } elseif (str_starts_with($argument, '--last-name=')) {
+                $lastName = substr($argument, 12);
+            } else {
+                throw new InvalidArgumentException('Invalid user option. See php bin/cms help.');
+            }
+        }
+        if (($firstName === '') !== ($lastName === '')) {
+            throw new InvalidArgumentException('First name and last name must be provided together.');
+        }
         $password = $this->passwords->read();
         if ($install) {
             $this->users()->install($email, $password, $firstName, $lastName);
@@ -306,12 +320,9 @@ Usage:
   php bin/cms <command> [arguments]
 
 Commands:
-  install <email> [--first-name=NAME] [--last-name=NAME]
-                                          Install SQLite and create the first superadmin
-  user:create <email> [--first-name=NAME] [--last-name=NAME]
-                                          Create an admin
-  user:create-superadmin <email> [--first-name=NAME] [--last-name=NAME]
-                                          Create a technical superadmin
+  install <email>                         Install SQLite and create the first superadmin
+  user:create <email>                     Create an admin
+  user:create-superadmin <email>          Create a technical superadmin
   user:password <email>                   Change a user password
   user:security-keys:clear <email>         Remove all WebAuthn/YubiKey credentials
   block:create <type> [--with-assets]      Create a developer block package
@@ -326,6 +337,7 @@ Commands:
   release:check                            Validate production runtime, content and deployment
 
 Set CMS_PASSWORD for non-interactive use. Avoid shell history and process arguments.
+Name options: --first-name="Anna Maria" --last-name="Kowalska" (provide both or neither).
 TEXT;
 
         return $help . "\n";

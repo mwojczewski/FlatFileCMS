@@ -3,6 +3,7 @@ site:
   name: FlatFile CMS
   url: https://example.com
   defaultLayout: default
+  icons: {}
 seo:
   titleSuffix: FlatFile CMS
   description: ""

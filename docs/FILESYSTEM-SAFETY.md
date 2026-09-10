@@ -79,11 +79,12 @@ variants; media transformation and media-cache behavior belongs to
 
 ## Public HTML cache
 
-Anonymous public pages may be stored below `storage/cache/html/`. Entries
-contain inert JSON with rendered HTML and its modification timestamp. Their
-hashed keys separate releases, content generations, locales, routes and
-canonical query parameters. An administrator session cookie always bypasses
-the cache; the administration, API and media route groups never call it.
+Public pages may be stored below `storage/cache/html/`. PHP-serialized entries
+contain rendered HTML, its modification timestamp and a SHA-256 content hash
+used as the ETag. The hash is verified when reading an entry. Hashed cache keys
+separate releases, content generations, locales, routes and canonical query
+parameters. The administration, API and media route groups never call the
+public HTML cache.
 
 Successful writes outside `storage/`, as well as page-directory creation,
 moves and deletion, rotate `storage/cache/html-generation` under an

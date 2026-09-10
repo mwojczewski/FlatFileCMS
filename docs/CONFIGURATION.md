@@ -9,16 +9,16 @@ predictably after its environment has been supplied.
 
 `.env.local` is untracked and belongs to the deployment/runtime operator.
 
-| Concern | Variables |
-|---|---|
-| Runtime | `APP_ENV`, `APP_DEBUG`, `APP_SECRET`, `APP_TIMEZONE` |
-| Diagnostics | `LOG_LEVEL`, `LOG_MAX_FILES` |
-| Infrastructure cache | `YAML_CACHE_JSON_ENABLED`, `YAML_CACHE_SERIALIZE_ENABLED` |
-| Reverse proxy | `TRUSTED_PROXIES` |
-| Session deployment | `SESSION_NAME`, `SESSION_LIFETIME`, `SESSION_COOKIE_SECURE`, `SESSION_COOKIE_SAME_SITE` |
-| Auth protection | `AUTH_LOGIN_*`, `AUTH_RESET_*`, `AUTH_PASSWORD_RESET_TTL` |
-| WebAuthn deployment | `WEBAUTHN_RP_ID`, `WEBAUTHN_RP_NAME` |
-| Mail transport | `MAIL_*` |
+| Concern              | Variables                                                                               |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| Runtime              | `APP_ENV`, `APP_DEBUG`, `APP_SECRET`, `APP_TIMEZONE`                                    |
+| Diagnostics          | `LOG_LEVEL`, `LOG_MAX_FILES`                                                            |
+| Infrastructure cache | `YAML_CACHE_JSON_ENABLED`, `YAML_CACHE_SERIALIZE_ENABLED`                               |
+| Reverse proxy        | `TRUSTED_PROXIES`                                                                       |
+| Session deployment   | `SESSION_NAME`, `SESSION_LIFETIME`, `SESSION_COOKIE_SECURE`, `SESSION_COOKIE_SAME_SITE` |
+| Auth protection      | `AUTH_LOGIN_*`, `AUTH_RESET_*`, `AUTH_PASSWORD_RESET_TTL`                               |
+| WebAuthn deployment  | `WEBAUTHN_RP_ID`, `WEBAUTHN_RP_NAME`                                                    |
+| Mail transport       | `MAIL_*`                                                                                |
 
 `HttpOnly` is not configurable: administrator session cookies must always use
 it. Other non-negotiable security guarantees should likewise be enforced in
@@ -42,11 +42,12 @@ fallback. Both switches belong to the environment because the useful choice
 depends on the server and deployment mode and because reading `setup.yml`
 itself uses these caches.
 
-`PUBLIC_HTML_CACHE_ENABLED` enables the full-page cache for anonymous public
-HTML requests. It never applies to administration, API, media, redirects,
-errors, non-GET requests or requests carrying the configured administrator
-session cookie. Cache keys include the resolved locale, public content path,
-canonical query parameters, content generation and `APP_RELEASE`.
+`PUBLIC_HTML_CACHE_ENABLED` enables the full-page cache for public HTML
+requests. It never applies to administration, API, media, redirects, errors or
+non-GET requests. Cache keys include the resolved locale, public content path,
+canonical query parameters, content generation and `APP_RELEASE`. Each entry
+uses PHP serialization and stores the HTML, modification timestamp and its
+SHA-256 hash used as the response ETag.
 
 `APP_RELEASE` must change with every deployment that can affect rendered
 output, for example to the deployed Git commit SHA or build identifier. This
@@ -74,14 +75,14 @@ Changing the beacon token also changes the public HTML cache namespace.
 `setup.yml` is versioned, copied with the site and may later be managed through
 the admin application.
 
-| Concern | Keys |
-|---|---|
-| Site identity | `site.name`, `site.url` |
-| Rendering | `site.defaultLayout` |
-| SEO defaults | `seo.*` |
-| Upload policy | `media.maxUploadBytes`, `media.allowedMimeTypes`, `media.stripMetadata` |
-| Media transforms | `media.transformations.enabled`, `quality`, `maxWidth`, `maxHeight`, `maxPixels`, `media.formats` |
-| Generated media cache | `media.cache.enabled` |
+| Concern               | Keys                                                                                              |
+| --------------------- | ------------------------------------------------------------------------------------------------- |
+| Site identity         | `site.name`, `site.url`                                                                           |
+| Rendering             | `site.defaultLayout`                                                                              |
+| SEO defaults          | `seo.*`                                                                                           |
+| Upload policy         | `media.maxUploadBytes`, `media.allowedMimeTypes`, `media.stripMetadata`                           |
+| Media transforms      | `media.transformations.enabled`, `quality`, `maxWidth`, `maxHeight`, `maxPixels`, `media.formats` |
+| Generated media cache | `media.cache.enabled`                                                                             |
 
 `site.url` is the sole canonical site URL. There is no `APP_URL` environment
 override. Media processing has no environment override either; copying the

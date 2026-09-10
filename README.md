@@ -43,6 +43,8 @@ revision-safe configuration editors and production release hardening.
 - multilingual website routing with default-locale redirects;
 - per-page block asset discovery, deduplication and content fingerprinting;
 - cache validators for both JSON and HTML responses;
+- release-, content-, locale- and route-aware full-page cache for anonymous public HTML;
+- shared public HTML document shell with an optional environment-configured Cloudflare Web Analytics beacon;
 - `pagination.yml` collections with translated routes, sorting, filtering and pagination;
 - collection output through both REST API and server-rendered layouts.
 - SQLite users with strict admin/superadmin visibility rules;

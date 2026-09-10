@@ -19,7 +19,8 @@ final readonly class WebAuthnService
         private SessionStore $session,
         private string $rpName,
         private string $rpId,
-    ) {}
+    ) {
+    }
 
     /** @return array<string, mixed> */
     public function registrationOptions(User $user): array
