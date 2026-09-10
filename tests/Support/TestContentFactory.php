@@ -148,7 +148,7 @@ final class TestContentFactory
                 $partials,
             ),
             new HtmlResponseFactory(),
-            new PublicHtmlCache($paths, false, 'test', 'flatfile_cms_session'),
+            new PublicHtmlCache($paths, false, 'test'),
         );
     }
 }

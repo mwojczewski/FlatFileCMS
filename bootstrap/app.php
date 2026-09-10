@@ -309,7 +309,6 @@ $container->set(
             $enabled,
             ($enabled ? $environment->get('APP_RELEASE') : $environment->get('APP_RELEASE', 'disabled'))
                 . ':' . hash('sha256', $environment->get('CLOUDFLARE_BEACON_TOKEN', '')),
-            $environment->get('SESSION_NAME', 'flatfile_cms_session'),
         );
     },
 );

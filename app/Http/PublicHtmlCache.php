@@ -7,7 +7,6 @@ namespace FlatFileCms\Http;
 use FlatFileCms\Infrastructure\Filesystem\FilesystemRoot;
 use FlatFileCms\Infrastructure\Filesystem\RelativePath;
 use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
-use JsonException;
 
 final readonly class PublicHtmlCache
 {
@@ -18,7 +17,6 @@ final readonly class PublicHtmlCache
         SafePathResolver $paths,
         private bool $enabled,
         private string $release,
-        private string $sessionName,
     ) {
         $this->directory = $paths->resolve(FilesystemRoot::Storage, RelativePath::fromString('cache/html'));
         $this->generationFile = $paths->resolve(
@@ -74,16 +72,19 @@ final readonly class PublicHtmlCache
             return null;
         }
 
-        try {
-            $data = json_decode($contents, true, flags: JSON_THROW_ON_ERROR);
-        } catch (JsonException) {
-            return null;
-        }
-        if (!\is_array($data) || !\is_string($data['html'] ?? null) || !\is_int($data['modifiedAt'] ?? null)) {
+        $data = @unserialize($contents, ['allowed_classes' => false]);
+        if (
+            !\is_array($data)
+            || !\is_string($data['html'] ?? null)
+            || !\is_int($data['modifiedAt'] ?? null)
+            || !\is_string($data['contentHash'] ?? null)
+            || preg_match('/^[a-f0-9]{64}$/D', $data['contentHash']) !== 1
+            || !hash_equals($data['contentHash'], hash('sha256', $data['html']))
+        ) {
             return null;
         }
 
-        return new PublicHtmlCacheEntry($data['html'], $data['modifiedAt']);
+        return new PublicHtmlCacheEntry($data['html'], $data['modifiedAt'], $data['contentHash']);
     }
 
     /** @param array<string, mixed> $query */
@@ -99,14 +100,11 @@ final readonly class PublicHtmlCache
             return;
         }
 
-        try {
-            $contents = json_encode(
-                ['html' => $html, 'modifiedAt' => $modifiedAt],
-                JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
-            );
-        } catch (JsonException) {
-            return;
-        }
+        $contents = serialize([
+            'html' => $html,
+            'modifiedAt' => $modifiedAt,
+            'contentHash' => hash('sha256', $html),
+        ]);
 
         $file = $this->file($locale, $path, $query);
         $temporary = tempnam($this->directory, '.cms-html-');
@@ -127,12 +125,7 @@ final readonly class PublicHtmlCache
 
     private function eligible(Request $request): bool
     {
-        if (!$this->enabled || !\in_array($request->method(), ['GET', 'HEAD'], true)) {
-            return false;
-        }
-        $cookie = $request->header('cookie');
-
-        return $cookie === null || preg_match('/(?:^|;\s*)' . preg_quote($this->sessionName, '/') . '=/', $cookie) !== 1;
+        return $this->enabled && \in_array($request->method(), ['GET', 'HEAD'], true);
     }
 
     /** @param array<string, mixed> $query */
@@ -143,7 +136,7 @@ final readonly class PublicHtmlCache
             JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
         );
 
-        return $this->directory . '/' . hash('sha256', (string) $key) . '.json';
+        return $this->directory . '/' . hash('sha256', (string) $key) . '.cache';
     }
 
     private function generation(): string

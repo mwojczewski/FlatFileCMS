@@ -9,5 +9,6 @@ final readonly class PublicHtmlCacheEntry
     public function __construct(
         public string $html,
         public int $modifiedAt,
+        public string $contentHash,
     ) {}
 }

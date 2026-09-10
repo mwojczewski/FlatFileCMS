@@ -42,11 +42,12 @@ fallback. Both switches belong to the environment because the useful choice
 depends on the server and deployment mode and because reading `setup.yml`
 itself uses these caches.
 
-`PUBLIC_HTML_CACHE_ENABLED` enables the full-page cache for anonymous public
-HTML requests. It never applies to administration, API, media, redirects,
-errors, non-GET requests or requests carrying the configured administrator
-session cookie. Cache keys include the resolved locale, public content path,
-canonical query parameters, content generation and `APP_RELEASE`.
+`PUBLIC_HTML_CACHE_ENABLED` enables the full-page cache for public HTML
+requests. It never applies to administration, API, media, redirects, errors or
+non-GET requests. Cache keys include the resolved locale, public content path,
+canonical query parameters, content generation and `APP_RELEASE`. Each entry
+uses PHP serialization and stores the HTML, modification timestamp and its
+SHA-256 hash used as the response ETag.
 
 `APP_RELEASE` must change with every deployment that can affect rendered
 output, for example to the deployed Git commit SHA or build identifier. This

@@ -63,7 +63,12 @@ final readonly class SiteController
 
         $cached = $this->htmlCache->get($request, $locale, $contentPath, $request->query());
         if ($cached !== null) {
-            return $this->responses->cacheable($request, $cached->html, $cached->modifiedAt);
+            return $this->responses->cacheable(
+                $request,
+                $cached->html,
+                $cached->modifiedAt,
+                $cached->contentHash,
+            );
         }
 
         $pages = $this->pages->all($languages);
@@ -101,9 +106,11 @@ final readonly class SiteController
                 $configuration->modifiedAt(),
                 $navigation->modifiedAt(),
             );
-            $this->htmlCache->put($request, $locale, $contentPath, $request->query(), $rendered->html(), $modifiedAt);
+            $html = $rendered->html();
+            $contentHash = hash('sha256', $html);
+            $this->htmlCache->put($request, $locale, $contentPath, $request->query(), $html, $modifiedAt);
 
-            return $this->responses->cacheable($request, $rendered->html(), $modifiedAt);
+            return $this->responses->cacheable($request, $html, $modifiedAt, $contentHash);
         }
 
         $view = $this->pageViews->create($page, $locale, $languages, $routes, $configuration);
@@ -119,9 +126,11 @@ final readonly class SiteController
             $configuration->modifiedAt(),
             $navigation->modifiedAt(),
         );
-        $this->htmlCache->put($request, $locale, $contentPath, $request->query(), $rendered->html(), $modifiedAt);
+        $html = $rendered->html();
+        $contentHash = hash('sha256', $html);
+        $this->htmlCache->put($request, $locale, $contentPath, $request->query(), $html, $modifiedAt);
 
-        return $this->responses->cacheable($request, $rendered->html(), $modifiedAt);
+        return $this->responses->cacheable($request, $html, $modifiedAt, $contentHash);
     }
 
     /** @return array{string, string, ?string} */
