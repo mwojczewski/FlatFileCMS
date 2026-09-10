@@ -74,10 +74,11 @@
     items: Array.isArray(items) ? items.map(normalizeItem) : [],
   }));
 
-  const element = (name, className = "", text = "") => {
+  const element = (name, className = "", text = "", html = "") => {
     const node = document.createElement(name);
     if (className) node.className = className;
-    if (text) node.textContent = text;
+    if (html) node.innerHTML = html;
+    else if (text) node.textContent = text;
     return node;
   };
 
@@ -110,12 +111,15 @@
   };
 
   const icons = {
-    up: '<path d="m18 15-6-6-6 6"/>',
-    down: '<path d="m6 9 6 6 6-6"/>',
-    outdent: '<path d="M9 18h10M9 12h10M9 6h10M5 8l-4 4 4 4"/>',
-    edit: '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4z"/>',
-    addChild: '<path d="M5 4v6a4 4 0 0 0 4 4h10"/><path d="m16 11 3 3-3 3"/><path d="M12 18v4m-2-2h4"/>',
-    remove: '<path d="M3 6h18M8 6V4h8v2m-9 0 1 15h8l1-15M10 11v6m4-6v6"/>',
+    up: '<path fill-rule="evenodd" d="M8 10a.5.5 0 0 0 .5-.5V3.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 3.707V9.5a.5.5 0 0 0 .5.5m-7 2.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5"/>',
+    down: '<path fill-rule="evenodd" d="M1 3.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5M8 6a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 .708-.708L7.5 12.293V6.5A.5.5 0 0 1 8 6"/>',
+    outdent:
+      '<path fill-rule="evenodd" d="M13 8a.5.5 0 0 0-.5-.5H5.707l2.147-2.146a.5.5 0 1 0-.708-.708l-3 3a.5.5 0 0 0 0 .708l3 3a.5.5 0 0 0 .708-.708L5.707 8.5H12.5A.5.5 0 0 0 13 8"/><path fill-rule="evenodd" d="M3.5 4a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 1 0v-7a.5.5 0 0 0-.5-.5"/>',
+    edit: '<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>',
+    addChild:
+      '<path fill-rule="evenodd" d="M3 8a.5.5 0 0 1 .5-.5h6.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H3.5A.5.5 0 0 1 3 8"/><path fill-rule="evenodd" d="M12.5 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5"/>',
+    remove:
+      '<path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>',
   };
 
   const iconButton = (label, icon, action, modifier = "") => {
@@ -128,14 +132,14 @@
     node.setAttribute("aria-label", label);
     node.title = label;
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("viewBox", "0 0 24 24");
-    svg.setAttribute("width", "18");
-    svg.setAttribute("height", "18");
-    svg.setAttribute("fill", "none");
-    svg.setAttribute("stroke", "currentColor");
-    svg.setAttribute("stroke-width", "2");
-    svg.setAttribute("stroke-linecap", "round");
-    svg.setAttribute("stroke-linejoin", "round");
+    svg.setAttribute("viewBox", "0 0 16 16");
+    svg.setAttribute("width", "16px");
+    svg.setAttribute("height", "16px");
+    svg.setAttribute("fill", "currentColor");
+    // svg.setAttribute("stroke", "currentColor");
+    // svg.setAttribute("stroke-width", "2");
+    // svg.setAttribute("stroke-linecap", "round");
+    // svg.setAttribute("stroke-linejoin", "round");
     svg.setAttribute("aria-hidden", "true");
     svg.innerHTML = icons[icon];
     node.append(svg);
@@ -149,7 +153,8 @@
     trigger.title = label;
     actions.querySelectorAll(".navigation-action").forEach((action) => {
       const actionLabel = action.getAttribute("aria-label");
-      if (actionLabel) action.append(element("span", "navigation-action-label", actionLabel));
+      if (actionLabel)
+        action.append(element("span", "navigation-action-label", actionLabel));
     });
     actions.classList.add("navigation-actions-popover");
     menu.append(trigger, actions);
@@ -320,7 +325,12 @@
     card.draggable = true;
     card.style.setProperty("--navigation-depth", String(depth));
     const row = element("div", "navigation-item-row");
-    const handle = element("span", "drag-handle", "⋮⋮");
+    const handle = element(
+      "span",
+      "drag-handle",
+      "",
+      '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-grip-vertical" viewBox="0 0 16 16"><path d="M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0M7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0M7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/></svg>',
+    );
     handle.tabIndex = 0;
     handle.setAttribute("role", "button");
     handle.setAttribute("aria-label", "Przeciągnij, aby zmienić kolejność");
@@ -328,7 +338,9 @@
     card.addEventListener("dragstart", (event) => {
       if (
         event.target instanceof Element &&
-        event.target.closest(".navigation-item-actions, .navigation-actions-menu")
+        event.target.closest(
+          ".navigation-item-actions, .navigation-actions-menu",
+        )
       ) {
         event.preventDefault();
         return;
@@ -429,25 +441,42 @@
       );
     if (parentContext)
       actions.append(
-        iconButton("Wysuń o jeden poziom", "outdent", () => {
-          const moved = removeFrom(items, index);
-          parentContext.items.splice(parentContext.index + 1, 0, moved);
-          render(true);
-        }, "navigation-action-structure"),
+        iconButton(
+          "Wysuń o jeden poziom",
+          "outdent",
+          () => {
+            const moved = removeFrom(items, index);
+            parentContext.items.splice(parentContext.index + 1, 0, moved);
+            render(true);
+          },
+          "navigation-action-structure",
+        ),
       );
-    actions.append(iconButton("Edytuj pozycję", "edit", () => openDialog(item), "navigation-action-edit"));
+    actions.append(
+      iconButton(
+        "Edytuj pozycję",
+        "edit",
+        () => openDialog(item),
+        "navigation-action-edit",
+      ),
+    );
     if (depth < 8)
       actions.append(
-        iconButton("Dodaj pozycję podrzędną", "addChild", () => {
-          const child = normalizeItem({ label: { [defaultLocale]: "" } });
-          item.children.push(child);
-          render();
-          openDialog(child, () => {
-            const childIndex = item.children.indexOf(child);
-            if (childIndex >= 0) item.children.splice(childIndex, 1);
-            render(true);
-          });
-        }, "navigation-action-add"),
+        iconButton(
+          "Dodaj pozycję podrzędną",
+          "addChild",
+          () => {
+            const child = normalizeItem({ label: { [defaultLocale]: "" } });
+            item.children.push(child);
+            render();
+            openDialog(child, () => {
+              const childIndex = item.children.indexOf(child);
+              if (childIndex >= 0) item.children.splice(childIndex, 1);
+              render(true);
+            });
+          },
+          "navigation-action-add",
+        ),
       );
     actions.append(
       iconButton(
@@ -529,12 +558,17 @@
       });
       const data = await response.json();
       if (!response.ok || typeof data.revision !== "string") {
-        throw new Error(data.error?.message ?? "Nie udało się zapisać nawigacji.");
+        throw new Error(
+          data.error?.message ?? "Nie udało się zapisać nawigacji.",
+        );
       }
       revision.value = data.revision;
       setSaveState("saved", "Wszystkie zmiany zapisane");
     } catch (error) {
-      setSaveState("error", error instanceof Error ? error.message : "Błąd zapisu");
+      setSaveState(
+        "error",
+        error instanceof Error ? error.message : "Błąd zapisu",
+      );
     } finally {
       saving = false;
       if (saveAgain) {
@@ -552,9 +586,12 @@
 
   const render = (shouldSave = false) => {
     editor.replaceChildren();
-    if (menuCount instanceof HTMLElement) menuCount.textContent = String(menus.length);
+    if (menuCount instanceof HTMLElement)
+      menuCount.textContent = String(menus.length);
     if (itemCount instanceof HTMLElement)
-      itemCount.textContent = String(menus.reduce((total, menu) => total + countItems(menu.items), 0));
+      itemCount.textContent = String(
+        menus.reduce((total, menu) => total + countItems(menu.items), 0),
+      );
     menus.forEach((menu, menuIndex) => {
       const section = element("section", "form-section navigation-menu");
       const heading = element("div", "section-heading navigation-menu-heading");
@@ -563,7 +600,13 @@
         element("p", "eyebrow", "Menu"),
         element("h2", "", menu.name),
       );
-      title.append(element("span", "navigation-menu-count", `${countItems(menu.items)} pozycji`));
+      title.append(
+        element(
+          "span",
+          "navigation-menu-count",
+          `${countItems(menu.items)} pozycji`,
+        ),
+      );
       const menuActions = element("div", "actions");
       menuActions.append(
         button("Dodaj pozycję", () => {

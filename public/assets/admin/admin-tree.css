@@ -104,6 +104,7 @@
   background: transparent;
   box-shadow: none;
   font-size: 0.7rem;
+  gap: 1rem;
 }
 .navigation-actions-popover .navigation-action svg {
   flex: 0 0 1rem;
@@ -146,4 +147,3 @@
     display: none;
   }
 }
-
