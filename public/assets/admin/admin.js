@@ -19,7 +19,9 @@ const setSidebarCollapsed = (collapsed) => {
 };
 
 try {
-  setSidebarCollapsed(localStorage.getItem("flatfile-admin-sidebar") === "collapsed");
+  setSidebarCollapsed(
+    localStorage.getItem("flatfile-admin-sidebar") === "collapsed",
+  );
 } catch {
   setSidebarCollapsed(false);
 }
@@ -28,7 +30,10 @@ sidebarCollapse?.addEventListener("click", () => {
   const collapsed = !shell?.classList.contains("sidebar-collapsed");
   setSidebarCollapsed(collapsed);
   try {
-    localStorage.setItem("flatfile-admin-sidebar", collapsed ? "collapsed" : "expanded");
+    localStorage.setItem(
+      "flatfile-admin-sidebar",
+      collapsed ? "collapsed" : "expanded",
+    );
   } catch {
     // The selected width still applies for the current page.
   }
@@ -69,9 +74,16 @@ document.addEventListener("keydown", (event) => {
 });
 
 document.querySelectorAll(".success, .error").forEach((message) => {
-  if (!(message instanceof HTMLElement) || message.textContent.trim() === "") return;
-  message.setAttribute("role", message.classList.contains("error") ? "alert" : "status");
-  message.setAttribute("aria-live", message.classList.contains("error") ? "assertive" : "polite");
+  if (!(message instanceof HTMLElement) || message.textContent.trim() === "")
+    return;
+  message.setAttribute(
+    "role",
+    message.classList.contains("error") ? "alert" : "status",
+  );
+  message.setAttribute(
+    "aria-live",
+    message.classList.contains("error") ? "assertive" : "polite",
+  );
 });
 
 const statusMessages = {
@@ -94,7 +106,9 @@ if (activeStatus && adminContent instanceof HTMLElement) {
   notification.setAttribute("aria-live", "polite");
   notification.innerHTML = `<span aria-hidden="true">✓</span><p>${statusMessages[activeStatus]}</p><button type="button" aria-label="Zamknij komunikat">×</button>`;
   adminContent.prepend(notification);
-  notification.querySelector("button")?.addEventListener("click", () => notification.remove());
+  notification
+    .querySelector("button")
+    ?.addEventListener("click", () => notification.remove());
   currentUrl.searchParams.delete(activeStatus);
   window.history.replaceState({}, "", currentUrl);
 }
@@ -125,7 +139,10 @@ if (firstInvalid instanceof HTMLElement) {
 
 const siteIconSource = document.querySelector("[data-site-icon-source]");
 const siteIconPreview = document.querySelector("[data-site-icon-preview]");
-if (siteIconSource instanceof HTMLInputElement && siteIconPreview instanceof HTMLImageElement) {
+if (
+  siteIconSource instanceof HTMLInputElement &&
+  siteIconPreview instanceof HTMLImageElement
+) {
   let previewUrl = null;
   siteIconSource.addEventListener("change", () => {
     if (previewUrl !== null) URL.revokeObjectURL(previewUrl);
@@ -165,8 +182,10 @@ if (pageSearch instanceof HTMLInputElement) {
       row.hidden = !shouldShow;
       visible += shouldShow ? 1 : 0;
     });
-    if (emptyRow instanceof HTMLTableRowElement) emptyRow.hidden = visible !== 0;
-    if (resultCount instanceof HTMLElement) resultCount.textContent = `${visible} ${visible === 1 ? "pozycja" : "pozycji"}`;
+    if (emptyRow instanceof HTMLTableRowElement)
+      emptyRow.hidden = visible !== 0;
+    if (resultCount instanceof HTMLElement)
+      resultCount.textContent = `${visible} ${visible === 1 ? "pozycja" : "pozycji"}`;
   };
   pageSearch.addEventListener("input", updatePageResults);
   document.querySelectorAll("[data-page-branch-toggle]").forEach((control) => {
@@ -178,7 +197,10 @@ if (pageSearch instanceof HTMLInputElement) {
       if (collapsed) collapsedBranches.add(identity);
       else collapsedBranches.delete(identity);
       control.setAttribute("aria-expanded", String(!collapsed));
-      control.setAttribute("aria-label", collapsed ? "Rozwiń podstrony" : "Zwiń podstrony");
+      control.setAttribute(
+        "aria-label",
+        collapsed ? "Rozwiń podstrony" : "Zwiń podstrony",
+      );
       updatePageResults();
     });
   });
@@ -199,7 +221,10 @@ if (pageTree instanceof HTMLTableSectionElement) {
     state.dataset.state = type;
   };
   pageTree.addEventListener("dragstart", (event) => {
-    const row = event.target instanceof Element ? event.target.closest("[data-page-row][draggable=true]") : null;
+    const row =
+      event.target instanceof Element
+        ? event.target.closest("[data-page-row][draggable=true]")
+        : null;
     if (!(row instanceof HTMLTableRowElement)) return;
     draggedRow = row;
     row.classList.add("is-dragging");
@@ -209,28 +234,64 @@ if (pageTree instanceof HTMLTableSectionElement) {
     }
   });
   pageTree.addEventListener("dragover", (event) => {
-    const row = event.target instanceof Element ? event.target.closest("[data-page-row]") : null;
-    if (!(row instanceof HTMLTableRowElement) || !draggedRow || row === draggedRow) return;
+    const row =
+      event.target instanceof Element
+        ? event.target.closest("[data-page-row]")
+        : null;
+    if (
+      !(row instanceof HTMLTableRowElement) ||
+      !draggedRow ||
+      row === draggedRow
+    )
+      return;
     const target = row.dataset.pageIdentity ?? "";
     const source = draggedRow.dataset.pageIdentity ?? "";
     if (target.startsWith(`${source}/`)) return;
     event.preventDefault();
-    pageTree.querySelectorAll(".is-drop-before, .is-drop-inside, .is-drop-after").forEach((item) => item.classList.remove("is-drop-before", "is-drop-inside", "is-drop-after"));
+    pageTree
+      .querySelectorAll(".is-drop-before, .is-drop-inside, .is-drop-after")
+      .forEach((item) =>
+        item.classList.remove(
+          "is-drop-before",
+          "is-drop-inside",
+          "is-drop-after",
+        ),
+      );
     const rectangle = row.getBoundingClientRect();
     const ratio = (event.clientY - rectangle.top) / rectangle.height;
-    dropMode = target !== "homepage" && ratio > 0.28 && ratio < 0.72 ? "inside" : ratio >= 0.5 ? "after" : "before";
+    dropMode =
+      target !== "homepage" && ratio > 0.28 && ratio < 0.72
+        ? "inside"
+        : ratio >= 0.5
+          ? "after"
+          : "before";
     row.classList.add(`is-drop-${dropMode}`);
   });
   pageTree.addEventListener("drop", async (event) => {
-    const targetRow = event.target instanceof Element ? event.target.closest("[data-page-row]") : null;
-    if (!(targetRow instanceof HTMLTableRowElement) || !draggedRow || targetRow === draggedRow) return;
+    const targetRow =
+      event.target instanceof Element
+        ? event.target.closest("[data-page-row]")
+        : null;
+    if (
+      !(targetRow instanceof HTMLTableRowElement) ||
+      !draggedRow ||
+      targetRow === draggedRow
+    )
+      return;
     event.preventDefault();
     const source = draggedRow.dataset.pageIdentity ?? "";
     const target = targetRow.dataset.pageIdentity ?? "";
     const parent = dropMode === "inside" ? target : parentOf(target);
-    const siblings = [...pageTree.querySelectorAll("[data-page-row]")].filter((row) => parentOf(row.dataset.pageIdentity ?? "") === parent && row !== draggedRow);
+    const siblings = [...pageTree.querySelectorAll("[data-page-row]")].filter(
+      (row) =>
+        parentOf(row.dataset.pageIdentity ?? "") === parent &&
+        row !== draggedRow,
+    );
     const targetIndex = siblings.indexOf(targetRow);
-    const position = dropMode === "inside" ? Number.MAX_SAFE_INTEGER : Math.max(0, targetIndex + (dropMode === "after" ? 1 : 0));
+    const position =
+      dropMode === "inside"
+        ? Number.MAX_SAFE_INTEGER
+        : Math.max(0, targetIndex + (dropMode === "after" ? 1 : 0));
     setState("Zapisywanie nowego położenia…", "saving");
     const body = new FormData();
     body.set("_csrf", pageTree.dataset.pageTreeCsrf ?? "");
@@ -239,8 +300,13 @@ if (pageTree instanceof HTMLTableSectionElement) {
     body.set("position", String(position));
     body.set("revision", draggedRow.dataset.pageRevision ?? "");
     try {
-      const response = await fetch("/admin/pages/reorder", { method: "POST", headers: { Accept: "application/json" }, body });
-      if (!response.ok) throw new Error("Nie udało się zmienić położenia strony.");
+      const response = await fetch("/admin/pages/reorder", {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body,
+      });
+      if (!response.ok)
+        throw new Error("Nie udało się zmienić położenia strony.");
       setState("Położenie zapisane", "saved");
       window.location.reload();
     } catch (error) {
@@ -248,17 +314,34 @@ if (pageTree instanceof HTMLTableSectionElement) {
     }
   });
   pageTree.addEventListener("dragend", () => {
-    pageTree.querySelectorAll(".is-dragging, .is-drop-before, .is-drop-inside, .is-drop-after").forEach((item) => item.classList.remove("is-dragging", "is-drop-before", "is-drop-inside", "is-drop-after"));
+    pageTree
+      .querySelectorAll(
+        ".is-dragging, .is-drop-before, .is-drop-inside, .is-drop-after",
+      )
+      .forEach((item) =>
+        item.classList.remove(
+          "is-dragging",
+          "is-drop-before",
+          "is-drop-inside",
+          "is-drop-after",
+        ),
+      );
     draggedRow = null;
   });
 }
 
 document.addEventListener("click", (event) => {
   if (!(event.target instanceof Element)) return;
-  const activeMenu = event.target.closest("[data-page-actions-menu], [data-actions-menu], .navigation-actions-menu");
-  document.querySelectorAll("[data-page-actions-menu][open], [data-actions-menu][open], .navigation-actions-menu[open]").forEach((menu) => {
-    if (menu !== activeMenu) menu.removeAttribute("open");
-  });
+  const activeMenu = event.target.closest(
+    "[data-page-actions-menu], [data-actions-menu], .navigation-actions-menu",
+  );
+  document
+    .querySelectorAll(
+      "[data-page-actions-menu][open], [data-actions-menu][open], .navigation-actions-menu[open]",
+    )
+    .forEach((menu) => {
+      if (menu !== activeMenu) menu.removeAttribute("open");
+    });
 });
 
 const mediaSearch = document.querySelector("[data-media-search]");
@@ -275,7 +358,8 @@ if (mediaSearch instanceof HTMLInputElement) {
       visible += matches ? 1 : 0;
     });
     if (emptyMedia instanceof HTMLElement) emptyMedia.hidden = visible !== 0;
-    if (mediaCount instanceof HTMLElement) mediaCount.textContent = `${visible} ${visible === 1 ? "plik" : "plików"}`;
+    if (mediaCount instanceof HTMLElement)
+      mediaCount.textContent = `${visible} ${visible === 1 ? "plik" : "plików"}`;
   };
   mediaSearch.addEventListener("input", updateMediaResults);
 }

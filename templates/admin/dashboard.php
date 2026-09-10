@@ -1,6 +1,6 @@
 <?php
 $status = is_string($analytics['status'] ?? null) ? $analytics['status'] : 'error';
-$range = is_string($analytics['range'] ?? null) ? $analytics['range'] : '7d';
+$range = is_string($analytics['range'] ?? null) ? $analytics['range'] : '24h';
 $number = static fn(mixed $value): string => number_format(is_numeric($value) ? (float) $value : 0, 0, ',', ' ');
 $bytes = static function (mixed $value): string {
     $size = is_numeric($value) ? (float) $value : 0;
@@ -23,6 +23,13 @@ $rating = static fn(string $value): string => match ($value) {
 };
 $rows = static fn(string $key): array => is_array($analytics[$key] ?? null) ? $analytics[$key] : [];
 $contentSummary = is_array($contentSummary ?? null) ? $contentSummary : [];
+
+$vitals = is_array($analytics['vitals'] ?? null) ? $analytics['vitals'] : null;
+
+if (is_array($vitals)) {
+    $vitals['lcp'] /= 1000;
+    $vitals['inp'] /= 1000;
+}
 ?>
 <section class="dashboard-overview" aria-labelledby="dashboard-overview-title">
     <div class="dashboard-welcome editor-primary-actions">
@@ -43,13 +50,22 @@ $contentSummary = is_array($contentSummary ?? null) ? $contentSummary : [];
         </a>
     </div>
     <div class="content-summary" aria-label="Stan zawartości">
-        <a href="/admin/pages"><strong><?= $number($contentSummary['pages'] ?? 0) ?></strong><span>Strony</span></a>
-        <a
-            href="/admin/pages"><strong><?= $number($contentSummary['collections'] ?? 0) ?></strong><span>Kolekcje</span></a>
-        <a
-            href="/admin/pages"><strong><?= $number($contentSummary['published'] ?? 0) ?></strong><span>Aktywne</span></a>
-        <a
-            href="/admin/settings"><strong><?= $number($contentSummary['languages'] ?? 0) ?></strong><span>Języki</span></a>
+        <a href="/admin/pages">
+            <strong><?= $number($contentSummary['pages'] ?? 0) ?></strong>
+            <span>Strony</span>
+        </a>
+        <a href="/admin/pages">
+            <strong><?= $number($contentSummary['collections'] ?? 0) ?></strong>
+            <span>Kolekcje</span>
+        </a>
+        <a href="/admin/pages">
+            <strong><?= $number($contentSummary['published'] ?? 0) ?></strong>
+            <span>Aktywne</span>
+        </a>
+        <a href="/admin/settings">
+            <strong><?= $number($contentSummary['languages'] ?? 0) ?></strong>
+            <span>Języki</span>
+        </a>
     </div>
     <nav class="dashboard-quick-actions" aria-label="Szybkie akcje">
         <a href="/admin/pages">
@@ -182,29 +198,44 @@ $contentSummary = is_array($contentSummary ?? null) ? $contentSummary : [];
     }
     ?>
     <?php if (is_string($analytics['warning'] ?? null)): ?>
-        <div class="analytics-notice warning"><?= $escape($analytics['warning']) ?></div><?php endif; ?>
+        <div class="analytics-notice warning"><?= $escape($analytics['warning']) ?></div>
+    <?php endif; ?>
     <section class="metric-grid" aria-label="Podsumowanie ruchu">
         <article class="metric-card">
-            <span>Odsłony</span><strong><?= $number($summary['pageViews'] ?? 0) ?></strong><?= $change($summary['pageViewsChange'] ?? null) ?><small>względem
-                poprzedniego okresu</small>
+            <span>Odsłony</span>
+            <strong><?= $number($summary['pageViews'] ?? 0) ?></strong>
+            <?= $change($summary['pageViewsChange'] ?? null) ?>
+            <small>względem poprzedniego okresu</small>
         </article>
         <article class="metric-card">
-            <span>Wizyty</span><strong><?= $number($summary['visits'] ?? 0) ?></strong><?= $change($summary['visitsChange'] ?? null) ?><small>wejścia
-                zewnętrzne i bezpośrednie</small>
+            <span>Wizyty</span>
+            <strong><?= $number($summary['visits'] ?? 0) ?></strong>
+            <?= $change($summary['visitsChange'] ?? null) ?>
+            <small>wejścia zewnętrzne i bezpośrednie</small>
         </article>
-        <article class="metric-card"><span>Odsłon na
-                wizytę</span><strong><?= $escape(number_format((float) ($summary['viewsPerVisit'] ?? 0), 2, ',', ' ')) ?></strong><span
-                class="metric-change neutral">średnia</span><small>za wybrany okres</small></article>
-        <article class="metric-card"><span>Żądania
-                HTTP</span><strong><?= $number($summary['requests'] ?? 0) ?></strong><span
-                class="metric-change neutral">edge</span><small>ruch użytkowników przez Cloudflare</small></article>
         <article class="metric-card">
-            <span>Transfer</span><strong><?= $escape($bytes($summary['transferBytes'] ?? 0)) ?></strong><span
-                class="metric-change neutral">edge</span><small>dane wysłane do odwiedzających</small>
+            <span>Odsłon na wizytę</span>
+            <strong><?= $escape(number_format((float) ($summary['viewsPerVisit'] ?? 0), 2, ',', ' ')) ?></strong>
+            <span class="metric-change neutral">średnia</span>
+            <small>za wybrany okres</small>
         </article>
-        <article class="metric-card"><span>Cache hit
-                ratio</span><strong><?= $escape(number_format((float) ($summary['cacheHitRatio'] ?? 0), 1, ',', ' ')) ?>%</strong><span
-                class="metric-change good">Cloudflare</span><small><?= ($analytics['cache'] ?? '') === 'stale' ? 'dane archiwalne' : 'dane odświeżone' ?></small>
+        <article class="metric-card">
+            <span>Żądania HTTP</span>
+            <strong><?= $number($summary['requests'] ?? 0) ?></strong>
+            <span class="metric-change neutral">edge</span>
+            <small>ruch użytkowników przez Cloudflare</small>
+        </article>
+        <article class="metric-card">
+            <span>Transfer</span>
+            <strong><?= $escape($bytes($summary['transferBytes'] ?? 0)) ?></strong>
+            <span class="metric-change neutral">edge</span>
+            <small>dane wysłane do odwiedzających</small>
+        </article>
+        <article class="metric-card">
+            <span>Cache hit ratio</span>
+            <strong><?= $escape(number_format((float) ($summary['cacheHitRatio'] ?? 0), 1, ',', ' ')) ?>%</strong>
+            <span class="metric-change good">Cloudflare</span>
+            <small><?= ($analytics['cache'] ?? '') === 'stale' ? 'dane archiwalne' : 'dane odświeżone' ?></small>
         </article>
     </section>
 
@@ -214,7 +245,10 @@ $contentSummary = is_array($contentSummary ?? null) ? $contentSummary : [];
                 <p class="eyebrow">Ruch w czasie</p>
                 <h2>Odsłony i wizyty</h2>
             </div>
-            <div class="chart-legend"><span class="views">Odsłony</span><span class="visits">Wizyty</span></div>
+            <div class="chart-legend">
+                <span class="views">Odsłony</span>
+                <span class="visits">Wizyty</span>
+            </div>
         </header>
         <?php if ($series === []): ?>
             <p class="analytics-no-data">Brak danych w wybranym okresie.</p>
@@ -232,9 +266,12 @@ $contentSummary = is_array($contentSummary ?? null) ? $contentSummary : [];
                 <div class="chart-labels">
                     <?php foreach ($series as $index => $point):
                         if ($index % max(1, (int) ceil($count / 7)) !== 0 && $index !== $count - 1)
-                            continue; ?><span><?= $escape((string) ($point['label'] ?? '')) ?></span><?php endforeach; ?>
+                            continue; ?>
+                        <span><?= $escape((string) ($point['label'] ?? '')) ?></span>
+                    <?php endforeach; ?>
                 </div>
-            </div><?php endif; ?>
+            </div>
+        <?php endif; ?>
     </section>
 
     <div class="analytics-columns">
@@ -254,9 +291,14 @@ $contentSummary = is_array($contentSummary ?? null) ? $contentSummary : [];
                         <?php foreach ($ranking as $row):
                             $width = min(100, ((int) ($row['pageViews'] ?? 0) / $maximum) * 100); ?>
                             <li>
-                                <div><span class="ranking-label"
-                                        title="<?= $escape((string) ($row['label'] ?? '')) ?>"><?= $escape((string) ($row['label'] ?? '')) ?></span><strong><?= $number($row['pageViews'] ?? 0) ?></strong>
-                                </div><span class="bar"><i style="width:<?= $escape(number_format($width, 1, '.', '')) ?>%"></i></span>
+                                <div>
+                                    <span class="ranking-label"
+                                        title="<?= $escape((string) ($row['label'] ?? '')) ?>"><?= $escape((string) ($row['label'] ?? '')) ?></span>
+                                    <strong><?= $number($row['pageViews'] ?? 0) ?></strong>
+                                </div>
+                                <span class="bar">
+                                    <i style="width:<?= $escape(number_format($width, 1, '.', '')) ?>%"></i>
+                                </span>
                             </li>
                         <?php endforeach; ?>
                     </ol><?php endif; ?>
@@ -269,10 +311,10 @@ $contentSummary = is_array($contentSummary ?? null) ? $contentSummary : [];
             <div>
                 <p class="eyebrow">Real User Monitoring · P75</p>
                 <h2>Core Web Vitals</h2>
-            </div><span>75. percentyl</span>
+            </div>
+            <span>75. percentyl</span>
         </header>
-        <?php $vitals = is_array($analytics['vitals'] ?? null) ? $analytics['vitals'] : null;
-        if ($vitals === null): ?>
+        <?php if ($vitals === null): ?>
             <p class="analytics-no-data">Brak danych Web Vitals. Sprawdź beacon Web Analytics i uprawnienia tokenu.</p>
         <?php else: ?>
             <div class="vitals-grid">
@@ -280,7 +322,10 @@ $contentSummary = is_array($contentSummary ?? null) ? $contentSummary : [];
                     $state = (string) ($vitals[$key . 'Rating'] ?? 'poor'); ?>
                     <article class="vital-card <?= $state ?>">
                         <div class="vital-gauge">
-                            <span></span><strong><?= $escape($key === 'cls' ? number_format((float) ($vitals[$key] ?? 0), 3, ',', '') : $number($vitals[$key] ?? 0)) ?><small><?= $unit ?></small></strong>
+                            <span></span>
+                            <strong><?= $escape($key === 'cls' ? number_format((float) ($vitals[$key] ?? 0), 3, ',', '') : $number($vitals[$key] ?? 0)) ?>
+                                <small><?= $unit ?></small>
+                            </strong>
                         </div>
                         <div>
                             <h3><?= $label ?></h3>
@@ -303,10 +348,17 @@ $contentSummary = is_array($contentSummary ?? null) ? $contentSummary : [];
                     <p class="analytics-no-data">Brak danych.</p><?php else: ?>
                     <ul>
                         <?php foreach ($ranking as $row): ?>
-                            <li><span><?= $escape((string) ($row['label'] ?? '')) ?></span><span class="compact-bar"><i
-                                        style="width:<?= $escape(number_format(((int) ($row['pageViews'] ?? 0) / $total) * 100, 1, '.', '')) ?>%"></i></span><strong><?= $escape(number_format(((int) ($row['pageViews'] ?? 0) / $total) * 100, 1, ',', '')) ?>%</strong>
-                            </li><?php endforeach; ?>
-                    </ul><?php endif; ?>
+                            <li>
+                                <span><?= $escape((string) ($row['label'] ?? '')) ?></span>
+                                <span class="compact-bar">
+                                    <i
+                                        style="width:<?= $escape(number_format(((int) ($row['pageViews'] ?? 0) / $total) * 100, 1, '.', '')) ?>%"></i>
+                                </span>
+                                <strong><?= $escape(number_format(((int) ($row['pageViews'] ?? 0) / $total) * 100, 1, ',', '')) ?>%</strong>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
             </section>
         <?php endforeach; ?>
     </div>

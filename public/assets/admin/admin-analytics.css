@@ -250,6 +250,7 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+  white-space: nowrap;
 }
 .vital-gauge small {
   margin-left: 0.12rem;
