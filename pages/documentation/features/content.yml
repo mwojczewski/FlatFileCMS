@@ -5,168 +5,152 @@ slug:
   pl: mozliwosci
   en: features
 title:
-  pl: 'Możliwości FlatFile CMS'
-  en: 'FlatFile CMS features'
+  pl: "Możliwości FlatFile CMS"
+  en: "FlatFile CMS features"
 order: 0
 seo:
   title:
-    pl: 'Możliwości FlatFile CMS - techniczny przewodnik'
-    en: 'FlatFile CMS features - a technical guide'
+    pl: "Możliwości FlatFile CMS - techniczny przewodnik"
+    en: "FlatFile CMS features - a technical guide"
   description:
-    pl: 'Techniczny przewodnik po blokach, SSR, REST API, kolekcjach, lokalizacji, mediach i bezpieczeństwie FlatFile CMS.'
-    en: 'A technical guide to blocks, SSR, the REST API, collections, localization, media and security in FlatFile CMS.'
+    pl: "Techniczny przewodnik po blokach, SSR, REST API, kolekcjach, lokalizacji, mediach i bezpieczeństwie FlatFile CMS."
+    en: "A technical guide to blocks, SSR, the REST API, collections, localization, media and security in FlatFile CMS."
   robots:
     index: true
     follow: true
   openGraph: {}
   twitter: {}
   jsonLd:
-    '@context': 'https://schema.org'
-    '@type': TechArticle
-    headline: 'FlatFile CMS Features'
+    "@context": "https://schema.org"
+    "@type": TechArticle
+    headline: "FlatFile CMS Features"
 blocks:
-  -
-    id: 01a08c3a-655d-7b14-ae5a-89ee33ea616c
+  - id: 01a08c3a-655d-7b14-ae5a-89ee33ea616c
     type: page-progressbar
     enabled: true
     data:
       accent: mint
-  -
-    id: 01a05e10-1001-7401-8401-000000000001
+  - id: 01a05e10-1001-7401-8401-000000000001
     type: docs-hero
     enabled: true
     data:
       breadcrumb:
-        pl: 'Dokumentacja / 01 /Możliwości'
-        en: 'Documentation / 01 / Features'
+        pl: "Dokumentacja / 01 /Możliwości"
+        en: "Documentation / 01 / Features"
       title:
-        pl: 'Możliwości FlatFile CMS'
-        en: 'FlatFile CMS features'
+        pl: "Możliwości FlatFile CMS"
+        en: "FlatFile CMS features"
       lead:
-        pl: 'Techniczny przewodnik po kontraktach treści, systemie bloków, renderowaniu, kolekcjach, mediach i granicach bezpieczeństwa frameworka.'
-        en: 'A technical guide to the framework’s content contracts, block system, rendering, collections, media and security boundaries.'
+        pl: "Techniczny przewodnik po kontraktach treści, systemie bloków, renderowaniu, kolekcjach, mediach i granicach bezpieczeństwa frameworka."
+        en: "A technical guide to the framework’s content contracts, block system, rendering, collections, media and security boundaries."
       level: średniozaawansowany
       reading_time:
-        pl: 'około 18 minut'
-        en: 'about 18 minutes'
-      updated: '2026-09-02'
+        pl: "około 18 minut"
+        en: "about 18 minutes"
+      updated: "2026-09-02"
       topics:
-        -
-          label:
+        - label:
             pl: YAML
             en: YAML
-        -
-          label:
+        - label:
             pl: Bloki
             en: Blocks
-        -
-          label:
+        - label:
             pl: SSR
             en: SSR
-        -
-          label:
-            pl: 'REST API'
-            en: 'REST API'
-        -
-          label:
+        - label:
+            pl: "REST API"
+            en: "REST API"
+        - label:
             pl: Media
             en: Media
-        -
-          label:
+        - label:
             pl: Bezpieczeństwo
             en: Security
-  -
-    id: 01a05e10-1001-7402-8402-000000000002
+  - id: 01a05e10-1001-7402-8402-000000000002
     type: docs-toc
     enabled: true
     data:
       title:
-        pl: 'Jak czytać ten przewodnik'
-        en: 'How to read this guide'
+        pl: "Jak czytać ten przewodnik"
+        en: "How to read this guide"
       intro:
-        pl: 'Zacznij od pipeline’u, a następnie przejdź przez kontrakty, adaptery publiczne, kolekcje i bezpieczeństwo. Każdy rozdział łączy decyzję architektoniczną z fragmentem konfiguracji lub kodu.'
-        en: 'Start with the pipeline, then move through contracts, public adapters, collections and security. Every chapter connects an architectural decision with configuration or code.'
+        pl: "Zacznij od pipeline’u, a następnie przejdź przez kontrakty, adaptery publiczne, kolekcje i bezpieczeństwo. Każdy rozdział łączy decyzję architektoniczną z fragmentem konfiguracji lub kodu."
+        en: "Start with the pipeline, then move through contracts, public adapters, collections and security. Every chapter connects an architectural decision with configuration or code."
       items:
-        -
-          number: '01'
+        - number: "01"
           title:
-            pl: 'Pipeline wykonania'
-            en: 'Execution pipeline'
+            pl: "Pipeline wykonania"
+            en: "Execution pipeline"
           description:
-            pl: 'Droga od repozytorium YAML do odpowiedzi HTTP.'
-            en: 'The path from a YAML repository to an HTTP response.'
+            pl: "Droga od repozytorium YAML do odpowiedzi HTTP."
+            en: "The path from a YAML repository to an HTTP response."
           url:
-            pl: '/pl/dokumentacja/mozliwosci#architektura'
-            en: '/en/documentation/features#architektura'
-        -
-          number: '02'
+            pl: "/pl/dokumentacja/mozliwosci#architektura"
+            en: "/en/documentation/features#architektura"
+        - number: "02"
           title:
-            pl: 'Kontrakty i bloki'
-            en: 'Contracts and blocks'
+            pl: "Kontrakty i bloki"
+            en: "Contracts and blocks"
           description:
-            pl: 'Tożsamość strony, block.yml i bezpieczny renderer.'
-            en: 'Page identity, block.yml and a safe renderer.'
+            pl: "Tożsamość strony, block.yml i bezpieczny renderer."
+            en: "Page identity, block.yml and a safe renderer."
           url:
-            pl: '/pl/dokumentacja/mozliwosci#content-model'
-            en: '/en/documentation/features#content-model'
-        -
-          number: '03'
+            pl: "/pl/dokumentacja/mozliwosci#content-model"
+            en: "/en/documentation/features#content-model"
+        - number: "03"
           title:
-            pl: 'HTML i JSON'
-            en: 'HTML and JSON'
+            pl: "HTML i JSON"
+            en: "HTML and JSON"
           description:
-            pl: 'Jeden ViewModel i dwa niezależne adaptery.'
-            en: 'One ViewModel and two independent adapters.'
+            pl: "Jeden ViewModel i dwa niezależne adaptery."
+            en: "One ViewModel and two independent adapters."
           url:
-            pl: '/pl/dokumentacja/mozliwosci#developer-experience'
-            en: '/en/documentation/features#developer-experience'
-        -
-          number: '04'
+            pl: "/pl/dokumentacja/mozliwosci#developer-experience"
+            en: "/en/documentation/features#developer-experience"
+        - number: "04"
           title:
-            pl: 'Kolekcje i media'
-            en: 'Collections and media'
+            pl: "Kolekcje i media"
+            en: "Collections and media"
           description:
-            pl: 'Paginacja, allowlisty filtrów i pipeline obrazów.'
-            en: 'Pagination, filter allowlists and the image pipeline.'
+            pl: "Paginacja, allowlisty filtrów i pipeline obrazów."
+            en: "Pagination, filter allowlists and the image pipeline."
           url:
-            pl: '/pl/dokumentacja/mozliwosci#collections-media'
-            en: '/en/documentation/features#collections-media'
-        -
-          number: '05'
+            pl: "/pl/dokumentacja/mozliwosci#collections-media"
+            en: "/en/documentation/features#collections-media"
+        - number: "05"
           title:
-            pl: 'Bezpieczeństwo zapisu'
-            en: 'Write safety'
+            pl: "Bezpieczeństwo zapisu"
+            en: "Write safety"
           description:
-            pl: 'Rewizje, blokady, atomowe pliki i audyt.'
-            en: 'Revisions, locks, atomic files and audit.'
+            pl: "Rewizje, blokady, atomowe pliki i audyt."
+            en: "Revisions, locks, atomic files and audit."
           url:
-            pl: '/pl/dokumentacja/mozliwosci#security-tests'
-            en: '/en/documentation/features#security-tests'
-        -
-          number: '06'
+            pl: "/pl/dokumentacja/mozliwosci#security-tests"
+            en: "/en/documentation/features#security-tests"
+        - number: "06"
           title:
-            pl: 'Strategia testów'
-            en: 'Testing strategy'
+            pl: "Strategia testów"
+            en: "Testing strategy"
           description:
-            pl: 'Unit, repozytorium, HTTP oraz composer check.'
-            en: 'Unit, repository, HTTP and composer check.'
+            pl: "Unit, repozytorium, HTTP oraz composer check."
+            en: "Unit, repository, HTTP and composer check."
           url:
-            pl: '/pl/dokumentacja/mozliwosci#security-tests'
-            en: '/en/documentation/features#security-tests'
-  -
-    id: 01a05e10-1001-7412-8412-000000000012
+            pl: "/pl/dokumentacja/mozliwosci#security-tests"
+            en: "/en/documentation/features#security-tests"
+  - id: 01a05e10-1001-7412-8412-000000000012
     type: technical-table
     enabled: true
     data:
       eyebrow:
-        pl: '00 / Mapa odpowiedzialności'
-        en: '00 / Responsibility map'
+        pl: "00 / Mapa odpowiedzialności"
+        en: "00 / Responsibility map"
       title:
-        pl: 'Od treści do publicznej odpowiedzi.'
-        en: 'From content to a public response.'
+        pl: "Od treści do publicznej odpowiedzi."
+        en: "From content to a public response."
       intro:
-        pl: 'Każda warstwa otrzymuje kontrolowane wejście, realizuje jedną odpowiedzialność i przekazuje wynik do kolejnego elementu pipeline’u. Na wąskich ekranach każdy wiersz staje się osobną kartą.'
-        en: 'Each layer receives controlled input, performs one responsibility and passes its result to the next pipeline element. On narrow screens, every row becomes a separate card.'
+        pl: "Każda warstwa otrzymuje kontrolowane wejście, realizuje jedną odpowiedzialność i przekazuje wynik do kolejnego elementu pipeline’u. Na wąskich ekranach każdy wiersz staje się osobną kartą."
+        en: "Each layer receives controlled input, performs one responsibility and passes its result to the next pipeline element. On narrow screens, every row becomes a separate card."
       column_1:
         pl: Warstwa
         en: Layer
@@ -180,133 +164,120 @@ blocks:
         pl: Wyjście
         en: Output
       rows:
-        -
-          cell_1:
+        - cell_1:
             pl: Content
             en: Content
           cell_2:
             pl: YAML
             en: YAML
           cell_3:
-            pl: 'Odczyt, rewizje i stabilna tożsamość'
-            en: 'Reads, revisions and stable identity'
+            pl: "Odczyt, rewizje i stabilna tożsamość"
+            en: "Reads, revisions and stable identity"
           cell_4:
-            pl: 'Model domenowy'
-            en: 'Domain model'
-        -
-          cell_1:
+            pl: "Model domenowy"
+            en: "Domain model"
+        - cell_1:
             pl: Blocks
             en: Blocks
           cell_2:
-            pl: 'Dane bloku'
-            en: 'Block data'
+            pl: "Dane bloku"
+            en: "Block data"
           cell_3:
-            pl: 'Walidacja, normalizacja i lokalizacja'
-            en: 'Validation, normalization and localization'
+            pl: "Walidacja, normalizacja i lokalizacja"
+            en: "Validation, normalization and localization"
           cell_4:
-            pl: 'Normalized data'
-            en: 'Normalized data'
-        -
-          cell_1:
+            pl: "Normalized data"
+            en: "Normalized data"
+        - cell_1:
             pl: ViewModel
             en: ViewModel
           cell_2:
-            pl: 'Strona i konfiguracja'
-            en: 'Page and configuration'
+            pl: "Strona i konfiguracja"
+            en: "Page and configuration"
           cell_3:
-            pl: 'SEO, nawigacja, media i aktywne bloki'
-            en: 'SEO, navigation, media and enabled blocks'
+            pl: "SEO, nawigacja, media i aktywne bloki"
+            en: "SEO, navigation, media and enabled blocks"
           cell_4:
-            pl: 'Publiczny model'
-            en: 'Public model'
-        -
-          cell_1:
+            pl: "Publiczny model"
+            en: "Public model"
+        - cell_1:
             pl: Rendering
             en: Rendering
           cell_2:
-            pl: 'Publiczny model'
-            en: 'Public model'
+            pl: "Publiczny model"
+            en: "Public model"
           cell_3:
-            pl: 'Renderery bloków i layout PHP'
-            en: 'Block renderers and PHP layout'
+            pl: "Renderery bloków i layout PHP"
+            en: "Block renderers and PHP layout"
           cell_4:
             pl: HTML
             en: HTML
-        -
-          cell_1:
+        - cell_1:
             pl: API
             en: API
           cell_2:
-            pl: 'Publiczny model'
-            en: 'Public model'
+            pl: "Publiczny model"
+            en: "Public model"
           cell_3:
-            pl: 'Kontrolowana serializacja'
-            en: 'Controlled serialization'
+            pl: "Kontrolowana serializacja"
+            en: "Controlled serialization"
           cell_4:
             pl: JSON
             en: JSON
-  -
-    id: 01a05e10-1001-7404-8404-000000000004
+  - id: 01a05e10-1001-7404-8404-000000000004
     type: architecture
     enabled: true
     data:
       eyebrow:
-        pl: 'Pipeline wykonania'
-        en: 'Execution pipeline'
+        pl: "Pipeline wykonania"
+        en: "Execution pipeline"
       title:
-        pl: 'Od pliku do odpowiedzi HTTP.'
-        en: 'From file to HTTP response.'
+        pl: "Od pliku do odpowiedzi HTTP."
+        en: "From file to HTTP response."
       intro:
-        pl: 'Repozytoria odpowiadają za odczyt kontraktów, procesory za poprawność danych, a adaptery renderujące nie powielają logiki domenowej.'
-        en: 'Repositories read contracts, processors guarantee valid data and rendering adapters never duplicate domain logic.'
+        pl: "Repozytoria odpowiadają za odczyt kontraktów, procesory za poprawność danych, a adaptery renderujące nie powielają logiki domenowej."
+        en: "Repositories read contracts, processors guarantee valid data and rendering adapters never duplicate domain logic."
       steps:
-        -
-          label:
-            pl: 'Repozytorium YAML'
-            en: 'YAML repository'
+        - label:
+            pl: "Repozytorium YAML"
+            en: "YAML repository"
           detail:
-            pl: 'Bezpieczny odczyt stron i konfiguracji'
-            en: 'Safe page and configuration reads'
-        -
-          label:
-            pl: 'Model domenowy'
-            en: 'Domain model'
+            pl: "Bezpieczny odczyt stron i konfiguracji"
+            en: "Safe page and configuration reads"
+        - label:
+            pl: "Model domenowy"
+            en: "Domain model"
           detail:
-            pl: 'Tożsamość, widoczność i metadane'
-            en: 'Identity, visibility and metadata'
-        -
-          label:
+            pl: "Tożsamość, widoczność i metadane"
+            en: "Identity, visibility and metadata"
+        - label:
             pl: BlockProcessor
             en: BlockProcessor
           detail:
-            pl: 'Walidacja, normalizacja i lokalizacja'
-            en: 'Validation, normalization and localization'
-        -
-          label:
+            pl: "Walidacja, normalizacja i lokalizacja"
+            en: "Validation, normalization and localization"
+        - label:
             pl: PageViewModel
             en: PageViewModel
           detail:
-            pl: 'SEO, media, nawigacja i gotowe bloki'
-            en: 'SEO, media, navigation and ready blocks'
-        -
-          label:
-            pl: 'Adapter HTML lub JSON'
-            en: 'HTML or JSON adapter'
+            pl: "SEO, media, nawigacja i gotowe bloki"
+            en: "SEO, media, navigation and ready blocks"
+        - label:
+            pl: "Adapter HTML lub JSON"
+            en: "HTML or JSON adapter"
           detail:
-            pl: 'SSR albo publiczna projekcja API'
-            en: 'SSR or a public API projection'
-        -
-          label:
-            pl: 'Cache HTTP'
-            en: 'HTTP cache'
+            pl: "SSR albo publiczna projekcja API"
+            en: "SSR or a public API projection"
+        - label:
+            pl: "Cache HTTP"
+            en: "HTTP cache"
           detail:
-            pl: 'ETag, Last-Modified i rewalidacja'
-            en: 'ETag, Last-Modified and revalidation'
+            pl: "ETag, Last-Modified i rewalidacja"
+            en: "ETag, Last-Modified and revalidation"
       note:
-        pl: 'Walidacja odbywa się przed renderowaniem i przed zapisem zmienionej treści.'
-        en: 'Validation runs before rendering and before modified content is written.'
-  -
-    id: 01a05e10-1001-7405-8405-000000000005
+        pl: "Walidacja odbywa się przed renderowaniem i przed zapisem zmienionej treści."
+        en: "Validation runs before rendering and before modified content is written."
+  - id: 01a05e10-1001-7405-8405-000000000005
     type: article-content
     enabled: true
     data:
@@ -455,22 +426,21 @@ blocks:
 
           Block CSS and JavaScript are collected only when an enabled block of that type appears on the page. `AssetPublisher` limits source size, rejects symlinks, calculates SHA-256 and publishes a fingerprinted file below `public/assets/blocks/`.
       note:
-        pl: 'Treść wybiera wyłącznie nazwę bloku i jego dane. Nigdy nie wskazuje ścieżki do pliku PHP.'
-        en: 'Content selects only a block name and its data. It never supplies a path to a PHP file.'
-  -
-    id: 01a05e10-1001-7406-8406-000000000006
+        pl: "Treść wybiera wyłącznie nazwę bloku i jego dane. Nigdy nie wskazuje ścieżki do pliku PHP."
+        en: "Content selects only a block name and its data. It never supplies a path to a PHP file."
+  - id: 01a05e10-1001-7406-8406-000000000006
     type: code-showcase
     enabled: true
     data:
       eyebrow:
-        pl: 'Jeden model, dwa adaptery'
-        en: 'One model, two adapters'
+        pl: "Jeden model, dwa adaptery"
+        en: "One model, two adapters"
       title:
-        pl: 'To samo źródło zasila HTML i JSON.'
-        en: 'The same source powers HTML and JSON.'
+        pl: "To samo źródło zasila HTML i JSON."
+        en: "The same source powers HTML and JSON."
       description:
-        pl: 'PageViewModelFactory składa zwalidowane bloki, SEO oraz wzbogacone media. Serializer projektuje model do API, a PageRenderer uruchamia renderery PHP - bez wywoływania jednego adaptera przez drugi.'
-        en: 'PageViewModelFactory assembles validated blocks, SEO and enriched media. The serializer projects the model into the API while PageRenderer runs PHP renderers - neither adapter calls the other.'
+        pl: "PageViewModelFactory składa zwalidowane bloki, SEO oraz wzbogacone media. Serializer projektuje model do API, a PageRenderer uruchamia renderery PHP - bez wywoływania jednego adaptera przez drugi."
+        en: "PageViewModelFactory assembles validated blocks, SEO and enriched media. The serializer projects the model into the API while PageRenderer runs PHP renderers - neither adapter calls the other."
       filename: pages/features/content.yml
       code: |-
         blocks:
@@ -488,20 +458,16 @@ blocks:
                     en: Content contracts
                   accent: mint
       bullets:
-        -
-          text:
-            pl: 'Disabled block jest walidowany, ale nie trafia do publicznego wyjścia.'
-            en: 'A disabled block is validated but omitted from public output.'
-        -
-          text:
-            pl: 'API i SSR stosują tę samą lokalizację oraz fallback.'
-            en: 'The API and SSR apply identical localization and fallback.'
-        -
-          text:
-            pl: 'Media otrzymują te same fingerprintowane URL-e w HTML i JSON.'
-            en: 'Media receives the same fingerprinted URLs in HTML and JSON.'
-  -
-    id: 01a05e10-1001-7407-8407-000000000007
+        - text:
+            pl: "Disabled block jest walidowany, ale nie trafia do publicznego wyjścia."
+            en: "A disabled block is validated but omitted from public output."
+        - text:
+            pl: "API i SSR stosują tę samą lokalizację oraz fallback."
+            en: "The API and SSR apply identical localization and fallback."
+        - text:
+            pl: "Media otrzymują te same fingerprintowane URL-e w HTML i JSON."
+            en: "Media receives the same fingerprinted URLs in HTML and JSON."
+  - id: 01a05e10-1001-7407-8407-000000000007
     type: article-content
     enabled: true
     data:
@@ -606,10 +572,9 @@ blocks:
 
           SVG is sanitized while raster files can receive variants based on configured quality, dimensions and pixel limits. A public fingerprint enables long caching without serving stale content after a file changes.
       note:
-        pl: 'Kolekcja jest konfiguracją zapytania nad stronami, a nie osobnym typem danych przechowywanym w bazie.'
-        en: 'A collection is a query configuration over pages, not a separate database-backed content type.'
-  -
-    id: 01a05e10-1001-7408-8408-000000000008
+        pl: "Kolekcja jest konfiguracją zapytania nad stronami, a nie osobnym typem danych przechowywanym w bazie."
+        en: "A collection is a query configuration over pages, not a separate database-backed content type."
+  - id: 01a05e10-1001-7408-8408-000000000008
     type: article-content
     enabled: true
     data:
@@ -646,7 +611,7 @@ blocks:
           composer check
           ```
 
-          PHP CS Fixer pilnuje jednolitego kodu, PHPStan sprawdza kontrakty typów, a PHPUnit weryfikuje zachowanie bez zależności od produkcyjnego filesystemu.
+          PHP CS Fixer pilnuje jednolitego kodu, PHPStan sprawdza kontrakty typów, a PHPUnit weryfikuje zachowanie bez zależności od produkcyjnego systemu plików.
 
           ## Co dalej
 
@@ -688,25 +653,24 @@ blocks:
 
           This page is a map of the system. The next tutorial - **Pierwsze uruchomienie** - will cover requirements, installation, environment configuration, administrator creation and publishing the first page.
       note:
-        pl: 'Dobra funkcja frameworka kończy się testowalnym kontraktem, a nie tylko działającym ekranem panelu.'
-        en: 'A good framework feature ends with a testable contract, not merely a working admin screen.'
-  -
-    id: 01a05e10-1001-7409-8409-000000000009
+        pl: "Dobra funkcja frameworka kończy się testowalnym kontraktem, a nie tylko działającym ekranem panelu."
+        en: "A good framework feature ends with a testable contract, not merely a working admin screen."
+  - id: 01a05e10-1001-7409-8409-000000000009
     type: call-to-action
     enabled: true
     data:
       eyebrow:
-        pl: 'Następny tutorial'
-        en: 'Next tutorial'
+        pl: "Następny tutorial"
+        en: "Next tutorial"
       title:
-        pl: 'Uruchom framework od zera.'
-        en: 'Start the framework from scratch.'
+        pl: "Uruchom framework od zera."
+        en: "Start the framework from scratch."
       description:
-        pl: 'Pierwsze uruchomienie pokaże kompletny proces od wymagań PHP i konfiguracji środowiska do pierwszego zalogowania i opublikowanej strony.'
-        en: 'Getting Started will cover the complete process from PHP requirements and environment configuration to the first login and published page.'
+        pl: "Pierwsze uruchomienie pokaże kompletny proces od wymagań PHP i konfiguracji środowiska do pierwszego zalogowania i opublikowanej strony."
+        en: "Getting Started will cover the complete process from PHP requirements and environment configuration to the first login and published page."
       button_label:
-        pl: 'Otwórz Dokumentację'
-        en: 'Open the Docs'
+        pl: "Otwórz Dokumentację"
+        en: "Open the Docs"
       button_url:
         pl: /pl/dokumentacja
         en: /en/documentation

@@ -1,0 +1,1007 @@
+schemaVersion: 1
+enabled: true
+layout: default
+slug:
+  pl: bezpieczenstwo
+  en: security
+title:
+  pl: Bezpieczeństwo — granice zaufania od requestu do systemu plików
+  en: Security — trust boundaries from request to filesystem
+date: "2026-09-12"
+order: 7
+category: security
+excerpt:
+  pl: Techniczny przewodnik po modelu bezpieczeństwa FlatFile CMS — produkcyjnym bootstrapie, proxy, sesjach, CSRF, hasłach, WebAuthn, walidacji, bezpiecznym systemie plików, cache i diagnostyce.
+  en: A technical guide to the FlatFile CMS security model — production bootstrap, proxies, sessions, CSRF, passwords, WebAuthn, validation, safe filesystem access, caching and diagnostics.
+seo:
+  title:
+    pl: Bezpieczeństwo FlatFile CMS — kompletny tutorial
+    en: FlatFile CMS security — complete tutorial
+  description:
+    pl: Poznaj granice zaufania CMS-a, ochronę panelu, WebAuthn, bezpieczne ścieżki, YAML, zapisy atomowe, sekrety, proxy i procedurę hardeningu.
+    en: Learn CMS trust boundaries, admin protection, WebAuthn, safe paths, YAML, atomic writes, secrets, proxies and the hardening procedure.
+  robots: { index: true, follow: true }
+  openGraph: {}
+  twitter: {}
+  jsonLd:
+    "@context": https://schema.org
+    "@type": TechArticle
+    headline: FlatFile CMS security — trust boundaries from request to filesystem
+    dateModified: "2026-09-12"
+blocks:
+  - id: 01a06d50-7007-7701-8701-000000000001
+    type: docs-hero
+    enabled: true
+    data:
+      breadcrumb:
+        {
+          pl: Dokumentacja / 07 / Bezpieczeństwo,
+          en: Documentation / 07 / Security,
+        }
+      title:
+        pl: Bezpieczeństwo — od requestu do systemu plików
+        en: Security — from request to filesystem
+      lead:
+        pl: Zobacz, jak kolejne warstwy ograniczają zaufanie do sieci, sesji, danych formularza, YAML-a, nazw ścieżek i cache — oraz gdzie kończą się gwarancje aplikacji.
+        en: See how successive layers limit trust in the network, session, form data, YAML, path names and cache—and where application guarantees end.
+      level: zaawansowany
+      reading_time: { pl: około 50 minut, en: about 50 minutes }
+      updated: "2026-09-12"
+      topics:
+        - label: { pl: Granice zaufania, en: Trust boundaries }
+        - label: { pl: Sesje i CSRF, en: Sessions and CSRF }
+        - label: { pl: WebAuthn, en: WebAuthn }
+        - label: { pl: Bezpieczny YAML, en: Safe YAML }
+        - label: { pl: System plików, en: Filesystem }
+        - label: { pl: Hardening, en: Hardening }
+  - id: 01a06d50-7007-7702-8702-000000000002
+    type: docs-toc
+    enabled: true
+    data:
+      title: { pl: Mapa granic bezpieczeństwa, en: Security boundary map }
+      intro:
+        pl: Bezpieczeństwo nie jest pojedynczym filtrem. Prześledzimy kontrolę od środowiska i proxy, przez tożsamość administratora, aż do atomowego zapisu i publicznej odpowiedzi.
+        en: Security is not one filter. We trace controls from environment and proxy through administrator identity to atomic storage and the public response.
+      items:
+        - number: "01"
+          title: { pl: Model zagrożeń, en: Threat model }
+          description:
+            {
+              pl: "Aktywa, granice i odpowiedzialność operatora.",
+              en: "Assets, boundaries and operator responsibility.",
+            }
+          url:
+            {
+              pl: /pl/dokumentacja/bezpieczenstwo#model-zagrozen,
+              en: /en/documentation/security#model-zagrozen,
+            }
+        - number: "02"
+          title: { pl: Bootstrap i proxy, en: Bootstrap and proxy }
+          description:
+            {
+              pl: Produkcyjne guardy i wiarygodny adres klienta.,
+              en: Production guards and trustworthy client IP.,
+            }
+          url:
+            {
+              pl: /pl/dokumentacja/bezpieczenstwo#bootstrap,
+              en: /en/documentation/security#bootstrap,
+            }
+        - number: "03"
+          title: { pl: Uwierzytelnianie, en: Authentication }
+          description:
+            {
+              pl: "Hasła, role, sesje i limity prób.",
+              en: "Passwords, roles, sessions and attempt limits.",
+            }
+          url:
+            {
+              pl: /pl/dokumentacja/bezpieczenstwo#uwierzytelnianie,
+              en: /en/documentation/security#uwierzytelnianie,
+            }
+        - number: "04"
+          title: { pl: CSRF i WebAuthn, en: CSRF and WebAuthn }
+          description:
+            {
+              pl: Ochrona mutacji i drugi składnik.,
+              en: Mutation protection and a second factor.,
+            }
+          url:
+            {
+              pl: /pl/dokumentacja/bezpieczenstwo#csrf-webauthn,
+              en: /en/documentation/security#csrf-webauthn,
+            }
+        - number: "05"
+          title: { pl: Walidacja danych, en: Data validation }
+          description:
+            {
+              pl: Kontrakty od requestu po bloki.,
+              en: Contracts from request through blocks.,
+            }
+          url:
+            {
+              pl: /pl/dokumentacja/bezpieczenstwo#walidacja,
+              en: /en/documentation/security#walidacja,
+            }
+        - number: "06"
+          title: { pl: System plików i YAML, en: Filesystem and YAML }
+          description:
+            {
+              pl: "Dozwolone korzenie, ścieżki i parser.",
+              en: "Allowed roots, paths and parser.",
+            }
+          url:
+            {
+              pl: /pl/dokumentacja/bezpieczenstwo#filesystem,
+              en: /en/documentation/security#filesystem,
+            }
+        - number: "07"
+          title: { pl: Zapis i cache, en: Writes and cache }
+          description:
+            {
+              pl: "Rewizje, blokady, atomowość i generacje.",
+              en: "Revisions, locks, atomicity and generations.",
+            }
+          url:
+            {
+              pl: /pl/dokumentacja/bezpieczenstwo#zapis-cache,
+              en: /en/documentation/security#zapis-cache,
+            }
+        - number: "08"
+          title: { pl: Hardening, en: Hardening }
+          description:
+            {
+              pl: Wdrożenie i diagnostyka bez wycieku danych.,
+              en: Deployment and diagnostics without data leaks.,
+            }
+          url:
+            {
+              pl: /pl/dokumentacja/bezpieczenstwo#hardening,
+              en: /en/documentation/security#hardening,
+            }
+  - id: 01a06d50-7007-7703-8703-000000000003
+    type: technical-table
+    enabled: true
+    data:
+      eyebrow: { pl: Obrona warstwowa, en: Defense in depth }
+      title:
+        {
+          pl: Każda granica ufa mniejszej liczbie danych.,
+          en: Every boundary trusts fewer inputs.,
+        }
+      intro:
+        pl: Kontrola na jednej warstwie nie usprawiedliwia pominięcia następnej. Walidacja formularza, bezpieczna ścieżka i zapis atomowy rozwiązują różne klasy problemów.
+        en: A control at one layer does not justify skipping the next. Form validation, safe path resolution and atomic writing solve different problem classes.
+      column_1: { pl: Granica, en: Boundary }
+      column_2: { pl: Dane niezaufane, en: Untrusted input }
+      column_3: { pl: Kontrola, en: Control }
+      column_4: { pl: Chronione aktywo, en: Protected asset }
+      rows:
+        - cell_1: { pl: Sieć, en: Network }
+          cell_2:
+            {
+              pl: "Metoda, path, nagłówki i IP",
+              en: "Method, path, headers and IP",
+            }
+          cell_3:
+            {
+              pl: "Router, limity i trusted proxies",
+              en: "Router, limits and trusted proxies",
+            }
+          cell_4: { pl: Dostępność i audyt, en: Availability and audit }
+        - cell_1: { pl: Sesja, en: Session }
+          cell_2: { pl: Cookie i stan logowania, en: Cookie and login state }
+          cell_3:
+            {
+              pl: "Strict mode, HttpOnly, Secure, SameSite i expiry",
+              en: "Strict mode, HttpOnly, Secure, SameSite and expiry",
+            }
+          cell_4: { pl: Tożsamość administratora, en: Administrator identity }
+        - cell_1: { pl: Mutacja, en: Mutation }
+          cell_2:
+            { pl: Pola POST i identyfikatory, en: POST fields and identifiers }
+          cell_3:
+            {
+              pl: "CSRF, role i walidacja domenowa",
+              en: "CSRF, roles and domain validation",
+            }
+          cell_4: { pl: Treść i ustawienia, en: Content and settings }
+        - cell_1: { pl: Model treści, en: Content model }
+          cell_2: { pl: YAML i dane bloków, en: YAML and block data }
+          cell_3:
+            {
+              pl: "Limity parsera, schematy i lokalizacja",
+              en: "Parser limits, schemas and localization",
+            }
+          cell_4:
+            { pl: Integralność reprezentacji, en: Representation integrity }
+        - cell_1: { pl: System plików, en: Filesystem }
+          cell_2: { pl: Korzeń i ścieżka relatywna, en: Root and relative path }
+          cell_3:
+            {
+              pl: "Enum korzeni, segmenty i realpath",
+              en: "Root enum, segments and realpath",
+            }
+          cell_4: { pl: Pliki spoza CMS-a, en: Files outside the CMS }
+        - cell_1: { pl: Współbieżność, en: Concurrency }
+          cell_2: { pl: Oczekiwana rewizja, en: Expected revision }
+          cell_3:
+            {
+              pl: "Blokada, SHA-256, fsync i rename",
+              en: "Lock, SHA-256, fsync and rename",
+            }
+          cell_4: { pl: Spójność zapisu, en: Write integrity }
+        - cell_1: { pl: Odpowiedź, en: Response }
+          cell_2: { pl: HTML i błędy, en: HTML and errors }
+          cell_3:
+            {
+              pl: "Escaping, CSP, no-store i redakcja debug",
+              en: "Escaping, CSP, no-store and debug redaction",
+            }
+          cell_4:
+            { pl: Przeglądarka i dane operatora, en: Browser and operator data }
+  - id: 01a06d50-7007-7704-8704-000000000004
+    type: article-content
+    enabled: true
+    data:
+      anchor: model-zagrozen
+      content:
+        pl: |-
+          ## 1. Najpierw nazwij aktywa
+
+          FlatFile CMS chroni trzy różne klasy danych. Treść, konfiguracja publiczna, definicje bloków i szablony są plikami. Tożsamości administratorów, skróty haseł, WebAuthn i tokeny odzyskiwania są w SQLite. Sekrety wdrożenia — APP_SECRET, SMTP i prywatne tokeny usług — należą wyłącznie do środowiska albo zewnętrznego secret managera.
+
+          Rozdzielenie własności jest kontrolą bezpieczeństwa. Skopiowanie pages i config nie powinno przenieść haseł. Publiczny endpoint config nie może czytać surowego setup.yml. Repozytorium Git nie powinno zawierać .env.local ani produkcyjnej bazy.
+
+          ## 2. Ustal aktorów i ich uprawnienia
+
+          Użytkownik publiczny może czytać opublikowane HTML, JSON i media. Administrator może zarządzać treścią i zwykłymi kontami ROLE_ADMIN. Superadmin jest kontem technicznym tworzonym tylko przez CLI; admin nie może go zobaczyć, wyliczyć po ID, zmienić ani usunąć.
+
+          Proces PHP ma dostęp zapisu tylko do katalogów runtime oraz obszarów treści wymagających edycji. Kod aplikacji, vendor, bloki i templates powinny być dla niego read-only. Operator systemu ma szersze uprawnienia i pozostaje poza granicą gwarancji aplikacji.
+
+          ## 3. Zapisz jawne założenie systemowe
+
+          SafePathResolver chroni przed ścieżką kontrolowaną przez request i przed ucieczką symlinkiem. Nie chroni przed napastnikiem mającym arbitralny zapis lokalny jako ten sam użytkownik systemowy, który może ścigać się z operacją PHP. Taki model wymaga izolacji systemowej, oddzielnych kont, poprawnych właścicieli, ograniczeń hostingu i bezpiecznego procesu wdrożenia.
+
+          Obrona warstwowa oznacza, że przejęcie jednego mechanizmu nie powinno automatycznie dawać wszystkiego. Kradzież cookie ogranicza timeout sesji i drugi składnik przy logowaniu; błąd w formularzu ogranicza walidacja domenowa i system plików; wyciek publicznego YAML-a nie może ujawnić sekretów, bo sekrety nie należą do YAML-a.
+        en: |-
+          ## 1. Name the assets first
+
+          FlatFile CMS protects three distinct data classes. Content, public configuration, block definitions and templates are files. Administrator identities, password hashes, WebAuthn and recovery tokens live in SQLite. Deployment secrets—APP_SECRET, SMTP and private service tokens—belong exclusively to the environment or an external secret manager.
+
+          Ownership separation is a security control. Copying pages and config should not transfer passwords. The public config endpoint must not read raw setup.yml. Git should contain neither .env.local nor the production database.
+
+          ## 2. Identify actors and privileges
+
+          A public visitor may read published HTML, JSON and media. An administrator may manage content and regular ROLE_ADMIN accounts. A superadmin is a technical account created only through CLI; an admin cannot view it, infer it by ID, modify it or delete it.
+
+          The PHP process gets write access only to runtime directories and editable content areas. Application code, vendor, blocks and templates should be read-only to it. A system operator has broader rights and lies outside application guarantees.
+
+          ## 3. State the operating-system assumption
+
+          SafePathResolver protects against a request-controlled path and symlink escape. It does not protect against an attacker with arbitrary local writes as the same operating-system user who can race PHP operations. That threat requires OS isolation, separate accounts, correct ownership, hosting restrictions and a safe deployment process.
+
+          Defense in depth means compromising one mechanism should not automatically grant everything. A stolen cookie is limited by session timeouts and a second factor at login; a form defect is constrained by domain and filesystem validation; exposed public YAML cannot leak secrets because secrets do not belong in YAML.
+      note:
+        pl: Bez modelu zagrożeń łatwo nazwać bezpieczeństwem dowolny pojedynczy nagłówek. Najpierw określ aktywo, aktora, granicę i skutek naruszenia.
+        en: Without a threat model any single header can be called security. First identify the asset, actor, boundary and breach impact.
+  - id: 01a06d50-7007-7705-8705-000000000005
+    type: article-content
+    enabled: true
+    data:
+      anchor: bootstrap
+      content:
+        pl: |-
+          ## 4. Nie pozwól uruchomić słabej produkcji
+
+          ProductionGuard odrzuca środowisko produkcyjne z włączonym debug, krótkim lub przykładowym APP_SECRET oraz niebezpiecznym cookie administratora. Minimalny kontrakt obejmuje APP_ENV=production, APP_DEBUG=0, co najmniej 32 losowe bajty sekretu i SESSION_COOKIE_SECURE=1.
+
+          APP_SECRET zasila mechanizmy wymagające tajnego klucza, dlatego nie może być stałą skopiowaną z dokumentacji. Generuj go poza historią shella i przekazuj przez kontrolowany system sekretów. Rotacja może unieważnić dane zależne od klucza i musi być zaplanowanym zdarzeniem.
+
+          ~~~dotenv
+          APP_ENV=production
+          APP_DEBUG=0
+          APP_SECRET=<co-najmniej-32-losowe-bajty>
+          SESSION_COOKIE_SECURE=1
+          SESSION_COOKIE_SAME_SITE=Lax
+          WEBAUTHN_RP_ID=example.com
+          ~~~
+
+          ## 5. Ufaj X-Forwarded-For tylko od znanego proxy
+
+          Request boundary korzysta z forwarded address wyłącznie, gdy bezpośredni peer należy do TRUSTED_PROXIES. Wartość przyjmuje dokładne IP i sieci CIDR. Łańcuch jest oceniany od najbliższego proxy do pierwszego niezaufanego adresu klienta.
+
+          Ustawienie 0.0.0.0/0 lub ::/0 pozwoliłoby dowolnemu klientowi podszyć się pod adres używany przez rate limiting i audyt. Dla Cloudflare utrzymuj aktualne oficjalne zakresy oraz zablokuj bezpośredni dostęp do originu albo upewnij się, że ruch bez proxy jest traktowany jako bezpośredni.
+
+          ## 6. Ogranicz request przed aplikacją i w aplikacji
+
+          Serwer WWW powinien ograniczać rozmiar body, timeouty i dozwolone entrypointy. Router dopuszcza metody przypisane trasie i zwraca METHOD_NOT_ALLOWED dla innej metody. Application odrzuca bodyTooLarge kodem REQUEST_BODY_TOO_LARGE przed uruchomieniem logiki kontrolera.
+
+          Limity PHP upload_max_filesize i post_max_size muszą obsłużyć dozwolony upload, ale serwer nadal powinien mieć skończony limit requestu. Większy limit transportu nie zmienia media.maxUploadBytes — plik musi przejść oba poziomy.
+        en: |-
+          ## 4. Refuse to start weak production
+
+          ProductionGuard rejects production with debug enabled, a short or example APP_SECRET, or an insecure administrator cookie. The minimal contract includes APP_ENV=production, APP_DEBUG=0, at least 32 random secret bytes and SESSION_COOKIE_SECURE=1.
+
+          APP_SECRET feeds mechanisms requiring a secret key, so it cannot be a constant copied from documentation. Generate it outside shell history and provide it through controlled secret management. Rotation may invalidate key-dependent data and must be a planned event.
+
+          ~~~dotenv
+          APP_ENV=production
+          APP_DEBUG=0
+          APP_SECRET=<at-least-32-random-bytes>
+          SESSION_COOKIE_SECURE=1
+          SESSION_COOKIE_SAME_SITE=Lax
+          WEBAUTHN_RP_ID=example.com
+          ~~~
+
+          ## 5. Trust X-Forwarded-For only from a known proxy
+
+          The request boundary uses a forwarded address only when the direct peer belongs to TRUSTED_PROXIES. The setting accepts exact IPs and CIDR ranges. A chain is evaluated from the nearest proxy toward the first untrusted client address.
+
+          Setting 0.0.0.0/0 or ::/0 would let any client spoof the address used by rate limiting and audit. With Cloudflare, maintain current official ranges and block direct origin access, or ensure traffic bypassing the proxy is treated as direct.
+
+          ## 6. Bound the request before and inside the application
+
+          The web server should limit body size, timeouts and executable entrypoints. Router permits methods assigned to a route and returns METHOD_NOT_ALLOWED for another method. Application rejects bodyTooLarge with REQUEST_BODY_TOO_LARGE before controller logic.
+
+          PHP upload_max_filesize and post_max_size must accommodate allowed uploads, but the server still needs a finite request limit. A larger transport limit does not change media.maxUploadBytes—the file must pass both levels.
+      note:
+        pl: release:check weryfikuje guardy środowiska, ale nie potwierdzi zewnętrznej reguły firewalla ani aktualności zakresów Cloudflare.
+        en: release:check verifies environment guards but cannot prove an external firewall rule or current Cloudflare ranges.
+  - id: 01a06d50-7007-7706-8706-000000000006
+    type: technical-table
+    enabled: true
+    data:
+      eyebrow: { pl: Sesja administratora, en: Administrator session }
+      title:
+        {
+          pl: Cookie jest tylko identyfikatorem ograniczonego stanu serwerowego.,
+          en: A cookie is only an identifier for bounded server-side state.,
+        }
+      intro:
+        pl: NativeSessionStore i Authenticator nakładają niezależne zabezpieczenia na transport, identyfikator sesji oraz czas uwierzytelnienia.
+        en: NativeSessionStore and Authenticator apply independent controls to transport, session identity and authentication time.
+      column_1: { pl: Mechanizm, en: Mechanism }
+      column_2: { pl: Ustawienie, en: Setting }
+      column_3: { pl: Chroni przed, en: Protects against }
+      column_4: { pl: Uwaga, en: Note }
+      rows:
+        - cell_1: { pl: Secure, en: Secure }
+          cell_2: { pl: Wymagane w produkcji, en: Required in production }
+          cell_3:
+            { pl: Wysłaniem cookie po HTTP, en: Sending the cookie over HTTP }
+          cell_4: { pl: Produkcja wymaga HTTPS, en: Production requires HTTPS }
+        - cell_1: { pl: HttpOnly, en: HttpOnly }
+          cell_2: { pl: Wymuszone w kodzie, en: Enforced in code }
+          cell_3:
+            {
+              pl: Odczytem cookie przez JavaScript,
+              en: Cookie reads from JavaScript,
+            }
+          cell_4: { pl: Nie jest przełącznikiem, en: Not configurable }
+        - cell_1: { pl: SameSite, en: SameSite }
+          cell_2: { pl: Lax albo Strict, en: Lax or Strict }
+          cell_3: { pl: Częścią żądań cross-site, en: Some cross-site requests }
+          cell_4: { pl: Nie zastępuje CSRF, en: Does not replace CSRF }
+        - cell_1: { pl: Strict mode, en: Strict mode }
+          cell_2:
+            { pl: session.use_strict_mode=1, en: session.use_strict_mode=1 }
+          cell_3: { pl: Przyjęciem nieznanego ID, en: Accepting an unknown ID }
+          cell_4: { pl: Tylko cookies, en: Cookies only }
+        - cell_1: { pl: Regeneracja, en: Regeneration }
+          cell_2:
+            {
+              pl: Po pełnym logowaniu i zmianie hasła,
+              en: After complete login and password change,
+            }
+          cell_3: { pl: Session fixation, en: Session fixation }
+          cell_4: { pl: Stary ID jest usuwany, en: Old ID is deleted }
+        - cell_1: { pl: Idle lifetime, en: Idle lifetime }
+          cell_2: { pl: Ostatnia aktywność, en: Last activity }
+          cell_3:
+            {
+              pl: Długim użyciem porzuconej sesji,
+              en: Long use of an abandoned session,
+            }
+          cell_4:
+            {
+              pl: Aktualizacja maksymalnie raz na minutę,
+              en: Updated at most once per minute,
+            }
+        - cell_1: { pl: Absolute lifetime, en: Absolute lifetime }
+          cell_2: { pl: Czas od logowania, en: Time since login }
+          cell_3:
+            {
+              pl: Nieskończonym przedłużaniem aktywnością,
+              en: Endless activity extension,
+            }
+          cell_4: { pl: Wymaga ponownego loginu, en: Requires a new login }
+  - id: 01a06d50-7007-7707-8707-000000000007
+    type: article-content
+    enabled: true
+    data:
+      anchor: uwierzytelnianie
+      content:
+        pl: |-
+          ## 7. Weryfikuj hasło bez ujawniania istnienia konta
+
+          Authenticator normalizuje email przez trim i lowercase. Gdy użytkownik nie istnieje, nadal wykonuje password verification na stałym kosztownym hashu. Odpowiedź dla nieistniejącego, wyłączonego i błędnie uwierzytelnionego konta brzmi tak samo: Invalid email or password.
+
+          RateLimiter ma niezależne kubełki dla konta, IP oraz pary IP–konto. Identyfikator jest przechowywany jako HMAC-SHA-256 z APP_SECRET, a nie jawny email lub IP. Po błędzie wszystkie odpowiednie kubełki rosną; po sukcesie czyszczony jest licznik konta i pary.
+
+          Prawdziwy adres klienta jest więc elementem bezpieczeństwa. Błędne TRUSTED_PROXIES może sprawić, że wszyscy użytkownicy dzielą IP proxy albo że napastnik je fałszuje.
+
+          ## 8. Wymuszaj autoryzację na backendzie
+
+          Ukrycie przycisku w panelu nie jest kontrolą dostępu. Operacja ponownie pobiera aktualnego użytkownika, sprawdza enabled i rolę. Panel zwykłego admina filtruje superadminów także przy bezpośrednim lookupie, blokuje samowyłączenie i samousunięcie oraz nie tworzy kont uprzywilejowanych przez HTTP.
+
+          Identyfikatory publiczne kont to UUIDv7, a numeryczne klucze SQLite pozostają wewnętrzne. UUID ogranicza enumerację, lecz nie zastępuje kontroli właściciela i roli. Każdy update lub delete nadal musi sprawdzić uprawnienie do konkretnego rekordu.
+
+          ## 9. Ustal politykę hasła w jednym miejscu
+
+          Tworzenie konta, zmiana hasła, reset i CLI powinny korzystać z tego samego PasswordPolicy oraz PasswordHasher. Zmiana wymaga aktualnego hasła, innego nowego hasła, zgodnego potwierdzenia i CSRF. Po zapisie identyfikator sesji jest regenerowany.
+
+          Nie przesyłaj hasła jako argumentu procesu. Instalator i komendy użytkowników czytają je interaktywnie; kontrolowana automatyzacja może ustawić CMS_PASSWORD tylko dla pojedynczego procesu. Historia shella, lista procesów i log CI nie mogą stać się magazynem haseł.
+        en: |-
+          ## 7. Verify passwords without exposing account existence
+
+          Authenticator normalizes email with trim and lowercase. When a user does not exist it still performs password verification against a fixed costly hash. Absent, disabled and incorrectly authenticated accounts receive the same Invalid email or password outcome.
+
+          RateLimiter has independent buckets for account, IP and IP–account pair. The identifier is stored as HMAC-SHA-256 using APP_SECRET rather than a plain email or IP. A failure increments all relevant buckets; success clears the account and pair counters.
+
+          The true client address is therefore security-sensitive. Incorrect TRUSTED_PROXIES can make every user share a proxy IP or let an attacker spoof one.
+
+          ## 8. Enforce authorization on the backend
+
+          Hiding a button is not access control. An operation fetches the current user again and checks enabled status and role. A regular admin's view filters superadmins even on direct lookup, prevents self-disable and self-delete, and never creates privileged accounts through HTTP.
+
+          Public account identifiers are UUIDv7 while numeric SQLite keys remain internal. UUID limits enumeration but never replaces owner and role checks. Every update or delete still authorizes the specific record.
+
+          ## 9. Centralize password policy
+
+          Account creation, password change, reset and CLI should use the same PasswordPolicy and PasswordHasher. A change requires current password, a different compliant password, matching confirmation and CSRF. The session identifier is regenerated after storage.
+
+          Never pass a password as a process argument. Installer and user commands read it interactively; controlled automation may set CMS_PASSWORD for one process only. Shell history, process listings and CI logs must not become password stores.
+      note:
+        pl: Nie rozróżniaj komunikatem ani czasem odpowiedzi, czy email istnieje. Recovery również powinno zawsze pokazywać taki sam wynik formularza.
+        en: Do not reveal email existence through message or response timing. Recovery should always show the same form outcome as well.
+  - id: 01a06d50-7007-7708-8708-000000000008
+    type: article-content
+    enabled: true
+    data:
+      anchor: csrf-webauthn
+      content:
+        pl: |-
+          ## 10. Chroń każdą mutację tokenem CSRF
+
+          CsrfTokenManager tworzy 32 losowe bajty i zapisuje ich 64-znakową reprezentację hex w sesji. Formularz przekazuje token, a backend porównuje go przez hash_equals. Brak, zły typ albo niezgodna wartość kończy operację przed zapisem.
+
+          SameSite ogranicza część żądań cross-site, ale nie zastępuje CSRF. Token musi chronić POST zmieniający stronę, blok, media, ustawienia, nawigację, użytkownika, hasło, klucz bezpieczeństwa i logout. GET pozostaje bez skutku ubocznego.
+
+          Token nie jest sekretem długoterminowym i nie powinien trafiać do URL-a, logu ani analityki. Jest związany z sesją. Po jej unieważnieniu poprzednia wartość nie daje dostępu.
+
+          ## 11. Włącz WebAuthn jako drugi składnik
+
+          Konto z co najmniej jednym credentialem po poprawnym haśle przechodzi do stanu pending 2FA. Pending zawiera ID użytkownika i czas, wygasa po 300 sekundach i nie jest jeszcze sesją uwierzytelnioną. Dopiero poprawna weryfikacja wywołuje complete, regeneruje ID i ustawia pełny stan.
+
+          Klucz przechowuje prywatny materiał w authenticatorze. SQLite zawiera credential ID, klucz publiczny, licznik podpisów i transporty. Rejestracja wymaga aktywnej sesji oraz ponownego podania aktualnego hasła. Usunięcie credentialu jest ograniczone ID zalogowanego właściciela.
+
+          WEBAUTHN_RP_ID to dokładny hostname bez schematu, portu i path. Credential jest kryptograficznie związany z RP ID. Zmiana domeny unieruchamia stare klucze; produkcja wymaga HTTPS, a HTTP jest dopuszczalne przez przeglądarki tylko dla localhost.
+
+          Brak attestation jest świadomą decyzją: system akceptuje kompatybilne klucze roaming FIDO2/U2F i nie śledzi modelu urządzenia. Utrata wszystkich kluczy wymaga kontrolowanej komendy CLI user:security-keys:clear.
+
+          ## 12. Projektuj reset hasła jako jednorazowy protokół
+
+          Formularz forgot zawsze zwraca taki sam komunikat. Limity działają osobno dla IP i znormalizowanego emaila. Serwer generuje 32 losowe bajty, wysyła token URL-safe, a zapisuje tylko SHA-256.
+
+          Token ma TTL, może zostać użyty raz i po sukcesie unieważnia wszystkie pozostałe tokeny użytkownika. Nieudane wysłanie SMTP odwołuje nowy token. Link bazuje na site.url, a credentiale SMTP pozostają wyłącznie w środowisku.
+        en: |-
+          ## 10. Protect every mutation with CSRF
+
+          CsrfTokenManager creates 32 random bytes and stores their 64-character hex representation in session. A form submits the token and backend compares it with hash_equals. Missing, wrong-type or mismatched input stops the operation before writing.
+
+          SameSite restricts some cross-site requests but never replaces CSRF. The token must protect every POST changing pages, blocks, media, settings, navigation, users, passwords, security keys and logout. GET remains side-effect free.
+
+          A CSRF token is not a long-term secret and must not enter a URL, log or analytics. It is bound to the session. After invalidation its previous value grants nothing.
+
+          ## 11. Enable WebAuthn as a second factor
+
+          An account with at least one credential enters pending 2FA after a correct password. Pending state contains user ID and time, expires after 300 seconds and is not an authenticated session. Only successful verification calls complete, regenerates ID and establishes full state.
+
+          A security key keeps private material in the authenticator. SQLite stores credential ID, public key, signature counter and transports. Registration requires an active session and current-password confirmation. Credential deletion is scoped to the logged-in owner's ID.
+
+          WEBAUTHN_RP_ID is the exact hostname without scheme, port or path. A credential is cryptographically bound to it. Domain changes make old keys unusable; production requires HTTPS, while browsers allow HTTP only for localhost.
+
+          No attestation is a deliberate decision: the system accepts compatible roaming FIDO2/U2F keys without tracking a device model. Losing every key requires the controlled user:security-keys:clear CLI command.
+
+          ## 12. Design password reset as a one-time protocol
+
+          The forgot form always returns the same outcome. Limits apply independently to IP and normalized email. The server creates 32 random bytes, sends the URL-safe token and stores only SHA-256.
+
+          A token has a TTL, is one-use and successful completion invalidates every other token for that user. Failed SMTP delivery revokes the new token. The link uses site.url while SMTP credentials remain environment-only.
+      note:
+        pl: Drugi składnik ogranicza skutek kradzieży hasła, ale nie naprawia XSS ani przejętej sesji. Każda granica nadal musi być chroniona.
+        en: A second factor limits password theft but does not repair XSS or a stolen session. Every boundary still requires protection.
+  - id: 01a06d50-7007-7709-8709-000000000009
+    type: article-content
+    enabled: true
+    data:
+      anchor: walidacja
+      content:
+        pl: |-
+          ## 13. Waliduj kolejno typ, strukturę i semantykę
+
+          Dane z Request są mixed. Kontroler najpierw sprawdza metodę, obecność, typ skalara i format. Warstwa domenowa następnie egzekwuje reguły biznesowe: dozwolony slug, aktywne locale, unikalną trasę, rolę użytkownika, MIME uploadu albo aktualną rewizję.
+
+          Samo rzutowanie na string może ukryć błędny typ. Nie przyjmuj tablicy tam, gdzie kontrakt mówi string. Nie ufaj hidden input z ID, rolą, limitem, ścieżką czy rewizją — przeglądarka jest źródłem niezaufanym.
+
+          ## 14. Traktuj block.yml jako allowlistę
+
+          BlockValidator odrzuca nieznane pola, brak wymaganych wartości, nieznane locale, złe typy i naruszenia ograniczeń długości lub zakresu. Repeater ponownie waliduje każdy element i jego pola. Nieznany typ bloku i niepoprawny UUIDv7 unieważnia stronę.
+
+          Wyłączony blok nadal przechodzi walidację, a dopiero potem jest pomijany publicznie. enabled nie jest magazynem niebezpiecznych danych. To ważne, ponieważ blok może zostać ponownie włączony, skopiowany albo edytowany.
+
+          Lokalizacja następuje dopiero po pełnej normalizacji. Renderer dostaje gotowe data, ale nadal koduje tekst dla HTML przez RenderContext.escape. Walidacja wejścia i output encoding są dwiema niezależnymi kontrolami.
+
+          ## 15. Ogranicz formatowane dane do konkretnego kontekstu
+
+          URL, email, data, kolor, liczba i choice mają osobne typy pól. Media nie przyjmują dowolnej ścieżki, lecz stronowy src sprawdzany przez bezpieczny resolver. Markdown usuwa wejściowy HTML, blokuje unsafe links i ogranicza zagnieżdżenie.
+
+          Nie dodawaj pola raw_html tylko dlatego, że jest wygodne. Jeżeli potrzebujesz nowej możliwości, utwórz typ lub komponent z wąskim kontraktem oraz renderer, który kontroluje strukturę HTML.
+        en: |-
+          ## 13. Validate type, structure and semantics in order
+
+          Request data is mixed. A controller first checks method, presence, scalar type and format. The domain layer then enforces business rules: allowed slug, enabled locale, unique route, user role, upload MIME or current revision.
+
+          Casting everything to string can hide an invalid type. Never accept an array where the contract says string. Never trust a hidden input containing ID, role, limit, path or revision—the browser is untrusted.
+
+          ## 14. Treat block.yml as an allowlist
+
+          BlockValidator rejects unknown fields, missing required values, unknown locales, wrong types and length or range violations. A repeater recursively validates every item and field. An unknown block type or invalid UUIDv7 invalidates the page.
+
+          A disabled block still passes validation before being omitted publicly. enabled is not storage for unsafe data. This matters because a block can later be enabled, copied or edited.
+
+          Localization happens only after complete normalization. A renderer receives ready data but still encodes text for HTML through RenderContext.escape. Input validation and output encoding are independent controls.
+
+          ## 15. Constrain formatted data to a concrete context
+
+          URL, email, date, color, number and choice have separate field types. Media accepts no arbitrary path but a page-local src checked by a safe resolver. Markdown strips input HTML, blocks unsafe links and limits nesting.
+
+          Do not add raw_html merely for convenience. When a new capability is needed, create a narrow field or component contract and a renderer controlling HTML structure.
+      note:
+        pl: Normalizacja nie oznacza zaufanego HTML-a. Renderer zawsze zna kontekst wyjścia i jako jedyny może dobrać poprawne kodowanie.
+        en: Normalization does not mean trusted HTML. Only the renderer knows the output context and can choose correct encoding.
+  - id: 01a06d50-7007-7710-8710-000000000010
+    type: code-showcase
+    enabled: true
+    data:
+      eyebrow: { pl: Bezpieczna ścieżka, en: Safe path }
+      title:
+        {
+          pl: "Kod wybiera korzeń, a dane mogą wskazać tylko walidowaną ścieżkę relatywną.",
+          en: "Code selects the root while data supplies only a validated relative path.",
+        }
+      description:
+        pl: Kontroler nie konkatenatuje ścieżki projektu. Enum korzeni i obiekt RelativePath ograniczają przestrzeń możliwych celów.
+        en: A controller never concatenates a project path. The root enum and RelativePath object constrain possible targets.
+      filename: app/Infrastructure/Filesystem/SafePathResolver.php
+      code: |-
+        $relative = RelativePath::fromString('documentation/security/content.yml');
+
+        $filename = $paths->resolve(
+            FilesystemRoot::Pages,
+            $relative,
+            mustExist: true,
+        );
+
+        // Niedozwolone przykłady:
+        // /etc/passwd
+        // ../config/setup.yml
+        // folder\windows-path
+        // katalog/./plik
+      bullets:
+        - text:
+            {
+              pl: "Dozwolony korzeń jest typem wybranym przez kod, nie stringiem z formularza.",
+              en: "The allowed root is a code-selected type, not a form string.",
+            }
+        - text:
+            {
+              pl: Istniejące segmenty przechodzą przez realpath i ponowną kontrolę containment.,
+              en: Existing segments pass through realpath and another containment check.,
+            }
+        - text:
+            {
+              pl: "Ścieżki absolutne, kropki, backslash, znaki sterujące i nazwy zastrzeżone są odrzucane.",
+              en: "Absolute paths, dots, backslashes, control characters and reserved names are rejected.",
+            }
+  - id: 01a06d50-7007-7711-8711-000000000011
+    type: article-content
+    enabled: true
+    data:
+      anchor: filesystem
+      content:
+        pl: |-
+          ## 16. Dopuść tylko zdefiniowane korzenie
+
+          FilesystemRoot wystawia cztery jawne korzenie: pages, errors, config i storage. SafePathResolver przyjmuje RelativePath, a nie dowolny string ścieżki systemowej. Dodanie nowego obszaru wymaga zmiany kodu enum, więc dane z requestu nie mogą wymyślić piątego korzenia.
+
+          RelativePath odrzuca ścieżki absolutne, litery dysków Windows, backslash, segmenty puste, kropkę, dwie kropki, znaki null i sterujące, znaki nieprzenośne oraz zastrzeżone nazwy Windows. Każdy istniejący segment jest rozwiązywany przez realpath i ponownie sprawdzany względem korzenia, co blokuje ucieczkę symlinkiem.
+
+          Korzenie runtime same nie mogą być symlinkami. Nie wystarczy sprawdzić prefix tekstowy, ponieważ /var/site/pages-evil zaczyna się podobnie do /var/site/pages. Porównanie odbywa się po normalizacji i na granicy segmentu.
+
+          ## 17. Parsuj YAML restrykcyjnie
+
+          YamlParser wymaga mapy na korzeniu dokumentu. Dopuszcza null, bool, int, skończony float, poprawny UTF-8 string i zagnieżdżone tablice. Nie włącza obiektów PHP ani tagów wykonujących konstrukcję typów.
+
+          Aliasy YAML są odrzucane przed ekspansją, co ogranicza ataki mnożące strukturę. Parser ma limity bajtów, głębokości i liczby znormalizowanych węzłów. Nawet poprawny składniowo dokument nie może zużyć nieograniczonej pamięci.
+
+          YamlFileRepository waliduje dokładną serializację przed przekazaniem jej do AtomicFileWriter. Błędny kandydat nie zastępuje poprzedniego pliku.
+
+          ## 18. Traktuj upload jako nieufne bajty
+
+          Polityka w setup.yml określa maxUploadBytes i allowedMimeTypes. Nie ufaj rozszerzeniu ani Content-Type wysłanemu przez przeglądarkę — zawartość jest inspektowana. Nazwa pliku przechodzi normalizację bezpiecznej ścieżki.
+
+          Obrazy mają limity szerokości, wysokości i liczby pikseli. SVG wymaga sanitizacji. Opcja stripMetadata ogranicza zachowanie metadanych, które mogą zawierać informacje prywatne. Warianty publiczne są generowane tylko w dozwolonych formatach i rozmiarach.
+        en: |-
+          ## 16. Permit only defined roots
+
+          FilesystemRoot exposes four explicit roots: pages, errors, config and storage. SafePathResolver accepts RelativePath rather than an arbitrary system-path string. Adding another area requires changing the code enum, so request data cannot invent a fifth root.
+
+          RelativePath rejects absolute paths, Windows drive letters, backslashes, empty segments, dot, dot-dot, null and control characters, non-portable characters and reserved Windows names. Every existing segment is resolved with realpath and checked again against the root, blocking symlink escape.
+
+          Runtime roots themselves cannot be symlinks. A textual prefix is insufficient because /var/site/pages-evil begins similarly to /var/site/pages. Comparison occurs after normalization and at a segment boundary.
+
+          ## 17. Parse YAML restrictively
+
+          YamlParser requires a mapping at the document root. It permits null, bool, int, finite float, valid UTF-8 string and nested arrays. PHP objects and type-constructing tags are not enabled.
+
+          YAML aliases are rejected before expansion, limiting structure-multiplication attacks. The parser has byte, depth and normalized-node limits. Even syntactically valid input cannot consume unbounded memory.
+
+          YamlFileRepository validates the exact serialization before passing it to AtomicFileWriter. An invalid candidate cannot replace the previous file.
+
+          ## 18. Treat uploads as untrusted bytes
+
+          setup.yml policy defines maxUploadBytes and allowedMimeTypes. Never trust the extension or browser-provided Content-Type—the content is inspected. A filename passes safe path normalization.
+
+          Images have width, height and pixel-count limits. SVG requires sanitization. stripMetadata limits retained metadata that may contain private information. Public variants are generated only in allowed formats and dimensions.
+      note:
+        pl: chmod 0777 nie jest naprawą bezpieczeństwa ani poprawną diagnostyką. Najpierw ustal dokładny proces, korzeń, właściciela i minimalne wymagane uprawnienie.
+        en: chmod 0777 is neither a security fix nor sound diagnostics. First identify the exact process, root, owner and minimum required permission.
+  - id: 01a06d50-7007-7712-8712-000000000012
+    type: article-content
+    enabled: true
+    data:
+      anchor: zapis-cache
+      content:
+        pl: |-
+          ## 19. Rozdziel rewizję, blokadę i atomowość
+
+          Rewizja jest SHA-256 pełnej zawartości albo specjalną wartością missing. Formularz otrzymuje rewizję podczas odczytu. Writer pod blokadą liczy ją ponownie; niezgodność kończy się RevisionConflictException i nie zmienia celu.
+
+          Blokada serializuje operacje konkurujące o zasób. Rewizja wykrywa utraconą aktualizację. Zapis atomowy gwarantuje, że czytelnik zobaczy starą albo nową wersję — nigdy połowę. Żaden z tych mechanizmów nie zastępuje pozostałych.
+
+          AtomicFileWriter tworzy plik tymczasowy w katalogu docelowym, zapisuje całość, flushuje, wykonuje fsync i atomowo zmienia nazwę. Ten sam system plików jest konieczny, aby rename zachował semantykę atomową. Po błędzie plik tymczasowy jest usuwany.
+
+          Operacje drzewa treści używają szerszej blokady, ponieważ move lub delete może zmienić wiele tras. Operacja waliduje stan przed i po zmianie, a nieudane przeniesienie wykonuje rollback katalogu.
+
+          ## 20. Nie ufaj cache bardziej niż źródłu
+
+          Cache YAML przechowuje JSON i opcjonalnie serializowaną tablicę. Wpis jest akceptowany tylko, gdy zapisana rewizja równa się SHA-256 bieżących bajtów źródła. unserialize używa allowed_classes=false, a wynik jest rekurencyjnie ograniczony do bezpiecznych skalarów i tablic.
+
+          Publiczny cache HTML zapisuje HTML, modifiedAt i SHA-256 używany jako ETag. Odczyt ponownie weryfikuje hash. Klucz rozdziela release, generację treści, locale, trasę i kanoniczne query.
+
+          Udany zapis poza storage oraz operacja tworzenia, move lub delete obraca storage/cache/html-generation pod blokadą. Unieważnia to wszystkie języki bez synchronicznego kasowania starych wpisów. APP_RELEASE zmienia namespace po wdrożeniu kodu i musi zmieniać się przy każdej wersji wpływającej na rendering.
+
+          Cache HTML nigdy nie obejmuje admina, API, mediów, redirectów, błędów ani metod innych niż GET. cache:clear usuwa wyłącznie odtwarzalne wpisy pod stałym storage/cache, nie przyjmuje ścieżki i nie podąża za symlinkami.
+        en: |-
+          ## 19. Separate revision, lock and atomicity
+
+          A revision is SHA-256 of complete contents or the special missing value. A form receives it on read. Under a lock, the writer recalculates it; mismatch raises RevisionConflictException without changing the target.
+
+          A lock serializes operations competing for a resource. A revision detects a lost update. Atomic writing guarantees readers see the old or new version—never half. None replaces the others.
+
+          AtomicFileWriter creates a temporary file in the destination directory, writes everything, flushes, fsyncs and atomically renames it. The same filesystem is required for atomic rename semantics. Failure removes the temporary file.
+
+          Content-tree operations use a broader lock because move or delete can alter many routes. An operation validates before and after mutation, and a failed move rolls the directory back.
+
+          ## 20. Never trust cache more than source
+
+          YAML cache stores JSON and optionally a serialized array. An entry is accepted only when its source revision equals SHA-256 of current bytes. unserialize uses allowed_classes=false and its result is recursively restricted to safe scalars and arrays.
+
+          Public HTML cache stores HTML, modifiedAt and SHA-256 used as ETag. Reads verify the hash again. The key separates release, content generation, locale, route and canonical query.
+
+          A successful write outside storage, or a create, move or delete operation, rotates storage/cache/html-generation under lock. This invalidates every language without synchronously deleting old entries. APP_RELEASE changes namespace after code deployment and must change for every release affecting rendering.
+
+          HTML cache never covers admin, API, media, redirects, errors or non-GET methods. cache:clear removes only reproducible entries below fixed storage/cache, accepts no path and follows no symlinks.
+      note:
+        pl: Cache jest niezaufanym artefaktem odtwarzalnym. Źródło i jego rewizja pozostają autorytetem.
+        en: Cache is an untrusted reproducible artifact. Source and its revision remain authoritative.
+  - id: 01a06d50-7007-7713-8713-000000000013
+    type: article-content
+    enabled: true
+    data:
+      anchor: hardening
+      content:
+        pl: |-
+          ## 21. Ustaw document root dokładnie na public
+
+          Projekt root zawiera config, pages, storage, SQLite, logi, vendor i .env.local. Żaden z tych zasobów nie może być obsługiwany statycznie. Document root serwera wskazuje dokładnie public, a konfiguracja wykonuje wyłącznie public/index.php i odmawia innych plików PHP.
+
+          Gotowe przykłady Nginx, Apache i Caddy są punktem startowym. Dostosuj domenę, socket PHP-FPM i certyfikaty. Ustaw bazowe nagłówki, kompresję, limit body i wyłącz directory listing. Nie polegaj wyłącznie na .htaccess, jeżeli możesz kontrolować virtual host.
+
+          ## 22. Stosuj minimalne uprawnienia
+
+          Użytkownik PHP potrzebuje zapisu do pages i config, katalogów storage oraz public/assets/blocks. app, blocks, templates, vendor, bin i entrypointy powinny pozostać read-only. Nie zmieniaj całego projektu na 0777.
+
+          Logi aplikacji zawierają path i IP klienta. Przechowuj je poza public, ogranicz dostęp, rotuj przez LOG_MAX_FILES i dobierz LOG_LEVEL do potrzeb. Audit trail jest osobnym zapisem zdarzeń administracyjnych i także wymaga polityki retencji oraz backupu.
+
+          ## 23. Nie ujawniaj błędu produkcyjnego
+
+          ErrorHandler zapisuje wyjątek do chronionego logu, lecz publicznie zwraca bezpieczny komunikat. Szczegóły debug mogą pojawić się tylko poza produkcją. Odpowiedzi admina i wrażliwe błędy używają no-store, a strony błędów mają noindex.
+
+          HTML koduje dane wyjściowe, interfejs API zwraca stabilny code i publiczny message, a ścieżka systemu plików nie może znaleźć się w body. CSP, X-Content-Type-Options, Referrer-Policy i X-Frame-Options ograniczają wybrane klasy ataków, ale nie zastępują walidacji ani poprawnego renderera.
+
+          ## 24. Wdrażaj jako spójną wersję
+
+          Uruchom composer check w buildzie, database:migrate oraz release:check na hoście. APP_RELEASE ustaw na commit lub niezmienny identyfikator artefaktu. Przełącz ruch dopiero po przejściu kontroli produkcyjnych.
+
+          Smoke test obejmuje health, HTML, API, login, upload i mail. Osobno sprawdź nagłówki cookie, próbę CSRF bez tokenu, odpowiedź 403/404 bez debug, blokadę nieprawidłowej metody i dostępność originu wyłącznie oczekiwaną drogą.
+
+          Backup musi objąć zgodny kod, pages, config, deweloperskie blocks/templates, bazę SQLite i szyfrowaną kopię sekretów. Cache, sesje i warianty mediów są odtwarzalne. Regularnie testuj restoration, nie tylko tworzenie archiwum.
+        en: |-
+          ## 21. Point document root exactly at public
+
+          Project root contains config, pages, storage, SQLite, logs, vendor and .env.local. None may be served statically. Server document root points exactly at public, while configuration executes only public/index.php and denies other PHP files.
+
+          Hardened Nginx, Apache and Caddy examples are starting points. Adapt domain, PHP-FPM socket and certificates. Set baseline headers, compression and body limits, and disable directory listing. Do not rely solely on .htaccess when the virtual host is controllable.
+
+          ## 22. Apply least privilege
+
+          The PHP user needs writes to pages and config, storage directories and public/assets/blocks. app, blocks, templates, vendor, bin and entrypoints should stay read-only. Never chmod the complete project to 0777.
+
+          Application logs contain request paths and client IPs. Keep them outside public, restrict access, rotate through LOG_MAX_FILES and choose LOG_LEVEL deliberately. The audit trail separately records administrative events and also needs retention and backup policy.
+
+          ## 23. Do not expose production faults
+
+          ErrorHandler records exceptions in protected logs but returns a safe public message. Debug details may appear only outside production. Admin and sensitive errors use no-store, while error pages carry noindex.
+
+          HTML encodes output, API returns stable code and public message, and a filesystem path must never enter the body. CSP, X-Content-Type-Options, Referrer-Policy and X-Frame-Options reduce selected attacks but do not replace validation or a correct renderer.
+
+          ## 24. Deploy one coherent version
+
+          Run composer check in build, database:migrate and release:check on the host. Set APP_RELEASE to a commit or immutable artifact identifier. Switch traffic only after production checks pass.
+
+          Smoke testing covers health, HTML, API, login, upload and mail. Separately inspect cookie headers, a CSRF attempt without a token, a 403/404 without debug, invalid-method rejection and origin availability only through the expected path.
+
+          Backups must cover compatible code, pages, config, developer blocks/templates, SQLite and an encrypted secret copy. Cache, sessions and media variants are reproducible. Regularly test restoration rather than archive creation alone.
+      note:
+        pl: Nagłówki bezpieczeństwa są ostatnią warstwą odpowiedzi, nie pierwszą linią projektu. Największą wartość daje poprawna separacja danych, kodu, sekretów i uprawnień.
+        en: Security headers are the response's final layer, not the design's first line. Correct separation of data, code, secrets and privileges provides the greatest value.
+  - id: 01a06d50-7007-7714-8714-000000000014
+    type: diagnostic-table
+    enabled: true
+    data:
+      anchor: diagnostyka-bezpieczenstwa
+      eyebrow: { pl: 25 / Diagnostyka, en: 25 / Troubleshooting }
+      title:
+        {
+          pl: Diagnozuj bez osłabiania mechanizmu ochronnego.,
+          en: Diagnose without weakening the protective control.,
+        }
+      intro:
+        pl: Błąd bezpieczeństwa często wygląda jak problem funkcjonalny. Najpierw zidentyfikuj warstwę i dowód, a dopiero potem zmieniaj konfigurację.
+        en: A security failure often resembles a functional defect. Identify the layer and evidence before changing configuration.
+      rows:
+        - layer: { pl: Bootstrap, en: Bootstrap }
+          problem: { pl: Produkcja nie startuje, en: Production will not start }
+          cause:
+            {
+              pl: "Debug, krótki sekret lub insecure cookie narusza guard.",
+              en: "Debug, short secret or insecure cookie violates the guard.",
+            }
+          check:
+            {
+              pl: Popraw konkretną wartość z komunikatu; nie wyłączaj ProductionGuard.,
+              en: Correct the named setting; never disable ProductionGuard.,
+            }
+        - layer: { pl: Proxy, en: Proxy }
+          problem:
+            {
+              pl: Rate limit obejmuje wszystkich albo nikogo,
+              en: Rate limit affects everyone or nobody,
+            }
+          cause:
+            {
+              pl: TRUSTED_PROXIES nie odpowiada rzeczywistej topologii.,
+              en: TRUSTED_PROXIES does not match the real topology.,
+            }
+          check:
+            {
+              pl: "Porównaj direct peer, łańcuch X-Forwarded-For i aktualne CIDR proxy.",
+              en: "Compare direct peer, X-Forwarded-For chain and current proxy CIDRs.",
+            }
+        - layer: { pl: Sesja, en: Session }
+          problem:
+            { pl: Login wraca do formularza, en: Login returns to the form }
+          cause:
+            {
+              pl: "Cookie Secure po HTTP, zła domena lub brak zapisu sessions.",
+              en: "Secure cookie over HTTP, wrong domain or unwritable sessions.",
+            }
+          check:
+            {
+              pl: "Sprawdź HTTPS, Set-Cookie, SESSION_NAME i uprawnienia storage/sessions.",
+              en: "Check HTTPS, Set-Cookie, SESSION_NAME and storage/sessions permissions.",
+            }
+        - layer: { pl: CSRF, en: CSRF }
+          problem:
+            {
+              pl: Poprawny formularz jest odrzucany,
+              en: A valid form is rejected,
+            }
+          cause:
+            {
+              pl: Token pochodzi ze starej sesji lub nie został przesłany.,
+              en: Token comes from an old session or was not submitted.,
+            }
+          check:
+            {
+              pl: Odśwież formularz i sprawdź zgodność cookie z sesją; nie omijaj validate.,
+              en: Refresh the form and match cookie to session; never bypass validate.,
+            }
+        - layer: { pl: WebAuthn, en: WebAuthn }
+          problem:
+            {
+              pl: Klucz przestał działać po migracji,
+              en: Key stopped working after migration,
+            }
+          cause:
+            {
+              pl: Zmienił się hostname albo WEBAUTHN_RP_ID.,
+              en: Hostname or WEBAUTHN_RP_ID changed.,
+            }
+          check:
+            {
+              pl: Porównaj RP ID rejestracji z obecną domeną i HTTPS.,
+              en: Compare registration RP ID with current domain and HTTPS.,
+            }
+        - layer: { pl: Filesystem, en: Filesystem }
+          problem:
+            { pl: Zapis odrzucony mimo chmod, en: Write rejected despite chmod }
+          cause:
+            {
+              pl: "Zły owner, parent, symlink, root lub reguła hostingu.",
+              en: "Wrong owner, parent, symlink, root or hosting rule.",
+            }
+          check:
+            {
+              pl: "Sprawdź pełny łańcuch, użytkownika PHP, realpath i log; nie ustawiaj 0777.",
+              en: "Check the full chain, PHP user, realpath and log; never set 0777.",
+            }
+        - layer: { pl: Rewizja, en: Revision }
+          problem: { pl: Formularz zwraca 409, en: Form returns 409 }
+          cause:
+            {
+              pl: Plik zmienił się po jego odczycie.,
+              en: File changed after it was read.,
+            }
+          check:
+            {
+              pl: Pobierz nową rewizję i świadomie połącz zmiany; nie wyłączaj kontroli.,
+              en: Fetch the new revision and deliberately merge; never disable the check.,
+            }
+        - layer: { pl: Cache HTML, en: HTML cache }
+          problem:
+            {
+              pl: Po deployu widać stary kod,
+              en: Old code remains after deployment,
+            }
+          cause:
+            {
+              pl: APP_RELEASE nie zmienił namespace albo wdrożenie jest niespójne.,
+              en: APP_RELEASE did not change namespace or deployment is incoherent.,
+            }
+          check:
+            {
+              pl: Ustaw identyfikator artefaktu i porównaj release na wszystkich instancjach.,
+              en: Set the artifact identifier and compare release across instances.,
+            }
+        - layer: { pl: Błąd publiczny, en: Public error }
+          problem:
+            {
+              pl: Odpowiedź ujawnia ścieżkę serwera,
+              en: Response exposes a server path,
+            }
+          cause:
+            {
+              pl: APP_DEBUG działa w publicznym środowisku lub wyjątek jest wypisywany ręcznie.,
+              en: APP_DEBUG runs publicly or an exception is printed manually.,
+            }
+          check:
+            {
+              pl: "Zablokuj ruch, wyłącz debug, popraw ErrorHandler i zrotuj ujawnione sekrety.",
+              en: "Block traffic, disable debug, fix ErrorHandler and rotate exposed secrets.",
+            }
+      note:
+        pl: Najpierw zachowaj dowody w chronionym logu. Masowe chmod, wyłączenie CSRF lub debug na produkcji może usunąć objaw kosztem realnej ochrony.
+        en: Preserve evidence in a protected log first. Broad chmod, disabled CSRF or production debug may remove the symptom by sacrificing real protection.
+  - id: 01a06d50-7007-7715-8715-000000000015
+    type: article-content
+    enabled: true
+    data:
+      anchor: checklista-bezpieczenstwa
+      content:
+        pl: |-
+          ## 26. Checklista bezpieczeństwa przed publikacją
+
+          Potwierdź:
+
+          1. document root wskazuje dokładnie public;
+          2. serwer wykonuje wyłącznie public/index.php;
+          3. APP_ENV=production, APP_DEBUG=0 i APP_SECRET jest losowy;
+          4. HTTPS oraz Secure, HttpOnly i właściwe SameSite są aktywne;
+          5. TRUSTED_PROXIES zawiera tylko rzeczywiste proxy;
+          6. origin nie jest przypadkowo dostępny z pominięciem oczekiwanej warstwy;
+          7. pages, config i wymagane runtime mają minimalny zapis;
+          8. kod, vendor, bloki i templates są read-only dla PHP;
+          9. .env.local, SQLite, logi i audit leżą poza public i backupem jawnym;
+          10. każda mutacja HTTP sprawdza sesję, rolę i CSRF;
+          11. rate limiting używa prawdziwego IP i niezależnych kubełków;
+          12. reset hasła nie ujawnia konta i przechowuje tylko hash tokenu;
+          13. WEBAUTHN_RP_ID odpowiada finalnej domenie;
+          14. formularze, YAML, bloki, media i ścieżki przechodzą własne kontrakty;
+          15. zapisy używają rewizji, blokady i operacji atomowej;
+          16. APP_RELEASE zmienia się z artefaktem wdrożenia;
+          17. błędy publiczne nie ujawniają debug ani systemu plików;
+          18. logi są chronione, rotowane i nie zawierają niepotrzebnych sekretów;
+          19. composer check, database:migrate i release:check przechodzą;
+          20. restoration backupu zostało praktycznie przetestowane.
+
+          Bezpieczny CMS nie ufa temu, że panel jest ukryty albo że użytkownik wpisze poprawne dane. Każda warstwa redukuje możliwości wejścia, a każda operacja zapisu potwierdza tożsamość, intencję, kontrakt, miejsce docelowe i aktualność stanu.
+        en: |-
+          ## 26. Pre-publication security checklist
+
+          Confirm that:
+
+          1. document root points exactly at public;
+          2. the server executes only public/index.php;
+          3. APP_ENV=production, APP_DEBUG=0 and APP_SECRET is random;
+          4. HTTPS and Secure, HttpOnly and appropriate SameSite are active;
+          5. TRUSTED_PROXIES contains only real proxies;
+          6. origin is not accidentally accessible around the expected layer;
+          7. pages, config and required runtime have minimum write permissions;
+          8. code, vendor, blocks and templates are read-only for PHP;
+          9. .env.local, SQLite, logs and audit are outside public and plaintext backups;
+          10. every HTTP mutation checks session, role and CSRF;
+          11. rate limiting uses the true IP and independent buckets;
+          12. password reset does not expose accounts and stores only token hashes;
+          13. WEBAUTHN_RP_ID matches the final domain;
+          14. forms, YAML, blocks, media and paths pass dedicated contracts;
+          15. writes use revision, lock and atomic operation;
+          16. APP_RELEASE changes with the deployed artifact;
+          17. public errors expose neither debug nor filesystem;
+          18. logs are protected, rotated and contain no unnecessary secrets;
+          19. composer check, database:migrate and release:check pass;
+          20. backup restoration has been practically tested.
+
+          A secure CMS never trusts that the admin is hidden or that a user will submit correct data. Every layer reduces input capability, and every write confirms identity, intent, contract, destination and current state.
+      note:
+        pl: Checklista jest minimum wydaniowym, nie jednorazowym certyfikatem. Powtarzaj ją po zmianie infrastruktury, domeny, proxy, autoryzacji lub procesu deployu.
+        en: The checklist is a release minimum, not a one-time certificate. Repeat it after changes to infrastructure, domain, proxy, authorization or deployment.
+  - id: 01a06d50-7007-7716-8716-000000000016
+    type: call-to-action
+    enabled: true
+    data:
+      eyebrow: { pl: Następny tutorial, en: Next tutorial }
+      title:
+        {
+          pl: Wdróż CMS bez niespodzianek.,
+          en: Deploy the CMS without surprises.,
+        }
+      description:
+        pl: Ostatni rozdział przeprowadzi przez artefakt release, konfigurację PHP i serwera WWW, uprawnienia, migracje, cache, smoke testy, backup oraz rollback.
+        en: The final chapter covers the release artifact, PHP and web-server configuration, permissions, migrations, caching, smoke tests, backup and rollback.
+      button_label: { pl: Przejdź do wdrożenia, en: Continue to deployment }
+      button_url:
+        { pl: /pl/dokumentacja/wdrozenie, en: /en/documentation/deployment }

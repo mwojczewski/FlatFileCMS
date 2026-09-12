@@ -5,196 +5,178 @@ slug:
   pl: api
   en: api
 title:
-  pl: 'API - od pierwszego żądania do bezpiecznej integracji'
-  en: 'API - from the first request to a safe integration'
-date: '2026-09-09'
+  pl: "API - od pierwszego żądania do bezpiecznej integracji"
+  en: "API - from the first request to a safe integration"
+date: "2026-09-09"
 order: 5
 category: api
 excerpt:
-  pl: 'Kompletny tutorial publicznego API FlatFile CMS - endpointy, lokalizacja, strony, kolekcje, media, nawigacja, konfiguracja, cache warunkowy, błędy, OpenAPI i implementacja klienta.'
-  en: 'A complete FlatFile CMS public API tutorial - endpoints, localization, pages, collections, media, navigation, configuration, conditional caching, errors, OpenAPI and client implementation.'
+  pl: "Kompletny tutorial publicznego API FlatFile CMS - endpointy, lokalizacja, strony, kolekcje, media, nawigacja, konfiguracja, cache warunkowy, błędy, OpenAPI i implementacja klienta."
+  en: "A complete FlatFile CMS public API tutorial - endpoints, localization, pages, collections, media, navigation, configuration, conditional caching, errors, OpenAPI and client implementation."
 seo:
   title:
-    pl: 'Publiczne API FlatFile CMS - kompletny tutorial integracji'
-    en: 'FlatFile CMS Public API - complete integration tutorial'
+    pl: "Publiczne API FlatFile CMS - kompletny tutorial integracji"
+    en: "FlatFile CMS Public API - complete integration tutorial"
   description:
-    pl: 'Naucz się korzystać z read-only API v1, filtrować kolekcje, obsługiwać ETag i błędy oraz budować klienta na podstawie OpenAPI 3.1.'
-    en: 'Learn to use the read-only v1 API, filter collections, handle ETag and errors, and build a client from OpenAPI 3.1.'
+    pl: "Naucz się korzystać z read-only API v1, filtrować kolekcje, obsługiwać ETag i błędy oraz budować klienta na podstawie OpenAPI 3.1."
+    en: "Learn to use the read-only v1 API, filter collections, handle ETag and errors, and build a client from OpenAPI 3.1."
   robots:
     index: true
     follow: true
   openGraph: {}
   twitter: {}
   jsonLd:
-    '@context': 'https://schema.org'
-    '@type': TechArticle
-    headline: 'FlatFile CMS Public API - from the first request to a safe integration'
-    dateModified: '2026-09-09'
+    "@context": "https://schema.org"
+    "@type": TechArticle
+    headline: "FlatFile CMS Public API - from the first request to a safe integration"
+    dateModified: "2026-09-09"
 blocks:
-  -
-    id: 01a08c2b-a1e3-71fc-a580-536acabb4a78
+  - id: 01a08c2b-a1e3-71fc-a580-536acabb4a78
     type: page-progressbar
     enabled: true
     data:
       accent: mint
-  -
-    id: 01a06d50-6006-7601-8601-000000000001
+  - id: 01a06d50-6006-7601-8601-000000000001
     type: docs-hero
     enabled: true
     data:
       breadcrumb:
-        pl: 'Dokumentacja / 06 / API'
-        en: 'Documentation / 06 / API'
+        pl: "Dokumentacja / 06 / API"
+        en: "Documentation / 06 / API"
       title:
-        pl: 'API - od pierwszego żądania do bezpiecznej integracji'
-        en: 'API - from the first request to a safe integration'
+        pl: "API - od pierwszego żądania do bezpiecznej integracji"
+        en: "API - from the first request to a safe integration"
       lead:
-        pl: 'Zbuduj klienta headless, który pobiera lokalizowane strony i kolekcje, korzysta z gotowych adresów mediów, respektuje kontrakty zapytań i oszczędza transfer dzięki rewalidacji HTTP.'
-        en: 'Build a headless client that fetches localized pages and collections, uses ready media URLs, respects query contracts and saves bandwidth through HTTP revalidation.'
+        pl: "Zbuduj klienta headless, który pobiera lokalizowane strony i kolekcje, korzysta z gotowych adresów mediów, respektuje kontrakty zapytań i oszczędza transfer dzięki rewalidacji HTTP."
+        en: "Build a headless client that fetches localized pages and collections, uses ready media URLs, respects query contracts and saves bandwidth through HTTP revalidation."
       level: średniozaawansowany
       reading_time:
-        pl: 'około 45 minut'
-        en: 'about 45 minutes'
-      updated: '2026-09-09'
+        pl: "około 45 minut"
+        en: "about 45 minutes"
+      updated: "2026-09-09"
       topics:
-        -
-          label:
+        - label:
             pl: REST
             en: REST
-        -
-          label:
+        - label:
             pl: JSON
             en: JSON
-        -
-          label:
-            pl: 'OpenAPI 3.1'
-            en: 'OpenAPI 3.1'
-        -
-          label:
+        - label:
+            pl: "OpenAPI 3.1"
+            en: "OpenAPI 3.1"
+        - label:
             pl: Kolekcje
             en: Collections
-        -
-          label:
+        - label:
             pl: ETag
             en: ETag
-        -
-          label:
-            pl: 'Obsługa błędów'
-            en: 'Error handling'
-  -
-    id: 01a06d50-6006-7602-8602-000000000002
+        - label:
+            pl: "Obsługa błędów"
+            en: "Error handling"
+  - id: 01a06d50-6006-7602-8602-000000000002
     type: docs-toc
     enabled: true
     data:
       title:
-        pl: 'Mapa integracji'
-        en: 'Integration map'
+        pl: "Mapa integracji"
+        en: "Integration map"
       intro:
-        pl: 'Zaczniemy od granic API i wyboru locale, następnie przejdziemy przez wszystkie zasoby, cache, błędy, formalny kontrakt OpenAPI i produkcyjnego klienta.'
-        en: 'We start with API boundaries and locale selection, then cover every resource, caching, errors, the formal OpenAPI contract and a production client.'
+        pl: "Zaczniemy od granic API i wyboru locale, następnie przejdziemy przez wszystkie zasoby, cache, błędy, formalny kontrakt OpenAPI i produkcyjnego klienta."
+        en: "We start with API boundaries and locale selection, then cover every resource, caching, errors, the formal OpenAPI contract and a production client."
       items:
-        -
-          number: '01'
+        - number: "01"
           title:
-            pl: 'Kontrakt API'
-            en: 'API contract'
+            pl: "Kontrakt API"
+            en: "API contract"
           description:
-            pl: 'Read-only, wersjonowanie i format JSON.'
-            en: 'Read-only behavior, versioning and JSON.'
+            pl: "Read-only, wersjonowanie i format JSON."
+            en: "Read-only behavior, versioning and JSON."
           url:
-            pl: '/pl/dokumentacja/api#kontrakt-api'
-            en: '/en/documentation/api#kontrakt-api'
-        -
-          number: '02'
+            pl: "/pl/dokumentacja/api#kontrakt-api"
+            en: "/en/documentation/api#kontrakt-api"
+        - number: "02"
           title:
             pl: Strony
             en: Pages
           description:
-            pl: 'Homepage, zagnieżdżone trasy, bloki i SEO.'
-            en: 'Homepage, nested routes, blocks and SEO.'
+            pl: "Homepage, zagnieżdżone trasy, bloki i SEO."
+            en: "Homepage, nested routes, blocks and SEO."
           url:
-            pl: '/pl/dokumentacja/api#strony-api'
-            en: '/en/documentation/api#strony-api'
-        -
-          number: '03'
+            pl: "/pl/dokumentacja/api#strony-api"
+            en: "/en/documentation/api#strony-api"
+        - number: "03"
           title:
             pl: Kolekcje
             en: Collections
           description:
-            pl: 'Filtry, sortowanie, paginacja i atrybuty.'
-            en: 'Filters, sorting, pagination and attributes.'
+            pl: "Filtry, sortowanie, paginacja i atrybuty."
+            en: "Filters, sorting, pagination and attributes."
           url:
-            pl: '/pl/dokumentacja/api#kolekcje-api'
-            en: '/en/documentation/api#kolekcje-api'
-        -
-          number: '04'
+            pl: "/pl/dokumentacja/api#kolekcje-api"
+            en: "/en/documentation/api#kolekcje-api"
+        - number: "04"
           title:
-            pl: 'Nawigacja i config'
-            en: 'Navigation and config'
+            pl: "Nawigacja i config"
+            en: "Navigation and config"
           description:
-            pl: 'Publiczne projekcje ustawień witryny.'
-            en: 'Public projections of website settings.'
+            pl: "Publiczne projekcje ustawień witryny."
+            en: "Public projections of website settings."
           url:
-            pl: '/pl/dokumentacja/api#projekcje-api'
-            en: '/en/documentation/api#projekcje-api'
-        -
-          number: '05'
+            pl: "/pl/dokumentacja/api#projekcje-api"
+            en: "/en/documentation/api#projekcje-api"
+        - number: "05"
           title:
-            pl: 'Cache warunkowy'
-            en: 'Conditional cache'
+            pl: "Cache warunkowy"
+            en: "Conditional cache"
           description:
-            pl: 'HEAD, ETag, Last-Modified i 304.'
-            en: 'HEAD, ETag, Last-Modified and 304.'
+            pl: "HEAD, ETag, Last-Modified i 304."
+            en: "HEAD, ETag, Last-Modified and 304."
           url:
-            pl: '/pl/dokumentacja/api#cache-api'
-            en: '/en/documentation/api#cache-api'
-        -
-          number: '06'
+            pl: "/pl/dokumentacja/api#cache-api"
+            en: "/en/documentation/api#cache-api"
+        - number: "06"
           title:
             pl: Błędy
             en: Errors
           description:
-            pl: 'Stabilne kody i decyzje klienta.'
-            en: 'Stable codes and client decisions.'
+            pl: "Stabilne kody i decyzje klienta."
+            en: "Stable codes and client decisions."
           url:
-            pl: '/pl/dokumentacja/api#bledy-api'
-            en: '/en/documentation/api#bledy-api'
-        -
-          number: '07'
+            pl: "/pl/dokumentacja/api#bledy-api"
+            en: "/en/documentation/api#bledy-api"
+        - number: "07"
           title:
             pl: OpenAPI
             en: OpenAPI
           description:
-            pl: 'Specyfikacja 3.1 i dokumentacja Scalar.'
-            en: '3.1 specification and Scalar documentation.'
+            pl: "Specyfikacja 3.1 i dokumentacja Scalar."
+            en: "3.1 specification and Scalar documentation."
           url:
-            pl: '/pl/dokumentacja/api#openapi'
-            en: '/en/documentation/api#openapi'
-        -
-          number: '08'
+            pl: "/pl/dokumentacja/api#openapi"
+            en: "/en/documentation/api#openapi"
+        - number: "08"
           title:
-            pl: 'Klient produkcyjny'
-            en: 'Production client'
+            pl: "Klient produkcyjny"
+            en: "Production client"
           description:
-            pl: 'Timeouty, walidacja i strategia retry.'
-            en: 'Timeouts, validation and retry strategy.'
+            pl: "Timeouty, walidacja i strategia retry."
+            en: "Timeouts, validation and retry strategy."
           url:
-            pl: '/pl/dokumentacja/api#klient-api'
-            en: '/en/documentation/api#klient-api'
-  -
-    id: 01a06d50-6006-7603-8603-000000000003
+            pl: "/pl/dokumentacja/api#klient-api"
+            en: "/en/documentation/api#klient-api"
+  - id: 01a06d50-6006-7603-8603-000000000003
     type: technical-table
     enabled: true
     data:
       eyebrow:
-        pl: 'API v1'
-        en: 'API v1'
+        pl: "API v1"
+        en: "API v1"
       title:
-        pl: 'Sześć publicznych zasobów pokrywa model headless.'
-        en: 'Six public resources cover the headless model.'
+        pl: "Sześć publicznych zasobów pokrywa model headless."
+        en: "Six public resources cover the headless model."
       intro:
-        pl: 'Wszystkie endpointy treści obsługują GET i HEAD. Ścieżka API nie zawiera prefiksu języka; locale wybiera parametr lang.'
-        en: 'Every content endpoint supports GET and HEAD. API paths contain no language prefix; the lang parameter selects locale.'
+        pl: "Wszystkie endpointy treści obsługują GET i HEAD. Ścieżka API nie zawiera prefiksu języka; locale wybiera parametr lang."
+        en: "Every content endpoint supports GET and HEAD. API paths contain no language prefix; the lang parameter selects locale."
       column_1:
         pl: Endpoint
         en: Endpoint
@@ -205,24 +187,22 @@ blocks:
         pl: Parametry
         en: Parameters
       column_4:
-        pl: 'Typowy cel'
-        en: 'Typical use'
+        pl: "Typowy cel"
+        en: "Typical use"
       rows:
-        -
-          cell_1:
+        - cell_1:
             pl: /api/v1/health
             en: /api/v1/health
           cell_2:
-            pl: 'Stan runtime'
-            en: 'Runtime status'
+            pl: "Stan runtime"
+            en: "Runtime status"
           cell_3:
             pl: Brak
             en: None
           cell_4:
-            pl: 'Health check i monitoring'
-            en: 'Health check and monitoring'
-        -
-          cell_1:
+            pl: "Health check i monitoring"
+            en: "Health check and monitoring"
+        - cell_1:
             pl: /api/v1/pages
             en: /api/v1/pages
           cell_2:
@@ -232,62 +212,57 @@ blocks:
             pl: lang
             en: lang
           cell_4:
-            pl: 'Start aplikacji headless'
-            en: 'Headless application entry'
-        -
-          cell_1:
-            pl: '/api/v1/pages/{path}'
-            en: '/api/v1/pages/{path}'
+            pl: "Start aplikacji headless"
+            en: "Headless application entry"
+        - cell_1:
+            pl: "/api/v1/pages/{path}"
+            en: "/api/v1/pages/{path}"
           cell_2:
-            pl: 'Pojedyncza strona'
-            en: 'Single page'
+            pl: "Pojedyncza strona"
+            en: "Single page"
           cell_3:
-            pl: 'path, lang'
-            en: 'path, lang'
+            pl: "path, lang"
+            en: "path, lang"
           cell_4:
-            pl: 'Widok treści i bloków'
-            en: 'Content and block view'
-        -
-          cell_1:
-            pl: '/api/v1/collections/{path}'
-            en: '/api/v1/collections/{path}'
+            pl: "Widok treści i bloków"
+            en: "Content and block view"
+        - cell_1:
+            pl: "/api/v1/collections/{path}"
+            en: "/api/v1/collections/{path}"
           cell_2:
-            pl: 'Lista wpisów'
-            en: 'Entry list'
+            pl: "Lista wpisów"
+            en: "Entry list"
           cell_3:
-            pl: 'path, lang, page i filtry'
-            en: 'path, lang, page and filters'
+            pl: "path, lang, page i filtry"
+            en: "path, lang, page and filters"
           cell_4:
-            pl: 'Blog, dokumentacja, katalog'
-            en: 'Blog, documentation, catalogue'
-        -
-          cell_1:
+            pl: "Blog, dokumentacja, katalog"
+            en: "Blog, documentation, catalogue"
+        - cell_1:
             pl: /api/v1/navigation
             en: /api/v1/navigation
           cell_2:
-            pl: 'Wszystkie menu'
-            en: 'All menus'
+            pl: "Wszystkie menu"
+            en: "All menus"
           cell_3:
             pl: lang
             en: lang
           cell_4:
-            pl: 'Nawigacja klienta'
-            en: 'Client navigation'
-        -
-          cell_1:
+            pl: "Nawigacja klienta"
+            en: "Client navigation"
+        - cell_1:
             pl: /api/v1/config
             en: /api/v1/config
           cell_2:
-            pl: 'Publiczna konfiguracja'
-            en: 'Public configuration'
+            pl: "Publiczna konfiguracja"
+            en: "Public configuration"
           cell_3:
             pl: lang
             en: lang
           cell_4:
-            pl: 'Branding i języki'
-            en: 'Branding and languages'
-  -
-    id: 01a06d50-6006-7604-8604-000000000004
+            pl: "Branding i języki"
+            en: "Branding and languages"
+  - id: 01a06d50-6006-7604-8604-000000000004
     type: article-content
     enabled: true
     data:
@@ -342,22 +317,21 @@ blocks:
 
           The health endpoint returns status, application name and stage number. It confirms runtime operation but does not replace a probe of a specific page, configuration or content-dependent connection.
       note:
-        pl: 'Tożsamość katalogowa strony nie jest parametrem API. path zawsze oznacza lokalizowaną ścieżkę publiczną bez prefiksu języka.'
+        pl: "Tożsamość katalogowa strony nie jest parametrem API. path zawsze oznacza lokalizowaną ścieżkę publiczną bez prefiksu języka."
         en: "A page's directory identity is not an API parameter. path always means the localized public path without a language prefix."
-  -
-    id: 01a06d50-6006-7605-8605-000000000005
+  - id: 01a06d50-6006-7605-8605-000000000005
     type: code-showcase
     enabled: true
     data:
       eyebrow:
-        pl: 'Pierwsze żądanie'
-        en: 'First request'
+        pl: "Pierwsze żądanie"
+        en: "First request"
       title:
-        pl: 'Pobierz stronę i sprawdź odpowiedź przed użyciem danych.'
-        en: 'Fetch a page and verify the response before using data.'
+        pl: "Pobierz stronę i sprawdź odpowiedź przed użyciem danych."
+        en: "Fetch a page and verify the response before using data."
       description:
-        pl: 'Minimalny klient sprawdza status, Content-Type oraz podstawowy kształt JSON. Timeout przerywa integrację, która nie może czekać bez końca.'
-        en: 'A minimal client checks status, Content-Type and the basic JSON shape. A timeout stops an integration that cannot wait forever.'
+        pl: "Minimalny klient sprawdza status, Content-Type oraz podstawowy kształt JSON. Timeout przerywa integrację, która nie może czekać bez końca."
+        en: "A minimal client checks status, Content-Type and the basic JSON shape. A timeout stops an integration that cannot wait forever."
       filename: client.php
       code: |-
         <?php
@@ -387,20 +361,16 @@ blocks:
             throw new RuntimeException('Unexpected API response.');
         }
       bullets:
-        -
-          text:
-            pl: 'W produkcji odczytaj status z klienta HTTP i rozróżnij transport od błędu API.'
-            en: 'In production read status from the HTTP client and distinguish transport from an API error.'
-        -
-          text:
-            pl: 'Nie wyłączaj walidacji TLS i ustaw krótki timeout połączenia oraz odpowiedzi.'
-            en: 'Never disable TLS validation; set short connection and response timeouts.'
-        -
-          text:
-            pl: 'Waliduj pola używane przez aplikację, nawet gdy OpenAPI generuje typy.'
-            en: 'Validate fields used by the application even when OpenAPI generates types.'
-  -
-    id: 01a06d50-6006-7606-8606-000000000006
+        - text:
+            pl: "W produkcji odczytaj status z klienta HTTP i rozróżnij transport od błędu API."
+            en: "In production read status from the HTTP client and distinguish transport from an API error."
+        - text:
+            pl: "Nie wyłączaj walidacji TLS i ustaw krótki timeout połączenia oraz odpowiedzi."
+            en: "Never disable TLS validation; set short connection and response timeouts."
+        - text:
+            pl: "Waliduj pola używane przez aplikację, nawet gdy OpenAPI generuje typy."
+            en: "Validate fields used by the application even when OpenAPI generates types."
+  - id: 01a06d50-6006-7606-8606-000000000006
     type: article-content
     enabled: true
     data:
@@ -454,7 +424,7 @@ blocks:
 
           ## 6. Używaj gotowych metadanych mediów
 
-          Pola image i file zachowują lokalny src, ale otrzymują także niezmienny url, mimeType, size oraz fingerprint. Obraz dodatkowo zawiera width i height. Klient używa url bez wyprowadzania ścieżki filesystemu lub własnego hasha.
+          Pola image i file zachowują lokalny src, ale otrzymują także niezmienny url, mimeType, size oraz fingerprint. Obraz dodatkowo zawiera width i height. Klient używa url bez wyprowadzania ścieżki systemu plików lub własnego hasha.
 
           URL mediów jest fingerprintowany. Można go długo cache'ować jako immutable, ponieważ zmiana bajtów prowadzi do nowego adresu. width i height pozwalają zarezerwować miejsce w layoucie i ograniczyć CLS przed pobraniem pliku.
         en: |-
@@ -509,10 +479,9 @@ blocks:
 
           Media URLs are fingerprinted. They can be cached as immutable because changing bytes creates a new address. width and height let the layout reserve space and reduce CLS before downloading the file.
       note:
-        pl: 'Blocks jest kontraktem danych, nie zdalnym HTML-em. O bezpieczeństwo renderowania w przeglądarce nadal odpowiada klient.'
-        en: 'Blocks is a data contract, not remote HTML. The client remains responsible for safe browser rendering.'
-  -
-    id: 01a06d50-6006-7607-8607-000000000007
+        pl: "Blocks jest kontraktem danych, nie zdalnym HTML-em. O bezpieczeństwo renderowania w przeglądarce nadal odpowiada klient."
+        en: "Blocks is a data contract, not remote HTML. The client remains responsible for safe browser rendering."
+  - id: 01a06d50-6006-7607-8607-000000000007
     type: article-content
     enabled: true
     data:
@@ -563,10 +532,9 @@ blocks:
 
           A typical client fetches the collection for a list view and the individual page after navigation. Prefetch selectively, with a concurrency limit and ETag revalidation.
       note:
-        pl: 'Nie zakładaj, że każdy parametr query jest filtrem. Serwer celowo stosuje wyłącznie filtry zadeklarowane przez właściciela kolekcji.'
-        en: 'Do not assume every query parameter is a filter. The server deliberately applies only filters declared by the collection owner.'
-  -
-    id: 01a06d50-6006-7608-8608-000000000008
+        pl: "Nie zakładaj, że każdy parametr query jest filtrem. Serwer celowo stosuje wyłącznie filtry zadeklarowane przez właściciela kolekcji."
+        en: "Do not assume every query parameter is a filter. The server deliberately applies only filters declared by the collection owner."
+  - id: 01a06d50-6006-7608-8608-000000000008
     type: article-content
     enabled: true
     data:
@@ -613,10 +581,9 @@ blocks:
 
           Never combine a wildcard with credentials and do not add authorization headers to a read-only API that does not require them. A same-origin frontend is simpler and safer whenever possible.
       note:
-        pl: 'Publiczne API oznacza publiczny odczyt treści, nie publiczny dostęp do całej konfiguracji instalacji.'
+        pl: "Publiczne API oznacza publiczny odczyt treści, nie publiczny dostęp do całej konfiguracji instalacji."
         en: "Public API means public content reads, not public access to the installation's complete configuration."
-  -
-    id: 01a06d50-6006-7609-8609-000000000009
+  - id: 01a06d50-6006-7609-8609-000000000009
     type: article-content
     enabled: true
     data:
@@ -663,128 +630,119 @@ blocks:
 
           A page ETag changes with JSON bytes. Last-Modified tracks the page, used block definitions, media, route index, languages and configuration. A collection additionally tracks query results and resources affecting the list.
       note:
-        pl: 'Po 304 zachowaj poprzednie body. Pusta odpowiedź nie oznacza pustego zasobu, lecz potwierdzenie aktualności lokalnej kopii.'
-        en: 'After 304 retain the previous body. An empty response does not mean an empty resource; it validates the local copy.'
-  -
-    id: 01a06d50-6006-7610-8610-000000000010
+        pl: "Po 304 zachowaj poprzednie body. Pusta odpowiedź nie oznacza pustego zasobu, lecz potwierdzenie aktualności lokalnej kopii."
+        en: "After 304 retain the previous body. An empty response does not mean an empty resource; it validates the local copy."
+  - id: 01a06d50-6006-7610-8610-000000000010
     type: technical-table
     enabled: true
     data:
       eyebrow:
-        pl: 'Kontrakt błędów'
-        en: 'Error contract'
+        pl: "Kontrakt błędów"
+        en: "Error contract"
       title:
-        pl: 'Kod błędu prowadzi decyzję klienta.'
-        en: 'The error code drives the client decision.'
+        pl: "Kod błędu prowadzi decyzję klienta."
+        en: "The error code drives the client decision."
       intro:
-        pl: 'message jest tekstem dla diagnostyki. Logika programu powinna rozpoznawać stabilne code oraz status HTTP.'
-        en: 'message is diagnostic text. Program logic should recognize stable code and HTTP status.'
+        pl: "message jest tekstem dla diagnostyki. Logika programu powinna rozpoznawać stabilne code oraz status HTTP."
+        en: "message is diagnostic text. Program logic should recognize stable code and HTTP status."
       column_1:
-        pl: 'Status i code'
-        en: 'Status and code'
+        pl: "Status i code"
+        en: "Status and code"
       column_2:
         pl: Znaczenie
         en: Meaning
       column_3:
-        pl: 'Reakcja klienta'
-        en: 'Client action'
+        pl: "Reakcja klienta"
+        en: "Client action"
       column_4:
         pl: Retry
         en: Retry
       rows:
-        -
-          cell_1:
-            pl: '400 LANGUAGE_NOT_AVAILABLE'
-            en: '400 LANGUAGE_NOT_AVAILABLE'
+        - cell_1:
+            pl: "400 LANGUAGE_NOT_AVAILABLE"
+            en: "400 LANGUAGE_NOT_AVAILABLE"
           cell_2:
-            pl: 'Locale nie jest aktywne'
-            en: 'Locale is not enabled'
+            pl: "Locale nie jest aktywne"
+            en: "Locale is not enabled"
           cell_3:
-            pl: 'Wybierz język z /api/v1/config'
-            en: 'Select a language from /api/v1/config'
+            pl: "Wybierz język z /api/v1/config"
+            en: "Select a language from /api/v1/config"
           cell_4:
-            pl: 'Nie bez zmiany danych'
-            en: 'Not without changing input'
-        -
-          cell_1:
-            pl: '400 INVALID_COLLECTION_QUERY'
-            en: '400 INVALID_COLLECTION_QUERY'
+            pl: "Nie bez zmiany danych"
+            en: "Not without changing input"
+        - cell_1:
+            pl: "400 INVALID_COLLECTION_QUERY"
+            en: "400 INVALID_COLLECTION_QUERY"
           cell_2:
-            pl: 'Błędna strona, filtr lub wartość'
-            en: 'Invalid page, filter or value'
+            pl: "Błędna strona, filtr lub wartość"
+            en: "Invalid page, filter or value"
           cell_3:
-            pl: 'Popraw query według kontraktu'
-            en: 'Correct query against the contract'
+            pl: "Popraw query według kontraktu"
+            en: "Correct query against the contract"
           cell_4:
-            pl: 'Nie bez korekty'
-            en: 'Not without correction'
-        -
-          cell_1:
-            pl: '404 PAGE_NOT_FOUND'
-            en: '404 PAGE_NOT_FOUND'
+            pl: "Nie bez korekty"
+            en: "Not without correction"
+        - cell_1:
+            pl: "404 PAGE_NOT_FOUND"
+            en: "404 PAGE_NOT_FOUND"
           cell_2:
-            pl: 'Strona nie istnieje lub jest wyłączona'
-            en: 'Page is absent or disabled'
+            pl: "Strona nie istnieje lub jest wyłączona"
+            en: "Page is absent or disabled"
           cell_3:
-            pl: 'Pokaż not found i usuń cache wpisu'
-            en: 'Show not found and evict entry cache'
+            pl: "Pokaż not found i usuń cache wpisu"
+            en: "Show not found and evict entry cache"
           cell_4:
-            pl: 'Zwykle nie'
-            en: 'Usually no'
-        -
-          cell_1:
-            pl: '404 COLLECTION_NOT_FOUND'
-            en: '404 COLLECTION_NOT_FOUND'
+            pl: "Zwykle nie"
+            en: "Usually no"
+        - cell_1:
+            pl: "404 COLLECTION_NOT_FOUND"
+            en: "404 COLLECTION_NOT_FOUND"
           cell_2:
-            pl: 'Kolekcja nie jest publiczna'
-            en: 'Collection is not public'
+            pl: "Kolekcja nie jest publiczna"
+            en: "Collection is not public"
           cell_3:
-            pl: 'Sprawdź lokalizowany path'
-            en: 'Check localized path'
+            pl: "Sprawdź lokalizowany path"
+            en: "Check localized path"
           cell_4:
-            pl: 'Zwykle nie'
-            en: 'Usually no'
-        -
-          cell_1:
-            pl: '404 ROUTE_NOT_FOUND'
-            en: '404 ROUTE_NOT_FOUND'
+            pl: "Zwykle nie"
+            en: "Usually no"
+        - cell_1:
+            pl: "404 ROUTE_NOT_FOUND"
+            en: "404 ROUTE_NOT_FOUND"
           cell_2:
-            pl: 'Endpoint API nie istnieje'
-            en: 'API endpoint does not exist'
+            pl: "Endpoint API nie istnieje"
+            en: "API endpoint does not exist"
           cell_3:
-            pl: 'Popraw wersję lub ścieżkę klienta'
-            en: 'Correct client version or path'
+            pl: "Popraw wersję lub ścieżkę klienta"
+            en: "Correct client version or path"
           cell_4:
             pl: Nie
-            en: 'No'
-        -
-          cell_1:
-            pl: '405 METHOD_NOT_ALLOWED'
-            en: '405 METHOD_NOT_ALLOWED'
+            en: "No"
+        - cell_1:
+            pl: "405 METHOD_NOT_ALLOWED"
+            en: "405 METHOD_NOT_ALLOWED"
           cell_2:
-            pl: 'Użyto metody innej niż GET lub HEAD'
-            en: 'Method other than GET or HEAD was used'
+            pl: "Użyto metody innej niż GET lub HEAD"
+            en: "Method other than GET or HEAD was used"
           cell_3:
-            pl: 'Popraw metodę; API jest read-only'
-            en: 'Correct method; API is read-only'
+            pl: "Popraw metodę; API jest read-only"
+            en: "Correct method; API is read-only"
           cell_4:
             pl: Nie
-            en: 'No'
-        -
-          cell_1:
-            pl: '500 INTERNAL_SERVER_ERROR'
-            en: '500 INTERNAL_SERVER_ERROR'
+            en: "No"
+        - cell_1:
+            pl: "500 INTERNAL_SERVER_ERROR"
+            en: "500 INTERNAL_SERVER_ERROR"
           cell_2:
-            pl: 'Błąd serwera lub treści'
-            en: 'Server or content fault'
+            pl: "Błąd serwera lub treści"
+            en: "Server or content fault"
           cell_3:
-            pl: 'Pokaż fallback i zapisz correlation context'
-            en: 'Show fallback and log correlation context'
+            pl: "Pokaż fallback i zapisz correlation context"
+            en: "Show fallback and log correlation context"
           cell_4:
-            pl: 'Ograniczony backoff'
-            en: 'Bounded backoff'
-  -
-    id: 01a06d50-6006-7611-8611-000000000011
+            pl: "Ograniczony backoff"
+            en: "Bounded backoff"
+  - id: 01a06d50-6006-7611-8611-000000000011
     type: article-content
     enabled: true
     data:
@@ -793,7 +751,7 @@ blocks:
         pl: |-
           ## 15. Parsuj błędy przed danymi sukcesu
 
-          Błąd ma stabilny kształt z error.code i error.message. W trybie produkcyjnym wyjątek serwera nie ujawnia ścieżek filesystemu ani stack trace. Pole debug może pojawić się wyłącznie przy włączonym debug i nie może stać się zależnością klienta.
+          Błąd ma stabilny kształt z error.code i error.message. W trybie produkcyjnym wyjątek serwera nie ujawnia ścieżek systemu plików ani stosu wywołań. Pole debug może pojawić się wyłącznie przy włączonym debug i nie może stać się zależnością klienta.
 
           ~~~json
           {
@@ -837,10 +795,9 @@ blocks:
 
           If a client holds the last valid, revalidated public representation, it may use it as a controlled stale fallback. Do not substitute it for a 404 without policy because the resource may have been intentionally withdrawn.
       note:
-        pl: 'Nigdy nie pokazuj użytkownikowi surowego debug ani całego body błędu 500. Zachowaj szczegóły w kontrolowanym logu integracji.'
-        en: 'Never display raw debug or the complete 500 body to a user. Retain details in a controlled integration log.'
-  -
-    id: 01a06d50-6006-7612-8612-000000000012
+        pl: "Nigdy nie pokazuj użytkownikowi surowego debug ani całego body błędu 500. Zachowaj szczegóły w kontrolowanym logu integracji."
+        en: "Never display raw debug or the complete 500 body to a user. Retain details in a controlled integration log."
+  - id: 01a06d50-6006-7612-8612-000000000012
     type: article-content
     enabled: true
     data:
@@ -879,10 +836,9 @@ blocks:
 
           The interactive documentation is a developer tool, not an authorization mechanism. Public read-only endpoints require no token. A future write API should receive a separate security model rather than inheriting this decision automatically.
       note:
-        pl: 'OpenAPI opisuje interfejs sieciowy. block.yml pozostaje bardziej szczegółowym kontraktem dynamicznych pól data poszczególnych komponentów.'
+        pl: "OpenAPI opisuje interfejs sieciowy. block.yml pozostaje bardziej szczegółowym kontraktem dynamicznych pól data poszczególnych komponentów."
         en: "OpenAPI describes the network interface. block.yml remains the more detailed contract for each component's dynamic data fields."
-  -
-    id: 01a06d50-6006-7613-8613-000000000013
+  - id: 01a06d50-6006-7613-8613-000000000013
     type: article-content
     enabled: true
     data:
@@ -929,133 +885,123 @@ blocks:
 
           A post-deployment smoke test should fetch health, config, homepage in both languages, one media page, a collection and openapi.json. It then repeats a page request with If-None-Match and expects a bodyless 304.
       note:
-        pl: 'Najbardziej odporny klient nie kopiuje modelu CMS-a w ciemno - jawnie mapuje tylko pola potrzebne aplikacji i toleruje kompatybilne rozszerzenia.'
-        en: 'The most resilient client does not mirror the CMS model blindly-it explicitly maps needed fields and tolerates compatible extensions.'
-  -
-    id: 01a06d50-6006-7614-8614-000000000014
+        pl: "Najbardziej odporny klient nie kopiuje modelu CMS-a w ciemno - jawnie mapuje tylko pola potrzebne aplikacji i toleruje kompatybilne rozszerzenia."
+        en: "The most resilient client does not mirror the CMS model blindly-it explicitly maps needed fields and tolerates compatible extensions."
+  - id: 01a06d50-6006-7614-8614-000000000014
     type: diagnostic-table
     enabled: true
     data:
       anchor: diagnostyka-api
       eyebrow:
-        pl: '22 / Diagnostyka'
-        en: '22 / Troubleshooting'
+        pl: "22 / Diagnostyka"
+        en: "22 / Troubleshooting"
       title:
-        pl: 'Znajdź pierwszą granicę, na której kontrakt przestaje działać.'
-        en: 'Find the first boundary where the contract stops working.'
+        pl: "Znajdź pierwszą granicę, na której kontrakt przestaje działać."
+        en: "Find the first boundary where the contract stops working."
       intro:
-        pl: 'Sprawdzaj kolejno transport, routing, locale, query, reprezentację, cache i renderowanie klienta. Nie zaczynaj od czyszczenia wszystkich cache.'
-        en: 'Check transport, routing, locale, query, representation, cache and client rendering in order. Do not start by purging every cache.'
+        pl: "Sprawdzaj kolejno transport, routing, locale, query, reprezentację, cache i renderowanie klienta. Nie zaczynaj od czyszczenia wszystkich cache."
+        en: "Check transport, routing, locale, query, representation, cache and client rendering in order. Do not start by purging every cache."
       rows:
-        -
-          layer:
+        - layer:
             pl: Transport
             en: Transport
           problem:
-            pl: 'Brak statusu HTTP i JSON'
-            en: 'No HTTP status or JSON'
+            pl: "Brak statusu HTTP i JSON"
+            en: "No HTTP status or JSON"
           cause:
-            pl: 'DNS, TLS, timeout lub blokada sieciowa.'
-            en: 'DNS, TLS, timeout or network block.'
+            pl: "DNS, TLS, timeout lub blokada sieciowa."
+            en: "DNS, TLS, timeout or network block."
           check:
-            pl: 'Sprawdź połączenie z originem, certyfikat, timeout i log klienta.'
-            en: 'Check origin connectivity, certificate, timeout and client log.'
-        -
-          layer:
+            pl: "Sprawdź połączenie z originem, certyfikat, timeout i log klienta."
+            en: "Check origin connectivity, certificate, timeout and client log."
+        - layer:
             pl: Routing
             en: Routing
           problem:
             pl: ROUTE_NOT_FOUND
             en: ROUTE_NOT_FOUND
           cause:
-            pl: 'Błędna wersja lub nazwa endpointu.'
-            en: 'Wrong version or endpoint name.'
+            pl: "Błędna wersja lub nazwa endpointu."
+            en: "Wrong version or endpoint name."
           check:
-            pl: 'Porównaj URL z /api/openapi.json; /api/v1/pages to homepage.'
-            en: 'Compare URL with /api/openapi.json; /api/v1/pages is homepage.'
-        -
-          layer:
+            pl: "Porównaj URL z /api/openapi.json; /api/v1/pages to homepage."
+            en: "Compare URL with /api/openapi.json; /api/v1/pages is homepage."
+        - layer:
             pl: Locale
             en: Locale
           problem:
             pl: LANGUAGE_NOT_AVAILABLE
             en: LANGUAGE_NOT_AVAILABLE
           cause:
-            pl: 'Kod języka nie jest aktywny.'
-            en: 'Language code is not enabled.'
+            pl: "Kod języka nie jest aktywny."
+            en: "Language code is not enabled."
           check:
-            pl: 'Pobierz languages z /api/v1/config bez parametru lang.'
-            en: 'Fetch languages from /api/v1/config without lang.'
-        -
-          layer:
+            pl: "Pobierz languages z /api/v1/config bez parametru lang."
+            en: "Fetch languages from /api/v1/config without lang."
+        - layer:
             pl: Strona
             en: Page
           problem:
-            pl: 'PAGE_NOT_FOUND mimo istniejącego katalogu'
-            en: 'PAGE_NOT_FOUND despite an existing directory'
+            pl: "PAGE_NOT_FOUND mimo istniejącego katalogu"
+            en: "PAGE_NOT_FOUND despite an existing directory"
           cause:
-            pl: 'Użyto tożsamości katalogowej, złego slugu locale albo strona jest wyłączona.'
-            en: 'Directory identity, wrong locale slug or a disabled page was used.'
+            pl: "Użyto tożsamości katalogowej, złego slugu locale albo strona jest wyłączona."
+            en: "Directory identity, wrong locale slug or a disabled page was used."
           check:
-            pl: 'Sprawdź publiczny path dla wybranego języka bez prefiksu locale.'
-            en: 'Check the public path for the selected language without locale prefix.'
-        -
-          layer:
+            pl: "Sprawdź publiczny path dla wybranego języka bez prefiksu locale."
+            en: "Check the public path for the selected language without locale prefix."
+        - layer:
             pl: Kolekcja
             en: Collection
           problem:
             pl: INVALID_COLLECTION_QUERY
             en: INVALID_COLLECTION_QUERY
           cause:
-            pl: 'page nie jest dodatnie albo filtr narusza allowedValues.'
-            en: 'page is not positive or a filter violates allowedValues.'
+            pl: "page nie jest dodatnie albo filtr narusza allowedValues."
+            en: "page is not positive or a filter violates allowedValues."
           check:
-            pl: 'Porównaj query z pagination.yml i zakoduj wartości URL.'
-            en: 'Compare query with pagination.yml and URL-encode values.'
-        -
-          layer:
+            pl: "Porównaj query z pagination.yml i zakoduj wartości URL."
+            en: "Compare query with pagination.yml and URL-encode values."
+        - layer:
             pl: Cache
             en: Cache
           problem:
-            pl: '304 prowadzi do pustego ekranu'
-            en: '304 produces a blank screen'
+            pl: "304 prowadzi do pustego ekranu"
+            en: "304 produces a blank screen"
           cause:
-            pl: 'Klient potraktował puste body jako nową treść.'
-            en: 'Client treated the empty body as new content.'
+            pl: "Klient potraktował puste body jako nową treść."
+            en: "Client treated the empty body as new content."
           check:
-            pl: 'Po 304 użyj zachowanego body powiązanego z wysłanym ETag.'
-            en: 'After 304 use stored body associated with the sent ETag.'
-        -
-          layer:
+            pl: "Po 304 użyj zachowanego body powiązanego z wysłanym ETag."
+            en: "After 304 use stored body associated with the sent ETag."
+        - layer:
             pl: Przeglądarka
             en: Browser
           problem:
-            pl: 'Fetch blokowany mimo odpowiedzi curl'
-            en: 'Fetch blocked despite a successful curl'
+            pl: "Fetch blokowany mimo odpowiedzi curl"
+            en: "Fetch blocked despite a successful curl"
           cause:
-            pl: 'Brak polityki CORS dla innego originu.'
-            en: 'No CORS policy for a different origin.'
+            pl: "Brak polityki CORS dla innego originu."
+            en: "No CORS policy for a different origin."
           check:
-            pl: 'Sprawdź konsolę i nagłówki; skonfiguruj wąską allowlistę originów.'
-            en: 'Inspect console and headers; configure a narrow origin allowlist.'
-        -
-          layer:
+            pl: "Sprawdź konsolę i nagłówki; skonfiguruj wąską allowlistę originów."
+            en: "Inspect console and headers; configure a narrow origin allowlist."
+        - layer:
             pl: Komponent
             en: Component
           problem:
-            pl: 'JSON działa, lecz bloku nie widać'
-            en: 'JSON works but a block is absent'
+            pl: "JSON działa, lecz bloku nie widać"
+            en: "JSON works but a block is absent"
           cause:
-            pl: 'Klient nie ma renderera dla type albo blok jest disabled.'
-            en: 'Client lacks a renderer for type or block is disabled.'
+            pl: "Klient nie ma renderera dla type albo blok jest disabled."
+            en: "Client lacks a renderer for type or block is disabled."
           check:
-            pl: 'Porównaj type z registry klienta i publiczną tablicą blocks.'
-            en: 'Compare type with the client registry and public blocks array.'
+            pl: "Porównaj type z registry klienta i publiczną tablicą blocks."
+            en: "Compare type with the client registry and public blocks array."
       note:
-        pl: 'Zapisuj nagłówki odpowiedzi razem ze statusem. Bez ETag, Last-Modified i Content-Type diagnoza cache oraz wariantu odpowiedzi jest niepełna.'
-        en: 'Record response headers with status. Without ETag, Last-Modified and Content-Type, cache and representation diagnosis is incomplete.'
-  -
-    id: 01a06d50-6006-7615-8615-000000000015
+        pl: "Zapisuj nagłówki odpowiedzi razem ze statusem. Bez ETag, Last-Modified i Content-Type diagnoza cache oraz wariantu odpowiedzi jest niepełna."
+        en: "Record response headers with status. Without ETag, Last-Modified and Content-Type, cache and representation diagnosis is incomplete."
+  - id: 01a06d50-6006-7615-8615-000000000015
     type: article-content
     enabled: true
     data:
@@ -1084,7 +1030,7 @@ blocks:
           16. testy kontraktowe korzystają z aktualnego openapi.json;
           17. smoke test obejmuje PL, EN, kolekcję, media, błędy i rewalidację.
 
-          API pozostaje małe, ponieważ udostępnia gotowy model prezentacyjny zamiast szczegółów filesystemu. Klient jest odporny wtedy, gdy respektuje tę granicę, traktuje HTTP jako protokół z semantyką i jawnie mapuje dynamiczne bloki.
+          API pozostaje małe, ponieważ udostępnia gotowy model prezentacyjny zamiast szczegółów systemu plików. Klient jest odporny wtedy, gdy respektuje tę granicę, traktuje HTTP jako protokół z semantyką i jawnie mapuje dynamiczne bloki.
         en: |-
           ## 23. Production-ready integration checklist
 
@@ -1110,25 +1056,24 @@ blocks:
 
           The API stays small because it exposes a prepared presentation model rather than filesystem details. A client is resilient when it respects that boundary, treats HTTP as a semantic protocol and explicitly maps dynamic blocks.
       note:
-        pl: 'Kontrakt sieciowy jest częścią produktu. Wdrażaj zmianę API razem ze specyfikacją, testami i kompatybilnym klientem.'
-        en: 'The network contract is part of the product. Release an API change together with its specification, tests and a compatible client.'
-  -
-    id: 01a06d50-6006-7616-8616-000000000016
+        pl: "Kontrakt sieciowy jest częścią produktu. Wdrażaj zmianę API razem ze specyfikacją, testami i kompatybilnym klientem."
+        en: "The network contract is part of the product. Release an API change together with its specification, tests and a compatible client."
+  - id: 01a06d50-6006-7616-8616-000000000016
     type: call-to-action
     enabled: true
     data:
       eyebrow:
-        pl: 'Następny tutorial'
-        en: 'Next tutorial'
+        pl: "Następny tutorial"
+        en: "Next tutorial"
       title:
-        pl: 'Zabezpiecz cały stos CMS-a.'
-        en: 'Secure the complete CMS stack.'
+        pl: "Zabezpiecz cały stos CMS-a."
+        en: "Secure the complete CMS stack."
       description:
-        pl: 'Kolejny rozdział połączy granice zaufania, walidację wejścia, bezpieczny filesystem, sesje, CSRF, uwierzytelnianie, nagłówki i praktykę wdrożeniową.'
-        en: 'The next chapter combines trust boundaries, input validation, filesystem safety, sessions, CSRF, authentication, headers and deployment practice.'
+        pl: "Kolejny rozdział połączy granice zaufania, walidację wejścia, bezpieczny system plików, sesje, CSRF, uwierzytelnianie, nagłówki i praktykę wdrożeniową."
+        en: "The next chapter combines trust boundaries, input validation, filesystem safety, sessions, CSRF, authentication, headers and deployment practice."
       button_label:
-        pl: 'Przejdź do bezpieczeństwa'
-        en: 'Continue to security'
+        pl: "Przejdź do bezpieczeństwa"
+        en: "Continue to security"
       button_url:
         pl: /pl/dokumentacja/bezpieczenstwo
         en: /en/documentation/security
