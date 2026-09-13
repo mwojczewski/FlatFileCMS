@@ -160,7 +160,9 @@ final readonly class MediaConfig
             $result[] = $item;
         }
 
-        return array_values(array_unique($result));
+        return $result
+            |> array_unique(...)
+            |> array_values(...);
     }
 
     /** @return list<string> */

@@ -15,6 +15,7 @@ final readonly class UserRepository
 
     public function create(
         string $email,
+        #[\SensitiveParameter]
         string $passwordHash,
         Role $role,
         string $firstName = '',
@@ -132,7 +133,7 @@ SQL);
         return $user;
     }
 
-    public function updatePassword(User $user, string $passwordHash): void
+    public function updatePassword(User $user, #[\SensitiveParameter] string $passwordHash): void
     {
         $now = (new DateTimeImmutable())->format(DATE_ATOM);
         $statement = $this->database->prepare(<<<'SQL'

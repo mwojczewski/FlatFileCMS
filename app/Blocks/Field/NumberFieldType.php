@@ -9,11 +9,13 @@ use FlatFileCms\Blocks\FieldValueException;
 
 final readonly class NumberFieldType implements FieldType
 {
+    #[\Override]
     public function name(): string
     {
         return 'number';
     }
 
+    #[\Override]
     public function validateDefinition(FieldDefinition $definition): void
     {
         $integerOnly = $definition->settings()['integer'] ?? false;
@@ -27,6 +29,7 @@ final readonly class NumberFieldType implements FieldType
         }
     }
 
+    #[\Override]
     public function normalize(mixed $value, FieldDefinition $definition, FieldContext $context): int|float
     {
         if (\is_string($value) && is_numeric($value)) {
@@ -56,6 +59,7 @@ final readonly class NumberFieldType implements FieldType
         return $value;
     }
 
+    #[\Override]
     public function localize(
         mixed $value,
         string $locale,

@@ -644,7 +644,7 @@ final readonly class AdminPageBuilderController
     {
         $message = implode(' ', array_map(
             static fn(ValidationError $error): string => $error->path() . ': ' . $error->message(),
-            $exception->errors(),
+            $exception->errors,
         ));
 
         return new HttpException(422, 'BLOCK_DATA_INVALID', $message, previous: $exception);

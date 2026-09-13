@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Tests\Unit\Http;
 
+use FlatFileCms\Http\ApiErrorResponder;
 use FlatFileCms\Http\ErrorHandler;
 use FlatFileCms\Http\HttpException;
 use FlatFileCms\Http\Request;
+use FlatFileCms\Http\WebErrorRenderer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -14,6 +16,23 @@ use RuntimeException;
 #[CoversClass(ErrorHandler::class)]
 final class ErrorHandlerTest extends TestCase
 {
+    public function testErrorRenderersRemainLazyUntilTheirResponseFormatIsNeeded(): void
+    {
+        $handler = new ErrorHandler(
+            apiErrors: static fn(): ApiErrorResponder => new ApiErrorResponder(),
+            webErrors: static function (): WebErrorRenderer {
+                throw new RuntimeException('The web renderer must stay lazy for API errors.');
+            },
+        );
+
+        $response = $handler->render(
+            new Request('GET', '/api/v1/missing'),
+            new HttpException(404, 'PAGE_NOT_FOUND', 'Page not found'),
+        );
+
+        self::assertSame(404, $response->status());
+    }
+
     public function testItUsesTheApiErrorEnvelope(): void
     {
         $handler = new ErrorHandler();

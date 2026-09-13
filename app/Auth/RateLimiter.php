@@ -10,6 +10,7 @@ final readonly class RateLimiter
 {
     public function __construct(
         private PDO $database,
+        #[\SensitiveParameter]
         private string $secret,
         private int $maxAttempts,
         private int $windowSeconds,

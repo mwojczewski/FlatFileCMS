@@ -13,8 +13,9 @@ final class PartialRegistry
 {
     private string $root;
 
-    /** @var array<string, string>|null */
-    private ?array $partials = null;
+    /** @var array<string, string> */
+    private array $partials = [];
+    private bool $scanned = false;
 
     public function __construct(string $projectRoot)
     {
@@ -29,7 +30,7 @@ final class PartialRegistry
     /** @return array<string, string> */
     public function all(): array
     {
-        if ($this->partials !== null) {
+        if ($this->scanned) {
             return $this->partials;
         }
 
@@ -53,6 +54,7 @@ final class PartialRegistry
 
         ksort($partials);
         $this->partials = $partials;
+        $this->scanned = true;
 
         return $partials;
     }
@@ -65,8 +67,16 @@ final class PartialRegistry
             throw new RenderingException('Partial name is invalid.', previous: $exception);
         }
 
-        return $this->all()[$name]
-            ?? throw new RenderingException(\sprintf('Unknown partial "%s".', $name));
+        if (isset($this->partials[$name])) {
+            return $this->partials[$name];
+        }
+
+        $path = $this->root . DIRECTORY_SEPARATOR . $name . '.php';
+        if (!is_file($path) || is_link($path)) {
+            throw new RenderingException(\sprintf('Unknown partial "%s".', $name));
+        }
+
+        return $this->partials[$name] = $path;
     }
 
     public function modifiedAt(): int

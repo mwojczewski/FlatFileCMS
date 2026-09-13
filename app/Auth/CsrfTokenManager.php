@@ -21,7 +21,7 @@ final readonly class CsrfTokenManager
         return $token;
     }
 
-    public function validate(mixed $token): void
+    public function validate(#[\SensitiveParameter] mixed $token): void
     {
         if (!\is_string($token) || !hash_equals($this->token(), $token)) {
             throw new AuthenticationException('Invalid CSRF token.');

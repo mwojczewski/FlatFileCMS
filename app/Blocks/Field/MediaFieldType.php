@@ -22,14 +22,17 @@ final readonly class MediaFieldType implements FieldType
         private SafePathResolver $paths,
     ) {}
 
+    #[\Override]
     public function name(): string
     {
         return $this->name;
     }
 
+    #[\Override]
     public function validateDefinition(FieldDefinition $definition): void {}
 
     /** @return array<string, mixed> */
+    #[\Override]
     public function normalize(mixed $value, FieldDefinition $definition, FieldContext $context): array
     {
         $mapping = \is_string($value) ? ['src' => $value] : $this->mapping($value);
@@ -78,6 +81,7 @@ final readonly class MediaFieldType implements FieldType
         return $normalized;
     }
 
+    #[\Override]
     public function localize(
         mixed $value,
         string $locale,

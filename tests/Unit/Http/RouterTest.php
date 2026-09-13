@@ -86,16 +86,29 @@ final class RouterTest extends TestCase
             $router->dispatch(new Request('POST', '/health'));
             self::fail('Expected method-not-allowed exception.');
         } catch (HttpException $exception) {
-            self::assertSame(405, $exception->status());
-            self::assertSame('METHOD_NOT_ALLOWED', $exception->errorCode());
+            self::assertSame(405, $exception->status);
+            self::assertSame('METHOD_NOT_ALLOWED', $exception->errorCode);
         }
 
         try {
             $router->dispatch(new Request('GET', '/missing'));
             self::fail('Expected not-found exception.');
         } catch (HttpException $exception) {
-            self::assertSame(404, $exception->status());
-            self::assertSame('ROUTE_NOT_FOUND', $exception->errorCode());
+            self::assertSame(404, $exception->status);
+            self::assertSame('ROUTE_NOT_FOUND', $exception->errorCode);
         }
+    }
+
+    public function testScopedRouterKeepsOnlyRoutesForItsRequestFamily(): void
+    {
+        $router = new Router('api');
+        $router->get('/api/health', static fn(): Response => Response::json(['status' => 'ok']), 'api.health');
+        $router->get('/admin', static fn(): Response => Response::html('admin'), 'admin.entry');
+        $router->get('/{path*}', static fn(): Response => Response::html('site'), 'site.page');
+
+        self::assertSame(200, $router->dispatch(new Request('GET', '/api/health'))->status());
+
+        $this->expectException(HttpException::class);
+        $router->dispatch(new Request('GET', '/admin'));
     }
 }

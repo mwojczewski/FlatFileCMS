@@ -10,6 +10,7 @@ use FlatFileCms\Content\InvalidContentException;
 use FlatFileCms\Domain\Content\Page;
 use FlatFileCms\Domain\Localization\LanguageConfig;
 use FlatFileCms\Domain\Localization\LocalizedDataResolver;
+use FlatFileCms\Http\PublicHttpUrl;
 
 final readonly class SeoResolver
 {
@@ -157,7 +158,7 @@ final readonly class SeoResolver
 
     private function absoluteUrl(?string $baseUrl, string $path): string
     {
-        return $baseUrl === null ? $path : rtrim($baseUrl, '/') . $path;
+        return $baseUrl === null ? $path : PublicHttpUrl::fromString($baseUrl)->resolve($path);
     }
 
     private function canonical(?string $configured, ?string $baseUrl, string $publicUrl): string
@@ -166,17 +167,14 @@ final readonly class SeoResolver
             return $this->absoluteUrl($baseUrl, $publicUrl);
         }
 
-        if (str_starts_with($configured, '/')) {
-            return $this->absoluteUrl($baseUrl, $configured);
-        }
-
-        if (
-            filter_var($configured, FILTER_VALIDATE_URL) === false
-            || !\in_array(parse_url($configured, PHP_URL_SCHEME), ['http', 'https'], true)
-        ) {
+        try {
+            $canonical = CanonicalReference::fromString($configured);
+        } catch (\InvalidArgumentException) {
             throw new InvalidContentException('SEO canonical URL is invalid.');
         }
 
-        return $configured;
+        return $baseUrl === null || !str_starts_with($configured, '/')
+            ? $canonical->value()
+            : $canonical->absolute(PublicHttpUrl::fromString($baseUrl));
     }
 }

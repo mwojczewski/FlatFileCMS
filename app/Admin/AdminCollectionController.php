@@ -91,16 +91,6 @@ final readonly class AdminCollectionController
             throw new InvalidArgumentException('Items per page must be an integer between 1 and 100.');
         }
         $canonical = trim($this->string($body['canonical'] ?? null, 'Canonical'));
-        if ($canonical !== '' && str_starts_with($canonical, '//')) {
-            throw new InvalidArgumentException('Canonical site path cannot start with two slashes.');
-        }
-        if ($canonical !== '' && !str_starts_with($canonical, '/')) {
-            $scheme = parse_url($canonical, PHP_URL_SCHEME);
-            if (filter_var($canonical, FILTER_VALIDATE_URL) === false || !\in_array($scheme, ['http', 'https'], true)) {
-                throw new InvalidArgumentException('Canonical URL must be an HTTP(S) URL or an absolute site path.');
-            }
-        }
-
         return new CollectionSettings(
             ($body['enabled'] ?? null) === '1',
             $layout,

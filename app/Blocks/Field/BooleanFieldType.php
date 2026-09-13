@@ -9,13 +9,16 @@ use FlatFileCms\Blocks\FieldValueException;
 
 final readonly class BooleanFieldType implements FieldType
 {
+    #[\Override]
     public function name(): string
     {
         return 'boolean';
     }
 
+    #[\Override]
     public function validateDefinition(FieldDefinition $definition): void {}
 
+    #[\Override]
     public function normalize(mixed $value, FieldDefinition $definition, FieldContext $context): bool
     {
         if (\is_bool($value)) {
@@ -31,6 +34,7 @@ final readonly class BooleanFieldType implements FieldType
         throw new FieldValueException('INVALID_TYPE', 'Value must be boolean.');
     }
 
+    #[\Override]
     public function localize(
         mixed $value,
         string $locale,

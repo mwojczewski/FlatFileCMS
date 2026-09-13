@@ -33,7 +33,7 @@ final readonly class Request
         $method = \is_string($serverMethod) ? strtoupper($serverMethod) : 'GET';
         $serverUri = $_SERVER['REQUEST_URI'] ?? null;
         $uri = \is_string($serverUri) ? $serverUri : '/';
-        $path = parse_url($uri, PHP_URL_PATH);
+        $path = RequestTarget::path($uri);
         $headers = [];
 
         foreach ($_SERVER as $key => $value) {
@@ -63,7 +63,7 @@ final readonly class Request
 
         return new self(
             method: $method,
-            path: self::normalizePath(\is_string($path) ? $path : '/'),
+            path: self::normalizePath($path),
             headers: $headers,
             query: self::stringKeyedArray($_GET),
             parsedBody: self::stringKeyedArray($_POST),
@@ -133,36 +133,16 @@ final readonly class Request
     }
 
     /** @param array<string, string> $attributes */
+    #[\NoDiscard('Request is immutable; use the returned instance.')]
     public function withAttributes(array $attributes): self
     {
-        return new self(
-            method: $this->method,
-            path: $this->path,
-            headers: $this->headers,
-            query: $this->query,
-            parsedBody: $this->parsedBody,
-            rawBody: $this->rawBody,
-            attributes: [...$this->attributes, ...$attributes],
-            clientIp: $this->clientIp,
-            files: $this->files,
-            bodyTooLarge: $this->bodyTooLarge,
-        );
+        return clone($this, ['attributes' => [...$this->attributes, ...$attributes]]);
     }
 
+    #[\NoDiscard('Request is immutable; use the returned instance.')]
     public function withClientIp(string $clientIp): self
     {
-        return new self(
-            method: $this->method,
-            path: $this->path,
-            headers: $this->headers,
-            query: $this->query,
-            parsedBody: $this->parsedBody,
-            rawBody: $this->rawBody,
-            attributes: $this->attributes,
-            clientIp: $clientIp,
-            files: $this->files,
-            bodyTooLarge: $this->bodyTooLarge,
-        );
+        return clone($this, ['clientIp' => $clientIp]);
     }
 
     private static function normalizePath(string $path): string

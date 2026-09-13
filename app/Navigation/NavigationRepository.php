@@ -204,19 +204,11 @@ final readonly class NavigationRepository
     private function externalUrl(mixed $value): string
     {
         $url = ContentData::string($value, 'url');
-        if (str_starts_with($url, '/') && !str_starts_with($url, '//')) {
-            return $url;
-        }
-
-        $scheme = parse_url($url, PHP_URL_SCHEME);
-        if (!\is_string($scheme) || !\in_array(strtolower($scheme), ['http', 'https', 'mailto', 'tel'], true)) {
+        try {
+            return NavigationLink::fromString($url)->value();
+        } catch (InvalidArgumentException) {
             throw new InvalidArgumentException('Navigation URL is invalid.');
         }
-        if (\in_array(strtolower($scheme), ['http', 'https'], true) && filter_var($url, FILTER_VALIDATE_URL) === false) {
-            throw new InvalidArgumentException('Navigation URL is invalid.');
-        }
-
-        return $url;
     }
 
     private function labels(mixed $value, LanguageConfig $languages): void

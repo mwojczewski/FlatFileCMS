@@ -137,7 +137,7 @@ final class BlockValidatorTest extends TestCase
         } catch (BlockValidationException $exception) {
             $paths = array_map(
                 static fn(ValidationError $error): string => $error->path(),
-                $exception->errors(),
+                $exception->errors,
             );
 
             self::assertContains('data.unexpected', $paths);

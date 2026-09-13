@@ -11,12 +11,7 @@ blocks:
       title:
         { pl: Nie masz dostępu do tej strony, en: You cannot access this page }
       content:
-        {
-          pl: Jeśli uważasz,
-          że to pomyłka,
-          skontaktuj się z administratorem.,
-          en: If you think this is a mistake,
-          contact the administrator.,
-        }
+        pl: Jeśli uważasz, że to pomyłka, skontaktuj się z administratorem.
+        en: If you think this is a mistake, contact the administrator.
       buttonLabel: { pl: Wróć na stronę główną, en: Return to homepage }
       buttonUrl: /

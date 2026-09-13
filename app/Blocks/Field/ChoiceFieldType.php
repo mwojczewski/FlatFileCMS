@@ -14,11 +14,13 @@ final readonly class ChoiceFieldType implements FieldType
         private bool $multiple,
     ) {}
 
+    #[\Override]
     public function name(): string
     {
         return $this->name;
     }
 
+    #[\Override]
     public function validateDefinition(FieldDefinition $definition): void
     {
         FieldSettings::allowedValues($definition->settings());
@@ -34,6 +36,7 @@ final readonly class ChoiceFieldType implements FieldType
     }
 
     /** @return string|list<string> */
+    #[\Override]
     public function normalize(mixed $value, FieldDefinition $definition, FieldContext $context): string|array
     {
         $allowed = FieldSettings::allowedValues($definition->settings());
@@ -57,7 +60,9 @@ final readonly class ChoiceFieldType implements FieldType
 
             $normalized[] = $item;
         }
-        $normalized = array_values(array_unique($normalized));
+        $normalized = $normalized
+            |> array_unique(...)
+            |> array_values(...);
         $minimum = FieldSettings::integer($definition->settings(), 'minItems', 'min');
         $maximum = FieldSettings::integer($definition->settings(), 'maxItems', 'max');
         if ($minimum !== null && \count($normalized) < $minimum) {
@@ -70,6 +75,7 @@ final readonly class ChoiceFieldType implements FieldType
         return $normalized;
     }
 
+    #[\Override]
     public function localize(
         mixed $value,
         string $locale,

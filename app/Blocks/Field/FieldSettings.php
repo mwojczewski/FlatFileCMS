@@ -62,6 +62,8 @@ final class FieldSettings
             throw new FieldValueException('INVALID_SCHEMA_RULE', 'Choice options must contain non-empty string values.');
         }
 
-        return array_values(array_unique($values));
+        return $values
+            |> array_unique(...)
+            |> array_values(...);
     }
 }

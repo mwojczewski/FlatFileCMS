@@ -15,6 +15,7 @@ final readonly class ConsoleApplication
     /**
      * @param Closure(): UserCommandService $users
      * @param Closure(): ReleaseChecker $release
+     * @param Closure(): int|null $cacheWarmup
      */
     public function __construct(
         private BlockScaffolder $blocks,
@@ -25,6 +26,7 @@ final readonly class ConsoleApplication
         private RuntimePruner $runtimePruner,
         private CloudflareAnalyticsService $analytics,
         private Closure $release,
+        private ?Closure $cacheWarmup = null,
     ) {}
 
     /** @param list<string> $arguments */
@@ -41,6 +43,7 @@ final readonly class ConsoleApplication
             return match ($command) {
                 'block:create' => $this->createBlock(\array_slice($arguments, 2)),
                 'cache:clear' => $this->clearCache(\array_slice($arguments, 2)),
+                'cache:warmup' => $this->warmUpCache(\array_slice($arguments, 2)),
                 'cache:prune' => $this->pruneCache(\array_slice($arguments, 2)),
                 'cloudflare:analytics:refresh' => $this->refreshCloudflareAnalytics(\array_slice($arguments, 2)),
                 'runtime:prune' => $this->pruneRuntime(\array_slice($arguments, 2)),
@@ -172,6 +175,22 @@ final readonly class ConsoleApplication
 
         $count = $this->cache->clear();
         $this->output(\sprintf("Cache cleared. Removed %d item(s).\n", $count));
+
+        return 0;
+    }
+
+    /** @param list<string> $arguments */
+    private function warmUpCache(array $arguments): int
+    {
+        if ($arguments !== []) {
+            throw new InvalidArgumentException('Usage: php bin/cms cache:warmup');
+        }
+        if ($this->cacheWarmup === null) {
+            throw new InvalidArgumentException('Compiled cache warmup is unavailable.');
+        }
+
+        $count = ($this->cacheWarmup)();
+        $this->output(\sprintf("Compiled cache warmed. %d YAML document(s).\n", $count));
 
         return 0;
     }
@@ -318,6 +337,7 @@ Commands:
   user:security-keys:clear <email>         Remove all WebAuthn/YubiKey credentials
   block:create <type> [--with-assets]      Create a developer block package
   cache:clear                              Remove all generated cache entries
+  cache:warmup                             Validate YAML and build the production cache
   cache:prune [--dry-run]                  Remove expired block assets and cache files
     [--assets-older-than=7d] [--cache-older-than=30d]
   cloudflare:analytics:refresh [24h|7d|30d|90d]

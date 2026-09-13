@@ -72,6 +72,7 @@ use FlatFileCms\Http\ApiErrorResponder;
 use FlatFileCms\Http\ErrorHandler;
 use FlatFileCms\Http\HtmlResponseFactory;
 use FlatFileCms\Http\PublicHtmlCache;
+use FlatFileCms\Http\Request;
 use FlatFileCms\Http\Router;
 use FlatFileCms\Http\TrustedProxyResolver;
 use FlatFileCms\Http\WebErrorRenderer;
@@ -80,6 +81,7 @@ use FlatFileCms\Infrastructure\Filesystem\AtomicFileWriter;
 use FlatFileCms\Infrastructure\Filesystem\DirectoryOperator;
 use FlatFileCms\Infrastructure\Filesystem\FileLockManager;
 use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
+use FlatFileCms\Infrastructure\Yaml\CompiledYamlCache;
 use FlatFileCms\Infrastructure\Yaml\YamlFileCache;
 use FlatFileCms\Infrastructure\Yaml\YamlFileRepository;
 use FlatFileCms\Infrastructure\Yaml\YamlParser;
@@ -124,7 +126,7 @@ use Psr\Log\LoggerInterface;
 
 $projectRoot = dirname(__DIR__);
 
-require "{$projectRoot}/vendor/autoload.php";
+require_once "{$projectRoot}/vendor/autoload.php";
 
 $environment = Environment::load($projectRoot);
 ProductionGuard::initialize($environment);
@@ -334,6 +336,16 @@ $container->set(
 );
 $container->set(YamlParser::class, static fn(): YamlParser => new YamlParser());
 $container->set(
+    CompiledYamlCache::class,
+    static fn(Container $container): CompiledYamlCache => new CompiledYamlCache(
+        $container->get(Environment::class)->boolean('COMPILED_CACHE_ENABLED', false),
+        $container->get(Environment::class)->get('APP_RELEASE', 'development'),
+        $container->get(SafePathResolver::class),
+        $container->get(AtomicFileWriter::class),
+        $container->get(YamlParser::class),
+    ),
+);
+$container->set(
     YamlFileCache::class,
     static fn(Container $container): YamlFileCache => new YamlFileCache(
         $container->get(Environment::class)->boolean('YAML_CACHE_JSON_ENABLED', true),
@@ -349,6 +361,7 @@ $container->set(
         $container->get(YamlParser::class),
         $container->get(YamlFileCache::class),
         $container->get(AtomicFileWriter::class),
+        compiledCache: $container->get(CompiledYamlCache::class),
     ),
 );
 $container->set(
@@ -946,8 +959,15 @@ $container->set(
         $container->get(SiteTextRepository::class),
     ),
 );
-$container->set(Router::class, static function (Container $container) use ($projectRoot): Router {
-    $router = new Router();
+$routeScope = isset($request) && $request instanceof Request
+    ? match (true) {
+        str_starts_with($request->path(), '/api/') => 'api',
+        str_starts_with($request->path(), '/admin') => 'admin',
+        default => 'public',
+    }
+: null;
+$container->set(Router::class, static function (Container $container) use ($projectRoot, $routeScope): Router {
+    $router = new Router($routeScope);
     $registerRoutes = require "{$projectRoot}/config/routes.php";
     if (!is_callable($registerRoutes)) {
         throw new RuntimeException('Route configuration must return a callable.');
@@ -960,8 +980,8 @@ $container->set(Router::class, static function (Container $container) use ($proj
 $container->set(ErrorHandler::class, static fn(Container $container): ErrorHandler => new ErrorHandler(
     debug: $container->get(Environment::class)->debug(),
     logger: $container->get(LoggerInterface::class),
-    apiErrors: $container->get(ApiErrorResponder::class),
-    webErrors: $container->get(WebErrorRenderer::class),
+    apiErrors: static fn(): ApiErrorResponder => $container->get(ApiErrorResponder::class),
+    webErrors: static fn(): WebErrorRenderer => $container->get(WebErrorRenderer::class),
 ));
 
 return new Application(

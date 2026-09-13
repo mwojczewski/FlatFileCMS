@@ -99,7 +99,9 @@ final readonly class RenderContext
             }
             $normalizedWidths[] = $width;
         }
-        $normalizedWidths = array_values(array_unique($normalizedWidths));
+        $normalizedWidths = $normalizedWidths
+            |> array_unique(...)
+            |> array_values(...);
         sort($normalizedWidths);
         if ($fit === 'cover' && ($aspectRatio === null || $aspectRatio <= 0)) {
             throw new RenderingException('Cover picture variants require a positive aspect ratio.');

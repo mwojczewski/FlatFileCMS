@@ -13,7 +13,7 @@ final readonly class PasswordResetRepository
         private UserRepository $users,
     ) {}
 
-    public function issue(User $user, string $tokenHash, int $expiresAt): void
+    public function issue(User $user, #[\SensitiveParameter] string $tokenHash, int $expiresAt): void
     {
         $this->database->beginTransaction();
         try {
@@ -35,7 +35,7 @@ SQL);
         }
     }
 
-    public function valid(string $tokenHash, int $now): bool
+    public function valid(#[\SensitiveParameter] string $tokenHash, int $now): bool
     {
         $statement = $this->database->prepare(<<<'SQL'
 SELECT 1 FROM password_reset_tokens
@@ -46,7 +46,7 @@ SQL);
         return $statement->fetchColumn() !== false;
     }
 
-    public function claim(string $tokenHash, int $now): User
+    public function claim(#[\SensitiveParameter] string $tokenHash, int $now): User
     {
         $this->database->beginTransaction();
         try {

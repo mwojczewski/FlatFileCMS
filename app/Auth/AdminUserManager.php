@@ -17,7 +17,9 @@ final readonly class AdminUserManager
     public function create(
         User $actor,
         string $email,
+        #[\SensitiveParameter]
         string $password,
+        #[\SensitiveParameter]
         string $confirmation,
         string $firstName = '',
         string $lastName = '',
@@ -42,7 +44,9 @@ final readonly class AdminUserManager
         int $id,
         string $email,
         bool $enabled,
+        #[\SensitiveParameter]
         string $password,
+        #[\SensitiveParameter]
         string $confirmation,
         ?string $firstName = null,
         ?string $lastName = null,

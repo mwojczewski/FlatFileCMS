@@ -12,13 +12,16 @@ final readonly class FormattedStringFieldType implements FieldType
 {
     public function __construct(private string $name) {}
 
+    #[\Override]
     public function name(): string
     {
         return $this->name;
     }
 
+    #[\Override]
     public function validateDefinition(FieldDefinition $definition): void {}
 
+    #[\Override]
     public function normalize(mixed $value, FieldDefinition $definition, FieldContext $context): string
     {
         if (!\is_string($value)) {
@@ -42,6 +45,7 @@ final readonly class FormattedStringFieldType implements FieldType
         return $this->name === 'color' ? strtolower($value) : $value;
     }
 
+    #[\Override]
     public function localize(
         mixed $value,
         string $locale,
@@ -53,12 +57,7 @@ final readonly class FormattedStringFieldType implements FieldType
 
     private function validUrl(string $value): bool
     {
-        if (str_starts_with($value, '/') && !str_starts_with($value, '//')) {
-            return true;
-        }
-
-        return filter_var($value, FILTER_VALIDATE_URL) !== false
-            && \in_array(parse_url($value, PHP_URL_SCHEME), ['http', 'https'], true);
+        return ContentUrl::isValid($value);
     }
 
     private function validDate(string $value, string $format): bool

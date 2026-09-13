@@ -9,6 +9,11 @@ use InvalidArgumentException;
 
 final readonly class Route
 {
+    private string $expression;
+
+    /** @var list<string> */
+    private array $parameterNames;
+
     /**
      * @param list<string> $methods
      * @param Closure(Request): Response $handler
@@ -22,6 +27,24 @@ final readonly class Route
         if ($methods === [] || $pattern === '' || $pattern[0] !== '/') {
             throw new InvalidArgumentException('A route requires methods and an absolute URL pattern.');
         }
+
+        $names = [];
+        $quoted = preg_quote($this->pattern, '#');
+        $expression = preg_replace_callback(
+            '/\\\\\{([A-Za-z_][A-Za-z0-9_]*)(\\\\\*)?\\\\\}/',
+            static function (array $match) use (&$names): string {
+                $names[] = $match[1];
+
+                return ($match[2] ?? '') === '\\*' ? '(.+)' : '([^/]+)';
+            },
+            $quoted,
+        );
+        if (!\is_string($expression)) {
+            throw new InvalidArgumentException('Route pattern cannot be compiled.');
+        }
+
+        $this->expression = "#^{$expression}$#D";
+        $this->parameterNames = $names;
     }
 
     public function allows(string $method): bool
@@ -37,25 +60,13 @@ final readonly class Route
     /** @return array<string, string>|null */
     public function parameters(string $path): ?array
     {
-        $names = [];
-        $quoted = preg_quote($this->pattern, '#');
-        $expression = preg_replace_callback(
-            '/\\\\\{([A-Za-z_][A-Za-z0-9_]*)(\\\\\*)?\\\\\}/',
-            static function (array $match) use (&$names): string {
-                $names[] = $match[1];
-
-                return ($match[2] ?? '') === '\\*' ? '(.+)' : '([^/]+)';
-            },
-            $quoted,
-        );
-
-        if (!\is_string($expression) || preg_match("#^{$expression}$#D", $path, $matches) !== 1) {
+        if (preg_match($this->expression, $path, $matches) !== 1) {
             return null;
         }
 
         array_shift($matches);
         $parameters = [];
-        foreach ($names as $index => $name) {
+        foreach ($this->parameterNames as $index => $name) {
             $parameters[$name] = rawurldecode($matches[$index]);
         }
 

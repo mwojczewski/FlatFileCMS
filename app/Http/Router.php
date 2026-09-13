@@ -12,6 +12,13 @@ final class Router
     /** @var list<Route> */
     private array $routes = [];
 
+    public function __construct(private readonly ?string $scope = null)
+    {
+        if ($scope !== null && !\in_array($scope, ['api', 'admin', 'public'], true)) {
+            throw new InvalidArgumentException('Router scope must be api, admin or public.');
+        }
+    }
+
     /** @param Closure(Request): Response $handler */
     public function get(string $pattern, Closure $handler, string $name): void
     {
@@ -30,6 +37,9 @@ final class Router
      */
     public function add(array $methods, string $pattern, Closure $handler, string $name): void
     {
+        if ($this->scope !== null && !str_starts_with($name, $this->scope === 'public' ? 'site.' : $this->scope . '.')) {
+            return;
+        }
         if ($this->hasName($name)) {
             throw new InvalidArgumentException(\sprintf('Route name "%s" is already registered.', $name));
         }

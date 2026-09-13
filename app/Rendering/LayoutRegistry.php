@@ -13,8 +13,9 @@ final class LayoutRegistry
 {
     private string $root;
 
-    /** @var array<string, string>|null */
-    private ?array $layouts = null;
+    /** @var array<string, string> */
+    private array $layouts = [];
+    private bool $scanned = false;
 
     public function __construct(string $projectRoot)
     {
@@ -29,7 +30,7 @@ final class LayoutRegistry
     /** @return array<string, string> */
     public function all(): array
     {
-        if ($this->layouts !== null) {
+        if ($this->scanned) {
             return $this->layouts;
         }
 
@@ -53,6 +54,7 @@ final class LayoutRegistry
 
         ksort($layouts);
         $this->layouts = $layouts;
+        $this->scanned = true;
 
         return $layouts;
     }
@@ -65,8 +67,16 @@ final class LayoutRegistry
             throw new RenderingException('Layout name is invalid.', previous: $exception);
         }
 
-        return $this->all()[$name]
-            ?? throw new RenderingException(\sprintf('Unknown layout "%s".', $name));
+        if (isset($this->layouts[$name])) {
+            return $this->layouts[$name];
+        }
+
+        $path = $this->root . DIRECTORY_SEPARATOR . $name . '.php';
+        if (!is_file($path) || is_link($path)) {
+            throw new RenderingException(\sprintf('Unknown layout "%s".', $name));
+        }
+
+        return $this->layouts[$name] = $path;
     }
 
     public function modifiedAt(string $name): int

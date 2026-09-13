@@ -171,8 +171,8 @@ YAML);
             ));
             self::fail('Expected disabled page to be hidden.');
         } catch (HttpException $exception) {
-            self::assertSame(404, $exception->status());
-            self::assertSame('PAGE_NOT_FOUND', $exception->errorCode());
+            self::assertSame(404, $exception->status);
+            self::assertSame('PAGE_NOT_FOUND', $exception->errorCode);
         }
     }
 

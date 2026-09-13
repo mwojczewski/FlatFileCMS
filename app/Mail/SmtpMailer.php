@@ -15,6 +15,7 @@ final readonly class SmtpMailer implements Mailer
         private int $port,
         private string $encryption,
         private string $username,
+        #[\SensitiveParameter]
         private string $password,
         private string $fromAddress,
         private string $fromName,
@@ -24,6 +25,7 @@ final readonly class SmtpMailer implements Mailer
         }
     }
 
+    #[\Override]
     public function send(
         string $recipient,
         string $subject,

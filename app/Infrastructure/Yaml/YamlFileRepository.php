@@ -21,6 +21,7 @@ final readonly class YamlFileRepository
         private YamlFileCache $cache,
         private AtomicFileWriter $fileWriter,
         private int $maxBytes = 1_048_576,
+        private ?CompiledYamlCache $compiledCache = null,
     ) {
         if ($this->maxBytes < 1) {
             throw new InvalidYamlException('YAML repository size limit must be positive.');
@@ -30,6 +31,12 @@ final readonly class YamlFileRepository
     public function read(FilesystemRoot $root, RelativePath $relativePath): YamlDocument
     {
         $this->assertYamlPath($relativePath);
+        $cacheKey = $root->value . ':' . $relativePath->value();
+        $compiled = $this->compiledCache?->get($cacheKey);
+        if ($compiled !== null) {
+            return $compiled;
+        }
+
         $absolutePath = $this->pathResolver->resolve($root, $relativePath, mustExist: true);
         if (!is_file($absolutePath)) {
             throw new FilesystemException('YAML path does not reference a regular file.');
@@ -46,7 +53,6 @@ final readonly class YamlFileRepository
         }
 
         $revision = FileRevision::fromContents($contents);
-        $cacheKey = $root->value . ':' . $relativePath->value();
         $cached = $this->cache->get($cacheKey, $revision);
         if ($cached !== null) {
             return new YamlDocument($cached, $revision);
@@ -83,6 +89,7 @@ final readonly class YamlFileRepository
         $revision = $this->fileWriter->write($root, $relativePath, $contents, $expectedRevision);
         $cacheKey = "{$root->value}:" . $relativePath->value();
         $this->cache->put($cacheKey, $revision, $normalizedData);
+        $this->compiledCache?->refresh();
 
         return new YamlDocument($normalizedData, $revision);
     }

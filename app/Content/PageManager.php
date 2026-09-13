@@ -18,6 +18,7 @@ use FlatFileCms\Infrastructure\Filesystem\RelativePath;
 use FlatFileCms\Infrastructure\Filesystem\RevisionConflictException;
 use FlatFileCms\Infrastructure\Yaml\YamlFileRepository;
 use FlatFileCms\Rendering\LayoutRegistry;
+use FlatFileCms\Seo\CanonicalReference;
 use InvalidArgumentException;
 use Throwable;
 
@@ -313,12 +314,10 @@ final readonly class PageManager
             }
         }
         $canonical = $metadata->canonical();
-        if ($canonical !== null && str_starts_with($canonical, '//')) {
-            throw new InvalidArgumentException('Canonical site path cannot start with two slashes.');
-        }
-        if ($canonical !== null && !str_starts_with($canonical, '/')) {
-            $scheme = parse_url($canonical, PHP_URL_SCHEME);
-            if (filter_var($canonical, FILTER_VALIDATE_URL) === false || !\in_array($scheme, ['http', 'https'], true)) {
+        if ($canonical !== null) {
+            try {
+                CanonicalReference::fromString($canonical);
+            } catch (InvalidArgumentException) {
                 throw new InvalidArgumentException('Canonical URL must be an HTTP(S) URL or an absolute site path.');
             }
         }

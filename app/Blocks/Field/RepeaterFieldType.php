@@ -9,11 +9,13 @@ use FlatFileCms\Blocks\FieldValueException;
 
 final readonly class RepeaterFieldType implements FieldType
 {
+    #[\Override]
     public function name(): string
     {
         return 'repeater';
     }
 
+    #[\Override]
     public function validateDefinition(FieldDefinition $definition): void
     {
         $minimum = FieldSettings::integer($definition->settings(), 'minItems', 'min');
@@ -24,6 +26,7 @@ final readonly class RepeaterFieldType implements FieldType
     }
 
     /** @return list<mixed> */
+    #[\Override]
     public function normalize(mixed $value, FieldDefinition $definition, FieldContext $context): array
     {
         if (!\is_array($value) || !array_is_list($value)) {
@@ -42,6 +45,7 @@ final readonly class RepeaterFieldType implements FieldType
         return $value;
     }
 
+    #[\Override]
     public function localize(
         mixed $value,
         string $locale,

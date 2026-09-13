@@ -16,8 +16,11 @@ final readonly class PasswordChanger
 
     public function change(
         User $user,
+        #[\SensitiveParameter]
         string $currentPassword,
+        #[\SensitiveParameter]
         string $newPassword,
+        #[\SensitiveParameter]
         string $confirmation,
     ): User {
         if (!$this->hasher->verify($currentPassword, $user->passwordHash())) {

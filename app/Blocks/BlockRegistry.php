@@ -19,8 +19,9 @@ final class BlockRegistry
 {
     private const int MAX_DEFINITION_BYTES = 262_144;
 
-    /** @var array<string, BlockDefinition>|null */
-    private ?array $definitions = null;
+    /** @var array<string, BlockDefinition> */
+    private array $definitions = [];
+    private bool $scanned = false;
     private string $blocksRoot;
 
     public function __construct(
@@ -40,7 +41,7 @@ final class BlockRegistry
     /** @return array<string, BlockDefinition> */
     public function all(): array
     {
-        if ($this->definitions !== null) {
+        if ($this->scanned) {
             return $this->definitions;
         }
 
@@ -54,7 +55,7 @@ final class BlockRegistry
 
             try {
                 $type = Slug::fromString($item->getFilename())->value();
-                $definition = $this->load($type, $item->getPathname());
+                $definition = $this->get($type);
             } catch (FieldValueException|InvalidArgumentException|InvalidYamlException $exception) {
                 throw new InvalidBlockDefinitionException(
                     \sprintf('Block directory "%s" contains an invalid definition.', $item->getFilename()),
@@ -67,6 +68,7 @@ final class BlockRegistry
 
         ksort($definitions);
         $this->definitions = $definitions;
+        $this->scanned = true;
 
         return $definitions;
     }
@@ -79,8 +81,23 @@ final class BlockRegistry
             throw new InvalidBlockDefinitionException('Block type is invalid.', previous: $exception);
         }
 
-        return $this->all()[$type]
-            ?? throw new InvalidBlockDefinitionException(\sprintf('Unknown block type "%s".', $type));
+        if (isset($this->definitions[$type])) {
+            return $this->definitions[$type];
+        }
+
+        $directory = $this->blocksRoot . DIRECTORY_SEPARATOR . $type;
+        if (!is_dir($directory) || is_link($directory)) {
+            throw new InvalidBlockDefinitionException(\sprintf('Unknown block type "%s".', $type));
+        }
+
+        try {
+            return $this->definitions[$type] = $this->load($type, $directory);
+        } catch (FieldValueException|InvalidArgumentException|InvalidYamlException $exception) {
+            throw new InvalidBlockDefinitionException(
+                \sprintf('Block directory "%s" contains an invalid definition.', $type),
+                previous: $exception,
+            );
+        }
     }
 
     private function load(string $type, string $directory): BlockDefinition

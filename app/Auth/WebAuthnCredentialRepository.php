@@ -27,7 +27,7 @@ final readonly class WebAuthnCredentialRepository
         return $credentials;
     }
 
-    public function findByCredentialId(string $credentialId): ?WebAuthnCredential
+    public function findByCredentialId(#[\SensitiveParameter] string $credentialId): ?WebAuthnCredential
     {
         $statement = $this->database->prepare('SELECT * FROM webauthn_credentials WHERE credential_id = :id');
         $statement->bindValue(':id', $credentialId, PDO::PARAM_LOB);
@@ -41,7 +41,9 @@ final readonly class WebAuthnCredentialRepository
     public function add(
         User $user,
         string $name,
+        #[\SensitiveParameter]
         string $credentialId,
+        #[\SensitiveParameter]
         string $publicKey,
         int $signatureCounter,
         array $transports,

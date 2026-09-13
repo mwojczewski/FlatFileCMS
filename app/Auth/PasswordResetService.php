@@ -70,13 +70,20 @@ final readonly class PasswordResetService
         );
     }
 
-    public function isValid(string $token): bool
+    public function isValid(#[\SensitiveParameter] string $token): bool
     {
         return $this->validTokenFormat($token) && $this->tokens->valid($this->hash($token), time());
     }
 
-    public function reset(string $token, string $password, string $confirmation, string $ip): void
-    {
+    public function reset(
+        #[\SensitiveParameter]
+        string $token,
+        #[\SensitiveParameter]
+        string $password,
+        #[\SensitiveParameter]
+        string $confirmation,
+        string $ip,
+    ): void {
         if (!$this->validTokenFormat($token)) {
             throw new AuthenticationException('Password reset link is invalid or expired.');
         }
@@ -90,7 +97,7 @@ final readonly class PasswordResetService
         $this->audit->log('auth.password_reset', $user->id(), "users/{$user->id()}", $ip);
     }
 
-    private function resetUrl(string $token): string
+    private function resetUrl(#[\SensitiveParameter] string $token): string
     {
         $configuration = $this->configuration->get()->data();
         $site = ContentData::map($configuration['site'] ?? null, 'site');
@@ -104,12 +111,12 @@ final readonly class PasswordResetService
         return rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
     }
 
-    private function hash(string $token): string
+    private function hash(#[\SensitiveParameter] string $token): string
     {
         return hash('sha256', $token);
     }
 
-    private function validTokenFormat(string $token): bool
+    private function validTokenFormat(#[\SensitiveParameter] string $token): bool
     {
         return preg_match('/^[A-Za-z0-9_-]{43}$/D', $token) === 1;
     }

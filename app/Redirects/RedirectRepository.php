@@ -59,7 +59,7 @@ final readonly class RedirectRepository
                 $rule = new RedirectRule(
                     $this->id(ContentData::string($item['id'] ?? null, "{$path}.id")),
                     $this->source(ContentData::string($item['source'] ?? null, "{$path}.source")),
-                    $this->target(ContentData::string($item['target'] ?? null, "{$path}.target")),
+                    RedirectTarget::fromString(ContentData::string($item['target'] ?? null, "{$path}.target"))->value(),
                     $this->status(ContentData::integer($item['status'] ?? null, "{$path}.status")),
                     ContentData::boolean($item['enabled'] ?? null, "{$path}.enabled"),
                 );
@@ -99,27 +99,6 @@ final readonly class RedirectRepository
         return $source;
     }
 
-    private function target(string $target): string
-    {
-        if ($target === '' || str_contains($target, "\0") || preg_match('/[\x01-\x1F\x7F\\\\]/', $target) === 1) {
-            throw new InvalidArgumentException('Redirect target contains unsafe characters.');
-        }
-        if (str_starts_with($target, '/') && !str_starts_with($target, '//')) {
-            $path = parse_url($target, PHP_URL_PATH);
-            if (!\is_string($path) || \in_array('..', explode('/', $path), true)) {
-                throw new InvalidArgumentException('Redirect target path is invalid.');
-            }
-
-            return $target;
-        }
-        $scheme = parse_url($target, PHP_URL_SCHEME);
-        if (filter_var($target, FILTER_VALIDATE_URL) === false || !\in_array($scheme, ['http', 'https'], true)) {
-            throw new InvalidArgumentException('Redirect target must be a site path or absolute HTTP(S) URL.');
-        }
-
-        return $target;
-    }
-
     private function status(int $status): int
     {
         if (!\in_array($status, [301, 302, 303, 307, 308], true)) {
@@ -140,8 +119,7 @@ final readonly class RedirectRepository
                     throw new InvalidArgumentException('Redirect rules contain a cycle.');
                 }
                 $visited[$current] = true;
-                $target = $targets[$current];
-                $current = str_starts_with($target, '/') ? (parse_url($target, PHP_URL_PATH) ?: '/') : '';
+                $current = RedirectTarget::fromString($targets[$current])->sitePath() ?? '';
                 if ($current === '') {
                     break;
                 }

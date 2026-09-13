@@ -44,7 +44,7 @@ final readonly class WebAuthnService
     }
 
     /** @param array<string, mixed> $response */
-    public function register(User $user, string $name, array $response): void
+    public function register(User $user, string $name, #[\SensitiveParameter] array $response): void
     {
         $challenge = $this->consumeChallenge('register');
         try {
@@ -86,7 +86,7 @@ final readonly class WebAuthnService
     }
 
     /** @param array<string, mixed> $response */
-    public function authenticate(User $user, array $response): void
+    public function authenticate(User $user, #[\SensitiveParameter] array $response): void
     {
         $challenge = $this->consumeChallenge('authenticate');
         $credentialId = $this->binary($response, 'id');
@@ -166,7 +166,7 @@ final readonly class WebAuthnService
     }
 
     /** @param array<string, mixed> $response */
-    private function binary(array $response, string $field): string
+    private function binary(#[\SensitiveParameter] array $response, string $field): string
     {
         $value = $response[$field] ?? null;
         if (!\is_string($value) || $value === '') {
@@ -176,7 +176,7 @@ final readonly class WebAuthnService
         return $this->base64UrlDecode($value);
     }
 
-    private function base64UrlDecode(string $value): string
+    private function base64UrlDecode(#[\SensitiveParameter] string $value): string
     {
         if (preg_match('/^[A-Za-z0-9_-]+$/D', $value) !== 1) {
             throw new AuthenticationException('WebAuthn data is not valid base64url.');
@@ -204,6 +204,8 @@ final readonly class WebAuthnService
             }
         }
 
-        return array_values(array_unique($result));
+        return $result
+            |> array_unique(...)
+            |> array_values(...);
     }
 }

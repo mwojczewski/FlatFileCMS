@@ -11,11 +11,13 @@ final readonly class TextFieldType implements FieldType
 {
     public function __construct(private string $name) {}
 
+    #[\Override]
     public function name(): string
     {
         return $this->name;
     }
 
+    #[\Override]
     public function validateDefinition(FieldDefinition $definition): void
     {
         $minimum = FieldSettings::integer($definition->settings(), 'minLength', 'min');
@@ -25,6 +27,7 @@ final readonly class TextFieldType implements FieldType
         }
     }
 
+    #[\Override]
     public function normalize(mixed $value, FieldDefinition $definition, FieldContext $context): string
     {
         if (!\is_string($value)) {
@@ -45,6 +48,7 @@ final readonly class TextFieldType implements FieldType
         return $value;
     }
 
+    #[\Override]
     public function localize(
         mixed $value,
         string $locale,

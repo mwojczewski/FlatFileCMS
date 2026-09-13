@@ -4,22 +4,27 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Http;
 
+use Closure;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
 final readonly class ErrorHandler
 {
+    /**
+     * @param ApiErrorResponder|Closure(): ApiErrorResponder|null $apiErrors
+     * @param WebErrorRenderer|Closure(): WebErrorRenderer|null $webErrors
+     */
     public function __construct(
         private bool $debug = false,
         private ?LoggerInterface $logger = null,
-        private ?ApiErrorResponder $apiErrors = null,
-        private ?WebErrorRenderer $webErrors = null,
+        private ApiErrorResponder|Closure|null $apiErrors = null,
+        private WebErrorRenderer|Closure|null $webErrors = null,
     ) {}
 
     public function render(Request $request, Throwable $exception): Response
     {
-        $status = $exception instanceof HttpException ? $exception->status() : 500;
-        $code = $exception instanceof HttpException ? $exception->errorCode() : 'INTERNAL_SERVER_ERROR';
+        $status = $exception instanceof HttpException ? $exception->status : 500;
+        $code = $exception instanceof HttpException ? $exception->errorCode : 'INTERNAL_SERVER_ERROR';
         $publicMessage = $exception instanceof HttpException ? $exception->getMessage() : 'Internal server error';
 
         $this->log($request, $exception, $status, $code);
@@ -31,7 +36,8 @@ final readonly class ErrorHandler
             $headers = str_starts_with($request->path(), '/admin/')
                 ? ['Cache-Control' => 'no-store', 'Pragma' => 'no-cache']
                 : [];
-            $response = ($this->apiErrors ?? new ApiErrorResponder())->respond(
+            $apiErrors = $this->apiErrors instanceof Closure ? ($this->apiErrors)() : $this->apiErrors;
+            $response = ($apiErrors ?? new ApiErrorResponder())->respond(
                 $status,
                 $code,
                 $publicMessage,
@@ -50,7 +56,8 @@ final readonly class ErrorHandler
 
         if (!str_starts_with($request->path(), '/admin') && $this->webErrors !== null) {
             try {
-                $response = $this->webErrors->render($request, $status);
+                $webErrors = $this->webErrors instanceof Closure ? ($this->webErrors)() : $this->webErrors;
+                $response = $webErrors->render($request, $status);
                 if ($response !== null) {
                     return $response;
                 }

@@ -24,8 +24,13 @@ final readonly class UserCommandService
         private AuditLogger $audit,
     ) {}
 
-    public function install(string $email, string $password, string $firstName = '', string $lastName = ''): void
-    {
+    public function install(
+        string $email,
+        #[\SensitiveParameter]
+        string $password,
+        string $firstName = '',
+        string $lastName = '',
+    ): void {
         $this->schema->install();
         if ($this->users->count() !== 0) {
             throw new RuntimeException('CMS already contains users.');
@@ -35,6 +40,7 @@ final readonly class UserCommandService
 
     public function create(
         string $email,
+        #[\SensitiveParameter]
         string $password,
         Role $role = Role::Admin,
         string $firstName = '',
@@ -46,7 +52,7 @@ final readonly class UserCommandService
         $this->audit->log('user.created', null, "users/{$user->publicId()}", 'cli', ['role' => $role->value]);
     }
 
-    public function changePassword(string $email, string $password): void
+    public function changePassword(string $email, #[\SensitiveParameter] string $password): void
     {
         $this->schema->install();
         $this->policy->validate($password);

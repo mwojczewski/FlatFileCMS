@@ -199,7 +199,7 @@ final readonly class BlockValidator
 
             return ['valid' => true, 'value' => $items];
         } catch (FieldValueException $exception) {
-            $errors[] = new ValidationError($path, $exception->validationCode(), $exception->getMessage());
+            $errors[] = new ValidationError($path, $exception->validationCode, $exception->getMessage());
 
             return ['valid' => false, 'value' => null];
         } catch (InvalidBlockDefinitionException $exception) {

@@ -46,14 +46,12 @@ final readonly class ContactFormService
         }
 
         $page = $this->pages->get(PageIdentity::fromString($pageId), $languages);
-        $block = null;
-        foreach ($page->blocks() as $candidate) {
-            if (($candidate['id'] ?? null) === $blockId && ($candidate['type'] ?? null) === 'contact-form'
-                && ($candidate['enabled'] ?? true) === true) {
-                $block = $candidate;
-                break;
-            }
-        }
+        $block = array_find(
+            $page->blocks(),
+            static fn(array $candidate): bool => ($candidate['id'] ?? null) === $blockId
+                && ($candidate['type'] ?? null) === 'contact-form'
+                && ($candidate['enabled'] ?? true) === true,
+        );
         if ($block === null || !\is_array($block['data'] ?? null)) {
             throw new ContactFormException('Formularz nie istnieje lub jest wyłączony.');
         }
@@ -174,7 +172,11 @@ final readonly class ContactFormService
             return [];
         }
 
-        return array_values(array_filter(array_map(trim(...), preg_split('/\R/u', $value) ?: []), static fn(string $item): bool => $item !== ''));
+        return $value
+            |> (static fn(string $input): array => preg_split('/\R/u', $input) ?: [])
+            |> (static fn(array $items): array => array_map(trim(...), $items))
+            |> (static fn(array $items): array => array_filter($items, static fn(string $item): bool => $item !== ''))
+            |> array_values(...);
     }
 
     /**

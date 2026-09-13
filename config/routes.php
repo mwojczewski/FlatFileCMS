@@ -83,14 +83,14 @@ return static function (Router $router, ?Container $container = null): void {
         $router->get(
             '/api/openapi.json',
             static fn(Request $request): Response =>
-            $apiDocs()->specification($request),
+                $apiDocs()->specification($request),
             'api.documentation.specification',
         );
 
         $router->get(
             '/api/docs',
             static fn(Request $request): Response =>
-            $apiDocs()->documentation($request),
+                $apiDocs()->documentation($request),
             'api.documentation.ui',
         );
         $admin = static fn(): AdminAuthController => $container->get(AdminAuthController::class);

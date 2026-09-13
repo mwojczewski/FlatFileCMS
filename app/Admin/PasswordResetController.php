@@ -90,7 +90,7 @@ final readonly class PasswordResetController
         return Response::redirect('/admin/login?password_reset=1', 303);
     }
 
-    private function resetFormContent(string $token, string $error = ''): string
+    private function resetFormContent(#[\SensitiveParameter] string $token, string $error = ''): string
     {
         return $this->views->render('password-reset/reset', [
             'token' => $token,
@@ -99,7 +99,7 @@ final readonly class PasswordResetController
         ]);
     }
 
-    private function token(mixed $token): string
+    private function token(#[\SensitiveParameter] mixed $token): string
     {
         return \is_string($token) ? $token : '';
     }

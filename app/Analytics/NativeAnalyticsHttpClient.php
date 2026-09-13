@@ -9,8 +9,14 @@ use JsonException;
 final readonly class NativeAnalyticsHttpClient implements AnalyticsHttpClient
 {
     /** @param array<string, mixed> $payload */
-    public function postJson(string $url, array $payload, string $token, int $timeout): string
-    {
+    #[\Override]
+    public function postJson(
+        string $url,
+        array $payload,
+        #[\SensitiveParameter]
+        string $token,
+        int $timeout,
+    ): string {
         try {
             $body = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
         } catch (JsonException $exception) {

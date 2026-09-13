@@ -8,7 +8,7 @@ use InvalidArgumentException;
 
 final readonly class PasswordPolicy
 {
-    public function validate(string $password): void
+    public function validate(#[\SensitiveParameter] string $password): void
     {
         if (mb_strlen($password) < 8) {
             throw new InvalidArgumentException('Password must contain at least 8 characters.');

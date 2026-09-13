@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FlatFileCms\Config;
 
 use FlatFileCms\Content\InvalidContentException;
+use FlatFileCms\Http\PublicHttpUrl;
 use FlatFileCms\Infrastructure\Filesystem\FileRevision;
 use FlatFileCms\Infrastructure\Filesystem\FilesystemRoot;
 use FlatFileCms\Infrastructure\Filesystem\RelativePath;
@@ -68,10 +69,7 @@ final readonly class ConfigurationRepository
             $site = ContentData::map($data['site'] ?? null, 'site');
             ContentData::string($site['name'] ?? null, 'site.name');
             $url = ContentData::string($site['url'] ?? null, 'site.url');
-            if (
-                filter_var($url, FILTER_VALIDATE_URL) === false
-                || !\in_array(parse_url($url, PHP_URL_SCHEME), ['http', 'https'], true)
-            ) {
+            if (!PublicHttpUrl::isValid($url, allowFragment: false)) {
                 throw new InvalidArgumentException('site.url must be an absolute HTTP or HTTPS URL.');
             }
 

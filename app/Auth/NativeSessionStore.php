@@ -39,21 +39,25 @@ final class NativeSessionStore implements SessionStore
         }
     }
 
+    #[\Override]
     public function get(string $key): mixed
     {
         return $_SESSION[$key] ?? null;
     }
 
+    #[\Override]
     public function set(string $key, mixed $value): void
     {
         $_SESSION[$key] = $value;
     }
 
+    #[\Override]
     public function remove(string $key): void
     {
         unset($_SESSION[$key]);
     }
 
+    #[\Override]
     public function regenerate(): void
     {
         if (!session_regenerate_id(true)) {
@@ -61,6 +65,7 @@ final class NativeSessionStore implements SessionStore
         }
     }
 
+    #[\Override]
     public function invalidate(): void
     {
         $_SESSION = [];

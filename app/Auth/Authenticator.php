@@ -22,8 +22,12 @@ final readonly class Authenticator
         private int $idleLifetime = 7_200,
     ) {}
 
-    public function passwordLogin(string $email, string $password, string $ip = 'unknown'): bool
-    {
+    public function passwordLogin(
+        string $email,
+        #[\SensitiveParameter]
+        string $password,
+        string $ip = 'unknown',
+    ): bool {
         $identifier = mb_strtolower(trim($email));
         $pair = $ip . "\0" . $identifier;
         $this->limiter->assertAllowed('login_account', $identifier);

@@ -63,6 +63,21 @@ YAML);
         $this->registry()->all();
     }
 
+    public function testDirectLookupDoesNotScanUnrelatedBlockDirectories(): void
+    {
+        $this->project->write('blocks/hero/block.yml', <<<'YAML'
+schemaVersion: 1
+name: { pl: Hero }
+fields: { }
+YAML);
+        $this->project->write('blocks/hero/render.php', "<?php\n\ndeclare(strict_types=1);\n");
+        $this->project->write('blocks/broken/block.yml', "not: [valid\n");
+        $this->project->write('blocks/broken/render.php', "<?php\n\ndeclare(strict_types=1);\n");
+
+        self::assertSame('hero', $this->registry()->get('hero')->type());
+    }
+
+
     public function testItRejectsUnknownFieldTypeAtDiscoveryTime(): void
     {
         $this->project->write('blocks/broken/block.yml', <<<'YAML'

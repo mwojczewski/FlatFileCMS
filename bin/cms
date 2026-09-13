@@ -32,6 +32,7 @@ use FlatFileCms\Infrastructure\Database\SchemaInstaller;
 use FlatFileCms\Infrastructure\Filesystem\AtomicFileWriter;
 use FlatFileCms\Infrastructure\Filesystem\FileLockManager;
 use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
+use FlatFileCms\Infrastructure\Yaml\CompiledYamlCache;
 use FlatFileCms\Infrastructure\Yaml\YamlFileCache;
 use FlatFileCms\Infrastructure\Yaml\YamlFileRepository;
 use FlatFileCms\Infrastructure\Yaml\YamlParser;
@@ -45,6 +46,14 @@ require "{$projectRoot}/vendor/autoload.php";
 $paths = new SafePathResolver($projectRoot);
 $audit = new AuditLogger($paths);
 $environment = Environment::load($projectRoot);
+$cacheWriter = new AtomicFileWriter($paths, new FileLockManager($paths));
+$compiledYaml = new CompiledYamlCache(
+    true,
+    $environment->get('APP_RELEASE', 'development'),
+    $paths,
+    $cacheWriter,
+    new YamlParser(),
+);
 
 $users = static function () use ($projectRoot, $audit): UserCommandService {
     $database = new Database("{$projectRoot}/storage/database/cms.sqlite");
@@ -135,6 +144,7 @@ $console = new ConsoleApplication(
     new RuntimePruner($paths),
     $analytics,
     $release,
+    cacheWarmup: static fn(): int => $compiledYaml->warmUp(),
 );
 
 /** @var list<string> $argv */
