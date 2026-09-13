@@ -63,6 +63,19 @@ button:focus-visible {
   outline: 3px solid #8b70ff;
   outline-offset: 4px;
 }
+
+section a {
+  color: var(--ink);
+  font-weight: 500;
+  transition: text-decoration-color 0.4s ease-in-out;
+  text-decoration-thickness: 0.15rem;
+  text-underline-offset: 0.3rem;
+}
+
+section a:hover {
+  text-decoration-color: var(--mint);
+}
+
 .site-header {
   position: fixed;
   z-index: 100;

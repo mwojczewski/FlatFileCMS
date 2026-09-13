@@ -1,0 +1,814 @@
+schemaVersion: 1
+enabled: true
+layout: default
+slug:
+  pl: wdrozenie
+  en: deployment
+title:
+  pl: 'Wdrożenie — od artefaktu release do bezpiecznego rollbacku'
+  en: 'Deployment — from release artifact to safe rollback'
+date: '2026-09-13'
+order: 8
+category: deployment
+excerpt:
+  pl: 'Praktyczny przewodnik po produkcyjnym wdrożeniu FlatFile CMS — artefakcie, środowisku, PHP-FPM, serwerze WWW, uprawnieniach, migracjach, preflight, smoke testach, backupie i rollbacku.'
+  en: 'A practical guide to deploying FlatFile CMS in production — artifact, environment, PHP-FPM, web server, permissions, migrations, preflight, smoke tests, backup and rollback.'
+seo:
+  title:
+    pl: 'Wdrożenie FlatFile CMS — kompletny przewodnik produkcyjny'
+    en: 'Deploying FlatFile CMS — complete production guide'
+  description:
+    pl: 'Zbuduj powtarzalny release FlatFile CMS, skonfiguruj PHP i serwer WWW, uruchom preflight, wykonaj smoke testy oraz przygotuj backup i rollback.'
+    en: 'Build a repeatable FlatFile CMS release, configure PHP and the web server, run preflight and smoke tests, and prepare backup and rollback.'
+  robots:
+    index: true
+    follow: true
+  openGraph: {}
+  twitter: {}
+  jsonLd:
+    '@context': 'https://schema.org'
+    '@type': TechArticle
+    headline: 'FlatFile CMS deployment — from release artifact to safe rollback'
+    dateModified: '2026-09-13'
+blocks:
+  -
+    id: 01a09b30-8008-7800-8800-000000000000
+    type: page-progressbar
+    enabled: true
+    data:
+      accent: mint
+  -
+    id: 01a09b30-8008-7801-8801-000000000001
+    type: docs-hero
+    enabled: true
+    data:
+      breadcrumb:
+        pl: 'Dokumentacja / 08 / Wdrożenie'
+        en: 'Documentation / 08 / Deployment'
+      title:
+        pl: 'Wdrożenie — od artefaktu release do bezpiecznego rollbacku'
+        en: 'Deployment — from release artifact to safe rollback'
+      lead:
+        pl: 'Przeprowadź tę samą, sprawdzalną procedurę od czystego artefaktu i konfiguracji hosta aż do przełączenia ruchu, testów po wdrożeniu i kontrolowanego powrotu do poprzedniej wersji.'
+        en: 'Follow one verifiable procedure from a clean artifact and host configuration through traffic switching, post-deployment tests and a controlled return to the previous version.'
+      level: zaawansowany
+      reading_time:
+        pl: 'około 40 minut'
+        en: 'about 40 minutes'
+      updated: '2026-09-13'
+      topics:
+        -
+          label:
+            pl: 'Artefakt release'
+            en: 'Release artifact'
+        -
+          label:
+            pl: Środowisko
+            en: Environment
+        -
+          label:
+            pl: 'PHP i serwer WWW'
+            en: 'PHP and web server'
+        -
+          label:
+            pl: Uprawnienia
+            en: Permissions
+        -
+          label:
+            pl: Preflight
+            en: Preflight
+        -
+          label:
+            pl: 'Smoke testy'
+            en: 'Smoke tests'
+        -
+          label:
+            pl: Backup
+            en: Backup
+        -
+          label:
+            pl: Rollback
+            en: Rollback
+  -
+    id: 01a09b30-8008-7802-8802-000000000002
+    type: docs-toc
+    enabled: true
+    data:
+      title:
+        pl: 'Mapa wdrożenia'
+        en: 'Deployment map'
+      intro:
+        pl: 'Wdrożenie jest transakcją operacyjną. Najpierw przygotuj niezmienny artefakt i stan, potem sprawdź host, a dopiero na końcu skieruj ruch do nowej wersji.'
+        en: 'Deployment is an operational transaction. Prepare an immutable artifact and state first, verify the host next, and only then route traffic to the new version.'
+      items:
+        -
+          number: '01'
+          title:
+            pl: 'Model release'
+            en: 'Release model'
+          description:
+            pl: 'Oddziel kod, treść, runtime i sekrety.'
+            en: 'Separate code, content, runtime and secrets.'
+          url:
+            pl: '/pl/dokumentacja/wdrozenie#model-release'
+            en: '/en/documentation/deployment#model-release'
+        -
+          number: '02'
+          title:
+            pl: Artefakt
+            en: Artifact
+          description:
+            pl: 'Buduj z lockfile i bez zależności developerskich.'
+            en: 'Build from the lockfile without development dependencies.'
+          url:
+            pl: '/pl/dokumentacja/wdrozenie#artefakt'
+            en: '/en/documentation/deployment#artefakt'
+        -
+          number: '03'
+          title:
+            pl: Konfiguracja
+            en: Configuration
+          description:
+            pl: 'Ustaw produkcyjne środowisko i finalny HTTPS origin.'
+            en: 'Set the production environment and final HTTPS origin.'
+          url:
+            pl: '/pl/dokumentacja/wdrozenie#konfiguracja'
+            en: '/en/documentation/deployment#konfiguracja'
+        -
+          number: '04'
+          title:
+            pl: 'Host i uprawnienia'
+            en: 'Host and permissions'
+          description:
+            pl: 'Ogranicz document root i zapis procesu PHP.'
+            en: 'Restrict the document root and PHP write access.'
+          url:
+            pl: '/pl/dokumentacja/wdrozenie#host-uprawnienia'
+            en: '/en/documentation/deployment#host-uprawnienia'
+        -
+          number: '05'
+          title:
+            pl: 'Migracja i preflight'
+            en: 'Migration and preflight'
+          description:
+            pl: 'Zweryfikuj schemat, treść i pliki przed ruchem.'
+            en: 'Verify schema, content and files before traffic.'
+          url:
+            pl: '/pl/dokumentacja/wdrozenie#migracja-preflight'
+            en: '/en/documentation/deployment#migracja-preflight'
+        -
+          number: '06'
+          title:
+            pl: 'Przełączenie ruchu'
+            en: 'Traffic switch'
+          description:
+            pl: 'Publikuj atomowo i rozgrzej krytyczne ścieżki.'
+            en: 'Publish atomically and warm critical paths.'
+          url:
+            pl: '/pl/dokumentacja/wdrozenie#przelaczenie'
+            en: '/en/documentation/deployment#przelaczenie'
+        -
+          number: '07'
+          title:
+            pl: 'Smoke testy'
+            en: 'Smoke tests'
+          description:
+            pl: 'Sprawdź publiczny serwis i operacje administratora.'
+            en: 'Verify the public service and administrator operations.'
+          url:
+            pl: '/pl/dokumentacja/wdrozenie#smoke-testy'
+            en: '/en/documentation/deployment#smoke-testy'
+        -
+          number: '08'
+          title:
+            pl: 'Backup i rollback'
+            en: 'Backup and rollback'
+          description:
+            pl: 'Przywracaj zgodny zestaw kodu i danych.'
+            en: 'Restore a compatible code and data set.'
+          url:
+            pl: '/pl/dokumentacja/wdrozenie#backup-rollback'
+            en: '/en/documentation/deployment#backup-rollback'
+  -
+    id: 01a09b30-8008-7803-8803-000000000003
+    type: technical-table
+    enabled: true
+    data:
+      eyebrow:
+        pl: 'Cztery klasy stanu'
+        en: 'Four classes of state'
+      title:
+        pl: 'Nie wszystko wdraża się i odtwarza w ten sam sposób.'
+        en: 'Not everything is deployed and restored in the same way.'
+      intro:
+        pl: 'Powtarzalny proces zaczyna się od przypisania właściciela, trwałości i sposobu odzyskania każdej klasie danych.'
+        en: 'A repeatable process starts by assigning an owner, durability and recovery method to every class of data.'
+      column_1:
+        pl: Klasa
+        en: Class
+      column_2:
+        pl: Przykłady
+        en: Examples
+      column_3:
+        pl: 'Reguła wdrożenia'
+        en: 'Deployment rule'
+      column_4:
+        pl: Odzyskanie
+        en: Recovery
+      rows:
+        -
+          cell_1:
+            pl: Kod
+            en: Code
+          cell_2:
+            pl: 'app, blocks, templates, vendor'
+            en: 'app, blocks, templates, vendor'
+          cell_3:
+            pl: 'Niezmienny artefakt z identyfikatorem release.'
+            en: 'Immutable artifact with a release identifier.'
+          cell_4:
+            pl: 'Poprzedni artefakt'
+            en: 'Previous artifact'
+        -
+          cell_1:
+            pl: Treść
+            en: Content
+          cell_2:
+            pl: 'pages i config'
+            en: 'pages and config'
+          cell_3:
+            pl: 'Wspólny snapshot bez trwającego zapisu.'
+            en: 'Consistent snapshot without an active write.'
+          cell_4:
+            pl: 'Wersjonowany snapshot'
+            en: 'Versioned snapshot'
+        -
+          cell_1:
+            pl: 'Stan kont'
+            en: 'Account state'
+          cell_2:
+            pl: 'SQLite i WebAuthn'
+            en: 'SQLite and WebAuthn'
+          cell_3:
+            pl: 'Migracja addytywna przed przełączeniem ruchu.'
+            en: 'Additive migration before switching traffic.'
+          cell_4:
+            pl: 'Spójny backup SQLite'
+            en: 'Consistent SQLite backup'
+        -
+          cell_1:
+            pl: Runtime
+            en: Runtime
+          cell_2:
+            pl: 'cache, sesje, warianty, logi'
+            en: 'cache, sessions, variants, logs'
+          cell_3:
+            pl: 'Katalogi tworzone i zapisywalne na hoście.'
+            en: 'Directories created and writable on the host.'
+          cell_4:
+            pl: 'Odtworzenie lub osobna retencja'
+            en: 'Rebuild or separate retention'
+        -
+          cell_1:
+            pl: Sekrety
+            en: Secrets
+          cell_2:
+            pl: 'APP_SECRET, SMTP, .env.local'
+            en: 'APP_SECRET, SMTP, .env.local'
+          cell_3:
+            pl: 'Poza artefaktem i repozytorium.'
+            en: 'Outside the artifact and repository.'
+          cell_4:
+            pl: 'Szyfrowany magazyn sekretów'
+            en: 'Encrypted secret store'
+  -
+    id: 01a09b30-8008-7804-8804-000000000004
+    type: article-content
+    enabled: true
+    data:
+      anchor: model-release
+      content:
+        pl: |-
+          ## 1. Zacznij od modelu release, nie od kopiowania katalogu
+
+          Produkcyjne wdrożenie powinno wskazywać dokładnie jeden artefakt kodu i jeden zgodny stan danych. Nie edytuj plików PHP na działającym serwerze i nie uruchamiaj `composer update` na hoście. Lockfile ma zamienić zestaw zależności w powtarzalny wynik, a identyfikator release pozwala połączyć odpowiedź aplikacji, logi i cache z konkretną wersją.
+
+          Trzymaj kolejne wydania w osobnych katalogach, na przykład `releases/<id>`, a aktywną wersję wybieraj pojedynczym wskaźnikiem `current`. Katalog współdzielony powinien zawierać tylko stan, który ma przeżyć zmianę kodu: treść, konfigurację, bazę, logi, sesje i sekrety. Zanim zastosujesz taki układ, sprawdź ograniczenie aplikacji: korzenie kontrolowane przez `release:check` nie mogą być symlinkami. Bezpieczniejszy prosty wariant to przygotowanie kompletnego katalogu release i atomowa zmiana document root albo konfiguracji upstreamu.
+
+          Rozdziel build od aktywacji. Build może uruchamiać pełne `composer check` bez produkcyjnych sekretów. Aktywacja działa na docelowym hoście, gdzie dostępne są finalne uprawnienia, rozszerzenia PHP, baza i `.env.local`; tam obowiązkowy jest `php bin/cms release:check`.
+        en: |-
+          ## 1. Start with a release model, not directory copying
+
+          A production deployment should identify exactly one code artifact and one compatible data state. Do not edit PHP files on a live server and do not run `composer update` on the host. The lockfile turns the dependency set into a repeatable result, while the release identifier connects application responses, logs and cache to one version.
+
+          Keep releases in separate directories such as `releases/<id>` and select the active version through one `current` pointer. Shared storage should contain only state that survives code changes: content, configuration, database, logs, sessions and secrets. Check one application constraint before adopting this layout: roots inspected by `release:check` must not be symlinks. A safer simple variant is a complete release directory with an atomic document-root or upstream switch.
+
+          Separate build from activation. Build can run the complete `composer check` without production secrets. Activation runs on the target host where final permissions, PHP extensions, the database and `.env.local` exist; this is where `php bin/cms release:check` is mandatory.
+      note:
+        pl: 'Zielony pipeline nie dowodzi, że host ma poprawne uprawnienia, domenę lub socket PHP-FPM. Te własności sprawdza etap przed przełączeniem ruchu.'
+        en: 'A green pipeline does not prove that the host has correct permissions, domain or PHP-FPM socket. The pre-traffic stage verifies those properties.'
+  -
+    id: 01a09b30-8008-7805-8805-000000000005
+    type: code-showcase
+    enabled: true
+    data:
+      eyebrow:
+        pl: 'Powtarzalny build'
+        en: 'Repeatable build'
+      title:
+        pl: 'Buduj dokładnie z composer.lock.'
+        en: 'Build exactly from composer.lock.'
+      description:
+        pl: 'Zależności produkcyjne powstają podczas budowania artefaktu. Kontrole jakości wykonaj przed usunięciem zależności developerskich albo w oddzielnym etapie pipeline.'
+        en: 'Production dependencies are created while building the artifact. Run quality checks before removing development dependencies or in a separate pipeline stage.'
+      filename: release-build.sh
+      code: |-
+        composer install --no-interaction --prefer-dist
+        composer check
+        composer install --no-dev --classmap-authoritative \
+          --no-interaction --prefer-dist
+
+        test -f composer.lock
+        test -f public/index.php
+        test -f deploy/nginx.conf.example
+      bullets:
+        -
+          text:
+            pl: 'Nie zmienia wersji zależności podczas wdrożenia.'
+            en: 'Does not change dependency versions during deployment.'
+        -
+          text:
+            pl: 'Artefakt nie zawiera PHPUnit ani narzędzi analizy.'
+            en: 'The artifact excludes PHPUnit and analysis tools.'
+        -
+          text:
+            pl: 'Autoloader classmap jest zoptymalizowany dla produkcji.'
+            en: 'The classmap autoloader is optimized for production.'
+        -
+          text:
+            pl: 'Ten sam artefakt może przejść staging i produkcję.'
+            en: 'The same artifact can pass through staging and production.'
+  -
+    id: 01a09b30-8008-7806-8806-000000000006
+    type: article-content
+    enabled: true
+    data:
+      anchor: konfiguracja
+      content:
+        pl: |-
+          ## 2. Wstrzyknij konfigurację docelowego środowiska
+
+          `.env.local` należy do operatora wdrożenia, nie do Git ani artefaktu. W produkcji ustaw `APP_ENV=production`, wyłącz debug, użyj co najmniej 32 losowych bajtów w `APP_SECRET` i wymuś bezpieczne cookie sesji. `APP_RELEASE` powinien być niezmiennym identyfikatorem bieżącego artefaktu — najlepiej pełnym SHA commita lub numerem buildu — i musi zmienić się przy każdym wydaniu wpływającym na rendering.
+
+          `config/setup.yml` zawiera publiczną konfigurację produktu. `site.url` musi wskazywać finalny origin HTTPS widziany przez użytkownika, nie wewnętrzny adres kontenera. `WEBAUTHN_RP_ID` jest samym hostem bez schematu, portu i ścieżki. Jego zmiana może odłączyć wcześniej zarejestrowane klucze bezpieczeństwa.
+
+          Jeśli ruch przechodzi przez reverse proxy, wpisz do `TRUSTED_PROXIES` wyłącznie rzeczywiste adresy lub zakresy CIDR bezpośrednich proxy. Nie używaj `0.0.0.0/0` ani `::/0`. CMS ufa `X-Forwarded-For` dopiero wtedy, gdy bezpośredni peer znajduje się na tej liście; od tej decyzji zależą audit i limity prób logowania.
+        en: |-
+          ## 2. Inject target-environment configuration
+
+          `.env.local` belongs to the deployment operator, not Git or the artifact. In production set `APP_ENV=production`, disable debug, use at least 32 random bytes for `APP_SECRET`, and require a secure session cookie. `APP_RELEASE` should be an immutable identifier of the current artifact—preferably the full commit SHA or build number—and must change for every release affecting rendering.
+
+          `config/setup.yml` contains public product configuration. `site.url` must point to the final HTTPS origin visible to users, not an internal container address. `WEBAUTHN_RP_ID` is the bare host without scheme, port or path. Changing it can disconnect previously registered security keys.
+
+          When traffic passes through a reverse proxy, put only the real addresses or CIDR ranges of direct proxies in `TRUSTED_PROXIES`. Never use `0.0.0.0/0` or `::/0`. The CMS trusts `X-Forwarded-For` only when the direct peer is on this list; audit and login throttling depend on this decision.
+      note:
+        pl: 'Sekret generuj poza historią powłoki, na przykład w menedżerze haseł lub systemowym magazynie sekretów.'
+        en: 'Generate the secret outside shell history, for example in a password manager or system secret store.'
+  -
+    id: 01a09b30-8008-7807-8807-000000000007
+    type: code-showcase
+    enabled: true
+    data:
+      eyebrow:
+        pl: 'Minimalne środowisko'
+        en: 'Minimum environment'
+      title:
+        pl: 'Produkcja ma własne, jawne guardy.'
+        en: 'Production has explicit guards.'
+      description:
+        pl: 'Wartości domeny i strefy są przykładowe. Parametry SMTP, retencji logów i cache dodaj zgodnie z wybraną infrastrukturą.'
+        en: 'Domain and timezone values are examples. Add SMTP, log retention and cache parameters for the selected infrastructure.'
+      filename: .env.local
+      code: |-
+        APP_ENV=production
+        APP_DEBUG=0
+        APP_SECRET=<at-least-32-random-bytes>
+        APP_TIMEZONE=Europe/Warsaw
+        APP_RELEASE=<full-git-sha-or-build-id>
+
+        SESSION_COOKIE_SECURE=1
+        SESSION_COOKIE_SAME_SITE=Lax
+        WEBAUTHN_RP_ID=example.com
+        TRUSTED_PROXIES=10.0.0.0/24
+      bullets:
+        -
+          text:
+            pl: 'ProductionGuard zatrzymuje niebezpieczny start.'
+            en: 'ProductionGuard stops an unsafe startup.'
+        -
+          text:
+            pl: 'APP_RELEASE oddziela namespace cache kolejnych wydań.'
+            en: 'APP_RELEASE separates cache namespaces between releases.'
+        -
+          text:
+            pl: 'Finalna domena wiąże cookie i WebAuthn z właściwym originem.'
+            en: 'The final domain binds cookies and WebAuthn to the correct origin.'
+  -
+    id: 01a09b30-8008-7808-8808-000000000008
+    type: article-content
+    enabled: true
+    data:
+      anchor: host-uprawnienia
+      content:
+        pl: |-
+          ## 3. Ogranicz serwer WWW do katalogu public
+
+          Document root musi wskazywać dokładnie `public/`. Serwer może wykonywać wyłącznie `public/index.php`; inne pliki PHP powinny być odrzucane. Dzięki temu `pages/`, `config/`, `.env.local`, SQLite, logi, audit, źródła klas i szablony nie stają się plikami do pobrania. Gotowe punkty wyjścia znajdują się w `deploy/nginx.conf.example`, `deploy/apache2-vhost.conf.example` i `deploy/Caddyfile.example`.
+
+          Dopasuj domenę, ścieżkę projektu i socket PHP-FPM. Nginx używa gzip; opcjonalny Brotli wymaga modułu `ngx_brotli`. Apache wymaga odpowiednich modułów SSL, rewrite, headers, proxy_fcgi, filter i kompresji. Caddy zarządza HTTPS automatycznie i negocjuje Zstandard lub gzip. Po zmianie konfiguracji najpierw uruchom test składni serwera, potem łagodny reload.
+
+          Ustaw `upload_max_filesize` i `post_max_size` co najmniej na poziomie `media.maxUploadBytes`, zachowując skończony limit requestu w serwerze WWW. Wyłącz `display_errors`, pozostaw chronione `log_errors` i upewnij się, że wersja PHP-FPM jest tą samą wspieraną wersją 8.5+, którą sprawdził build.
+
+          ## 4. Nadaj minimalne uprawnienia
+
+          Proces PHP potrzebuje zapisu do `pages/`, `config/`, katalogów `storage/audit`, `storage/cache`, `storage/database`, `storage/logs`, `storage/sessions`, `storage/tmp` oraz `public/assets/blocks/`. Kod w `app/`, `blocks/`, `templates/`, `vendor/`, `bin/` i entrypointy PHP powinien być tylko do odczytu dla użytkownika serwera WWW.
+
+          Nie naprawiaj błędów przez `chmod 0777`. Ustal właściciela procesu PHP, grupę wdrożeniową i minimalne prawa dla każdego korzenia. Kontrolowane katalogi nie mogą być symlinkami. Jeśli model wielu release wymaga linków, zamontuj trwały wolumin pod finalną ścieżką albo zastosuj mechanizm publikacji zgodny z kontrolami aplikacji.
+        en: |-
+          ## 3. Restrict the web server to public
+
+          The document root must point exactly at `public/`. The server may execute only `public/index.php`; other PHP files should be rejected. This keeps `pages/`, `config/`, `.env.local`, SQLite, logs, audit, class sources and templates from becoming downloadable files. Starting configurations live in `deploy/nginx.conf.example`, `deploy/apache2-vhost.conf.example` and `deploy/Caddyfile.example`.
+
+          Adapt the domain, project path and PHP-FPM socket. Nginx uses gzip; optional Brotli requires `ngx_brotli`. Apache needs the relevant SSL, rewrite, headers, proxy_fcgi, filter and compression modules. Caddy manages HTTPS automatically and negotiates Zstandard or gzip. After configuration changes, run the server syntax test first and perform a graceful reload second.
+
+          Set `upload_max_filesize` and `post_max_size` at least as high as `media.maxUploadBytes` while keeping a finite request limit at the web server. Disable `display_errors`, retain protected `log_errors`, and confirm that PHP-FPM runs the same supported PHP 8.5+ line verified by the build.
+
+          ## 4. Grant minimum permissions
+
+          The PHP process needs write access to `pages/`, `config/`, `storage/audit`, `storage/cache`, `storage/database`, `storage/logs`, `storage/sessions`, `storage/tmp` and `public/assets/blocks/`. Code under `app/`, `blocks/`, `templates/`, `vendor/`, `bin/` and PHP entrypoints should be read-only for the web-server user.
+
+          Do not repair failures with `chmod 0777`. Identify the PHP process owner, deployment group and minimum rights for every root. Controlled directories must not be symlinks. If a multi-release model needs links, mount persistent storage at the final path or use a publication mechanism compatible with application checks.
+      note:
+        pl: 'Najważniejszy test izolacji jest prosty — żądanie do `/.env.local`, `/composer.lock` lub `/pages/.../content.yml` nigdy nie może zwrócić zawartości pliku.'
+        en: 'The most important isolation test is simple—a request for `/.env.local`, `/composer.lock` or `/pages/.../content.yml` must never return file contents.'
+      bookmarkDescription:
+        pl: 'Host I uprawnienia'
+        en: 'Host and permissions'
+  -
+    id: 01a09b30-8008-7809-8809-000000000009
+    type: article-content
+    enabled: true
+    data:
+      anchor: migracja-preflight
+      content:
+        pl: |-
+          ## 5. Migruj stan, a potem uruchom preflight
+
+          Przed przełączeniem ruchu wykonaj `php bin/cms database:migrate`. Migracje schematu uwierzytelniania są addytywne, ale nadal pracują na trwałym stanie — przed pierwszym wdrożeniem nowej wersji zrób spójny backup SQLite. Nie uruchamiaj kilku migratorów równolegle.
+
+          Następnie, z finalnym `.env.local` i jako właściwy użytkownik procesu, uruchom `php bin/cms release:check`. Polecenie kończy się kodem różnym od zera, jeśli brakuje warunku wydania. Sprawdza wersję PHP i rozszerzenia, produkcyjne guardy środowiska, istnienie i zapisywalność korzeni, HTTPS w `site.url`, wszystkie strony, kolekcje, bloki i lokalizowane nawigacje, redirecty, layout domyślny, schemat bazy oraz wymagane pliki release.
+
+          Preflight nie jest smoke testem. Potwierdza spójność procesu i danych widzianych lokalnie przez PHP, lecz nie dowodzi, że DNS prowadzi do hosta, certyfikat obejmuje domenę, proxy przekazuje poprawne nagłówki albo użytkownik z Internetu otrzyma właściwą odpowiedź.
+
+          Jeśli kontrola nie przechodzi, napraw pojedynczy zgłoszony kontrakt. Nie wyłączaj guardów i nie zmieniaj wszystkich uprawnień naraz. Po każdej korekcie uruchom pełny preflight ponownie.
+        en: |-
+          ## 5. Migrate state, then run preflight
+
+          Before switching traffic, run `php bin/cms database:migrate`. Authentication-schema migrations are additive, but they still operate on durable state—take a consistent SQLite backup before the first deployment of a new version. Do not run multiple migrators concurrently.
+
+          Next, with the final `.env.local` and as the correct process user, run `php bin/cms release:check`. The command exits non-zero when a release condition is missing. It checks the PHP version and extensions, production environment guards, existence and writability of roots, HTTPS in `site.url`, every page, collection, block and localized navigation, redirects, the default layout, database schema and required release files.
+
+          Preflight is not a smoke test. It confirms process and data consistency as seen locally by PHP, but it does not prove that DNS reaches the host, the certificate covers the domain, the proxy sends correct headers or an Internet user receives the expected response.
+
+          When a check fails, repair the single reported contract. Do not disable guards or change every permission at once. Run the full preflight again after each correction.
+      note:
+        pl: '`release:check` uruchamiaj także po odtworzeniu backupu i przed zakończeniem rollbacku.'
+        en: 'Run `release:check` after restoring a backup and before completing a rollback as well.'
+      bookmarkDescription:
+        pl: 'Migracja i preflight'
+        en: 'Migration and preflight'
+  -
+    id: 01a09b30-8008-7810-8810-000000000010
+    type: code-showcase
+    enabled: true
+    data:
+      eyebrow:
+        pl: 'Bramka aktywacji'
+        en: 'Activation gate'
+      title:
+        pl: 'Ruch trafia dopiero do sprawdzonego release.'
+        en: 'Traffic reaches only a verified release.'
+      description:
+        pl: 'Kolejność oddziela modyfikację trwałego stanu, kontrolę aplikacji i obserwację zewnętrzną.'
+        en: 'The order separates durable-state mutation, application verification and external observation.'
+      filename: activate-release.sh
+      code: |-
+        php bin/cms database:migrate
+        php bin/cms release:check
+
+        # Atomically switch the web-server upstream or document root here.
+
+        curl --fail --silent --show-error https://example.com/api/v1/health
+        curl --fail --silent --show-error https://example.com/pl/
+        curl --fail --silent --show-error https://example.com/api/v1/pages?lang=pl
+      bullets:
+        -
+          text:
+            pl: 'Migracja kończy się przed aktywacją kodu.'
+            en: 'Migration completes before code activation.'
+        -
+          text:
+            pl: 'Preflight blokuje wydanie niespójnego artefaktu.'
+            en: 'Preflight blocks an inconsistent artifact.'
+        -
+          text:
+            pl: 'Testy HTTP przechodzą przez publiczny origin.'
+            en: 'HTTP tests pass through the public origin.'
+        -
+          text:
+            pl: 'Każdy błąd zatrzymuje dalszy etap pipeline.'
+            en: 'Every failure stops the next pipeline stage.'
+  -
+    id: 01a09b30-8008-7811-8811-000000000011
+    type: article-content
+    enabled: true
+    data:
+      anchor: przelaczenie
+      content:
+        pl: |-
+          ## 6. Przełącz ruch atomowo i obserwuj nową wersję
+
+          Nie kopiuj plików bezpośrednio do aktywnego katalogu, bo część requestów zobaczy mieszaninę starego i nowego kodu. Przygotuj release obok, zakończ instalację zależności i preflight, a następnie wykonaj pojedynczą zmianę document root, upstreamu albo obrazu kontenera. Stary artefakt pozostaw dostępny do czasu zamknięcia okna obserwacji.
+
+          Zmiana `APP_RELEASE` tworzy nowy namespace publicznego cache HTML. Nie wymaga synchronicznego usuwania poprzednich wpisów. `php bin/cms cache:prune --dry-run` pokaże dane do usunięcia, a właściwe `cache:prune` może działać jako bezpieczne zadanie utrzymaniowe. `cache:clear` usuwa odtwarzalne wpisy, ale nie powinno być automatycznym lekarstwem na każdy problem.
+
+          Pierwsze requesty mogą utworzyć fingerprintowane zasoby bloków i cache, dlatego po aktywacji odwiedź krytyczne strony w obu językach. Obserwuj kody 5xx, czas odpowiedzi, logi PHP-FPM i `storage/logs/application-YYYY-MM-DD.log`. `LOG_LEVEL=notice` obejmuje także brakujące publiczne trasy; `LOG_MAX_FILES` ogranicza retencję, ale nie zastępuje polityki eksportu logów.
+        en: |-
+          ## 6. Switch traffic atomically and observe the new version
+
+          Do not copy files directly into the active directory because some requests will see a mix of old and new code. Prepare the release alongside it, finish dependency installation and preflight, then perform one document-root, upstream or container-image switch. Keep the previous artifact available until the observation window closes.
+
+          Changing `APP_RELEASE` creates a new public HTML-cache namespace. It does not require synchronous deletion of previous entries. `php bin/cms cache:prune --dry-run` reports removable data and the actual `cache:prune` can run as safe maintenance. `cache:clear` removes reproducible entries but should not become the automatic remedy for every issue.
+
+          Initial requests may create fingerprinted block assets and cache, so visit critical pages in both languages after activation. Watch 5xx codes, response time, PHP-FPM logs and `storage/logs/application-YYYY-MM-DD.log`. `LOG_LEVEL=notice` also covers missing public routes; `LOG_MAX_FILES` limits retention but does not replace a log-export policy.
+      note:
+        pl: 'Release jest aktywny dopiero wtedy, gdy publiczny monitoring potwierdza nową wersję — nie wtedy, gdy zakończyło się kopiowanie plików.'
+        en: 'A release is active only when public monitoring confirms the new version—not when file copying finishes.'
+      bookmarkDescription:
+        pl: 'Przełączenie ruchu'
+        en: 'Traffic switch'
+  -
+    id: 01a09b30-8008-7812-8812-000000000012
+    type: article-content
+    enabled: true
+    data:
+      anchor: smoke-testy
+      content:
+        pl: |-
+          ## 7. Sprawdź ścieżki odczytu i zapisu
+
+          Smoke test zaczynaj od publicznego originu. Pobierz `/api/v1/health`, stronę HTML w każdym języku, odpowiadającą stronę API, kolekcję, media oraz `openapi.json`. Powtórz żądanie strony z `If-None-Match` i oczekuj pustego `304`. Zweryfikuj poprawny certyfikat, przekierowanie HTTP do HTTPS, nagłówki bezpieczeństwa i brak dostępu do plików spoza `public/`.
+
+          Następnie zaloguj się do panelu i wykonaj kontrolowaną operację zapisu: otwórz builder istniejącej strony, zmień testowy blok, zapisz i sprawdź publiczny wynik. Przetestuj upload małego poprawnego obrazu, wysłanie wiadomości kontaktowej lub odzyskiwanie hasła, jeśli SMTP jest częścią wdrożenia. Po teście przywróć treść przez normalny mechanizm edytora — nie ręczną podmianę pliku.
+
+          Kontrola negatywna jest równie ważna: nieistniejąca strona ma zwrócić bezpieczne 404, próba wejścia do panelu bez sesji ma prowadzić do logowania, a stare dane formularza powinny dać konflikt rewizji zamiast nadpisać nowszą treść. Zajrzyj do audit trail i potwierdź, że zapis administratora został odnotowany.
+
+          Automatyzuj stabilne części scenariusza, ale zachowaj krótki test ręczny funkcji wymagających przeglądarki, cookie, WebAuthn lub odbioru poczty. Wynik smoke testu zapisz razem z identyfikatorem release i czasem aktywacji.
+        en: |-
+          ## 7. Verify read and write paths
+
+          Start smoke testing at the public origin. Fetch `/api/v1/health`, an HTML page in every language, the corresponding API page, a collection, media and `openapi.json`. Repeat a page request with `If-None-Match` and expect an empty `304`. Verify the certificate, HTTP-to-HTTPS redirect, security headers and absence of access to files outside `public/`.
+
+          Next log into the admin panel and perform a controlled write: open the builder for an existing page, change a test block, save it and inspect the public result. Test upload of a small valid image and contact or password-recovery mail when SMTP is part of the deployment. Restore test content through the normal editor mechanism, not a manual file replacement.
+
+          Negative checks matter as well: a missing page should produce a safe 404, unauthenticated admin access should lead to login, and stale form data should produce a revision conflict instead of overwriting newer content. Inspect the audit trail and confirm that the administrator write was recorded.
+
+          Automate stable parts of the scenario, but retain a short manual test for features requiring a browser, cookies, WebAuthn or mail receipt. Store the smoke-test result with the release identifier and activation time.
+      note:
+        pl: 'Health endpoint sprawdza dostępność aplikacji, lecz sam nie sprawdza logowania, zapisu YAML, uploadu ani dostarczenia poczty.'
+        en: 'The health endpoint checks application availability, but by itself does not verify login, YAML writes, uploads or mail delivery.'
+  -
+    id: 01a09b30-8008-7813-8813-000000000013
+    type: diagnostic-table
+    enabled: true
+    data:
+      anchor: diagnostyka-wdrozenia
+      eyebrow:
+        pl: 'Diagnostyka po aktywacji'
+        en: 'Post-activation diagnostics'
+      title:
+        pl: 'Objaw wskaże warstwę, jeśli zachowasz kolejność kontroli.'
+        en: 'A symptom identifies the layer when checks stay ordered.'
+      intro:
+        pl: 'Najpierw ustal, czy błąd dotyczy transportu, serwera WWW, procesu PHP, konfiguracji, trwałego stanu czy cache. Dopiero potem zmieniaj system.'
+        en: 'First decide whether the failure belongs to transport, web server, PHP process, configuration, durable state or cache. Change the system only after that.'
+      rows:
+        -
+          layer:
+            pl: Transport
+            en: Transport
+          problem:
+            pl: 'TLS albo redirect tworzy pętlę.'
+            en: 'TLS or redirect forms a loop.'
+          cause:
+            pl: 'Proxy i origin inaczej interpretują schemat żądania lub finalny host.'
+            en: 'Proxy and origin disagree about request scheme or final host.'
+          check:
+            pl: 'Sprawdź DNS, certyfikat, `site.url`, nagłówki proxy i regułę HTTP→HTTPS.'
+            en: 'Check DNS, certificate, `site.url`, proxy headers and the HTTP→HTTPS rule.'
+        -
+          layer:
+            pl: 'Serwer WWW'
+            en: 'Web server'
+          problem:
+            pl: 'Każda trasa zwraca 404 albo pobiera PHP.'
+            en: 'Every route returns 404 or downloads PHP.'
+          cause:
+            pl: 'Błędny document root, rewrite lub konfiguracja PHP-FPM.'
+            en: 'Incorrect document root, rewrite or PHP-FPM configuration.'
+          check:
+            pl: 'Potwierdź `public/`, jedyny entrypoint i właściwy socket procesu.'
+            en: 'Confirm `public/`, the sole entrypoint and the correct process socket.'
+        -
+          layer:
+            pl: 'Runtime PHP'
+            en: 'PHP runtime'
+          problem:
+            pl: 'Preflight zgłasza brak rozszerzenia.'
+            en: 'Preflight reports a missing extension.'
+          cause:
+            pl: 'CLI i PHP-FPM korzystają z innych instalacji lub ini.'
+            en: 'CLI and PHP-FPM use different installations or ini files.'
+          check:
+            pl: 'Porównaj wersję i moduły CLI z informacją procesu FPM.'
+            en: 'Compare CLI version and modules with the FPM process information.'
+        -
+          layer:
+            pl: Uprawnienia
+            en: Permissions
+          problem:
+            pl: 'Odczyt działa, zapis strony lub upload nie.'
+            en: 'Reads work but page save or upload fails.'
+          cause:
+            pl: 'Użytkownik PHP nie zapisuje do konkretnego korzenia runtime.'
+            en: 'The PHP user cannot write to a specific runtime root.'
+          check:
+            pl: 'Sprawdź właściciela procesu i dokładny katalog wskazany przez błąd; nie używaj 0777.'
+            en: 'Check the process owner and exact directory named by the error; do not use 0777.'
+        -
+          layer:
+            pl: Baza
+            en: Database
+          problem:
+            pl: 'Logowanie kończy się błędem po wydaniu.'
+            en: 'Login fails after the release.'
+          cause:
+            pl: 'Migracja nie została wykonana albo release widzi inną bazę.'
+            en: 'Migration was skipped or the release sees another database.'
+          check:
+            pl: 'Uruchom `database:migrate`, potem `release:check`, używając produkcyjnego środowiska.'
+            en: 'Run `database:migrate`, then `release:check`, using the production environment.'
+        -
+          layer:
+            pl: Cache
+            en: Cache
+          problem:
+            pl: 'Część stron nadal pokazuje stary HTML.'
+            en: 'Some pages still show old HTML.'
+          cause:
+            pl: 'APP_RELEASE nie zmienił się albo zewnętrzny cache nie został odświeżony.'
+            en: 'APP_RELEASE did not change or an external cache was not refreshed.'
+          check:
+            pl: 'Porównaj release ID, ETag, nagłówki CDN i odpowiedź bez pośredników.'
+            en: 'Compare release ID, ETag, CDN headers and a response without intermediaries.'
+        -
+          layer:
+            pl: Treść
+            en: Content
+          problem:
+            pl: 'Preflight odrzuca stronę lub nawigację.'
+            en: 'Preflight rejects a page or navigation.'
+          cause:
+            pl: 'Snapshot danych nie pasuje do schematów bloków nowego kodu.'
+            en: "The data snapshot does not match the new code's block schemas."
+          check:
+            pl: 'Odtwórz zgodny zestaw kodu i treści albo wykonaj przygotowaną migrację danych.'
+            en: 'Restore a compatible code-and-content set or run the prepared data migration.'
+      note:
+        pl: 'Najpierw zachowaj dowody — identyfikator release, czas, odpowiedź HTTP i właściwy fragment logu. Czyszczenie cache lub restart przed diagnozą może je usunąć.'
+        en: 'Preserve evidence first—the release identifier, time, HTTP response and relevant log excerpt. Cache clearing or restart before diagnosis may remove it.'
+  -
+    id: 01a09b30-8008-7814-8814-000000000014
+    type: article-content
+    enabled: true
+    data:
+      anchor: backup-rollback
+      content:
+        pl: |-
+          ## 8. Backupuj spójny zestaw i ćwicz odtwarzanie
+
+          Snapshot release obejmuje `pages/`, `config/`, własne `blocks/` i `templates/` oraz zgodny artefakt kodu. SQLite w `storage/database/cms.sqlite` kopiuj tylko bez aktywnego zapisu albo przez mechanizm online backup SQLite. `.env.local` i inne sekrety przechowuj osobno, szyfrowane i z ograniczoną możliwością odczytu.
+
+          Cache, sesje, wygenerowane zasoby bloków i warianty mediów są odtwarzalne. Nie muszą wydłużać krytycznej ścieżki backupu. Audit i logi mają inną wartość: ich retencja wynika z potrzeb bezpieczeństwa, prywatności i operacji, dlatego mogą trafiać do osobnego archiwum.
+
+          Backup jest zweryfikowany dopiero po udanym odtworzeniu. Regularnie twórz izolowane środowisko, przywracaj kod, treść, bazę i sekrety, uruchamiaj migrację oraz `release:check`, a potem wykonuj pełny smoke test. Mierz czas przywrócenia i porównuj go z wymaganym RTO; sprawdzaj także, ile danych tracisz względem RPO.
+
+          ## 9. Rollback przywraca kompatybilność, nie tylko stary kod
+
+          Gdy nowe wydanie uszkadza działanie, zatrzymaj dalsze zapisy lub przejdź w kontrolowane okno serwisowe. Przywróć poprzedni artefakt razem z kompatybilnym snapshotem treści i schematu. Migracje bazy są addytywne, ale nie zakładaj automatycznie, że dowolny stary kod poprawnie obsłuży nowsze dane.
+
+          Po przywróceniu ustaw identyfikator odpowiadający aktywnemu artefaktowi, uruchom `release:check`, przełącz ruch atomowo i powtórz smoke testy. Zachowaj logi i nieudany artefakt do analizy. Dopiero gdy publiczny monitoring jest stabilny, zamknij incydent i zaplanuj poprawkę jako nowe wydanie — nie jako ręczną edycję na serwerze.
+        en: |-
+          ## 8. Back up a consistent set and practise restoration
+
+          A release snapshot includes `pages/`, `config/`, custom `blocks/` and `templates/`, plus a compatible code artifact. Copy `storage/database/cms.sqlite` only when no write is active or through SQLite's online backup mechanism. Keep `.env.local` and other secrets separately, encrypted and with restricted read access.
+
+          Cache, sessions, generated block assets and media variants are reproducible. They need not extend the critical backup path. Audit and logs have a different value: retention follows security, privacy and operational requirements, so they may go to a separate archive.
+
+          A backup becomes verified only after successful restoration. Regularly create an isolated environment, restore code, content, database and secrets, run migration and `release:check`, then perform the full smoke test. Measure restoration time against the required RTO and verify data loss against RPO.
+
+          ## 9. Rollback restores compatibility, not only old code
+
+          When a new release breaks operation, stop further writes or enter a controlled maintenance window. Restore the previous artifact together with a compatible content and schema snapshot. Database migrations are additive, but do not automatically assume that arbitrary old code handles newer data correctly.
+
+          After restoration, set the identifier matching the active artifact, run `release:check`, switch traffic atomically and repeat smoke tests. Preserve logs and the failed artifact for analysis. Close the incident only when public monitoring is stable, and ship the correction as a new release—not a manual server edit.
+      note:
+        pl: 'Najkrótszy rollback bez sprawdzonego backupu bywa tylko szybszą drogą do drugiej awarii.'
+        en: 'The shortest rollback without a tested backup can be only a faster route to a second failure.'
+      bookmarkDescription:
+        pl: 'Backup i rollback'
+        en: 'Backup and rollback'
+  -
+    id: 01a09b30-8008-7815-8815-000000000015
+    type: article-content
+    enabled: true
+    data:
+      anchor: checklista-wdrozenia
+      content:
+        pl: |-
+          ## 10. Checklista wydania
+
+          1. Artefakt powstał z aktualnego `composer.lock` i przeszedł `composer check`.
+          2. Produkcyjny artefakt nie zawiera zależności developerskich.
+          3. `.env.local` pochodzi z chronionego źródła i nie leży w `public/`.
+          4. `APP_ENV=production`, debug jest wyłączony, a sekret i cookie spełniają guardy.
+          5. `APP_RELEASE` jednoznacznie identyfikuje nowe wydanie.
+          6. `site.url` i `WEBAUTHN_RP_ID` odpowiadają finalnej domenie.
+          7. `TRUSTED_PROXIES` zawiera tylko rzeczywiste proxy.
+          8. Document root wskazuje dokładnie `public/` i wykonuje tylko `index.php`.
+          9. PHP 8.5+, wymagane rozszerzenia, limity uploadu i PHP-FPM są zgodne.
+          10. Zapis jest ograniczony do treści, konfiguracji i katalogów runtime.
+          11. Przed migracją istnieje spójny backup SQLite i danych.
+          12. `database:migrate` oraz `release:check` kończą się powodzeniem.
+          13. Ruch jest przełączany atomowo, a poprzedni artefakt pozostaje dostępny.
+          14. Smoke test obejmuje HTML, API, cache warunkowy, logowanie, zapis, upload i pocztę.
+          15. Monitoring nie pokazuje nowych 5xx, opóźnień ani błędów aplikacji.
+          16. Procedura rollbacku wskazuje zgodny artefakt i snapshot.
+          17. Odtwarzanie backupu zostało praktycznie sprawdzone.
+
+          Dobre wdrożenie nie polega na braku błędów w konsoli. Polega na tym, że wersja jest identyfikowalna, przejście jest atomowe, wynik mierzalny, a powrót możliwy bez zgadywania.
+        en: |-
+          ## 10. Release checklist
+
+          1. The artifact was built from the current `composer.lock` and passed `composer check`.
+          2. The production artifact contains no development dependencies.
+          3. `.env.local` comes from a protected source and is not below `public/`.
+          4. `APP_ENV=production`, debug is off, and secret and cookie pass the guards.
+          5. `APP_RELEASE` identifies the new release unambiguously.
+          6. `site.url` and `WEBAUTHN_RP_ID` match the final domain.
+          7. `TRUSTED_PROXIES` contains only real proxies.
+          8. The document root points exactly at `public/` and executes only `index.php`.
+          9. PHP 8.5+, required extensions, upload limits and PHP-FPM are consistent.
+          10. Write access is limited to content, configuration and runtime directories.
+          11. A consistent SQLite and data backup exists before migration.
+          12. `database:migrate` and `release:check` succeed.
+          13. Traffic switches atomically and the previous artifact remains available.
+          14. Smoke tests cover HTML, API, conditional cache, login, write, upload and mail.
+          15. Monitoring shows no new 5xx responses, latency or application errors.
+          16. The rollback procedure identifies a compatible artifact and snapshot.
+          17. Backup restoration has been tested in practice.
+
+          A good deployment is not the absence of console errors. It means the version is identifiable, the transition atomic, the result measurable and the return path available without guesswork.
+      note:
+        pl: 'Przechowuj checklistę razem z historią release. Po incydencie aktualizuj procedurę, nie tylko kod.'
+        en: 'Store the checklist with release history. After an incident, update the procedure as well as the code.'
+  -
+    id: 01a09b30-8008-7816-8816-000000000016
+    type: call-to-action
+    enabled: true
+    data:
+      eyebrow:
+        pl: 'Dokumentacja kompletna'
+        en: 'Documentation complete'
+      title:
+        pl: 'Przejdź od tutorialu do własnego release.'
+        en: 'Move from the tutorial to your own release.'
+      description:
+        pl: 'Użyj checklisty jako bramki wdrożeniowej, dopasuj jeden z przykładów serwera i potwierdź cały proces przez release:check oraz smoke test z publicznej sieci.'
+        en: 'Use the checklist as a deployment gate, adapt one server example, and verify the complete process with release:check and a smoke test from the public network.'
+      button_label:
+        pl: 'Zobacz repozytorium'
+        en: 'View the repository'
+      button_url:
+        pl: 'https://github.com/mwojczewski/FlatFileCMS'
+        en: 'https://github.com/mwojczewski/FlatFileCMS'
