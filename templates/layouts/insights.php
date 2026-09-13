@@ -103,16 +103,7 @@ $documentHead = static function (): void {
     <?php
 };
 
-$documentBody = static function () use (
-    $context,
-    $navigation,
-    $localizedUrls,
-    $collection,
-    $items,
-    $pagination,
-    $queryUrl,
-    $locale,
-): void {
+$documentBody = static function () use ($context, $navigation, $localizedUrls, $collection, $items, $pagination, $queryUrl, $locale, ): void {
     ?>
     <?= $context->partial('navigation', ['menus' => $navigation, 'localizedUrls' => $localizedUrls]) ?>
     <main id="main-content" class="insights">
@@ -130,7 +121,10 @@ $documentBody = static function () use (
                 <p><?= $locale === 'pl' ? 'Brak artykułów.' : 'No articles found.' ?></p>
             <?php else: ?>
                 <?php foreach ($items as $index => $item): ?>
-                    <article><span>0<?= $context->escape((string) ($index + 1)) ?></span>
+                    <article>
+                        <span>
+                            <?= str_pad($context->escape($item['attributes']['order'] + 1) ?? $context->escape((string) ($index + 1)), 2, "0", STR_PAD_LEFT) ?>
+                        </span>
                         <div>
                             <p>ENGINEERING NOTE</p>
                             <h2><a href="<?= $context->escape($item['url']) ?>"><?= $context->escape($item['title']) ?></a></h2>

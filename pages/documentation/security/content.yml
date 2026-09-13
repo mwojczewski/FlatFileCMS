@@ -8,7 +8,7 @@ title:
   pl: 'Bezpieczeństwo — granice zaufania od requestu do systemu plików'
   en: 'Security — trust boundaries from request to filesystem'
 date: '2026-09-12'
-order: 7
+order: 6
 category: security
 excerpt:
   pl: 'Techniczny przewodnik po modelu bezpieczeństwa FlatFile CMS — produkcyjnym bootstrapie, proxy, sesjach, CSRF, hasłach, WebAuthn, walidacji, bezpiecznym systemie plików, cache i diagnostyce.'

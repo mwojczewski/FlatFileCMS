@@ -9,15 +9,7 @@ $queryUrl = static function (int $page) use ($collection, $filters): string {
 };
 
 $documentLocale = $collection['locale'];
-$documentBody = static function () use (
-    $context,
-    $navigation,
-    $localizedUrls,
-    $collection,
-    $items,
-    $pagination,
-    $queryUrl,
-): void {
+$documentBody = static function () use ($context, $navigation, $localizedUrls, $collection, $items, $pagination, $queryUrl, ): void {
     ?>
     <?= $context->partial('navigation', ['menus' => $navigation, 'localizedUrls' => $localizedUrls]) ?>
     <main id="main-content" class="collection container">

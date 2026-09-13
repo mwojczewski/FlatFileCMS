@@ -26,7 +26,8 @@ final readonly class CollectionRepository
         private YamlFileRepository $yaml,
         private SafePathResolver $paths,
         private ?ContentFileIndex $index = null,
-    ) {}
+    ) {
+    }
 
     /** @return list<Collection> */
     public function all(LanguageConfig $languages): array
@@ -74,7 +75,7 @@ final readonly class CollectionRepository
         try {
             $document = $this->yaml->read(FilesystemRoot::Pages, $relativePath);
             $directory = \dirname($this->paths->resolve(FilesystemRoot::Pages, $relativePath, mustExist: true));
-            if (is_file($directory . '/content.yml') || is_link($directory . '/content.yml')) {
+            if (is_file("{$directory}/content.yml") || is_link("{$directory}/content.yml")) {
                 throw new InvalidArgumentException('A directory cannot be both a page and a collection.');
             }
 
@@ -175,11 +176,11 @@ final readonly class CollectionRepository
         $mapping = ContentData::map($value, $field);
         $fallback = ContentData::string(
             $mapping[$languages->default()] ?? null,
-            $field . '.' . $languages->default(),
+            "{$field}.{$languages->default()}",
         );
         $localized = [];
         foreach ($languages->codes() as $locale) {
-            $localized[$locale] = ContentData::string($mapping[$locale] ?? $fallback, $field . '.' . $locale);
+            $localized[$locale] = ContentData::string($mapping[$locale] ?? $fallback, "{$field}.{$locale}");
         }
 
         return $localized;

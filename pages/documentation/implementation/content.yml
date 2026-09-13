@@ -8,7 +8,7 @@ title:
   pl: 'Wdrożenie — od artefaktu release do bezpiecznego rollbacku'
   en: 'Deployment — from release artifact to safe rollback'
 date: '2026-09-13'
-order: 8
+order: 7
 category: deployment
 excerpt:
   pl: 'Praktyczny przewodnik po produkcyjnym wdrożeniu FlatFile CMS — artefakcie, środowisku, PHP-FPM, serwerze WWW, uprawnieniach, migracjach, preflight, smoke testach, backupie i rollbacku.'
