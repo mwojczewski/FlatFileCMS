@@ -5,45 +5,49 @@ slug:
   pl: od-yaml-do-html
   en: from-yaml-to-html
 title:
-  pl: Od YAML do HTML - jedna ścieżka, dwa interfejsy
-  en: From YAML to HTML - one path, two interfaces
-date: "2026-08-31"
+  pl: 'Od YAML do HTML - jedna ścieżka, dwa interfejsy'
+  en: 'From YAML to HTML - one path, two interfaces'
+date: '2026-08-31'
 category: architecture
 excerpt:
-  pl: Jak wspólny ViewModel zasila SSR i REST API bez synchronizacji oraz powielania logiki.
-  en: How a shared ViewModel powers SSR and the REST API without synchronization or duplicated logic.
+  pl: 'Jak wspólny ViewModel zasila SSR i REST API bez synchronizacji oraz powielania logiki.'
+  en: 'How a shared ViewModel powers SSR and the REST API without synchronization or duplicated logic.'
 seo:
   title:
-    pl: Od YAML do HTML - architektura renderowania FlatFile CMS
-    en: From YAML to HTML - the FlatFile CMS rendering architecture
+    pl: 'Od YAML do HTML - architektura renderowania FlatFile CMS'
+    en: 'From YAML to HTML - the FlatFile CMS rendering architecture'
   description:
-    pl: Poznaj drogę treści od pliku YAML przez walidację bloków do HTML i REST API.
-    en: Follow content from a YAML file through block validation to HTML and the REST API.
+    pl: 'Poznaj drogę treści od pliku YAML przez walidację bloków do HTML i REST API.'
+    en: 'Follow content from a YAML file through block validation to HTML and the REST API.'
 blocks:
-  - id: 01a05820-2111-7101-8101-000000000001
+  -
+    id: 01a08c8e-c9a5-761f-b8d4-4181234c4255
+    type: page-progressbar
+    enabled: true
+    data:
+      accent: mint
+  -
+    id: 01a05820-2111-7101-8101-000000000001
     type: article-hero
     enabled: true
     data:
-      category: { pl: Architektura, en: Architecture }
-      date: "2026-08-31"
+      category:
+        pl: Architektura
+        en: Architecture
+      date: '2026-08-31'
       title:
-        {
-          pl: "Od YAML do HTML: jedna ścieżka, dwa interfejsy",
-          en: "From YAML to HTML: one path, two interfaces",
-        }
+        pl: 'Od YAML do HTML: jedna ścieżka, dwa interfejsy'
+        en: 'From YAML to HTML: one path, two interfaces'
       lead:
-        {
-          pl: "FlatFile CMS nie zmusza HTML i API do udawania, że są tym samym. Łączy je wcześniej - na poziomie poprawnie złożonego modelu strony.",
-          en: "FlatFile CMS does not force HTML and the API to pretend they are the same. It connects them earlier - through a correctly assembled page model.",
-        }
+        pl: 'FlatFile CMS nie zmusza HTML i API do udawania, że są tym samym. Łączy je wcześniej - na poziomie poprawnie złożonego modelu strony.'
+        en: 'FlatFile CMS does not force HTML and the API to pretend they are the same. It connects them earlier - through a correctly assembled page model.'
       image:
         src: cover.png
         alt:
-          {
-            pl: "Abstrakcyjny przepływ treści przez silnik PHP do gotowej strony",
-            en: "An abstract content flow through the PHP engine into a finished page",
-          }
-  - id: 01a05820-2111-7102-8102-000000000002
+          pl: 'Abstrakcyjny przepływ treści przez silnik PHP do gotowej strony'
+          en: 'An abstract content flow through the PHP engine into a finished page'
+  -
+    id: 01a05820-2111-7102-8102-000000000002
     type: article-content
     enabled: true
     data:
@@ -93,27 +97,24 @@ blocks:
 
           A new component therefore remains a local change: a YAML schema, PHP and optional CSS or JavaScript.
       note:
-        pl: Granica między modelem a adapterem pozwala rozwijać stronę i API niezależnie, bez rozjazdu danych.
-        en: The boundary between the model and its adapters lets the website and API evolve independently without data drift.
-  - id: 01a05820-2111-7103-8103-000000000003
+        pl: 'Granica między modelem a adapterem pozwala rozwijać stronę i API niezależnie, bez rozjazdu danych.'
+        en: 'The boundary between the model and its adapters lets the website and API evolve independently without data drift.'
+  -
+    id: 01a05820-2111-7103-8103-000000000003
     type: article-gallery
     enabled: true
     data:
       title:
-        {
-          pl: "Treść przepływa, ale pozostaje spójna",
-          en: "Content flows while remaining consistent",
-        }
+        pl: 'Treść przepływa, ale pozostaje spójna'
+        en: 'Content flows while remaining consistent'
       images:
-        - image:
+        -
+          image:
             src: cover.png
             alt:
-              {
-                pl: "Wizualizacja dokumentów, silnika i interfejsu strony",
-                en: "A visualization of documents, the engine and a website interface",
-              }
+              pl: 'Wizualizacja dokumentów, silnika i interfejsu strony'
+              en: 'A visualization of documents, the engine and a website interface'
           caption:
-            {
-              pl: "Jeden model treści zasila dwa niezależne adaptery wyjściowe.",
-              en: "One content model powers two independent output adapters.",
-            }
+            pl: 'Jeden model treści zasila dwa niezależne adaptery wyjściowe.'
+            en: 'One content model powers two independent output adapters.'
+order: 1

@@ -191,7 +191,9 @@ $enabledCount = count(array_filter($blocks, static fn(array $block): bool => $bl
                     <button type="button" data-inspector-tab="visibility" role="tab"
                         aria-selected="false">Widoczność</button>
                 </nav>
-                <?= $block['fields'] ?>
+                <div class="block-inspector-fields block-panel-fields" data-block-panel-fields="content">
+                    <?= $block['fields'] ?>
+                </div>
                 <div class="block-inspector-fields block-panel-fields block-visibility-panel"
                     data-block-panel-fields="visibility" hidden>
                     <div class="field">

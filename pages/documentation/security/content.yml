@@ -5,242 +5,302 @@ slug:
   pl: bezpieczenstwo
   en: security
 title:
-  pl: Bezpieczeństwo — granice zaufania od requestu do systemu plików
-  en: Security — trust boundaries from request to filesystem
-date: "2026-09-12"
+  pl: 'Bezpieczeństwo — granice zaufania od requestu do systemu plików'
+  en: 'Security — trust boundaries from request to filesystem'
+date: '2026-09-12'
 order: 7
 category: security
 excerpt:
-  pl: Techniczny przewodnik po modelu bezpieczeństwa FlatFile CMS — produkcyjnym bootstrapie, proxy, sesjach, CSRF, hasłach, WebAuthn, walidacji, bezpiecznym systemie plików, cache i diagnostyce.
-  en: A technical guide to the FlatFile CMS security model — production bootstrap, proxies, sessions, CSRF, passwords, WebAuthn, validation, safe filesystem access, caching and diagnostics.
+  pl: 'Techniczny przewodnik po modelu bezpieczeństwa FlatFile CMS — produkcyjnym bootstrapie, proxy, sesjach, CSRF, hasłach, WebAuthn, walidacji, bezpiecznym systemie plików, cache i diagnostyce.'
+  en: 'A technical guide to the FlatFile CMS security model — production bootstrap, proxies, sessions, CSRF, passwords, WebAuthn, validation, safe filesystem access, caching and diagnostics.'
 seo:
   title:
-    pl: Bezpieczeństwo FlatFile CMS — kompletny tutorial
-    en: FlatFile CMS security — complete tutorial
+    pl: 'Bezpieczeństwo FlatFile CMS — kompletny tutorial'
+    en: 'FlatFile CMS security — complete tutorial'
   description:
-    pl: Poznaj granice zaufania CMS-a, ochronę panelu, WebAuthn, bezpieczne ścieżki, YAML, zapisy atomowe, sekrety, proxy i procedurę hardeningu.
-    en: Learn CMS trust boundaries, admin protection, WebAuthn, safe paths, YAML, atomic writes, secrets, proxies and the hardening procedure.
-  robots: { index: true, follow: true }
+    pl: 'Poznaj granice zaufania CMS-a, ochronę panelu, WebAuthn, bezpieczne ścieżki, YAML, zapisy atomowe, sekrety, proxy i procedurę hardeningu.'
+    en: 'Learn CMS trust boundaries, admin protection, WebAuthn, safe paths, YAML, atomic writes, secrets, proxies and the hardening procedure.'
+  robots:
+    index: true
+    follow: true
   openGraph: {}
   twitter: {}
   jsonLd:
-    "@context": https://schema.org
-    "@type": TechArticle
-    headline: FlatFile CMS security — trust boundaries from request to filesystem
-    dateModified: "2026-09-12"
+    '@context': 'https://schema.org'
+    '@type': TechArticle
+    headline: 'FlatFile CMS security — trust boundaries from request to filesystem'
+    dateModified: '2026-09-12'
 blocks:
-  - id: 01a06d50-7007-7701-8701-000000000001
+  -
+    id: 01a09766-045e-799e-92f8-a073b13ba512
+    type: page-progressbar
+    enabled: true
+    data:
+      accent: mint
+  -
+    id: 01a06d50-7007-7701-8701-000000000001
     type: docs-hero
     enabled: true
     data:
       breadcrumb:
-        {
-          pl: Dokumentacja / 07 / Bezpieczeństwo,
-          en: Documentation / 07 / Security,
-        }
+        pl: 'Dokumentacja / 07 / Bezpieczeństwo'
+        en: 'Documentation / 07 / Security'
       title:
-        pl: Bezpieczeństwo — od requestu do systemu plików
-        en: Security — from request to filesystem
+        pl: 'Bezpieczeństwo — od requestu do systemu plików'
+        en: 'Security — from request to filesystem'
       lead:
-        pl: Zobacz, jak kolejne warstwy ograniczają zaufanie do sieci, sesji, danych formularza, YAML-a, nazw ścieżek i cache — oraz gdzie kończą się gwarancje aplikacji.
-        en: See how successive layers limit trust in the network, session, form data, YAML, path names and cache—and where application guarantees end.
+        pl: 'Zobacz, jak kolejne warstwy ograniczają zaufanie do sieci, sesji, danych formularza, YAML-a, nazw ścieżek i cache — oraz gdzie kończą się gwarancje aplikacji.'
+        en: 'See how successive layers limit trust in the network, session, form data, YAML, path names and cache—and where application guarantees end.'
       level: zaawansowany
-      reading_time: { pl: około 50 minut, en: about 50 minutes }
-      updated: "2026-09-12"
+      reading_time:
+        pl: 'około 50 minut'
+        en: 'about 50 minutes'
+      updated: '2026-09-12'
       topics:
-        - label: { pl: Granice zaufania, en: Trust boundaries }
-        - label: { pl: Sesje i CSRF, en: Sessions and CSRF }
-        - label: { pl: WebAuthn, en: WebAuthn }
-        - label: { pl: Bezpieczny YAML, en: Safe YAML }
-        - label: { pl: System plików, en: Filesystem }
-        - label: { pl: Hardening, en: Hardening }
-  - id: 01a06d50-7007-7702-8702-000000000002
+        -
+          label:
+            pl: 'Granice zaufania'
+            en: 'Trust boundaries'
+        -
+          label:
+            pl: 'Sesje i CSRF'
+            en: 'Sessions and CSRF'
+        -
+          label:
+            pl: WebAuthn
+            en: WebAuthn
+        -
+          label:
+            pl: 'Bezpieczny YAML'
+            en: 'Safe YAML'
+        -
+          label:
+            pl: 'System plików'
+            en: Filesystem
+        -
+          label:
+            pl: Hardening
+            en: Hardening
+  -
+    id: 01a06d50-7007-7702-8702-000000000002
     type: docs-toc
     enabled: true
     data:
-      title: { pl: Mapa granic bezpieczeństwa, en: Security boundary map }
+      title:
+        pl: 'Mapa granic bezpieczeństwa'
+        en: 'Security boundary map'
       intro:
-        pl: Bezpieczeństwo nie jest pojedynczym filtrem. Prześledzimy kontrolę od środowiska i proxy, przez tożsamość administratora, aż do atomowego zapisu i publicznej odpowiedzi.
-        en: Security is not one filter. We trace controls from environment and proxy through administrator identity to atomic storage and the public response.
+        pl: 'Bezpieczeństwo nie jest pojedynczym filtrem. Prześledzimy kontrolę od środowiska i proxy, przez tożsamość administratora, aż do atomowego zapisu i publicznej odpowiedzi.'
+        en: 'Security is not one filter. We trace controls from environment and proxy through administrator identity to atomic storage and the public response.'
       items:
-        - number: "01"
-          title: { pl: Model zagrożeń, en: Threat model }
+        -
+          number: '01'
+          title:
+            pl: 'Model zagrożeń'
+            en: 'Threat model'
           description:
-            {
-              pl: "Aktywa, granice i odpowiedzialność operatora.",
-              en: "Assets, boundaries and operator responsibility.",
-            }
+            pl: 'Aktywa, granice i odpowiedzialność operatora.'
+            en: 'Assets, boundaries and operator responsibility.'
           url:
-            {
-              pl: /pl/dokumentacja/bezpieczenstwo#model-zagrozen,
-              en: /en/documentation/security#model-zagrozen,
-            }
-        - number: "02"
-          title: { pl: Bootstrap i proxy, en: Bootstrap and proxy }
+            pl: '/pl/dokumentacja/bezpieczenstwo#model-zagrozen'
+            en: '/en/documentation/security#model-zagrozen'
+        -
+          number: '02'
+          title:
+            pl: 'Bootstrap i proxy'
+            en: 'Bootstrap and proxy'
           description:
-            {
-              pl: Produkcyjne guardy i wiarygodny adres klienta.,
-              en: Production guards and trustworthy client IP.,
-            }
+            pl: 'Produkcyjne guardy i wiarygodny adres klienta.'
+            en: 'Production guards and trustworthy client IP.'
           url:
-            {
-              pl: /pl/dokumentacja/bezpieczenstwo#bootstrap,
-              en: /en/documentation/security#bootstrap,
-            }
-        - number: "03"
-          title: { pl: Uwierzytelnianie, en: Authentication }
+            pl: '/pl/dokumentacja/bezpieczenstwo#bootstrap'
+            en: '/en/documentation/security#bootstrap'
+        -
+          number: '03'
+          title:
+            pl: Uwierzytelnianie
+            en: Authentication
           description:
-            {
-              pl: "Hasła, role, sesje i limity prób.",
-              en: "Passwords, roles, sessions and attempt limits.",
-            }
+            pl: 'Hasła, role, sesje i limity prób.'
+            en: 'Passwords, roles, sessions and attempt limits.'
           url:
-            {
-              pl: /pl/dokumentacja/bezpieczenstwo#uwierzytelnianie,
-              en: /en/documentation/security#uwierzytelnianie,
-            }
-        - number: "04"
-          title: { pl: CSRF i WebAuthn, en: CSRF and WebAuthn }
+            pl: '/pl/dokumentacja/bezpieczenstwo#uwierzytelnianie'
+            en: '/en/documentation/security#uwierzytelnianie'
+        -
+          number: '04'
+          title:
+            pl: 'CSRF i WebAuthn'
+            en: 'CSRF and WebAuthn'
           description:
-            {
-              pl: Ochrona mutacji i drugi składnik.,
-              en: Mutation protection and a second factor.,
-            }
+            pl: 'Ochrona mutacji i drugi składnik.'
+            en: 'Mutation protection and a second factor.'
           url:
-            {
-              pl: /pl/dokumentacja/bezpieczenstwo#csrf-webauthn,
-              en: /en/documentation/security#csrf-webauthn,
-            }
-        - number: "05"
-          title: { pl: Walidacja danych, en: Data validation }
+            pl: '/pl/dokumentacja/bezpieczenstwo#csrf-webauthn'
+            en: '/en/documentation/security#csrf-webauthn'
+        -
+          number: '05'
+          title:
+            pl: 'Walidacja danych'
+            en: 'Data validation'
           description:
-            {
-              pl: Kontrakty od requestu po bloki.,
-              en: Contracts from request through blocks.,
-            }
+            pl: 'Kontrakty od requestu po bloki.'
+            en: 'Contracts from request through blocks.'
           url:
-            {
-              pl: /pl/dokumentacja/bezpieczenstwo#walidacja,
-              en: /en/documentation/security#walidacja,
-            }
-        - number: "06"
-          title: { pl: System plików i YAML, en: Filesystem and YAML }
+            pl: '/pl/dokumentacja/bezpieczenstwo#walidacja'
+            en: '/en/documentation/security#walidacja'
+        -
+          number: '06'
+          title:
+            pl: 'System plików i YAML'
+            en: 'Filesystem and YAML'
           description:
-            {
-              pl: "Dozwolone korzenie, ścieżki i parser.",
-              en: "Allowed roots, paths and parser.",
-            }
+            pl: 'Dozwolone korzenie, ścieżki i parser.'
+            en: 'Allowed roots, paths and parser.'
           url:
-            {
-              pl: /pl/dokumentacja/bezpieczenstwo#filesystem,
-              en: /en/documentation/security#filesystem,
-            }
-        - number: "07"
-          title: { pl: Zapis i cache, en: Writes and cache }
+            pl: '/pl/dokumentacja/bezpieczenstwo#filesystem'
+            en: '/en/documentation/security#filesystem'
+        -
+          number: '07'
+          title:
+            pl: 'Zapis i cache'
+            en: 'Writes and cache'
           description:
-            {
-              pl: "Rewizje, blokady, atomowość i generacje.",
-              en: "Revisions, locks, atomicity and generations.",
-            }
+            pl: 'Rewizje, blokady, atomowość i generacje.'
+            en: 'Revisions, locks, atomicity and generations.'
           url:
-            {
-              pl: /pl/dokumentacja/bezpieczenstwo#zapis-cache,
-              en: /en/documentation/security#zapis-cache,
-            }
-        - number: "08"
-          title: { pl: Hardening, en: Hardening }
+            pl: '/pl/dokumentacja/bezpieczenstwo#zapis-cache'
+            en: '/en/documentation/security#zapis-cache'
+        -
+          number: '08'
+          title:
+            pl: Hardening
+            en: Hardening
           description:
-            {
-              pl: Wdrożenie i diagnostyka bez wycieku danych.,
-              en: Deployment and diagnostics without data leaks.,
-            }
+            pl: 'Wdrożenie i diagnostyka bez wycieku danych.'
+            en: 'Deployment and diagnostics without data leaks.'
           url:
-            {
-              pl: /pl/dokumentacja/bezpieczenstwo#hardening,
-              en: /en/documentation/security#hardening,
-            }
-  - id: 01a06d50-7007-7703-8703-000000000003
+            pl: '/pl/dokumentacja/bezpieczenstwo#hardening'
+            en: '/en/documentation/security#hardening'
+  -
+    id: 01a06d50-7007-7703-8703-000000000003
     type: technical-table
     enabled: true
     data:
-      eyebrow: { pl: Obrona warstwowa, en: Defense in depth }
+      eyebrow:
+        pl: 'Obrona warstwowa'
+        en: 'Defense in depth'
       title:
-        {
-          pl: Każda granica ufa mniejszej liczbie danych.,
-          en: Every boundary trusts fewer inputs.,
-        }
+        pl: 'Każda granica ufa mniejszej liczbie danych.'
+        en: 'Every boundary trusts fewer inputs.'
       intro:
-        pl: Kontrola na jednej warstwie nie usprawiedliwia pominięcia następnej. Walidacja formularza, bezpieczna ścieżka i zapis atomowy rozwiązują różne klasy problemów.
-        en: A control at one layer does not justify skipping the next. Form validation, safe path resolution and atomic writing solve different problem classes.
-      column_1: { pl: Granica, en: Boundary }
-      column_2: { pl: Dane niezaufane, en: Untrusted input }
-      column_3: { pl: Kontrola, en: Control }
-      column_4: { pl: Chronione aktywo, en: Protected asset }
+        pl: 'Kontrola na jednej warstwie nie usprawiedliwia pominięcia następnej. Walidacja formularza, bezpieczna ścieżka i zapis atomowy rozwiązują różne klasy problemów.'
+        en: 'A control at one layer does not justify skipping the next. Form validation, safe path resolution and atomic writing solve different problem classes.'
+      column_1:
+        pl: Granica
+        en: Boundary
+      column_2:
+        pl: 'Dane niezaufane'
+        en: 'Untrusted input'
+      column_3:
+        pl: Kontrola
+        en: Control
+      column_4:
+        pl: 'Chronione aktywo'
+        en: 'Protected asset'
       rows:
-        - cell_1: { pl: Sieć, en: Network }
+        -
+          cell_1:
+            pl: Sieć
+            en: Network
           cell_2:
-            {
-              pl: "Metoda, path, nagłówki i IP",
-              en: "Method, path, headers and IP",
-            }
+            pl: 'Metoda, path, nagłówki i IP'
+            en: 'Method, path, headers and IP'
           cell_3:
-            {
-              pl: "Router, limity i trusted proxies",
-              en: "Router, limits and trusted proxies",
-            }
-          cell_4: { pl: Dostępność i audyt, en: Availability and audit }
-        - cell_1: { pl: Sesja, en: Session }
-          cell_2: { pl: Cookie i stan logowania, en: Cookie and login state }
-          cell_3:
-            {
-              pl: "Strict mode, HttpOnly, Secure, SameSite i expiry",
-              en: "Strict mode, HttpOnly, Secure, SameSite and expiry",
-            }
-          cell_4: { pl: Tożsamość administratora, en: Administrator identity }
-        - cell_1: { pl: Mutacja, en: Mutation }
+            pl: 'Router, limity i trusted proxies'
+            en: 'Router, limits and trusted proxies'
+          cell_4:
+            pl: 'Dostępność i audyt'
+            en: 'Availability and audit'
+        -
+          cell_1:
+            pl: Sesja
+            en: Session
           cell_2:
-            { pl: Pola POST i identyfikatory, en: POST fields and identifiers }
+            pl: 'Cookie i stan logowania'
+            en: 'Cookie and login state'
           cell_3:
-            {
-              pl: "CSRF, role i walidacja domenowa",
-              en: "CSRF, roles and domain validation",
-            }
-          cell_4: { pl: Treść i ustawienia, en: Content and settings }
-        - cell_1: { pl: Model treści, en: Content model }
-          cell_2: { pl: YAML i dane bloków, en: YAML and block data }
-          cell_3:
-            {
-              pl: "Limity parsera, schematy i lokalizacja",
-              en: "Parser limits, schemas and localization",
-            }
+            pl: 'Strict mode, HttpOnly, Secure, SameSite i expiry'
+            en: 'Strict mode, HttpOnly, Secure, SameSite and expiry'
           cell_4:
-            { pl: Integralność reprezentacji, en: Representation integrity }
-        - cell_1: { pl: System plików, en: Filesystem }
-          cell_2: { pl: Korzeń i ścieżka relatywna, en: Root and relative path }
+            pl: 'Tożsamość administratora'
+            en: 'Administrator identity'
+        -
+          cell_1:
+            pl: Mutacja
+            en: Mutation
+          cell_2:
+            pl: 'Pola POST i identyfikatory'
+            en: 'POST fields and identifiers'
           cell_3:
-            {
-              pl: "Enum korzeni, segmenty i realpath",
-              en: "Root enum, segments and realpath",
-            }
-          cell_4: { pl: Pliki spoza CMS-a, en: Files outside the CMS }
-        - cell_1: { pl: Współbieżność, en: Concurrency }
-          cell_2: { pl: Oczekiwana rewizja, en: Expected revision }
-          cell_3:
-            {
-              pl: "Blokada, SHA-256, fsync i rename",
-              en: "Lock, SHA-256, fsync and rename",
-            }
-          cell_4: { pl: Spójność zapisu, en: Write integrity }
-        - cell_1: { pl: Odpowiedź, en: Response }
-          cell_2: { pl: HTML i błędy, en: HTML and errors }
-          cell_3:
-            {
-              pl: "Escaping, CSP, no-store i redakcja debug",
-              en: "Escaping, CSP, no-store and debug redaction",
-            }
+            pl: 'CSRF, role i walidacja domenowa'
+            en: 'CSRF, roles and domain validation'
           cell_4:
-            { pl: Przeglądarka i dane operatora, en: Browser and operator data }
-  - id: 01a06d50-7007-7704-8704-000000000004
+            pl: 'Treść i ustawienia'
+            en: 'Content and settings'
+        -
+          cell_1:
+            pl: 'Model treści'
+            en: 'Content model'
+          cell_2:
+            pl: 'YAML i dane bloków'
+            en: 'YAML and block data'
+          cell_3:
+            pl: 'Limity parsera, schematy i lokalizacja'
+            en: 'Parser limits, schemas and localization'
+          cell_4:
+            pl: 'Integralność reprezentacji'
+            en: 'Representation integrity'
+        -
+          cell_1:
+            pl: 'System plików'
+            en: Filesystem
+          cell_2:
+            pl: 'Korzeń i ścieżka relatywna'
+            en: 'Root and relative path'
+          cell_3:
+            pl: 'Enum korzeni, segmenty i realpath'
+            en: 'Root enum, segments and realpath'
+          cell_4:
+            pl: 'Pliki spoza CMS-a'
+            en: 'Files outside the CMS'
+        -
+          cell_1:
+            pl: Współbieżność
+            en: Concurrency
+          cell_2:
+            pl: 'Oczekiwana rewizja'
+            en: 'Expected revision'
+          cell_3:
+            pl: 'Blokada, SHA-256, fsync i rename'
+            en: 'Lock, SHA-256, fsync and rename'
+          cell_4:
+            pl: 'Spójność zapisu'
+            en: 'Write integrity'
+        -
+          cell_1:
+            pl: Odpowiedź
+            en: Response
+          cell_2:
+            pl: 'HTML i błędy'
+            en: 'HTML and errors'
+          cell_3:
+            pl: 'Escaping, CSP, no-store i redakcja debug'
+            en: 'Escaping, CSP, no-store and debug redaction'
+          cell_4:
+            pl: 'Przeglądarka i dane operatora'
+            en: 'Browser and operator data'
+  -
+    id: 01a06d50-7007-7704-8704-000000000004
     type: article-content
     enabled: true
     data:
@@ -283,9 +343,13 @@ blocks:
 
           Defense in depth means compromising one mechanism should not automatically grant everything. A stolen cookie is limited by session timeouts and a second factor at login; a form defect is constrained by domain and filesystem validation; exposed public YAML cannot leak secrets because secrets do not belong in YAML.
       note:
-        pl: Bez modelu zagrożeń łatwo nazwać bezpieczeństwem dowolny pojedynczy nagłówek. Najpierw określ aktywo, aktora, granicę i skutek naruszenia.
-        en: Without a threat model any single header can be called security. First identify the asset, actor, boundary and breach impact.
-  - id: 01a06d50-7007-7705-8705-000000000005
+        pl: 'Bez modelu zagrożeń łatwo nazwać bezpieczeństwem dowolny pojedynczy nagłówek. Najpierw określ aktywo, aktora, granicę i skutek naruszenia.'
+        en: 'Without a threat model any single header can be called security. First identify the asset, actor, boundary and breach impact.'
+      bookmarkDescription:
+        pl: 'Model zagrożeń'
+        en: 'Threat model'
+  -
+    id: 01a06d50-7007-7705-8705-000000000005
     type: article-content
     enabled: true
     data:
@@ -346,77 +410,131 @@ blocks:
 
           PHP upload_max_filesize and post_max_size must accommodate allowed uploads, but the server still needs a finite request limit. A larger transport limit does not change media.maxUploadBytes—the file must pass both levels.
       note:
-        pl: release:check weryfikuje guardy środowiska, ale nie potwierdzi zewnętrznej reguły firewalla ani aktualności zakresów Cloudflare.
-        en: release:check verifies environment guards but cannot prove an external firewall rule or current Cloudflare ranges.
-  - id: 01a06d50-7007-7706-8706-000000000006
+        pl: 'release:check weryfikuje guardy środowiska, ale nie potwierdzi zewnętrznej reguły firewalla ani aktualności zakresów Cloudflare.'
+        en: 'release:check verifies environment guards but cannot prove an external firewall rule or current Cloudflare ranges.'
+      bookmarkDescription:
+        pl: 'Bootstrap i proxy'
+        en: 'Bootstrap and proxy'
+  -
+    id: 01a06d50-7007-7706-8706-000000000006
     type: technical-table
     enabled: true
     data:
-      eyebrow: { pl: Sesja administratora, en: Administrator session }
+      eyebrow:
+        pl: 'Sesja administratora'
+        en: 'Administrator session'
       title:
-        {
-          pl: Cookie jest tylko identyfikatorem ograniczonego stanu serwerowego.,
-          en: A cookie is only an identifier for bounded server-side state.,
-        }
+        pl: 'Cookie jest tylko identyfikatorem ograniczonego stanu serwerowego.'
+        en: 'A cookie is only an identifier for bounded server-side state.'
       intro:
-        pl: NativeSessionStore i Authenticator nakładają niezależne zabezpieczenia na transport, identyfikator sesji oraz czas uwierzytelnienia.
-        en: NativeSessionStore and Authenticator apply independent controls to transport, session identity and authentication time.
-      column_1: { pl: Mechanizm, en: Mechanism }
-      column_2: { pl: Ustawienie, en: Setting }
-      column_3: { pl: Chroni przed, en: Protects against }
-      column_4: { pl: Uwaga, en: Note }
+        pl: 'NativeSessionStore i Authenticator nakładają niezależne zabezpieczenia na transport, identyfikator sesji oraz czas uwierzytelnienia.'
+        en: 'NativeSessionStore and Authenticator apply independent controls to transport, session identity and authentication time.'
+      column_1:
+        pl: Mechanizm
+        en: Mechanism
+      column_2:
+        pl: Ustawienie
+        en: Setting
+      column_3:
+        pl: 'Chroni przed'
+        en: 'Protects against'
+      column_4:
+        pl: Uwaga
+        en: Note
       rows:
-        - cell_1: { pl: Secure, en: Secure }
-          cell_2: { pl: Wymagane w produkcji, en: Required in production }
-          cell_3:
-            { pl: Wysłaniem cookie po HTTP, en: Sending the cookie over HTTP }
-          cell_4: { pl: Produkcja wymaga HTTPS, en: Production requires HTTPS }
-        - cell_1: { pl: HttpOnly, en: HttpOnly }
-          cell_2: { pl: Wymuszone w kodzie, en: Enforced in code }
-          cell_3:
-            {
-              pl: Odczytem cookie przez JavaScript,
-              en: Cookie reads from JavaScript,
-            }
-          cell_4: { pl: Nie jest przełącznikiem, en: Not configurable }
-        - cell_1: { pl: SameSite, en: SameSite }
-          cell_2: { pl: Lax albo Strict, en: Lax or Strict }
-          cell_3: { pl: Częścią żądań cross-site, en: Some cross-site requests }
-          cell_4: { pl: Nie zastępuje CSRF, en: Does not replace CSRF }
-        - cell_1: { pl: Strict mode, en: Strict mode }
+        -
+          cell_1:
+            pl: Secure
+            en: Secure
           cell_2:
-            { pl: session.use_strict_mode=1, en: session.use_strict_mode=1 }
-          cell_3: { pl: Przyjęciem nieznanego ID, en: Accepting an unknown ID }
-          cell_4: { pl: Tylko cookies, en: Cookies only }
-        - cell_1: { pl: Regeneracja, en: Regeneration }
-          cell_2:
-            {
-              pl: Po pełnym logowaniu i zmianie hasła,
-              en: After complete login and password change,
-            }
-          cell_3: { pl: Session fixation, en: Session fixation }
-          cell_4: { pl: Stary ID jest usuwany, en: Old ID is deleted }
-        - cell_1: { pl: Idle lifetime, en: Idle lifetime }
-          cell_2: { pl: Ostatnia aktywność, en: Last activity }
+            pl: 'Wymagane w produkcji'
+            en: 'Required in production'
           cell_3:
-            {
-              pl: Długim użyciem porzuconej sesji,
-              en: Long use of an abandoned session,
-            }
+            pl: 'Wysłaniem cookie po HTTP'
+            en: 'Sending the cookie over HTTP'
           cell_4:
-            {
-              pl: Aktualizacja maksymalnie raz na minutę,
-              en: Updated at most once per minute,
-            }
-        - cell_1: { pl: Absolute lifetime, en: Absolute lifetime }
-          cell_2: { pl: Czas od logowania, en: Time since login }
+            pl: 'Produkcja wymaga HTTPS'
+            en: 'Production requires HTTPS'
+        -
+          cell_1:
+            pl: HttpOnly
+            en: HttpOnly
+          cell_2:
+            pl: 'Wymuszone w kodzie'
+            en: 'Enforced in code'
           cell_3:
-            {
-              pl: Nieskończonym przedłużaniem aktywnością,
-              en: Endless activity extension,
-            }
-          cell_4: { pl: Wymaga ponownego loginu, en: Requires a new login }
-  - id: 01a06d50-7007-7707-8707-000000000007
+            pl: 'Odczytem cookie przez JavaScript'
+            en: 'Cookie reads from JavaScript'
+          cell_4:
+            pl: 'Nie jest przełącznikiem'
+            en: 'Not configurable'
+        -
+          cell_1:
+            pl: SameSite
+            en: SameSite
+          cell_2:
+            pl: 'Lax albo Strict'
+            en: 'Lax or Strict'
+          cell_3:
+            pl: 'Częścią żądań cross-site'
+            en: 'Some cross-site requests'
+          cell_4:
+            pl: 'Nie zastępuje CSRF'
+            en: 'Does not replace CSRF'
+        -
+          cell_1:
+            pl: 'Strict mode'
+            en: 'Strict mode'
+          cell_2:
+            pl: session.use_strict_mode=1
+            en: session.use_strict_mode=1
+          cell_3:
+            pl: 'Przyjęciem nieznanego ID'
+            en: 'Accepting an unknown ID'
+          cell_4:
+            pl: 'Tylko cookies'
+            en: 'Cookies only'
+        -
+          cell_1:
+            pl: Regeneracja
+            en: Regeneration
+          cell_2:
+            pl: 'Po pełnym logowaniu i zmianie hasła'
+            en: 'After complete login and password change'
+          cell_3:
+            pl: 'Session fixation'
+            en: 'Session fixation'
+          cell_4:
+            pl: 'Stary ID jest usuwany'
+            en: 'Old ID is deleted'
+        -
+          cell_1:
+            pl: 'Idle lifetime'
+            en: 'Idle lifetime'
+          cell_2:
+            pl: 'Ostatnia aktywność'
+            en: 'Last activity'
+          cell_3:
+            pl: 'Długim użyciem porzuconej sesji'
+            en: 'Long use of an abandoned session'
+          cell_4:
+            pl: 'Aktualizacja maksymalnie raz na minutę'
+            en: 'Updated at most once per minute'
+        -
+          cell_1:
+            pl: 'Absolute lifetime'
+            en: 'Absolute lifetime'
+          cell_2:
+            pl: 'Czas od logowania'
+            en: 'Time since login'
+          cell_3:
+            pl: 'Nieskończonym przedłużaniem aktywnością'
+            en: 'Endless activity extension'
+          cell_4:
+            pl: 'Wymaga ponownego loginu'
+            en: 'Requires a new login'
+  -
+    id: 01a06d50-7007-7707-8707-000000000007
     type: article-content
     enabled: true
     data:
@@ -463,9 +581,13 @@ blocks:
 
           Never pass a password as a process argument. Installer and user commands read it interactively; controlled automation may set CMS_PASSWORD for one process only. Shell history, process listings and CI logs must not become password stores.
       note:
-        pl: Nie rozróżniaj komunikatem ani czasem odpowiedzi, czy email istnieje. Recovery również powinno zawsze pokazywać taki sam wynik formularza.
-        en: Do not reveal email existence through message or response timing. Recovery should always show the same form outcome as well.
-  - id: 01a06d50-7007-7708-8708-000000000008
+        pl: 'Nie rozróżniaj komunikatem ani czasem odpowiedzi, czy email istnieje. Recovery również powinno zawsze pokazywać taki sam wynik formularza.'
+        en: 'Do not reveal email existence through message or response timing. Recovery should always show the same form outcome as well.'
+      bookmarkDescription:
+        pl: Uwierzytelnianie
+        en: Authentication
+  -
+    id: 01a06d50-7007-7708-8708-000000000008
     type: article-content
     enabled: true
     data:
@@ -520,9 +642,13 @@ blocks:
 
           A token has a TTL, is one-use and successful completion invalidates every other token for that user. Failed SMTP delivery revokes the new token. The link uses site.url while SMTP credentials remain environment-only.
       note:
-        pl: Drugi składnik ogranicza skutek kradzieży hasła, ale nie naprawia XSS ani przejętej sesji. Każda granica nadal musi być chroniona.
-        en: A second factor limits password theft but does not repair XSS or a stolen session. Every boundary still requires protection.
-  - id: 01a06d50-7007-7709-8709-000000000009
+        pl: 'Drugi składnik ogranicza skutek kradzieży hasła, ale nie naprawia XSS ani przejętej sesji. Każda granica nadal musi być chroniona.'
+        en: 'A second factor limits password theft but does not repair XSS or a stolen session. Every boundary still requires protection.'
+      bookmarkDescription:
+        pl: 'CSRF i WebAuthn'
+        en: 'CSRF and WebAuthn'
+  -
+    id: 01a06d50-7007-7709-8709-000000000009
     type: article-content
     enabled: true
     data:
@@ -569,21 +695,25 @@ blocks:
 
           Do not add raw_html merely for convenience. When a new capability is needed, create a narrow field or component contract and a renderer controlling HTML structure.
       note:
-        pl: Normalizacja nie oznacza zaufanego HTML-a. Renderer zawsze zna kontekst wyjścia i jako jedyny może dobrać poprawne kodowanie.
-        en: Normalization does not mean trusted HTML. Only the renderer knows the output context and can choose correct encoding.
-  - id: 01a06d50-7007-7710-8710-000000000010
+        pl: 'Normalizacja nie oznacza zaufanego HTML-a. Renderer zawsze zna kontekst wyjścia i jako jedyny może dobrać poprawne kodowanie.'
+        en: 'Normalization does not mean trusted HTML. Only the renderer knows the output context and can choose correct encoding.'
+      bookmarkDescription:
+        pl: 'Walidacja danych'
+        en: 'Data validation'
+  -
+    id: 01a06d50-7007-7710-8710-000000000010
     type: code-showcase
     enabled: true
     data:
-      eyebrow: { pl: Bezpieczna ścieżka, en: Safe path }
+      eyebrow:
+        pl: 'Bezpieczna ścieżka'
+        en: 'Safe path'
       title:
-        {
-          pl: "Kod wybiera korzeń, a dane mogą wskazać tylko walidowaną ścieżkę relatywną.",
-          en: "Code selects the root while data supplies only a validated relative path.",
-        }
+        pl: 'Kod wybiera korzeń, a dane mogą wskazać tylko walidowaną ścieżkę relatywną.'
+        en: 'Code selects the root while data supplies only a validated relative path.'
       description:
-        pl: Kontroler nie konkatenatuje ścieżki projektu. Enum korzeni i obiekt RelativePath ograniczają przestrzeń możliwych celów.
-        en: A controller never concatenates a project path. The root enum and RelativePath object constrain possible targets.
+        pl: 'Kontroler nie konkatenatuje ścieżki projektu. Enum korzeni i obiekt RelativePath ograniczają przestrzeń możliwych celów.'
+        en: 'A controller never concatenates a project path. The root enum and RelativePath object constrain possible targets.'
       filename: app/Infrastructure/Filesystem/SafePathResolver.php
       code: |-
         $relative = RelativePath::fromString('documentation/security/content.yml');
@@ -600,22 +730,20 @@ blocks:
         // folder\windows-path
         // katalog/./plik
       bullets:
-        - text:
-            {
-              pl: "Dozwolony korzeń jest typem wybranym przez kod, nie stringiem z formularza.",
-              en: "The allowed root is a code-selected type, not a form string.",
-            }
-        - text:
-            {
-              pl: Istniejące segmenty przechodzą przez realpath i ponowną kontrolę containment.,
-              en: Existing segments pass through realpath and another containment check.,
-            }
-        - text:
-            {
-              pl: "Ścieżki absolutne, kropki, backslash, znaki sterujące i nazwy zastrzeżone są odrzucane.",
-              en: "Absolute paths, dots, backslashes, control characters and reserved names are rejected.",
-            }
-  - id: 01a06d50-7007-7711-8711-000000000011
+        -
+          text:
+            pl: 'Dozwolony korzeń jest typem wybranym przez kod, nie stringiem z formularza.'
+            en: 'The allowed root is a code-selected type, not a form string.'
+        -
+          text:
+            pl: 'Istniejące segmenty przechodzą przez realpath i ponowną kontrolę containment.'
+            en: 'Existing segments pass through realpath and another containment check.'
+        -
+          text:
+            pl: 'Ścieżki absolutne, kropki, backslash, znaki sterujące i nazwy zastrzeżone są odrzucane.'
+            en: 'Absolute paths, dots, backslashes, control characters and reserved names are rejected.'
+  -
+    id: 01a06d50-7007-7711-8711-000000000011
     type: article-content
     enabled: true
     data:
@@ -666,9 +794,13 @@ blocks:
 
           Images have width, height and pixel-count limits. SVG requires sanitization. stripMetadata limits retained metadata that may contain private information. Public variants are generated only in allowed formats and dimensions.
       note:
-        pl: chmod 0777 nie jest naprawą bezpieczeństwa ani poprawną diagnostyką. Najpierw ustal dokładny proces, korzeń, właściciela i minimalne wymagane uprawnienie.
-        en: chmod 0777 is neither a security fix nor sound diagnostics. First identify the exact process, root, owner and minimum required permission.
-  - id: 01a06d50-7007-7712-8712-000000000012
+        pl: 'chmod 0777 nie jest naprawą bezpieczeństwa ani poprawną diagnostyką. Najpierw ustal dokładny proces, korzeń, właściciela i minimalne wymagane uprawnienie.'
+        en: 'chmod 0777 is neither a security fix nor sound diagnostics. First identify the exact process, root, owner and minimum required permission.'
+      bookmarkDescription:
+        pl: 'System plików i YAML'
+        en: 'Filesystem and YAML'
+  -
+    id: 01a06d50-7007-7712-8712-000000000012
     type: article-content
     enabled: true
     data:
@@ -715,9 +847,13 @@ blocks:
 
           HTML cache never covers admin, API, media, redirects, errors or non-GET methods. cache:clear removes only reproducible entries below fixed storage/cache, accepts no path and follows no symlinks.
       note:
-        pl: Cache jest niezaufanym artefaktem odtwarzalnym. Źródło i jego rewizja pozostają autorytetem.
-        en: Cache is an untrusted reproducible artifact. Source and its revision remain authoritative.
-  - id: 01a06d50-7007-7713-8713-000000000013
+        pl: 'Cache jest niezaufanym artefaktem odtwarzalnym. Źródło i jego rewizja pozostają autorytetem.'
+        en: 'Cache is an untrusted reproducible artifact. Source and its revision remain authoritative.'
+      bookmarkDescription:
+        pl: 'Zapis i cache'
+        en: 'Writes and cache'
+  -
+    id: 01a06d50-7007-7713-8713-000000000013
     type: article-content
     enabled: true
     data:
@@ -776,157 +912,149 @@ blocks:
 
           Backups must cover compatible code, pages, config, developer blocks/templates, SQLite and an encrypted secret copy. Cache, sessions and media variants are reproducible. Regularly test restoration rather than archive creation alone.
       note:
-        pl: Nagłówki bezpieczeństwa są ostatnią warstwą odpowiedzi, nie pierwszą linią projektu. Największą wartość daje poprawna separacja danych, kodu, sekretów i uprawnień.
-        en: Security headers are the response's final layer, not the design's first line. Correct separation of data, code, secrets and privileges provides the greatest value.
-  - id: 01a06d50-7007-7714-8714-000000000014
+        pl: 'Nagłówki bezpieczeństwa są ostatnią warstwą odpowiedzi, nie pierwszą linią projektu. Największą wartość daje poprawna separacja danych, kodu, sekretów i uprawnień.'
+        en: "Security headers are the response's final layer, not the design's first line. Correct separation of data, code, secrets and privileges provides the greatest value."
+      bookmarkDescription:
+        pl: Hardening
+        en: Hardening
+  -
+    id: 01a06d50-7007-7714-8714-000000000014
     type: diagnostic-table
     enabled: true
     data:
       anchor: diagnostyka-bezpieczenstwa
-      eyebrow: { pl: 25 / Diagnostyka, en: 25 / Troubleshooting }
+      eyebrow:
+        pl: '25 / Diagnostyka'
+        en: '25 / Troubleshooting'
       title:
-        {
-          pl: Diagnozuj bez osłabiania mechanizmu ochronnego.,
-          en: Diagnose without weakening the protective control.,
-        }
+        pl: 'Diagnozuj bez osłabiania mechanizmu ochronnego.'
+        en: 'Diagnose without weakening the protective control.'
       intro:
-        pl: Błąd bezpieczeństwa często wygląda jak problem funkcjonalny. Najpierw zidentyfikuj warstwę i dowód, a dopiero potem zmieniaj konfigurację.
-        en: A security failure often resembles a functional defect. Identify the layer and evidence before changing configuration.
+        pl: 'Błąd bezpieczeństwa często wygląda jak problem funkcjonalny. Najpierw zidentyfikuj warstwę i dowód, a dopiero potem zmieniaj konfigurację.'
+        en: 'A security failure often resembles a functional defect. Identify the layer and evidence before changing configuration.'
       rows:
-        - layer: { pl: Bootstrap, en: Bootstrap }
-          problem: { pl: Produkcja nie startuje, en: Production will not start }
-          cause:
-            {
-              pl: "Debug, krótki sekret lub insecure cookie narusza guard.",
-              en: "Debug, short secret or insecure cookie violates the guard.",
-            }
-          check:
-            {
-              pl: Popraw konkretną wartość z komunikatu; nie wyłączaj ProductionGuard.,
-              en: Correct the named setting; never disable ProductionGuard.,
-            }
-        - layer: { pl: Proxy, en: Proxy }
+        -
+          layer:
+            pl: Bootstrap
+            en: Bootstrap
           problem:
-            {
-              pl: Rate limit obejmuje wszystkich albo nikogo,
-              en: Rate limit affects everyone or nobody,
-            }
+            pl: 'Produkcja nie startuje'
+            en: 'Production will not start'
           cause:
-            {
-              pl: TRUSTED_PROXIES nie odpowiada rzeczywistej topologii.,
-              en: TRUSTED_PROXIES does not match the real topology.,
-            }
+            pl: 'Debug, krótki sekret lub insecure cookie narusza guard.'
+            en: 'Debug, short secret or insecure cookie violates the guard.'
           check:
-            {
-              pl: "Porównaj direct peer, łańcuch X-Forwarded-For i aktualne CIDR proxy.",
-              en: "Compare direct peer, X-Forwarded-For chain and current proxy CIDRs.",
-            }
-        - layer: { pl: Sesja, en: Session }
+            pl: 'Popraw konkretną wartość z komunikatu; nie wyłączaj ProductionGuard.'
+            en: 'Correct the named setting; never disable ProductionGuard.'
+        -
+          layer:
+            pl: Proxy
+            en: Proxy
           problem:
-            { pl: Login wraca do formularza, en: Login returns to the form }
+            pl: 'Rate limit obejmuje wszystkich albo nikogo'
+            en: 'Rate limit affects everyone or nobody'
           cause:
-            {
-              pl: "Cookie Secure po HTTP, zła domena lub brak zapisu sessions.",
-              en: "Secure cookie over HTTP, wrong domain or unwritable sessions.",
-            }
+            pl: 'TRUSTED_PROXIES nie odpowiada rzeczywistej topologii.'
+            en: 'TRUSTED_PROXIES does not match the real topology.'
           check:
-            {
-              pl: "Sprawdź HTTPS, Set-Cookie, SESSION_NAME i uprawnienia storage/sessions.",
-              en: "Check HTTPS, Set-Cookie, SESSION_NAME and storage/sessions permissions.",
-            }
-        - layer: { pl: CSRF, en: CSRF }
+            pl: 'Porównaj direct peer, łańcuch X-Forwarded-For i aktualne CIDR proxy.'
+            en: 'Compare direct peer, X-Forwarded-For chain and current proxy CIDRs.'
+        -
+          layer:
+            pl: Sesja
+            en: Session
           problem:
-            {
-              pl: Poprawny formularz jest odrzucany,
-              en: A valid form is rejected,
-            }
+            pl: 'Login wraca do formularza'
+            en: 'Login returns to the form'
           cause:
-            {
-              pl: Token pochodzi ze starej sesji lub nie został przesłany.,
-              en: Token comes from an old session or was not submitted.,
-            }
+            pl: 'Cookie Secure po HTTP, zła domena lub brak zapisu sessions.'
+            en: 'Secure cookie over HTTP, wrong domain or unwritable sessions.'
           check:
-            {
-              pl: Odśwież formularz i sprawdź zgodność cookie z sesją; nie omijaj validate.,
-              en: Refresh the form and match cookie to session; never bypass validate.,
-            }
-        - layer: { pl: WebAuthn, en: WebAuthn }
+            pl: 'Sprawdź HTTPS, Set-Cookie, SESSION_NAME i uprawnienia storage/sessions.'
+            en: 'Check HTTPS, Set-Cookie, SESSION_NAME and storage/sessions permissions.'
+        -
+          layer:
+            pl: CSRF
+            en: CSRF
           problem:
-            {
-              pl: Klucz przestał działać po migracji,
-              en: Key stopped working after migration,
-            }
+            pl: 'Poprawny formularz jest odrzucany'
+            en: 'A valid form is rejected'
           cause:
-            {
-              pl: Zmienił się hostname albo WEBAUTHN_RP_ID.,
-              en: Hostname or WEBAUTHN_RP_ID changed.,
-            }
+            pl: 'Token pochodzi ze starej sesji lub nie został przesłany.'
+            en: 'Token comes from an old session or was not submitted.'
           check:
-            {
-              pl: Porównaj RP ID rejestracji z obecną domeną i HTTPS.,
-              en: Compare registration RP ID with current domain and HTTPS.,
-            }
-        - layer: { pl: Filesystem, en: Filesystem }
+            pl: 'Odśwież formularz i sprawdź zgodność cookie z sesją; nie omijaj validate.'
+            en: 'Refresh the form and match cookie to session; never bypass validate.'
+        -
+          layer:
+            pl: WebAuthn
+            en: WebAuthn
           problem:
-            { pl: Zapis odrzucony mimo chmod, en: Write rejected despite chmod }
+            pl: 'Klucz przestał działać po migracji'
+            en: 'Key stopped working after migration'
           cause:
-            {
-              pl: "Zły owner, parent, symlink, root lub reguła hostingu.",
-              en: "Wrong owner, parent, symlink, root or hosting rule.",
-            }
+            pl: 'Zmienił się hostname albo WEBAUTHN_RP_ID.'
+            en: 'Hostname or WEBAUTHN_RP_ID changed.'
           check:
-            {
-              pl: "Sprawdź pełny łańcuch, użytkownika PHP, realpath i log; nie ustawiaj 0777.",
-              en: "Check the full chain, PHP user, realpath and log; never set 0777.",
-            }
-        - layer: { pl: Rewizja, en: Revision }
-          problem: { pl: Formularz zwraca 409, en: Form returns 409 }
-          cause:
-            {
-              pl: Plik zmienił się po jego odczycie.,
-              en: File changed after it was read.,
-            }
-          check:
-            {
-              pl: Pobierz nową rewizję i świadomie połącz zmiany; nie wyłączaj kontroli.,
-              en: Fetch the new revision and deliberately merge; never disable the check.,
-            }
-        - layer: { pl: Cache HTML, en: HTML cache }
+            pl: 'Porównaj RP ID rejestracji z obecną domeną i HTTPS.'
+            en: 'Compare registration RP ID with current domain and HTTPS.'
+        -
+          layer:
+            pl: Filesystem
+            en: Filesystem
           problem:
-            {
-              pl: Po deployu widać stary kod,
-              en: Old code remains after deployment,
-            }
+            pl: 'Zapis odrzucony mimo chmod'
+            en: 'Write rejected despite chmod'
           cause:
-            {
-              pl: APP_RELEASE nie zmienił namespace albo wdrożenie jest niespójne.,
-              en: APP_RELEASE did not change namespace or deployment is incoherent.,
-            }
+            pl: 'Zły owner, parent, symlink, root lub reguła hostingu.'
+            en: 'Wrong owner, parent, symlink, root or hosting rule.'
           check:
-            {
-              pl: Ustaw identyfikator artefaktu i porównaj release na wszystkich instancjach.,
-              en: Set the artifact identifier and compare release across instances.,
-            }
-        - layer: { pl: Błąd publiczny, en: Public error }
+            pl: 'Sprawdź pełny łańcuch, użytkownika PHP, realpath i log; nie ustawiaj 0777.'
+            en: 'Check the full chain, PHP user, realpath and log; never set 0777.'
+        -
+          layer:
+            pl: Rewizja
+            en: Revision
           problem:
-            {
-              pl: Odpowiedź ujawnia ścieżkę serwera,
-              en: Response exposes a server path,
-            }
+            pl: 'Formularz zwraca 409'
+            en: 'Form returns 409'
           cause:
-            {
-              pl: APP_DEBUG działa w publicznym środowisku lub wyjątek jest wypisywany ręcznie.,
-              en: APP_DEBUG runs publicly or an exception is printed manually.,
-            }
+            pl: 'Plik zmienił się po jego odczycie.'
+            en: 'File changed after it was read.'
           check:
-            {
-              pl: "Zablokuj ruch, wyłącz debug, popraw ErrorHandler i zrotuj ujawnione sekrety.",
-              en: "Block traffic, disable debug, fix ErrorHandler and rotate exposed secrets.",
-            }
+            pl: 'Pobierz nową rewizję i świadomie połącz zmiany; nie wyłączaj kontroli.'
+            en: 'Fetch the new revision and deliberately merge; never disable the check.'
+        -
+          layer:
+            pl: 'Cache HTML'
+            en: 'HTML cache'
+          problem:
+            pl: 'Po deployu widać stary kod'
+            en: 'Old code remains after deployment'
+          cause:
+            pl: 'APP_RELEASE nie zmienił namespace albo wdrożenie jest niespójne.'
+            en: 'APP_RELEASE did not change namespace or deployment is incoherent.'
+          check:
+            pl: 'Ustaw identyfikator artefaktu i porównaj release na wszystkich instancjach.'
+            en: 'Set the artifact identifier and compare release across instances.'
+        -
+          layer:
+            pl: 'Błąd publiczny'
+            en: 'Public error'
+          problem:
+            pl: 'Odpowiedź ujawnia ścieżkę serwera'
+            en: 'Response exposes a server path'
+          cause:
+            pl: 'APP_DEBUG działa w publicznym środowisku lub wyjątek jest wypisywany ręcznie.'
+            en: 'APP_DEBUG runs publicly or an exception is printed manually.'
+          check:
+            pl: 'Zablokuj ruch, wyłącz debug, popraw ErrorHandler i zrotuj ujawnione sekrety.'
+            en: 'Block traffic, disable debug, fix ErrorHandler and rotate exposed secrets.'
       note:
-        pl: Najpierw zachowaj dowody w chronionym logu. Masowe chmod, wyłączenie CSRF lub debug na produkcji może usunąć objaw kosztem realnej ochrony.
-        en: Preserve evidence in a protected log first. Broad chmod, disabled CSRF or production debug may remove the symptom by sacrificing real protection.
-  - id: 01a06d50-7007-7715-8715-000000000015
+        pl: 'Najpierw zachowaj dowody w chronionym logu. Masowe chmod, wyłączenie CSRF lub debug na produkcji może usunąć objaw kosztem realnej ochrony.'
+        en: 'Preserve evidence in a protected log first. Broad chmod, disabled CSRF or production debug may remove the symptom by sacrificing real protection.'
+  -
+    id: 01a06d50-7007-7715-8715-000000000015
     type: article-content
     enabled: true
     data:
@@ -987,21 +1115,25 @@ blocks:
 
           A secure CMS never trusts that the admin is hidden or that a user will submit correct data. Every layer reduces input capability, and every write confirms identity, intent, contract, destination and current state.
       note:
-        pl: Checklista jest minimum wydaniowym, nie jednorazowym certyfikatem. Powtarzaj ją po zmianie infrastruktury, domeny, proxy, autoryzacji lub procesu deployu.
-        en: The checklist is a release minimum, not a one-time certificate. Repeat it after changes to infrastructure, domain, proxy, authorization or deployment.
-  - id: 01a06d50-7007-7716-8716-000000000016
+        pl: 'Checklista jest minimum wydaniowym, nie jednorazowym certyfikatem. Powtarzaj ją po zmianie infrastruktury, domeny, proxy, autoryzacji lub procesu deployu.'
+        en: 'The checklist is a release minimum, not a one-time certificate. Repeat it after changes to infrastructure, domain, proxy, authorization or deployment.'
+  -
+    id: 01a06d50-7007-7716-8716-000000000016
     type: call-to-action
     enabled: true
     data:
-      eyebrow: { pl: Następny tutorial, en: Next tutorial }
+      eyebrow:
+        pl: 'Następny tutorial'
+        en: 'Next tutorial'
       title:
-        {
-          pl: Wdróż CMS bez niespodzianek.,
-          en: Deploy the CMS without surprises.,
-        }
+        pl: 'Wdróż CMS bez niespodzianek.'
+        en: 'Deploy the CMS without surprises.'
       description:
-        pl: Ostatni rozdział przeprowadzi przez artefakt release, konfigurację PHP i serwera WWW, uprawnienia, migracje, cache, smoke testy, backup oraz rollback.
-        en: The final chapter covers the release artifact, PHP and web-server configuration, permissions, migrations, caching, smoke tests, backup and rollback.
-      button_label: { pl: Przejdź do wdrożenia, en: Continue to deployment }
+        pl: 'Ostatni rozdział przeprowadzi przez artefakt release, konfigurację PHP i serwera WWW, uprawnienia, migracje, cache, smoke testy, backup oraz rollback.'
+        en: 'The final chapter covers the release artifact, PHP and web-server configuration, permissions, migrations, caching, smoke tests, backup and rollback.'
+      button_label:
+        pl: 'Przejdź do wdrożenia'
+        en: 'Continue to deployment'
       button_url:
-        { pl: /pl/dokumentacja/wdrozenie, en: /en/documentation/deployment }
+        pl: /pl/dokumentacja/wdrozenie
+        en: /en/documentation/deployment

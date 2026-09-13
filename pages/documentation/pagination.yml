@@ -23,7 +23,7 @@ sort:
   field: order
   direction: asc
 pagination:
-  perPage: 12
+  perPage: 5
 filters:
   -
     parameter: category
