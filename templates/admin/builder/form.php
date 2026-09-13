@@ -10,7 +10,8 @@
         </svg></span>
     <div>
         <p class="eyebrow"><?= $id === null ? 'Nowy blok' : 'Edycja bloku' ?></p>
-        <h2><?= $escape($name) ?></h2><code><?= $escape($definition->type()) ?></code>
+        <h2><?= $escape($name) ?></h2>
+        <code><?= $escape($definition->type()) ?></code>
     </div>
 </div>
 <form class="stack block-form block-inspector-form" method="post" action="<?= $escape($action) ?>"

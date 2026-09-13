@@ -116,16 +116,6 @@ final readonly class AdminAuthController
         }
     }
 
-    public function dashboard(Request $request): Response
-    {
-        $user = $this->authenticator->user();
-        if ($user === null) {
-            return Response::redirect('/admin/login');
-        }
-
-        return $this->page('Panel', $this->views->render('dashboard', ['user' => $user]));
-    }
-
     public function security(Request $request): Response
     {
         $user = $this->requireUser();

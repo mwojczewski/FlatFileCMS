@@ -26,8 +26,7 @@ final readonly class CollectionRepository
         private YamlFileRepository $yaml,
         private SafePathResolver $paths,
         private ?ContentFileIndex $index = null,
-    ) {
-    }
+    ) {}
 
     /** @return list<Collection> */
     public function all(LanguageConfig $languages): array

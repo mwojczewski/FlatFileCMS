@@ -29,6 +29,7 @@ final readonly class CollectionViewModelFactory
         $collection = $result->collection();
         $url = $routes->collectionUrlFor($collection->identity(), $locale);
         $items = [];
+        $position = (($result->page() - 1) * $result->perPage()) + 1;
         foreach ($result->items() as $page) {
             $attributes = $this->localization->resolve($page->attributes(), $locale, $languages);
             $items[] = [
@@ -36,6 +37,7 @@ final readonly class CollectionViewModelFactory
                 'url' => $routes->urlFor($page->identity(), $locale),
                 'title' => $page->title($locale, $languages->default()),
                 'attributes' => \is_array($attributes) ? $attributes : [],
+                'position' => $position++,
             ];
         }
 

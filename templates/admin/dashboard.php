@@ -36,7 +36,7 @@ if (is_array($vitals)) {
         <div>
             <p class="eyebrow">Przegląd systemu</p>
             <h2 id="dashboard-overview-title">Witaj w FlatFile CMS</h2>
-            <p>Treść, struktura witryny i najważniejsze akcje w jednym miejscu.</p>
+            <p class="lead">Treść, struktura witryny i najważniejsze akcje w jednym miejscu.</p>
         </div>
         <a class="button" href="/admin/pages/create">
             <span aria-hidden="true">

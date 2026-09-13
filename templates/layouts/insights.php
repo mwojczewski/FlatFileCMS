@@ -120,11 +120,8 @@ $documentBody = static function () use ($context, $navigation, $localizedUrls, $
             <?php if ($items === []): ?>
                 <p><?= $locale === 'pl' ? 'Brak artykułów.' : 'No articles found.' ?></p>
             <?php else: ?>
-                <?php foreach ($items as $index => $item): ?>
-                    <article>
-                        <span>
-                            <?= str_pad($context->escape($item['attributes']['order'] + 1) ?? $context->escape((string) ($index + 1)), 2, "0", STR_PAD_LEFT) ?>
-                        </span>
+                <?php foreach ($items as $item): ?>
+                    <article><span><?= $context->escape(sprintf('%02d', $item['position'])) ?></span>
                         <div>
                             <p>ENGINEERING NOTE</p>
                             <h2><a href="<?= $context->escape($item['url']) ?>"><?= $context->escape($item['title']) ?></a></h2>

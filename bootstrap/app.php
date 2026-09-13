@@ -262,6 +262,9 @@ $container->set(
     static fn(Container $container): AdminAnalyticsController => new AdminAnalyticsController(
         $container->get(Authenticator::class),
         $container->get(CloudflareAnalyticsService::class),
+        $container->get(LanguageRepository::class),
+        $container->get(PageRepository::class),
+        $container->get(CollectionRepository::class),
         $container->get(AdminView::class),
         $container->get(AdminLayout::class),
     ),
