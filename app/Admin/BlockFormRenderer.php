@@ -11,10 +11,18 @@ use FlatFileCms\Domain\Localization\LanguageConfig;
 final readonly class BlockFormRenderer
 {
     /** @param array<string, mixed> $data */
-    public function render(BlockDefinition $definition, LanguageConfig $languages, array $data): string
-    {
+    public function render(
+        BlockDefinition $definition,
+        LanguageConfig $languages,
+        array $data,
+        ?string $activeLocale = null,
+    ): string {
+        $activeLocale = $activeLocale !== null && $languages->has($activeLocale)
+            ? $activeLocale
+            : $languages->default();
+
         return '<div class="generated-fields">'
-            . $this->fields($definition->fields(), $languages, $data, 'data', 0)
+            . $this->fields($definition->fields(), $languages, $data, 'data', 0, $activeLocale)
             . '</div>';
     }
 
@@ -28,11 +36,19 @@ final readonly class BlockFormRenderer
         array $values,
         string $prefix,
         int $depth,
+        string $activeLocale,
     ): string {
         $html = '';
         foreach ($definitions as $name => $definition) {
             $value = $values[$name] ?? null;
-            $html .= $this->field($definition, $languages, $value, $prefix . '[' . $name . ']', $depth);
+            $html .= $this->field(
+                $definition,
+                $languages,
+                $value,
+                $prefix . '[' . $name . ']',
+                $depth,
+                $activeLocale,
+            );
         }
 
         return $html;
@@ -44,6 +60,7 @@ final readonly class BlockFormRenderer
         mixed $value,
         string $name,
         int $depth,
+        string $activeLocale,
     ): string {
         $label = $this->uiText($definition, 'label', $languages->default(), $definition->name());
         $help = $this->uiText($definition, 'help', $languages->default(), '');
@@ -51,14 +68,14 @@ final readonly class BlockFormRenderer
         if (!$definition->translatable()) {
             return '<div class="field"><div class="field-heading"><span>' . self::escape($label) . $required
                 . '</span>' . ($help === '' ? '' : '<small>' . self::escape($help) . '</small>') . '</div>'
-                . $this->control($definition, $languages, $value, $name, $depth) . '</div>';
+                . $this->control($definition, $languages, $value, $name, $depth, $activeLocale) . '</div>';
         }
 
         $localized = $this->mapping($value);
         $tabs = '';
         $panels = '';
         foreach ($languages->languages() as $locale => $languageName) {
-            $active = $locale === $languages->default();
+            $active = $locale === $activeLocale;
             $tabs .= '<button type="button" class="locale-tab' . ($active ? ' active' : '')
                 . '" data-locale-target="' . self::escape($locale) . '">' . self::escape($languageName) . '</button>';
             $panels .= '<div class="locale-panel' . ($active ? ' active' : '') . '" data-locale-panel="'
@@ -68,6 +85,7 @@ final readonly class BlockFormRenderer
                     $localized[$locale] ?? null,
                     $name . '[' . $locale . ']',
                     $depth,
+                    $activeLocale,
                 ) . '</div>';
         }
 
@@ -82,10 +100,11 @@ final readonly class BlockFormRenderer
         mixed $value,
         string $name,
         int $depth,
+        string $activeLocale,
     ): string {
         $type = $definition->type();
         if ($type === 'repeater') {
-            return $this->repeater($definition, $languages, $value, $name, $depth);
+            return $this->repeater($definition, $languages, $value, $name, $depth, $activeLocale);
         }
         if (\in_array($type, ['image', 'file'], true)) {
             return $this->media($definition, $languages, $value, $name);
@@ -127,6 +146,7 @@ final readonly class BlockFormRenderer
         mixed $value,
         string $name,
         int $depth,
+        string $activeLocale,
     ): string {
         $items = \is_array($value) && array_is_list($value) ? $value : [];
         $rows = '';
@@ -137,6 +157,7 @@ final readonly class BlockFormRenderer
                 $this->mapping($item),
                 $name . '[' . $index . ']',
                 $depth,
+                $activeLocale,
             );
         }
         $token = '__INDEX_' . $depth . '__';
@@ -146,6 +167,7 @@ final readonly class BlockFormRenderer
             [],
             $name . '[' . $token . ']',
             $depth,
+            $activeLocale,
         );
 
         return '<div class="repeater" data-repeater data-next-index="' . \count($items) . '"><div data-repeater-items>'
@@ -160,10 +182,11 @@ final readonly class BlockFormRenderer
         array $values,
         string $prefix,
         int $depth,
+        string $activeLocale,
     ): string {
         return '<fieldset class="repeater-item"><legend>Element</legend><button type="button" class="icon-button danger-text" '
             . 'data-repeater-remove aria-label="Usuń element">Usuń</button>'
-            . $this->fields($definition->fields(), $languages, $values, $prefix, $depth + 1) . '</fieldset>';
+            . $this->fields($definition->fields(), $languages, $values, $prefix, $depth + 1, $activeLocale) . '</fieldset>';
     }
 
     private function media(

@@ -137,16 +137,6 @@ h3 {
   background: #24a475;
   box-shadow: 0 0 0 3px var(--admin-success-soft);
 }
-.sidebar-account {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: 0.6rem;
-  align-items: center;
-  margin: 0;
-  padding: 0.85rem 1rem 1rem;
-  border-top: 0;
-}
-.account-avatar,
 .topbar-avatar {
   display: grid;
   place-items: center;
@@ -154,38 +144,6 @@ h3 {
   color: var(--admin-ink);
   background: #53615b26;
   font-weight: 750;
-}
-.account-avatar {
-  width: 2rem;
-  height: 2rem;
-  font-size: 0.75rem;
-}
-.account-copy {
-  display: grid;
-  min-width: 0;
-  line-height: 1.3;
-}
-.account-copy strong {
-  font-size: 0.75rem;
-}
-.account-copy small {
-  overflow: hidden;
-  font-size: 0.66rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.sidebar-account > span {
-  color: inherit;
-}
-.sidebar-logout {
-  width: 1.8rem;
-  min-height: 1.8rem;
-  border-radius: 0.45rem;
-  color: var(--admin-muted);
-}
-.sidebar-logout:hover {
-  color: var(--admin-danger);
-  background: var(--admin-danger-soft);
 }
 .admin-workspace {
   min-height: 100vh;
@@ -242,9 +200,39 @@ h3 {
   background: var(--admin-surface-subtle);
 }
 .topbar-avatar {
+  flex: 0 0 auto;
   width: 2.1rem;
   height: 2.1rem;
   font-size: 0.72rem;
+}
+.topbar-account {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  padding: 0.25rem 0.45rem;
+  border-radius: 0.65rem;
+  color: var(--admin-ink);
+  text-decoration: none;
+}
+.topbar-account:hover {
+  background: var(--admin-surface-subtle);
+}
+.topbar-account-copy {
+  display: grid;
+  min-width: 0;
+  line-height: 1.25;
+}
+.topbar-account-copy strong {
+  font-size: 0.75rem;
+}
+.topbar-account-copy small {
+  overflow: hidden;
+  max-width: 15rem;
+  color: var(--admin-muted);
+  font-size: 0.66rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .topbar-logout {
   min-height: 2rem;
@@ -409,7 +397,7 @@ svg {
 
 @media (max-width: 42rem) {
   .topbar-site-link,
-  .topbar-avatar {
+  .topbar-account-copy {
     display: none;
   }
   .topbar-logout {

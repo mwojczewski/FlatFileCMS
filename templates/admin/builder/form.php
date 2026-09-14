@@ -1,5 +1,5 @@
 <div class="block-form-heading">
-    <a class="editor-back" href="/admin/pages/builder?path=<?= rawurlencode($identity->value()) ?>"
+    <a class="editor-back" href="/admin/pages/builder?path=<?= rawurlencode($identity->value()) ?>&amp;locale=<?= rawurlencode($locale) ?>"
         aria-label="Wróć do edytora">←</a>
     <span class="block-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -18,12 +18,13 @@
     data-page-identity="<?= $escape($identity->value()) ?>">
     <input type="hidden" name="_csrf" value="<?= $escape($csrfToken) ?>">
     <input type="hidden" name="identity" value="<?= $escape($identity->value()) ?>">
+    <input type="hidden" name="locale" value="<?= $escape($locale) ?>">
     <input type="hidden" name="type" value="<?= $escape($definition->type()) ?>">
     <input type="hidden" name="revision" value="<?= $escape($revision->value()) ?>">
     <?php if ($id !== null): ?><input type="hidden" name="id" value="<?= $escape($id) ?>"><?php endif; ?>
     <div class="block-form-fields"><?= $fields ?></div>
     <div class="actions footer-actions block-form-actions"><span><strong><?= $escape($name) ?></strong><small>Zmiany
                 zostaną zapisane w treści strony.</small></span><a class="button secondary"
-            href="/admin/pages/builder?path=<?= rawurlencode($identity->value()) ?>">Anuluj</a><button
+            href="/admin/pages/builder?path=<?= rawurlencode($identity->value()) ?>&amp;locale=<?= rawurlencode($locale) ?>">Anuluj</a><button
             type="submit">Zapisz blok</button></div>
 </form>

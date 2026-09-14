@@ -67,27 +67,6 @@ $icon = static function (string $name): string {
             <span aria-hidden="true"></span>
             <span>Panel gotowy</span>
         </div>
-        <div class="sidebar-account">
-            <span class="account-avatar" aria-hidden="true" title="<?= $escape($displayName) ?>">
-                <?= $escape($accountInitials) ?>
-            </span>
-            <span class="account-copy">
-                <strong><?= $escape($displayName) ?></strong>
-                <small><?= $escape($email) ?></small>
-            </span>
-            <form method="post" action="/admin/logout">
-                <input type="hidden" name="_csrf" value="<?= $escape($csrfToken) ?>">
-                <button type="submit" class="sidebar-logout" aria-label="Wyloguj" title="Wyloguj">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                        viewBox="0 0 16 16">
-                        <path fill-rule="evenodd"
-                            d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z" />
-                        <path fill-rule="evenodd"
-                            d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z" />
-                    </svg>
-                </button>
-            </form>
-        </div>
     </aside>
     <div class="admin-workspace">
         <header class="admin-topbar">
@@ -113,7 +92,13 @@ $icon = static function (string $name): string {
                         </svg>
                     </span>
                 </a>
-                <span class="topbar-avatar" aria-hidden="true"><?= $escape($accountInitials) ?></span>
+                <a class="topbar-account" href="/admin/security" title="Przejdź do ustawień konta">
+                    <span class="topbar-avatar" aria-hidden="true"><?= $escape($accountInitials) ?></span>
+                    <span class="topbar-account-copy">
+                        <strong><?= $escape($displayName) ?></strong>
+                        <small><?= $escape($email) ?></small>
+                    </span>
+                </a>
                 <form method="post" action="/admin/logout">
                     <input type="hidden" name="_csrf" value="<?= $escape($csrfToken) ?>">
                     <button type="submit" class="topbar-logout">Wyloguj</button>

@@ -61,6 +61,28 @@
 .editor-primary-actions .button {
   gap: 0.35rem;
 }
+.builder-locale-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+}
+.builder-locale-picker label {
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.builder-locale-picker select {
+  width: auto;
+  min-width: 7.5rem;
+  min-height: 2.35rem;
+  padding-block: 0.45rem;
+  font-size: 0.76rem;
+}
+.builder-locale-picker button {
+  display: none;
+}
 .block-editor-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 17rem;
@@ -714,6 +736,20 @@ select {
   .wordpress-editor-topbar .editor-primary-actions {
     justify-content: stretch;
     min-width: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .builder-locale-picker label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .builder-locale-picker select {
+    min-width: 6rem;
   }
 }
 

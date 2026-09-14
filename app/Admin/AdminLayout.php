@@ -10,7 +10,7 @@ use FlatFileCms\Http\Response;
 
 final readonly class AdminLayout
 {
-    private const string ASSET_VERSION = '13.1.0';
+    private const string ASSET_VERSION = '13.2.0';
 
     public function __construct(
         private Authenticator $authenticator,

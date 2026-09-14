@@ -71,6 +71,16 @@ document.addEventListener("click", (event) => {
   }
 });
 
+const builderLocale = document.querySelector("[data-builder-locale]");
+if (builderLocale instanceof HTMLSelectElement) {
+  builderLocale.addEventListener("change", () => {
+    const form = builderLocale.closest("[data-builder-locale-form]");
+    if (form instanceof HTMLFormElement) {
+      form.requestSubmit();
+    }
+  });
+}
+
 let mediaSelection = null;
 
 function mediaDialog() {

@@ -74,14 +74,13 @@ final readonly class AdminPageBuilderController
             throw new HttpException(404, 'PAGE_NOT_FOUND', 'Page not found.', previous: $exception);
         }
         $languages = $this->languages->get();
+        $locale = $this->queryLocale($request, $languages);
         $routeIndex = PageRouteIndex::build(
             $this->pages->all($languages),
             $languages,
             $this->collections->all($languages),
         );
-        $localizedPath = $routeIndex->pathFor($identity, $languages->default());
-        $localePrefix = $languages->isMultilingual() ? '/' . $languages->default() : '';
-        $previewUrl = $localizedPath === '' ? ($localePrefix === '' ? '/' : $localePrefix . '/') : $localePrefix . '/' . $localizedPath;
+        $previewUrl = $this->previewUrl($routeIndex, $identity, $locale, $languages);
         $viewBlocks = [];
         foreach ($blocks as $position => $block) {
             $id = ContentData::string($block['id'] ?? null, 'block.id');
@@ -97,8 +96,8 @@ final readonly class AdminPageBuilderController
                 'type' => $type,
                 'enabled' => $enabled,
                 'position' => $position + 1,
-                'name' => $this->localized($definition->name(), $languages, $type),
-                'fields' => $this->forms->render($definition, $languages, $data),
+                'name' => $this->localized($definition->name(), $languages, $type, $locale),
+                'fields' => $this->forms->render($definition, $languages, $data, $locale),
                 'preview' => $this->renderPreviewDocument(
                     $definition,
                     $data,
@@ -106,6 +105,7 @@ final readonly class AdminPageBuilderController
                     $id,
                     $previewUrl,
                     $languages,
+                    $locale,
                 ),
             ];
         }
@@ -115,6 +115,8 @@ final readonly class AdminPageBuilderController
             'revision' => $editable->revision(),
             'csrfToken' => $this->csrf->token(),
             'previewUrl' => $previewUrl,
+            'languages' => $languages->languages(),
+            'locale' => $locale,
         ]);
 
         return $this->page('Bloki strony', $content, scripts: true);
@@ -130,10 +132,11 @@ final readonly class AdminPageBuilderController
             throw new HttpException(404, 'PAGE_NOT_FOUND', 'Page not found.', previous: $exception);
         }
         $languages = $this->languages->get();
+        $locale = $this->queryLocale($request, $languages);
         $cards = [];
         foreach ($this->registry->all() as $definition) {
-            $name = $this->localized($definition->name(), $languages, $definition->type());
-            $description = $this->localized($definition->description(), $languages, '');
+            $name = $this->localized($definition->name(), $languages, $definition->type(), $locale);
+            $description = $this->localized($definition->description(), $languages, '', $locale);
             $cards[] = [
                 'definition' => $definition,
                 'name' => $name,
@@ -145,6 +148,7 @@ final readonly class AdminPageBuilderController
         return $this->page('Wybierz blok', $this->views->render('builder/picker', [
             'identity' => $identity,
             'cards' => $cards,
+            'locale' => $locale,
         ]), scripts: true);
     }
 
@@ -183,7 +187,18 @@ final readonly class AdminPageBuilderController
             throw new HttpException(404, 'PAGE_NOT_FOUND', 'Page not found.', previous: $exception);
         }
 
-        return $this->blockForm('Dodaj blok', '/admin/pages/builder/create', $identity, $definition, [], $editable->revision());
+        $languages = $this->languages->get();
+        $locale = $this->queryLocale($request, $languages);
+
+        return $this->blockForm(
+            'Dodaj blok',
+            '/admin/pages/builder/create',
+            $identity,
+            $definition,
+            [],
+            $editable->revision(),
+            locale: $locale,
+        );
     }
 
     public function create(Request $request): Response
@@ -193,6 +208,7 @@ final readonly class AdminPageBuilderController
             $this->validateCsrf($request);
             $identity = $this->bodyIdentity($request);
             $languages = $this->languages->get();
+            $locale = $this->bodyLocale($request, $languages);
             $definition = $this->bodyDefinition($request);
             $data = $this->dataMapper->map($definition, $request->parsedBody()['data'] ?? [], $languages);
             $updated = $this->manager->add($identity, $definition->type(), $data, $this->bodyRevision($request), $languages);
@@ -209,6 +225,7 @@ final readonly class AdminPageBuilderController
                 $identity,
                 'created',
                 $updated->revision(),
+                $locale,
             );
         } catch (BlockValidationException $exception) {
             throw $this->validationException($exception);
@@ -232,8 +249,19 @@ final readonly class AdminPageBuilderController
         $block = $this->findBlock($editable->data(), $id);
         $definition = $this->registry->get(ContentData::string($block['type'] ?? null, 'block.type'));
         $data = ContentData::map($block['data'] ?? [], 'block.data');
+        $languages = $this->languages->get();
+        $locale = $this->queryLocale($request, $languages);
 
-        return $this->blockForm('Edytuj blok', '/admin/pages/builder/update', $identity, $definition, $data, $editable->revision(), $id);
+        return $this->blockForm(
+            'Edytuj blok',
+            '/admin/pages/builder/update',
+            $identity,
+            $definition,
+            $data,
+            $editable->revision(),
+            $id,
+            $locale,
+        );
     }
 
     public function update(Request $request): Response
@@ -244,6 +272,7 @@ final readonly class AdminPageBuilderController
             $identity = $this->bodyIdentity($request);
             $id = $this->bodyId($request);
             $languages = $this->languages->get();
+            $locale = $this->bodyLocale($request, $languages);
             $block = $this->manager->block($identity, $id);
             $definition = $this->registry->get(ContentData::string($block['type'] ?? null, 'block.type'));
             $data = $this->dataMapper->map($definition, $request->parsedBody()['data'] ?? [], $languages);
@@ -260,6 +289,7 @@ final readonly class AdminPageBuilderController
                 $identity,
                 'updated',
                 $updated->revision(),
+                $locale,
             );
         } catch (BlockValidationException $exception) {
             throw $this->validationException($exception);
@@ -278,6 +308,7 @@ final readonly class AdminPageBuilderController
             $identity = $this->bodyIdentity($request);
             $id = $this->bodyId($request);
             $languages = $this->languages->get();
+            $locale = $this->bodyLocale($request, $languages);
             $definition = $this->bodyDefinition($request);
             $data = $this->dataMapper->map($definition, $request->parsedBody()['data'] ?? [], $languages);
             $routeIndex = PageRouteIndex::build(
@@ -285,11 +316,7 @@ final readonly class AdminPageBuilderController
                 $languages,
                 $this->collections->all($languages),
             );
-            $localizedPath = $routeIndex->pathFor($identity, $languages->default());
-            $localePrefix = $languages->isMultilingual() ? '/' . $languages->default() : '';
-            $previewUrl = $localizedPath === ''
-                ? ($localePrefix === '' ? '/' : $localePrefix . '/')
-                : $localePrefix . '/' . $localizedPath;
+            $previewUrl = $this->previewUrl($routeIndex, $identity, $locale, $languages);
 
             return Response::json([
                 'preview' => $this->renderPreviewDocument(
@@ -299,6 +326,7 @@ final readonly class AdminPageBuilderController
                     $id,
                     $previewUrl,
                     $languages,
+                    $locale,
                 ),
             ]);
         } catch (BlockValidationException $exception) {
@@ -329,6 +357,8 @@ final readonly class AdminPageBuilderController
         try {
             $this->validateCsrf($request);
             $identity = $this->bodyIdentity($request);
+            $languages = $this->languages->get();
+            $locale = $this->bodyLocale($request, $languages);
             $rawOrder = $request->parsedBody()['order'] ?? null;
             if (!\is_array($rawOrder) || !array_is_list($rawOrder)) {
                 throw new InvalidArgumentException('Block order must be a list.');
@@ -340,7 +370,7 @@ final readonly class AdminPageBuilderController
                 }
                 $order[] = $id;
             }
-            $updated = $this->manager->reorder($identity, $order, $this->bodyRevision($request), $this->languages->get());
+            $updated = $this->manager->reorder($identity, $order, $this->bodyRevision($request), $languages);
             $this->audit->log(
                 'block.moved',
                 $actor->id(),
@@ -354,6 +384,7 @@ final readonly class AdminPageBuilderController
                 $identity,
                 'reordered',
                 $updated->revision(),
+                $locale,
             );
         } catch (RevisionConflictException $exception) {
             throw $this->conflict($exception);
@@ -371,6 +402,7 @@ final readonly class AdminPageBuilderController
             $id = $this->bodyId($request);
             $revision = $this->bodyRevision($request);
             $languages = $this->languages->get();
+            $locale = $this->bodyLocale($request, $languages);
             $updated = match ($operation) {
                 'duplicate' => $this->manager->duplicate($identity, $id, $revision, $languages),
                 'toggle' => $this->manager->toggle($identity, $id, $revision, $languages),
@@ -395,6 +427,7 @@ final readonly class AdminPageBuilderController
                 $identity,
                 $operation,
                 $updated->revision(),
+                $locale,
             );
         } catch (RevisionConflictException $exception) {
             throw $this->conflict($exception);
@@ -433,9 +466,13 @@ final readonly class AdminPageBuilderController
     }
 
     /** @param array<string, string> $values */
-    private function localized(array $values, LanguageConfig $languages, string $fallback): string
-    {
-        $localized = $values[$languages->default()] ?? null;
+    private function localized(
+        array $values,
+        LanguageConfig $languages,
+        string $fallback,
+        ?string $locale = null,
+    ): string {
+        $localized = $values[$locale ?? $languages->default()] ?? null;
         if (\is_string($localized) && $localized !== '') {
             return $localized;
         }
@@ -453,9 +490,11 @@ final readonly class AdminPageBuilderController
         array $data,
         FileRevision $revision,
         ?string $id = null,
+        ?string $locale = null,
     ): Response {
         $languages = $this->languages->get();
-        $name = $this->localized($definition->name(), $languages, $definition->type());
+        $locale ??= $languages->default();
+        $name = $this->localized($definition->name(), $languages, $definition->type(), $locale);
         $content = $this->views->render('builder/form', [
             'name' => $name,
             'action' => $action,
@@ -463,8 +502,9 @@ final readonly class AdminPageBuilderController
             'definition' => $definition,
             'revision' => $revision,
             'id' => $id,
-            'fields' => $this->forms->render($definition, $languages, $data),
+            'fields' => $this->forms->render($definition, $languages, $data, $locale),
             'csrfToken' => $this->csrf->token(),
+            'locale' => $locale,
         ]);
 
         return $this->page($title, $content, scripts: true);
@@ -478,12 +518,13 @@ final readonly class AdminPageBuilderController
         string $id,
         string $previewUrl,
         LanguageConfig $languages,
+        string $locale,
     ): string {
         $normalized = $this->validator->validate($definition, $data, $languages, $identity);
         $localized = $this->validator->localize(
             $definition,
             $normalized,
-            $languages->default(),
+            $locale,
             $languages,
             $identity,
         );
@@ -491,7 +532,7 @@ final readonly class AdminPageBuilderController
         $localized['_page_id'] = $identity->value();
         $localized['_return_path'] = $previewUrl;
         $context = new RenderContext(
-            $languages->default(),
+            $locale,
             $this->markdown,
             $this->partials,
             $identity,
@@ -506,11 +547,47 @@ final readonly class AdminPageBuilderController
             $styles .= '<link rel="stylesheet" href="' . AdminView::escape($style) . '">';
         }
 
-        return '<!doctype html><html lang="' . AdminView::escape($languages->default()) . '"><head><meta charset="utf-8">'
+        return '<!doctype html><html lang="' . AdminView::escape($locale) . '"><head><meta charset="utf-8">'
             . '<meta name="viewport" content="width=device-width,initial-scale=1"><base href="/">' . $styles
             . '<style>html{background:#fff}body{min-width:0;background:#fff;overflow-x:hidden}'
             . 'body>*{margin-block:0!important}.site-header,.site-footer{display:none!important}</style></head><body>'
             . $html . '</body></html>';
+    }
+
+    private function previewUrl(
+        PageRouteIndex $routeIndex,
+        PageIdentity $identity,
+        string $locale,
+        LanguageConfig $languages,
+    ): string {
+        $localizedPath = $routeIndex->pathFor($identity, $locale);
+        $localePrefix = $languages->isMultilingual() ? '/' . $locale : '';
+
+        return $localizedPath === ''
+            ? ($localePrefix === '' ? '/' : $localePrefix . '/')
+            : $localePrefix . '/' . $localizedPath;
+    }
+
+    private function queryLocale(Request $request, LanguageConfig $languages): string
+    {
+        return $this->locale($request->query()['locale'] ?? null, $languages);
+    }
+
+    private function bodyLocale(Request $request, LanguageConfig $languages): string
+    {
+        return $this->locale($request->parsedBody()['locale'] ?? null, $languages);
+    }
+
+    private function locale(mixed $value, LanguageConfig $languages): string
+    {
+        if ($value === null || $value === '') {
+            return $languages->default();
+        }
+        if (!\is_string($value) || !$languages->has($value)) {
+            throw new HttpException(400, 'LOCALE_INVALID', 'Language is invalid.');
+        }
+
+        return $value;
     }
 
     private function queryDefinition(Request $request): BlockDefinition
@@ -614,9 +691,13 @@ final readonly class AdminPageBuilderController
         }
     }
 
-    private function redirect(PageIdentity $identity, string $status): Response
+    private function redirect(PageIdentity $identity, string $status, string $locale): Response
     {
-        return Response::redirect('/admin/pages/builder?path=' . rawurlencode($identity->value()) . '&' . $status . '=1', 303);
+        return Response::redirect(
+            '/admin/pages/builder?path=' . rawurlencode($identity->value())
+            . '&locale=' . rawurlencode($locale) . '&' . $status . '=1',
+            303,
+        );
     }
 
     private function mutationResponse(
@@ -624,6 +705,7 @@ final readonly class AdminPageBuilderController
         PageIdentity $identity,
         string $status,
         FileRevision $revision,
+        string $locale,
     ): Response {
         if (str_contains($request->header('accept') ?? '', 'application/json')) {
             return Response::json([
@@ -632,7 +714,7 @@ final readonly class AdminPageBuilderController
             ]);
         }
 
-        return $this->redirect($identity, $status);
+        return $this->redirect($identity, $status, $locale);
     }
 
     private function conflict(RevisionConflictException $exception): HttpException

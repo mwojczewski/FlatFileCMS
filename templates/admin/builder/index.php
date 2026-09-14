@@ -18,6 +18,20 @@ $enabledCount = count(array_filter($blocks, static fn(array $block): bool => $bl
     </div>
     <div class="actions editor-primary-actions">
         <span class="editor-live-state" data-editor-live-state>Podgląd aktualny</span>
+        <?php if (count($languages) > 1): ?>
+            <form class="builder-locale-picker" method="get" action="/admin/pages/builder" data-builder-locale-form>
+                <input type="hidden" name="path" value="<?= $escape($identity->value()) ?>">
+                <label for="builder-render-locale">Język podglądu</label>
+                <select id="builder-render-locale" name="locale" data-builder-locale>
+                    <?php foreach ($languages as $code => $languageName): ?>
+                        <option value="<?= $escape($code) ?>" <?= $code === $locale ? ' selected' : '' ?>>
+                            <?= $escape($languageName) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <button type="submit" class="button secondary">Zmień</button>
+            </form>
+        <?php endif; ?>
         <a class="button secondary" href="<?= $escape($previewUrl) ?>" target="_blank" rel="noopener">Podgląd <span
                 aria-hidden="true">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -27,7 +41,7 @@ $enabledCount = count(array_filter($blocks, static fn(array $block): bool => $bl
                 </svg>
             </span>
         </a>
-        <a class="button" href="/admin/pages/builder/picker?path=<?= rawurlencode($identity->value()) ?>">
+        <a class="button" href="/admin/pages/builder/picker?path=<?= rawurlencode($identity->value()) ?>&amp;locale=<?= rawurlencode($locale) ?>">
             <span aria-hidden="true">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                     class="bi bi-plus-circle" viewBox="0 0 16 16">
@@ -51,7 +65,7 @@ $enabledCount = count(array_filter($blocks, static fn(array $block): bool => $bl
                 <div class="empty-state builder-empty"><span aria-hidden="true">＋</span><strong>Rozpocznij budowę
                         strony</strong>
                     <p>Dodaj pierwszy blok z biblioteki komponentów.</p><a class="button"
-                        href="/admin/pages/builder/picker?path=<?= rawurlencode($identity->value()) ?>">Wybierz blok</a>
+                        href="/admin/pages/builder/picker?path=<?= rawurlencode($identity->value()) ?>&amp;locale=<?= rawurlencode($locale) ?>">Wybierz blok</a>
                 </div>
             <?php endif; ?>
             <?php foreach ($blocks as $index => $block): ?>
@@ -102,6 +116,7 @@ $enabledCount = count(array_filter($blocks, static fn(array $block): bool => $bl
                                 <form method="post" action="<?= $url ?>" <?= $class === 'builder-action-remove' ? ' data-confirm="Usunąć ten blok bezpowrotnie?"' : '' ?>>
                                     <input type="hidden" name="_csrf" value="<?= $escape($csrfToken) ?>">
                                     <input type="hidden" name="identity" value="<?= $escape($identity->value()) ?>">
+                                    <input type="hidden" name="locale" value="<?= $escape($locale) ?>">
                                     <input type="hidden" name="id" value="<?= $escape($block['id']) ?>">
                                     <input type="hidden" name="revision" value="<?= $escape($revision->value()) ?>">
                                     <button type="submit" class="icon-button <?= $class ?>" aria-label="<?= $escape($label) ?>"
@@ -153,7 +168,7 @@ $enabledCount = count(array_filter($blocks, static fn(array $block): bool => $bl
             <?php endforeach; ?>
         </div>
         <a class="builder-inline-add"
-            href="/admin/pages/builder/picker?path=<?= rawurlencode($identity->value()) ?>"><span
+            href="/admin/pages/builder/picker?path=<?= rawurlencode($identity->value()) ?>&amp;locale=<?= rawurlencode($locale) ?>"><span
                 aria-hidden="true">＋</span> Dodaj blok</a>
     </main>
 
@@ -181,6 +196,7 @@ $enabledCount = count(array_filter($blocks, static fn(array $block): bool => $bl
                 data-block-name="<?= $escape($block['name']) ?>" <?= $index === 0 ? '' : ' hidden' ?>>
                 <input type="hidden" name="_csrf" value="<?= $escape($csrfToken) ?>">
                 <input type="hidden" name="identity" value="<?= $escape($identity->value()) ?>">
+                <input type="hidden" name="locale" value="<?= $escape($locale) ?>">
                 <input type="hidden" name="type" value="<?= $escape($block['type']) ?>">
                 <input type="hidden" name="id" value="<?= $escape($block['id']) ?>">
                 <input type="hidden" name="revision" value="<?= $escape($revision->value()) ?>">
@@ -218,7 +234,8 @@ $enabledCount = count(array_filter($blocks, static fn(array $block): bool => $bl
 
 <form class="order-form editor-order-form" method="post" action="/admin/pages/builder/reorder" data-order-form><input
         type="hidden" name="_csrf" value="<?= $escape($csrfToken) ?>"><input type="hidden" name="identity"
-        value="<?= $escape($identity->value()) ?>"><input type="hidden" name="revision"
+        value="<?= $escape($identity->value()) ?>"><input type="hidden" name="locale"
+        value="<?= $escape($locale) ?>"><input type="hidden" name="revision"
         value="<?= $escape($revision->value()) ?>"><span data-order-fields><?php foreach ($blocks as $block): ?><input
                 type="hidden" name="order[]" value="<?= $escape($block['id']) ?>"
                 data-order-field><?php endforeach; ?></span><span data-order-message>Kolejność bloków bez

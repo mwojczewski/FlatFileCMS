@@ -12,6 +12,7 @@ use FlatFileCms\Config\ConfigurationRepository;
 use FlatFileCms\Content\PageBlockManager;
 use FlatFileCms\Content\PageRepository;
 use FlatFileCms\Domain\Content\PageIdentity;
+use FlatFileCms\Http\HttpException;
 use FlatFileCms\Http\Request;
 use FlatFileCms\Http\UploadedFile;
 use FlatFileCms\Infrastructure\Filesystem\AtomicFileWriter;
@@ -180,6 +181,23 @@ final class MediaManagerTest extends TestCase
         self::assertSame(206, $range->status());
         self::assertSame(1, \strlen($range->body()));
         self::assertStringStartsWith('bytes 0-0/', $range->headers()['Content-Range']);
+    }
+
+    public function testPublicControllerRejectsAnIncompleteMediaUrl(): void
+    {
+        $controller = new PublicMediaController($this->repository, $this->variants);
+
+        try {
+            $controller->show(new Request(
+                'GET',
+                '/media/offer/photo.png',
+                attributes: ['path' => 'offer/photo.png'],
+            ));
+            self::fail('An incomplete media URL should not be served.');
+        } catch (HttpException $exception) {
+            self::assertSame(404, $exception->status);
+            self::assertSame('MEDIA_NOT_FOUND', $exception->errorCode);
+        }
     }
 
     public function testItLimitsCachedVariantsForOneSourceFile(): void

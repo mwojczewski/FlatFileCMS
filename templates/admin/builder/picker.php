@@ -27,7 +27,7 @@ $blockIcon = static function (string $type): string {
         <p class="lead">Wybierz komponent, który pojawi się na stronie <code><?= $escape($identity->value()) ?></code>.
         </p>
     </div>
-    <a class="button secondary" href="/admin/pages/builder?path=<?= rawurlencode($identity->value()) ?>">Anuluj</a>
+    <a class="button secondary" href="/admin/pages/builder?path=<?= rawurlencode($identity->value()) ?>&amp;locale=<?= rawurlencode($locale) ?>">Anuluj</a>
 </div>
 <label class="pages-search block-search">
     <span class="sr-only">Szukaj bloku</span>
@@ -43,7 +43,7 @@ $blockIcon = static function (string $type): string {
         $definition = $card['definition']; ?>
         <a class="picker-card" data-block-card
             data-block-search-value="<?= $escape(mb_strtolower($card['name'] . ' ' . $card['description'] . ' ' . $definition->type())) ?>"
-            href="/admin/pages/builder/create?path=<?= rawurlencode($identity->value()) ?>&amp;type=<?= rawurlencode($definition->type()) ?>">
+            href="/admin/pages/builder/create?path=<?= rawurlencode($identity->value()) ?>&amp;type=<?= rawurlencode($definition->type()) ?>&amp;locale=<?= rawurlencode($locale) ?>">
             <?php if ($card['preview']): ?>
                 <img src="/admin/pages/builder/preview?type=<?= rawurlencode($definition->type()) ?>" alt="">
             <?php else: ?>

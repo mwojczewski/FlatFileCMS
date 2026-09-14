@@ -62,4 +62,29 @@ final class BlockFormRendererTest extends TestCase
         self::assertStringContainsString('value="/en/documentation/getting-started"', $html);
         self::assertStringNotContainsString('type="url"', $html);
     }
+
+    public function testItActivatesTheSelectedPreviewLocaleInTranslatedFields(): void
+    {
+        $definition = new BlockDefinition(
+            'text',
+            ['pl' => 'Tekst', 'en' => 'Text'],
+            [],
+            null,
+            ['content' => new FieldDefinition('content', 'text', false, true, [])],
+            '/blocks/text',
+            '/blocks/text/render.php',
+            1,
+        );
+
+        $html = (new BlockFormRenderer())->render(
+            $definition,
+            new LanguageConfig('pl', ['pl' => 'Polski', 'en' => 'English']),
+            ['content' => ['pl' => 'Treść', 'en' => 'Content']],
+            'en',
+        );
+
+        self::assertStringContainsString('class="locale-tab active" data-locale-target="en"', $html);
+        self::assertStringContainsString('class="locale-panel active" data-locale-panel="en"', $html);
+        self::assertStringNotContainsString('class="locale-tab active" data-locale-target="pl"', $html);
+    }
 }
