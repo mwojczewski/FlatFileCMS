@@ -246,7 +246,7 @@ YAML);
     {
         $blocks = [];
         foreach (ContentData::list($data['blocks'] ?? [], 'blocks') as $index => $block) {
-            $blocks[] = ContentData::map($block, 'blocks.' . $index);
+            $blocks[] = ContentData::map($block, "blocks.{$index}");
         }
 
         return $blocks;

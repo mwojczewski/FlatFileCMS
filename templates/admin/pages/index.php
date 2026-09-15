@@ -95,7 +95,7 @@ $pageIcon = static function (bool $collection, bool $homepage): string {
                 <tr data-page-row data-page-identity="<?= $escape($identity) ?>" data-page-depth="<?= $depth ?>"
                     data-page-collection="<?= $entry['collection'] ? '1' : '0' ?>"
                     data-page-revision="<?= $escape($entry['revision']) ?>"
-                    data-page-search-value="<?= $escape(mb_strtolower($entry['title'] . ' ' . $identity)) ?>"
+                    data-page-search-value="<?= $escape(mb_strtolower("{$entry['title']} {$identity}")) ?>"
                     <?= $entry['identity']->isHomepage() ? '' : ' draggable="true"' ?>>
                     <td class="page-cell">
                         <span class="tree" style="--depth:<?= $depth ?>">

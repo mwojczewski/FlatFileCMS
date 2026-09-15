@@ -145,7 +145,7 @@ YAML);
             ? ''
             : \sprintf("slug:\n  pl: %s\n  en: %s\n", $slugs['pl'], $slugs['en']);
         $this->project->write(
-            'pages/' . $identity . '/content.yml',
+            "pages/{$identity}/content.yml",
             \sprintf(
                 "schemaVersion: 1\nenabled: %s\n%stitle:\n  pl: %s\n  en: %s\nblocks: []\n",
                 $enabled ? 'true' : 'false',

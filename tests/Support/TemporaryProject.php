@@ -28,7 +28,7 @@ final readonly class TemporaryProject
             'templates/layouts',
             'templates/partials',
         ] as $directory) {
-            $absolutePath = $path . '/' . $directory;
+            $absolutePath = "{$path}/{$directory}";
             if (!mkdir($absolutePath, 0o700, true) && !is_dir($absolutePath)) {
                 throw new RuntimeException('Unable to create temporary project directory.');
             }

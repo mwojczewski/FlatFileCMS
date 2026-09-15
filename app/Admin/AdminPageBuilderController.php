@@ -444,7 +444,7 @@ final readonly class AdminPageBuilderController
     {
         $blocks = [];
         foreach (ContentData::list($data['blocks'] ?? [], 'blocks') as $index => $block) {
-            $blocks[] = ContentData::map($block, 'blocks.' . $index);
+            $blocks[] = ContentData::map($block, "blocks.{$index}");
         }
 
         return $blocks;
@@ -564,8 +564,8 @@ final readonly class AdminPageBuilderController
         $localePrefix = $languages->isMultilingual() ? '/' . $locale : '';
 
         return $localizedPath === ''
-            ? ($localePrefix === '' ? '/' : $localePrefix . '/')
-            : $localePrefix . '/' . $localizedPath;
+            ? ($localePrefix === '' ? '/' : "{$localePrefix}/")
+            : "{$localePrefix}/{$localizedPath}";
     }
 
     private function queryLocale(Request $request, LanguageConfig $languages): string
@@ -725,7 +725,7 @@ final readonly class AdminPageBuilderController
     private function validationException(BlockValidationException $exception): HttpException
     {
         $message = implode(' ', array_map(
-            static fn(ValidationError $error): string => $error->path() . ': ' . $error->message(),
+            static fn(ValidationError $error): string => "{$error->path()}: {$error->message()}",
             $exception->errors,
         ));
 

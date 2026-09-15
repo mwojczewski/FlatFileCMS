@@ -155,7 +155,7 @@ YAML);
         string $plExcerpt,
         string $enExcerpt,
     ): void {
-        $this->project->write('pages/blog/' . $identity . '/content.yml', <<<YAML
+        $this->project->write("pages/blog/{$identity}/content.yml", <<<YAML
 schemaVersion: 1
 enabled: true
 slug: { pl: {$plSlug}, en: {$enSlug} }

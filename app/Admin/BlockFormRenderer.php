@@ -45,7 +45,7 @@ final readonly class BlockFormRenderer
                 $definition,
                 $languages,
                 $value,
-                $prefix . '[' . $name . ']',
+                "{$prefix}[{$name}]",
                 $depth,
                 $activeLocale,
             );
@@ -83,7 +83,7 @@ final readonly class BlockFormRenderer
                     $definition,
                     $languages,
                     $localized[$locale] ?? null,
-                    $name . '[' . $locale . ']',
+                    "{$name}[{$locale}]",
                     $depth,
                     $activeLocale,
                 ) . '</div>';
@@ -155,17 +155,17 @@ final readonly class BlockFormRenderer
                 $definition,
                 $languages,
                 $this->mapping($item),
-                $name . '[' . $index . ']',
+                "{$name}[{$index}]",
                 $depth,
                 $activeLocale,
             );
         }
-        $token = '__INDEX_' . $depth . '__';
+        $token = "__INDEX_{$depth}__";
         $template = $this->repeaterItem(
             $definition,
             $languages,
             [],
-            $name . '[' . $token . ']',
+            "{$name}[{$token}]",
             $depth,
             $activeLocale,
         );
@@ -198,7 +198,7 @@ final readonly class BlockFormRenderer
         $media = $this->mapping($value);
         $src = \is_string($media['src'] ?? null) ? $media['src'] : '';
         $html = '<div class="media-field-control" data-media-field><input type="text" data-media-source name="'
-            . self::escape($name . '[src]') . '" value="' . self::escape($src)
+            . self::escape("{$name}[src]") . '" value="' . self::escape($src)
             . '" placeholder="np. hero.jpg"><button type="button" class="button secondary" data-media-open data-media-kind="'
             . self::escape($definition->type()) . '">Wybierz z biblioteki</button></div>';
         if ($definition->type() !== 'image') {
