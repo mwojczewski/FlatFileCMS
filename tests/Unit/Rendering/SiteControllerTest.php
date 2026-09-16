@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Tests\Unit\Rendering;
 
+use FlatFileCms\Http\HttpException;
 use FlatFileCms\Http\Request;
 use FlatFileCms\Rendering\SiteController;
 use FlatFileCms\Tests\Support\TemporaryProject;
@@ -56,6 +57,37 @@ final class SiteControllerTest extends TestCase
         self::assertMatchesRegularExpression('#/assets/blocks/text/text\.[a-f0-9]{16}\.css#', $response->body());
         self::assertSame(1, substr_count($response->body(), '/assets/blocks/text/'));
         self::assertMatchesRegularExpression('/^"[a-f0-9]{64}"$/D', $response->headers()['ETag']);
+    }
+
+    public function testItServesReactPrerenderForConfiguredPage(): void
+    {
+        $html = '<!doctype html><html lang="en"><body><div id="root">React privacy</div></body></html>';
+        $this->project->write('public/app/prerender/en/privacy-policy/index.html', $html);
+
+        $response = $this->controller->page(new Request(
+            'GET',
+            '/en/privacy-policy',
+            attributes: ['path' => 'en/privacy-policy'],
+        ));
+
+        self::assertSame(200, $response->status());
+        self::assertSame($html, $response->body());
+        self::assertMatchesRegularExpression('/^"[a-f0-9]{64}"$/D', $response->headers()['ETag']);
+    }
+
+    public function testItReturnsServiceUnavailableWhenReactPrerenderIsMissing(): void
+    {
+        try {
+            $this->controller->page(new Request(
+                'GET',
+                '/pl/polityka-prywatnosci',
+                attributes: ['path' => 'pl/polityka-prywatnosci'],
+            ));
+            self::fail('Expected the missing prerender to fail.');
+        } catch (HttpException $exception) {
+            self::assertSame(503, $exception->status);
+            self::assertSame('PRERENDER_NOT_AVAILABLE', $exception->errorCode);
+        }
     }
 
     public function testItReturnsNotModifiedForMatchingEtag(): void
@@ -182,6 +214,14 @@ blocks:
       content:
         pl: '**bezpieczna** treść'
         en: '**safe** content <script>alert(1)</script>'
+YAML);
+        $this->project->write('pages/privacy/content.yml', <<<'YAML'
+schemaVersion: 1
+enabled: true
+render: { engine: react-prerender }
+slug: { pl: polityka-prywatnosci, en: privacy-policy }
+title: { pl: Polityka prywatności, en: Privacy policy }
+blocks: []
 YAML);
         $this->writeCollection('desc');
         $this->project->write('pages/blog/post/content.yml', <<<'YAML'

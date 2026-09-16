@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FlatFileCms\Domain\Content;
 
 use FlatFileCms\Infrastructure\Filesystem\FileRevision;
+use FlatFileCms\Rendering\PageRenderEngine;
 
 final readonly class Page
 {
@@ -69,6 +70,11 @@ final readonly class Page
     public function attributes(): array
     {
         return $this->attributes;
+    }
+
+    public function renderEngine(): PageRenderEngine
+    {
+        return PageRenderEngine::fromPageData($this->attributes);
     }
 
     public function revision(): FileRevision

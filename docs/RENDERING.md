@@ -91,6 +91,28 @@ redirected to the same path under the configured default locale:
 HTML responses use the same page visibility and translated-slug route index as
 the API. They also include ETag, Last-Modified and revalidation cache headers.
 
+## Optional React prerenders
+
+A page can select a prebuilt React document instead of the PHP block and layout
+renderer:
+
+```yaml
+render:
+  engine: react-prerender
+```
+
+After the normal localized route lookup succeeds, the CMS reads the complete
+HTML document from `public/app/prerender/{locale}/{localized-path}/index.html`.
+For example, `/en/privacy-policy` maps to
+`public/app/prerender/en/privacy-policy/index.html`; a localized homepage maps
+to `public/app/prerender/{locale}/index.html`. A missing artifact returns 503
+instead of silently falling back to PHP.
+
+The web server should deny direct HTTP access to `/app/prerender/` so that
+visitors cannot bypass page visibility, redirects and response headers. After
+deploying new prerenders, invalidate the public HTML cache in the same way as
+after publishing CMS content.
+
 Page-local media values retain their direct `src` filename but the shared page
 view model adds a fingerprinted public `url`, MIME information, size and image
 dimensions. `RenderContext::image()` emits that immutable URL with intrinsic

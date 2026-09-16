@@ -245,6 +245,11 @@ final readonly class PageManager
         $data = $existing ?? [];
         $data['schemaVersion'] = 1;
         $data['enabled'] = $metadata->enabled();
+        if ($metadata->renderEngine()->value === 'php') {
+            unset($data['render']);
+        } else {
+            $data['render'] = ['engine' => $metadata->renderEngine()->value];
+        }
         if ($metadata->layout() === null) {
             unset($data['layout']);
         } else {

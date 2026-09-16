@@ -27,6 +27,7 @@ use FlatFileCms\Infrastructure\Filesystem\FileRevision;
 use FlatFileCms\Infrastructure\Filesystem\FilesystemException;
 use FlatFileCms\Infrastructure\Filesystem\RevisionConflictException;
 use FlatFileCms\Rendering\LayoutRegistry;
+use FlatFileCms\Rendering\PageRenderEngine;
 use InvalidArgumentException;
 
 final readonly class AdminPageController
@@ -332,7 +333,8 @@ final readonly class AdminPageController
         $data = $request->parsedBody();
         $layout = $data['layout'] ?? null;
         $canonical = $data['canonical'] ?? null;
-        if (!\is_string($layout) || !\is_string($canonical)) {
+        $renderEngine = $data['render_engine'] ?? PageRenderEngine::Php->value;
+        if (!\is_string($layout) || !\is_string($canonical) || !\is_string($renderEngine)) {
             throw new InvalidArgumentException('Page form contains invalid scalar values.');
         }
 
@@ -346,6 +348,8 @@ final readonly class AdminPageController
             trim($canonical) === '' ? null : trim($canonical),
             ($data['robots_index'] ?? null) === '1',
             ($data['robots_follow'] ?? null) === '1',
+            PageRenderEngine::tryFrom($renderEngine)
+                ?? throw new InvalidArgumentException('Page render engine is invalid.'),
         );
     }
 

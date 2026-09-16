@@ -37,6 +37,7 @@ final readonly class SiteController
         private PageViewModelFactory $pageViews,
         private CollectionViewModelFactory $collectionViews,
         private PageRenderer $renderer,
+        private ReactPrerenderRepository $reactPrerenders,
         private CollectionRenderer $collectionRenderer,
         private HtmlResponseFactory $responses,
         private PublicHtmlCache $htmlCache,
@@ -113,8 +114,16 @@ final readonly class SiteController
             return $this->responses->cacheable($request, $html, $modifiedAt, $contentHash);
         }
 
-        $view = $this->pageViews->create($page, $locale, $languages, $routes, $configuration);
-        $rendered = $this->renderer->render($view, $navigation->menus());
+        if ($page->renderEngine() === PageRenderEngine::ReactPrerender) {
+            try {
+                $rendered = $this->reactPrerenders->render($locale, $contentPath);
+            } catch (PrerenderNotFoundException $exception) {
+                throw new HttpException(503, 'PRERENDER_NOT_AVAILABLE', $exception->getMessage(), previous: $exception);
+            }
+        } else {
+            $view = $this->pageViews->create($page, $locale, $languages, $routes, $configuration);
+            $rendered = $this->renderer->render($view, $navigation->menus());
+        }
 
         $modifiedAt = max(
             $page->modifiedAt(),

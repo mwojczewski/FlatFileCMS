@@ -14,6 +14,7 @@ use FlatFileCms\Infrastructure\Filesystem\FilesystemRoot;
 use FlatFileCms\Infrastructure\Filesystem\RelativePath;
 use FlatFileCms\Infrastructure\Filesystem\SafePathResolver;
 use FlatFileCms\Infrastructure\Yaml\YamlFileRepository;
+use FlatFileCms\Rendering\PageRenderEngine;
 use FlatFileCms\Support\ContentData;
 use InvalidArgumentException;
 use RecursiveDirectoryIterator;
@@ -108,6 +109,7 @@ final readonly class PageRepository
             $titles = $this->localizedStrings($data['title'] ?? null, 'title', $languages);
             $seo = isset($data['seo']) ? ContentData::map($data['seo'], 'seo') : [];
             $blocks = $this->blocks($data['blocks'] ?? []);
+            PageRenderEngine::fromPageData($data);
             $attributes = array_diff_key($data, array_flip([
                 'schemaVersion',
                 'enabled',

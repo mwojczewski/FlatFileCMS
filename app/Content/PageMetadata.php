@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace FlatFileCms\Content;
 
+use FlatFileCms\Rendering\PageRenderEngine;
+
 final readonly class PageMetadata
 {
     /**
@@ -22,6 +24,7 @@ final readonly class PageMetadata
         private ?string $canonical,
         private bool $robotsIndex,
         private bool $robotsFollow,
+        private PageRenderEngine $renderEngine = PageRenderEngine::Php,
     ) {}
 
     public function enabled(): bool
@@ -71,5 +74,10 @@ final readonly class PageMetadata
     public function robotsFollow(): bool
     {
         return $this->robotsFollow;
+    }
+
+    public function renderEngine(): PageRenderEngine
+    {
+        return $this->renderEngine;
     }
 }

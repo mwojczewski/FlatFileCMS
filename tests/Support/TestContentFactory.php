@@ -45,6 +45,7 @@ use FlatFileCms\Rendering\OutputBuffer;
 use FlatFileCms\Rendering\PageRenderer;
 use FlatFileCms\Rendering\PartialRegistry;
 use FlatFileCms\Rendering\PartialRenderer;
+use FlatFileCms\Rendering\ReactPrerenderRepository;
 use FlatFileCms\Rendering\SiteController;
 use FlatFileCms\Seo\SeoResolver;
 
@@ -141,6 +142,7 @@ final class TestContentFactory
             $views,
             $collectionViews,
             $renderer,
+            new ReactPrerenderRepository($project->path()),
             new CollectionRenderer(
                 new LayoutRegistry($project->path()),
                 $buffer,

@@ -118,6 +118,7 @@ use FlatFileCms\Rendering\OutputBuffer;
 use FlatFileCms\Rendering\PageRenderer;
 use FlatFileCms\Rendering\PartialRegistry;
 use FlatFileCms\Rendering\PartialRenderer;
+use FlatFileCms\Rendering\ReactPrerenderRepository;
 use FlatFileCms\Rendering\SiteController;
 use FlatFileCms\Seo\SeoResolver;
 use FlatFileCms\Seo\SitemapController;
@@ -916,6 +917,12 @@ $container->set(
     ),
 );
 $container->set(HtmlResponseFactory::class, static fn(): HtmlResponseFactory => new HtmlResponseFactory());
+$container->set(
+    ReactPrerenderRepository::class,
+    static fn(Container $container): ReactPrerenderRepository => new ReactPrerenderRepository(
+        $container->get(Environment::class)->projectRoot(),
+    ),
+);
 $container->set(ApiErrorResponder::class, static fn(): ApiErrorResponder => new ApiErrorResponder());
 $container->set(
     WebErrorRenderer::class,
@@ -939,6 +946,7 @@ $container->set(
         $container->get(PageViewModelFactory::class),
         $container->get(CollectionViewModelFactory::class),
         $container->get(PageRenderer::class),
+        $container->get(ReactPrerenderRepository::class),
         $container->get(CollectionRenderer::class),
         $container->get(HtmlResponseFactory::class),
         $container->get(PublicHtmlCache::class),
