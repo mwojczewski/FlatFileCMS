@@ -79,7 +79,7 @@ the admin application.
 | --------------------- | ------------------------------------------------------------------------------------------------- |
 | Site identity         | `site.name`, `site.url`                                                                           |
 | Rendering             | `site.defaultLayout`                                                                              |
-| SEO defaults          | `seo.*`                                                                                           |
+| SEO defaults          | `seo.*`, `seo.sitemap.images.maxWidth`, `seo.sitemap.images.maxHeight`                            |
 | Upload policy         | `media.maxUploadBytes`, `media.allowedMimeTypes`, `media.stripMetadata`                           |
 | Media transforms      | `media.transformations.enabled`, `quality`, `maxWidth`, `maxHeight`, `maxPixels`, `media.formats` |
 | Generated media cache | `media.cache.enabled`                                                                             |
@@ -87,6 +87,11 @@ the admin application.
 `site.url` is the sole canonical site URL. There is no `APP_URL` environment
 override. Media processing has no environment override either; copying the
 site preserves its declared media contract.
+
+Sitemap image URLs use the existing media transformation endpoint. Raster
+images are emitted as WebP variants contained within the configured
+`seo.sitemap.images.maxWidth` × `maxHeight` bounds (1280 × 720 by default),
+without upscaling. Non-transformable image formats retain their original URL.
 
 Image transformations and their generated-file cache are independent:
 `media.transformations.enabled: false` delegates processing to an edge service,

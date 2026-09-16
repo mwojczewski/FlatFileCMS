@@ -951,6 +951,9 @@ $container->set(
         $container->get(ConfigurationRepository::class),
         $container->get(PageRepository::class),
         $container->get(CollectionRepository::class),
+        $container->get(SeoResolver::class),
+        $container->get(MediaRepository::class),
+        $container->get(MediaUrlGenerator::class),
     ),
 );
 $container->set(
