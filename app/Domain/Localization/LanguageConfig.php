@@ -32,7 +32,6 @@ final readonly class LanguageConfig
     /** @return non-empty-list<string> */
     public function codes(): array
     {
-        /** @var non-empty-list<string> */
         return array_keys($this->languages);
     }
 

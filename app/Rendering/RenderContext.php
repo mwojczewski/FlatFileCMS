@@ -51,15 +51,15 @@ final readonly class RenderContext
         $alt = $this->imageAlt($image);
         [$htmlWidth, $htmlHeight] = $this->displayDimensions($file, $width, $height, $fit);
 
+        $dimensions = $htmlWidth !== null && $htmlHeight !== null
+            ? \sprintf(' width="%d" height="%d"', $htmlWidth, $htmlHeight)
+            : '';
+
         return \sprintf(
             '<img src="%s" alt="%s"%s%s>',
             $this->escape($src),
             $this->escape($alt),
-            $htmlWidth === null ? '' : \sprintf(
-                ' width="%d" height="%d"',
-                $htmlWidth,
-                $htmlHeight,
-            ),
+            $dimensions,
             $this->imageAttributes($attributes),
         );
     }
@@ -122,6 +122,10 @@ final readonly class RenderContext
         $alt = $this->imageAlt($image);
         [$htmlWidth, $htmlHeight] = $this->displayDimensions($file, $fallbackWidth, $fallbackHeight, $fit);
 
+        $dimensions = $htmlWidth !== null && $htmlHeight !== null
+            ? \sprintf(' width="%d" height="%d"', $htmlWidth, $htmlHeight)
+            : '';
+
         return \sprintf(
             '<picture><source type="%s" srcset="%s" sizes="%s"><img src="%s" alt="%s"%s%s></picture>',
             $this->escape($this->formatMimeType($format)),
@@ -129,7 +133,7 @@ final readonly class RenderContext
             $this->escape($sizes),
             $this->escape($fallback),
             $this->escape($alt),
-            $htmlWidth === null ? '' : \sprintf(' width="%d" height="%d"', $htmlWidth, $htmlHeight),
+            $dimensions,
             $this->imageAttributes($attributes),
         );
     }
@@ -199,7 +203,7 @@ final readonly class RenderContext
             }
 
             return $this->media->get($this->pageIdentity, MediaName::fromString($src));
-        } catch (InvalidArgumentException|MediaException $exception) {
+        } catch (InvalidArgumentException | MediaException $exception) {
             throw new RenderingException('Normalized image path is invalid.', previous: $exception);
         }
     }

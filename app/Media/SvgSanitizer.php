@@ -28,10 +28,10 @@ final class SvgSanitizer
         }
 
         $document = new DOMDocument();
-        $previous = libxml_use_internal_errors(true);
         if ($contents === '') {
             throw new MediaException('Uploaded SVG is not a valid SVG document.');
         }
+        $previous = libxml_use_internal_errors(true);
         try {
             $loaded = $document->loadXML($contents, LIBXML_NONET | LIBXML_COMPACT | LIBXML_NOBLANKS);
         } finally {

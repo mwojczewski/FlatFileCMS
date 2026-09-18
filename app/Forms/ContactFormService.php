@@ -173,7 +173,10 @@ final readonly class ContactFormService
         }
 
         return $value
-            |> (static fn(string $input): array => preg_split('/\R/u', $input) ?: [])
+            |> (static function (string $input): array {
+                $lines = preg_split('/\R/u', $input);
+                return $lines === false ? [] : $lines;
+            })
             |> (static fn(array $items): array => array_map(trim(...), $items))
             |> (static fn(array $items): array => array_filter($items, static fn(string $item): bool => $item !== ''))
             |> array_values(...);

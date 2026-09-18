@@ -37,12 +37,11 @@ final class CacheClearerTest extends TestCase
         self::assertSame(5, $clearer->clear());
         self::assertDirectoryExists($this->project->path('storage/cache'));
         self::assertFileExists($this->project->path('storage/cache/.gitkeep'));
+        $entries = scandir($this->project->path('storage/cache'));
+        self::assertIsArray($entries);
         self::assertSame(
             [],
-            array_values(array_diff(
-                scandir($this->project->path('storage/cache')) ?: [],
-                ['.', '..', '.gitkeep'],
-            )),
+            array_values(array_diff($entries, ['.', '..', '.gitkeep'])),
         );
         self::assertSame(0, $clearer->clear());
     }

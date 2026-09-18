@@ -95,7 +95,6 @@ final readonly class BlockScaffolder
             throw new BlockScaffolderException('Unable to create block files.', previous: $exception);
         }
 
-        /** @var non-empty-list<string> */
         return array_map(
             static fn(string $filename): string => "blocks/{$type}/{$filename}",
             array_keys($files),

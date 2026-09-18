@@ -24,19 +24,28 @@ final readonly class LogReader
             return [];
         }
 
+        $scan = scandir($this->directory);
+        if ($scan === false) {
+            return [];
+        }
+
         $files = [];
-        foreach (scandir($this->directory) ?: [] as $name) {
+        foreach ($scan as $name) {
             if (!$this->validName($name)) {
                 continue;
             }
+
             $path = $this->directory . '/' . $name;
             if (!is_file($path) || is_link($path)) {
                 continue;
             }
+
+            $size = filesize($path);
+            $modified = filemtime($path);
             $files[] = [
                 'name' => $name,
-                'size' => (int) (filesize($path) ?: 0),
-                'modified' => (int) (filemtime($path) ?: 0),
+                'size' => $size === false ? 0 : $size,
+                'modified' => $modified === false ? 0 : $modified,
             ];
         }
 

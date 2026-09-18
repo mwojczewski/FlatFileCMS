@@ -9,3 +9,4 @@ parameters:
     reportPossiblyNonexistentConstantArrayOffset: true
 includes:
     - phar://phpstan.phar/conf/bleedingEdge.neon
+    - vendor/phpstan/phpstan-strict-rules/rules.neon

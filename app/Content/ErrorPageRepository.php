@@ -36,15 +36,17 @@ final readonly class ErrorPageRepository
             $document = $this->yaml->read(FilesystemRoot::Errors, $relativePath);
             $data = $document->data();
             // Error pages are not routable, but Page's parser expects localized slugs.
-            $data['slug'] = array_fill_keys($languages->codes(), 'error-' . $candidate);
+            $data['slug'] = array_fill_keys($languages->codes(), "error-{$candidate}");
             clearstatcache(true, $absolutePath);
+
+            $mtime = filemtime($absolutePath) !== false ? filemtime($absolutePath) : time();
 
             return $this->pages->fromData(
                 PageIdentity::fromString($candidate),
                 $data,
                 $languages,
                 $document->revision(),
-                filemtime($absolutePath) ?: time(),
+                $mtime,
             );
         }
 

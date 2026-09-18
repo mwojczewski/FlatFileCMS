@@ -154,8 +154,9 @@ final class MediaManagerTest extends TestCase
 
         self::assertSame('image/webp', $variant->mimeType());
         self::assertNotSame('', $variant->contents());
-        self::assertNotEmpty(glob($this->project->path('storage/cache/media/*/*/*.webp')) ?: []);
-
+        $files = glob($this->project->path('storage/cache/media/*/*/*.webp'));
+        self::assertIsArray($files);
+        self::assertNotEmpty($files);
         $controller = new PublicMediaController($this->repository, $this->variants);
         $path = "offer/{$item->fingerprint()}/{$item->name()->value()}";
         $response = $controller->show(new Request('GET', "/media/{$path}", query: ['w' => '1', 'format' => 'webp'], attributes: ['path' => $path]));

@@ -210,8 +210,8 @@ final readonly class CollectionRepository
             $parameters[$parameter] = true;
 
             $allowedValues = [];
-            foreach (ContentData::list($definition['allowedValues'] ?? [], $path . '.allowedValues') as $value) {
-                $allowedValues[] = ContentData::string($value, $path . '.allowedValues');
+            foreach (ContentData::list($definition['allowedValues'] ?? [], "{$path}.allowedValues") as $allowedValue) {
+                $allowedValues[] = ContentData::string($allowedValue, "{$path}.allowedValues");
             }
 
             $filters[] = new CollectionFilter($parameter, $field, $allowedValues);
