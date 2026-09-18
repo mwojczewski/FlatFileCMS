@@ -47,8 +47,13 @@ YAML);
         $definitions = $this->registry()->all();
 
         self::assertSame(['hero'], array_keys($definitions));
-        self::assertSame('text', $definitions['hero']->fields()['title']->type());
-        self::assertTrue($definitions['hero']->fields()['title']->translatable());
+        $hero = $definitions['hero']
+            ?? throw new \RuntimeException('Hero block is missing.');
+        $title = $hero->fields()['title']
+            ?? throw new \RuntimeException('Hero title field is missing.');
+
+        self::assertSame('text', $title->type());
+        self::assertTrue($title->translatable());
     }
 
     public function testItRejectsBlockWithoutRenderer(): void
@@ -98,8 +103,21 @@ YAML);
 
         self::assertSame(
             [
-                'boolean', 'color', 'date', 'datetime', 'email', 'file', 'image', 'markdown',
-                'multiselect', 'number', 'repeater', 'select', 'text', 'textarea', 'url',
+                'boolean',
+                'color',
+                'date',
+                'datetime',
+                'email',
+                'file',
+                'image',
+                'markdown',
+                'multiselect',
+                'number',
+                'repeater',
+                'select',
+                'text',
+                'textarea',
+                'url',
             ],
             $types->names(),
         );

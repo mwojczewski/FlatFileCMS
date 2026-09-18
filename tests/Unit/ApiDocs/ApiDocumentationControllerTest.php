@@ -29,8 +29,8 @@ final class ApiDocumentationControllerTest extends TestCase
 
         self::assertSame(200, $response->status());
         self::assertIsArray($data);
-        self::assertSame('3.1.0', $data['openapi']);
-        self::assertStringStartsWith('application/vnd.oai.openapi+json', $response->headers()['Content-Type']);
+        self::assertSame('3.1.0', $data['openapi'] ?? null);
+        self::assertStringStartsWith('application/vnd.oai.openapi+json', $response->headers()['Content-Type'] ?? throw new \RuntimeException('Content-Type header is missing.'));
         self::assertArrayHasKey('ETag', $response->headers());
     }
 
@@ -40,7 +40,7 @@ final class ApiDocumentationControllerTest extends TestCase
         $second = $this->controller->specification(new Request(
             'GET',
             '/api/openapi.json',
-            headers: ['if-none-match' => $first->headers()['ETag']],
+            headers: ['if-none-match' => $first->headers()['ETag'] ?? throw new \RuntimeException('ETag header is missing.')],
         ));
 
         self::assertSame(304, $second->status());

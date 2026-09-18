@@ -27,17 +27,22 @@ final readonly class Environment
 
             foreach ($lines as $line) {
                 $line = trim($line);
-                if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) {
+                if ($line === '' || str_starts_with($line, '#')) {
                     continue;
                 }
 
-                [$key, $value] = explode('=', $line, 2);
-                $key = trim($key);
+                $separator = strpos($line, '=');
+                if ($separator === false) {
+                    continue;
+                }
+
+                $key = trim(substr($line, 0, $separator));
                 if ($key === '') {
                     continue;
                 }
 
-                $values[$key] = self::unquote(trim($value));
+                $value = trim(substr($line, $separator + 1));
+                $values[$key] = self::unquote($value);
             }
         }
 

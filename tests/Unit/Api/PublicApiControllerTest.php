@@ -16,6 +16,8 @@ use FlatFileCms\Tests\Support\TestContentFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+use function PHPUnit\Framework\throwException;
+
 #[CoversClass(PublicApiController::class)]
 #[CoversClass(ApiResponseFactory::class)]
 final class PublicApiControllerTest extends TestCase
@@ -52,21 +54,21 @@ final class PublicApiControllerTest extends TestCase
         $seo = ContentData::map($data['seo'] ?? null, 'seo');
 
         self::assertSame(200, $response->status());
-        self::assertSame('Services', $data['title']);
-        self::assertSame('/en/services', $data['url']);
-        self::assertSame('Welcome', $blockData['heading']);
+        self::assertSame('Services', $data['title'] ?? null);
+        self::assertSame('/en/services', $data['url'] ?? null);
+        self::assertSame('Welcome', $blockData['heading'] ?? null);
         $image = ContentData::map($blockData['image'] ?? null, 'blocks.0.data.image');
-        self::assertSame('hero.png', $image['src']);
-        self::assertSame('image/png', $image['mimeType']);
-        self::assertSame(1, $image['width']);
-        self::assertSame(1, $image['height']);
+        self::assertSame('hero.png', $image['src'] ?? null);
+        self::assertSame('image/png', $image['mimeType'] ?? null);
+        self::assertSame(1, $image['width'] ?? null);
+        self::assertSame(1, $image['height'] ?? null);
         self::assertMatchesRegularExpression(
             '#^/media/services/[a-f0-9]{16}/hero\.png$#D',
             ContentData::string($image['url'] ?? null, 'blocks.0.data.image.url'),
         );
-        self::assertSame('Services — Example', $seo['title']);
-        self::assertSame('Global description', $seo['description']);
-        self::assertMatchesRegularExpression('/^"[a-f0-9]{64}"$/D', $response->headers()['ETag']);
+        self::assertSame('Services — Example', $seo['title'] ?? null);
+        self::assertSame('Global description', $seo['description'] ?? null);
+        self::assertMatchesRegularExpression('/^"[a-f0-9]{64}"$/D', $response->headers()['ETag'] ?? throw new \RuntimeException('ETag header is missing.'));
     }
 
     public function testHomepageDoesNotAppendGlobalTitleSuffix(): void
@@ -80,7 +82,7 @@ final class PublicApiControllerTest extends TestCase
         $seo = ContentData::map($data['seo'] ?? null, 'seo');
 
         self::assertSame(200, $response->status());
-        self::assertSame('Home', $seo['title']);
+        self::assertSame('Home', $seo['title'] ?? null);
     }
 
     public function testItReturnsNotModifiedForMatchingEtag(): void
@@ -95,7 +97,7 @@ final class PublicApiControllerTest extends TestCase
         $conditional = new Request(
             'GET',
             '/api/v1/pages/services',
-            headers: ['if-none-match' => $first->headers()['ETag']],
+            headers: ['if-none-match' => $first->headers()['ETag'] ?? throw new \RuntimeException('ETag header is missing.')],
             query: ['lang' => 'pl'],
             attributes: ['path' => 'oferta'],
         );
@@ -126,7 +128,7 @@ final class PublicApiControllerTest extends TestCase
         $second = $this->controller->page(new Request(
             'GET',
             '/api/v1/pages/services',
-            headers: ['if-modified-since' => $first->headers()['Last-Modified']],
+            headers: ['if-modified-since' => $first->headers()['Last-Modified'] ?? throw new \RuntimeException('Last-Modified header is missing.')],
             query: ['lang' => 'en'],
             attributes: ['path' => 'services'],
         ));
@@ -147,8 +149,8 @@ final class PublicApiControllerTest extends TestCase
         $main = ContentData::list($menus['main'] ?? null, 'menus.main');
         $firstItem = ContentData::map($main[0] ?? null, 'menus.main.0');
 
-        self::assertSame('/en/services', $firstItem['url']);
-        self::assertSame('Services', $firstItem['label']);
+        self::assertSame('/en/services', $firstItem['url'] ?? null);
+        self::assertSame('Services', $firstItem['label'] ?? null);
     }
 
     public function testItDoesNotExposeDisabledPage(): void

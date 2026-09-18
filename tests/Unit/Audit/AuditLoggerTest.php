@@ -34,17 +34,17 @@ final class AuditLoggerTest extends TestCase
         $files = glob($this->project->path('storage/audit/*.jsonl'));
         self::assertIsArray($files);
         self::assertCount(1, $files);
-        $lines = file($files[0], FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $lines = file($files[0] ?? throw new \RuntimeException('Audit file is missing.'), FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         self::assertIsArray($lines);
         self::assertCount(2, $lines);
 
         /** @var array<string, mixed> $entry */
-        $entry = json_decode($lines[0], true, flags: JSON_THROW_ON_ERROR);
-        self::assertSame('page.updated', $entry['action']);
-        self::assertSame(7, $entry['user_id']);
-        self::assertSame('pages/oferta', $entry['resource']);
-        self::assertSame(['revision' => 'abc'], $entry['metadata']);
-        self::assertIsString($entry['timestamp']);
+        $entry = json_decode($lines[0] ?? throw new \RuntimeException('Audit entry is missing.'), true, flags: JSON_THROW_ON_ERROR);
+        self::assertSame('page.updated', $entry['action'] ?? null);
+        self::assertSame(7, $entry['user_id'] ?? null);
+        self::assertSame('pages/oferta', $entry['resource'] ?? null);
+        self::assertSame(['revision' => 'abc'], $entry['metadata'] ?? null);
+        self::assertIsString($entry['timestamp'] ?? null);
         self::assertMatchesRegularExpression('/^\d{4}-\d{2}-\d{2}T/', $entry['timestamp']);
     }
 }

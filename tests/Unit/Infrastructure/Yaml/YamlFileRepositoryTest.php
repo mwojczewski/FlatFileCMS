@@ -61,8 +61,8 @@ final class YamlFileRepositoryTest extends TestCase
         $this->project->write('config/setup.yml', "site:\n  name: After!\n");
         $second = $this->repository->read(FilesystemRoot::Config, $path);
 
-        self::assertSame(['name' => 'Before'], $first->data()['site']);
-        self::assertSame(['name' => 'After!'], $second->data()['site']);
+        self::assertSame(['name' => 'Before'], $first->data()['site'] ?? null);
+        self::assertSame(['name' => 'After!'], $second->data()['site'] ?? null);
         self::assertFalse($first->revision()->equals($second->revision()));
     }
 
@@ -106,8 +106,8 @@ final class YamlFileRepositoryTest extends TestCase
         $this->project->write('config/setup.yml', "site:\n  name: After\n");
         $second = $repository->read(FilesystemRoot::Config, $path);
 
-        self::assertSame(['name' => 'Before'], $first->data()['site']);
-        self::assertSame(['name' => 'After'], $second->data()['site']);
+        self::assertSame(['name' => 'Before'], $first->data()['site'] ?? null);
+        self::assertSame(['name' => 'After'], $second->data()['site'] ?? null);
         self::assertFalse($first->revision()->equals($second->revision()));
     }
 
@@ -123,11 +123,10 @@ final class YamlFileRepositoryTest extends TestCase
         self::assertCount(1, $this->cacheFiles('json'));
         self::assertCount(1, $this->cacheFiles('serialized'));
 
-        unlink($this->cacheFiles('serialized')[0]);
+        unlink($this->cacheFiles('serialized')[0] ?? throw new \RuntimeException('Expected serialized cache file to exist.'));
         self::assertSame($data, $cache->get('config:setup.yml', $revision));
         self::assertCount(1, $this->cacheFiles('serialized'));
-
-        unlink($this->cacheFiles('json')[0]);
+        unlink($this->cacheFiles('json')[0] ?? throw new \RuntimeException('Expected JSON cache file to exist.'));
         self::assertSame($data, $cache->get('config:setup.yml', $revision));
         self::assertCount(1, $this->cacheFiles('json'));
 

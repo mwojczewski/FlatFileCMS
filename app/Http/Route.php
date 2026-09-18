@@ -67,7 +67,7 @@ final readonly class Route
         array_shift($matches);
         $parameters = [];
         foreach ($this->parameterNames as $index => $name) {
-            $parameters[$name] = rawurldecode($matches[$index]);
+            $parameters[$name] = rawurldecode($matches[$index] ?? throw new InvalidArgumentException('Invalid index range.'));
         }
 
         return $parameters;

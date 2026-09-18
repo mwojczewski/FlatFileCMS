@@ -76,7 +76,7 @@ YAML);
             $revision,
             $this->languages,
         );
-        $first = $this->blocks($created->data())[0];
+        $first = $this->blocks($created->data())[0] ?? null;
         $firstId = ContentData::string($first['id'] ?? null, 'id');
         self::assertMatchesRegularExpression(
             '/^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/D',
@@ -99,7 +99,7 @@ YAML);
             $duplicated->revision(),
             $this->languages,
         );
-        self::assertFalse($this->blocks($toggled->data())[1]['enabled']);
+        self::assertFalse($this->blocks($toggled->data())[1]['enabled'] ?? true);
 
         $reordered = $this->manager->reorder(
             $this->identity,
@@ -107,7 +107,7 @@ YAML);
             $toggled->revision(),
             $this->languages,
         );
-        self::assertSame($secondId, $this->blocks($reordered->data())[0]['id']);
+        self::assertSame($secondId, $this->blocks($reordered->data())[0]['id'] ?? null);
 
         $updated = $this->manager->update(
             $this->identity,
@@ -118,7 +118,7 @@ YAML);
         );
         $updatedBlock = $this->manager->block($this->identity, $firstId);
         $updatedData = ContentData::map($updatedBlock['data'] ?? null, 'data');
-        self::assertSame(['pl' => 'Zmieniony', 'en' => 'Changed'], $updatedData['title']);
+        self::assertSame(['pl' => 'Zmieniony', 'en' => 'Changed'], $updatedData['title'] ?? null);
 
         $deleted = $this->manager->delete(
             $this->identity,
@@ -160,7 +160,7 @@ YAML);
             $initial->revision(),
             $this->languages,
         );
-        $block = $this->blocks($created->data())[0];
+        $block = $this->blocks($created->data())[0] ?? null;
         $id = ContentData::string($block['id'] ?? null, 'id');
 
         self::assertFalse($created->revision()->equals($initial->revision()));
@@ -187,8 +187,8 @@ YAML);
 
         $updatedBlock = $this->manager->block($this->identity, $id);
         $updatedData = ContentData::map($updatedBlock['data'] ?? null, 'data');
-        self::assertSame(['pl' => 'Trzeci', 'en' => 'Third'], $updatedData['title']);
-        self::assertTrue($updatedData['highlighted']);
+        self::assertSame(['pl' => 'Trzeci', 'en' => 'Third'], $updatedData['title'] ?? null);
+        self::assertTrue($updatedData['highlighted'] ?? false);
 
         $this->expectException(RevisionConflictException::class);
         $this->manager->update(

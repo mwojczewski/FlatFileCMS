@@ -117,7 +117,7 @@ final readonly class PageBlockManager
             $languages,
             function (array $blocks) use ($id): array {
                 $index = $this->indexOf($blocks, $id);
-                $copy = $blocks[$index];
+                $copy = $blocks[$index] ?? throw new InvalidArgumentException('Block does not exist on this page.');
                 $copy['id'] = UuidV7::generate();
                 array_splice($blocks, $index + 1, 0, [$copy]);
 

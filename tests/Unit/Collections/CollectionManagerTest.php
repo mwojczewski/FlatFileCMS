@@ -88,7 +88,9 @@ YAML);
         self::assertSame('aktualnosci', $updated->slug('pl')?->value());
         self::assertSame('asc', $updated->sortDirection());
         self::assertSame(24, $updated->perPage());
-        self::assertSame('category', $updated->filters()[0]->parameter());
+        $category = $updated->filters()[0]
+            ?? throw new \RuntimeException('Expected filter to be present in updated collection settings');
+        self::assertSame('category', $category->parameter());
         self::assertSame(7, $updated->order());
     }
 }

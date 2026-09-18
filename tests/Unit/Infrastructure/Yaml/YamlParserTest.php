@@ -16,8 +16,8 @@ final class YamlParserTest extends TestCase
     {
         $data = (new YamlParser())->parse("enabled: true\ntitle:\n  pl: Oferta\n");
 
-        self::assertSame(true, $data['enabled']);
-        self::assertSame(['pl' => 'Oferta'], $data['title']);
+        self::assertSame(true, $data['enabled'] ?? null);
+        self::assertSame(['pl' => 'Oferta'], $data['title'] ?? null);
     }
 
     public function testItRejectsASequenceAtDocumentRoot(): void

@@ -32,7 +32,7 @@ final class ApplicationTest extends TestCase
         $response = $this->application->handle(new Request('GET', '/api/v1/health'));
 
         self::assertSame(200, $response->status());
-        self::assertSame('application/json; charset=UTF-8', $response->headers()['Content-Type']);
+        self::assertSame('application/json; charset=UTF-8', $response->headers()['Content-Type'] ?? null);
         self::assertSame(
             ['status' => 'ok', 'application' => 'FlatFile CMS', 'stage' => 13],
             json_decode($response->body(), true, flags: JSON_THROW_ON_ERROR),

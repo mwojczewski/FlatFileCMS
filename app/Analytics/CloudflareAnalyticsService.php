@@ -92,7 +92,7 @@ final readonly class CloudflareAnalyticsService
     /** @return array<string, mixed> */
     private function fetch(string $range): array
     {
-        $days = self::RANGES[$range];
+        $days = self::RANGES[$range] ?? throw new \InvalidArgumentException('Invalid analytics range.');
         $zone = new DateTimeZone($this->config->timezone);
         $end = new DateTimeImmutable('now', $zone);
         $start = $end->modify(\sprintf('-%d days', $days));

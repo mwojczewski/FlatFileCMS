@@ -12,6 +12,8 @@ use FlatFileCms\Tests\Support\TestContentFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+use function PHPUnit\Framework\throwException;
+
 #[CoversClass(SiteController::class)]
 final class SiteControllerTest extends TestCase
 {
@@ -36,9 +38,9 @@ final class SiteControllerTest extends TestCase
         $page = $this->controller->page(new Request('GET', '/uslugi', attributes: ['path' => 'uslugi']));
 
         self::assertSame(302, $homepage->status());
-        self::assertSame('/pl/', $homepage->headers()['Location']);
+        self::assertSame('/pl/', $homepage->headers()['Location'] ?? null);
         self::assertSame(302, $page->status());
-        self::assertSame('/pl/uslugi', $page->headers()['Location']);
+        self::assertSame('/pl/uslugi', $page->headers()['Location'] ?? null);
     }
 
     public function testItRendersLocalizedValidatedPageAndOnlyItsAssets(): void
@@ -56,7 +58,7 @@ final class SiteControllerTest extends TestCase
         self::assertStringNotContainsString('<script>alert', $response->body());
         self::assertMatchesRegularExpression('#/assets/blocks/text/text\.[a-f0-9]{16}\.css#', $response->body());
         self::assertSame(1, substr_count($response->body(), '/assets/blocks/text/'));
-        self::assertMatchesRegularExpression('/^"[a-f0-9]{64}"$/D', $response->headers()['ETag']);
+        self::assertMatchesRegularExpression('/^"[a-f0-9]{64}"$/D', $response->headers()['ETag'] ?? throw new \RuntimeException('Expected ETag header to exist.'));
     }
 
     public function testItServesReactPrerenderForConfiguredPage(): void
@@ -72,7 +74,7 @@ final class SiteControllerTest extends TestCase
 
         self::assertSame(200, $response->status());
         self::assertSame($html, $response->body());
-        self::assertMatchesRegularExpression('/^"[a-f0-9]{64}"$/D', $response->headers()['ETag']);
+        self::assertMatchesRegularExpression('/^"[a-f0-9]{64}"$/D', $response->headers()['ETag'] ?? throw new \RuntimeException('Expected ETag header to exist.'));
     }
 
     public function testItReturnsServiceUnavailableWhenReactPrerenderIsMissing(): void
@@ -97,7 +99,7 @@ final class SiteControllerTest extends TestCase
         $second = $this->controller->page(new Request(
             'GET',
             '/en/services',
-            headers: ['if-none-match' => $first->headers()['ETag']],
+            headers: ['if-none-match' => $first->headers()['ETag'] ?? throw new \RuntimeException('Expected ETag header to exist.')],
             attributes: ['path' => 'en/services'],
         ));
 

@@ -106,13 +106,13 @@ final class CloudflareAnalyticsTest extends TestCase
         $topPage = $topPages[0] ?? [];
         $vitals = $this->map($result['vitals'] ?? null);
 
-        self::assertSame('ready', $refreshed['status']);
-        self::assertSame('ready', $result['status']);
-        self::assertSame(120, $summary['pageViews']);
-        self::assertSame(20, $summary['pageViewsChange']);
-        self::assertSame('/', $topPage['label']);
-        self::assertSame(75, $summary['cacheHitRatio']);
-        self::assertSame('good', $vitals['lcpRating']);
+        self::assertSame('ready', $refreshed['status'] ?? null);
+        self::assertSame('ready', $result['status'] ?? null);
+        self::assertSame(120, $summary['pageViews'] ?? null);
+        self::assertSame(20, $summary['pageViewsChange'] ?? null);
+        self::assertSame('/', $topPage['label'] ?? null);
+        self::assertSame(75, $summary['cacheHitRatio'] ?? null);
+        self::assertSame('good', $vitals['lcpRating'] ?? null);
         self::assertCount(2, $http->payloads);
     }
 
@@ -161,13 +161,13 @@ final class CloudflareAnalyticsTest extends TestCase
         );
 
         $refreshed = $service->refresh('7d');
-        self::assertSame('ready', $refreshed['status']);
+        self::assertSame('ready', $refreshed['status'] ?? null);
         self::assertCount(2, $http->payloads);
 
         $http->payloads = [];
         $cached = $service->dashboard('7d');
-        self::assertSame('ready', $cached['status']);
-        self::assertSame('fresh', $cached['cache']);
+        self::assertSame('ready', $cached['status'] ?? null);
+        self::assertSame('fresh', $cached['cache'] ?? null);
         self::assertCount(0, $http->payloads);
     }
 

@@ -61,11 +61,11 @@ YAML);
             new LanguageConfig('pl', ['pl' => 'Polski', 'en' => 'English']),
         );
 
-        self::assertSame(['pl' => 'Nagłówek', 'en' => 'Heading'], $mapped['heading']);
-        self::assertSame('false', $mapped['visible']);
+        self::assertSame(['pl' => 'Nagłówek', 'en' => 'Heading'], $mapped['heading'] ?? null);
+        self::assertSame('false', $mapped['visible'] ?? null);
         self::assertSame(
             [['label' => ['pl' => 'Pierwsza', 'en' => 'First']]],
-            $mapped['cards'],
+            $mapped['cards'] ?? null,
         );
     }
 
@@ -87,6 +87,6 @@ YAML);
             new LanguageConfig('pl', ['pl' => 'Polski', 'en' => 'English']),
         );
 
-        self::assertSame(['pl' => 'Nagłówek'], $mapped['heading']);
+        self::assertSame(['pl' => 'Nagłówek'], $mapped['heading'] ?? null);
     }
 }

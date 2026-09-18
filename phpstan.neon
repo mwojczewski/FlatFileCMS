@@ -4,4 +4,8 @@ parameters:
         - app
         - tests
     tmpDir: storage/tmp/phpstan
-
+    checkUninitializedProperties: false
+    reportPossiblyNonexistentGeneralArrayOffset: true
+    reportPossiblyNonexistentConstantArrayOffset: true
+includes:
+    - phar://phpstan.phar/conf/bleedingEdge.neon

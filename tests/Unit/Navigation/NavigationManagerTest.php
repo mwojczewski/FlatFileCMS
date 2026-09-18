@@ -67,26 +67,30 @@ YAML);
     {
         $revision = $this->manager->editable()->revision();
         $document = $this->manager->update([
-            'main' => [[
-                'label' => ['pl' => 'Oferta', 'en' => 'Services'],
-                'link' => ['type' => 'page', 'page' => 'services'],
-                'target' => '_self',
-                'children' => [[
-                    'label' => ['pl' => 'Kontakt', 'en' => 'Contact'],
-                    'link' => ['type' => 'url', 'url' => '/kontakt'],
+            'main' => [
+                [
+                    'label' => ['pl' => 'Oferta', 'en' => 'Services'],
+                    'link' => ['type' => 'page', 'page' => 'services'],
                     'target' => '_self',
-                    'children' => [],
-                ]],
-            ]],
+                    'children' => [
+                        [
+                            'label' => ['pl' => 'Kontakt', 'en' => 'Contact'],
+                            'link' => ['type' => 'url', 'url' => '/kontakt'],
+                            'target' => '_self',
+                            'children' => [],
+                        ],
+                    ],
+                ],
+            ],
         ], $revision);
 
-        $main = $document->menus()['main'];
+        $main = $document->menus()['main'] ?? throw new \InvalidArgumentException('Main menu is missing.');
         $first = ContentData::map($main[0] ?? null, 'main.0');
         $children = ContentData::list($first['children'] ?? null, 'main.0.children');
         $child = ContentData::map($children[0] ?? null, 'main.0.children.0');
 
-        self::assertSame('/pl/oferta', $first['url']);
-        self::assertSame('/kontakt', $child['url']);
+        self::assertSame('/pl/oferta', $first['url'] ?? null);
+        self::assertSame('/kontakt', $child['url'] ?? null);
     }
 
     public function testItDoesNotWriteNavigationWithMissingPageReference(): void
@@ -96,10 +100,12 @@ YAML);
 
         try {
             $this->manager->update([
-                'main' => [[
-                    'label' => ['pl' => 'Brak', 'en' => 'Missing'],
-                    'link' => ['type' => 'page', 'page' => 'missing'],
-                ]],
+                'main' => [
+                    [
+                        'label' => ['pl' => 'Brak', 'en' => 'Missing'],
+                        'link' => ['type' => 'page', 'page' => 'missing'],
+                    ],
+                ],
             ], $editable->revision());
             self::fail('Expected invalid navigation to be rejected.');
         } catch (InvalidContentException) {

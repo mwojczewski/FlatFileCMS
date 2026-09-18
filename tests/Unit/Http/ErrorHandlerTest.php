@@ -71,9 +71,9 @@ final class ErrorHandlerTest extends TestCase
             new HttpException(409, 'PAGE_REVISION_CONFLICT', 'Page changed in another session.'),
         );
 
-        self::assertSame('no-store', $response->headers()['Cache-Control']);
-        self::assertSame('no-cache', $response->headers()['Pragma']);
-        self::assertSame('DENY', $response->headers()['X-Frame-Options']);
+        self::assertSame('no-store', $response->headers()['Cache-Control'] ?? null);
+        self::assertSame('no-cache', $response->headers()['Pragma'] ?? null);
+        self::assertSame('DENY', $response->headers()['X-Frame-Options'] ?? null);
     }
 
     public function testUnauthenticatedAdministratorHtmlRequestRedirectsToLogin(): void
@@ -85,8 +85,8 @@ final class ErrorHandlerTest extends TestCase
         );
 
         self::assertSame(302, $response->status());
-        self::assertSame('/admin/login', $response->headers()['Location']);
-        self::assertSame('no-store', $response->headers()['Cache-Control']);
+        self::assertSame('/admin/login', $response->headers()['Location'] ?? null);
+        self::assertSame('no-store', $response->headers()['Cache-Control'] ?? null);
     }
 
     public function testUnauthenticatedJsonRequestKeepsErrorEnvelope(): void

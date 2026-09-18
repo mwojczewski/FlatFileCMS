@@ -54,7 +54,7 @@ final readonly class TrustedProxyResolver
             if (!$this->trusted($current)) {
                 break;
             }
-            $current = $forwarded[$index];
+            $current = $forwarded[$index] ?? throw new InvalidArgumentException('Invalid index range.');
         }
 
         return $current;
@@ -92,8 +92,10 @@ final readonly class TrustedProxyResolver
     {
         $address = $network;
         $prefixValue = null;
-        if (str_contains($network, '/')) {
-            [$address, $prefixValue] = explode('/', $network, 2);
+        $separator = strpos($network, '/');
+        if ($separator !== false) {
+            $address = substr($network, 0, $separator);
+            $prefixValue = substr($network, $separator + 1);
         }
 
         $packed = inet_pton($address);

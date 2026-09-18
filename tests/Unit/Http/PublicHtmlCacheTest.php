@@ -41,7 +41,8 @@ final class PublicHtmlCacheTest extends TestCase
         $files = glob($this->project->path('storage/cache/html/*.cache'));
         self::assertIsArray($files);
         self::assertCount(1, $files);
-        self::assertIsArray(unserialize((string) file_get_contents($files[0]), ['allowed_classes' => false]));
+        $file = $files[0] ?? throw new \RuntimeException('Expected cache file to exist.');
+        self::assertIsArray(unserialize((string) file_get_contents($file), ['allowed_classes' => false]));
         self::assertNull($cache->get($request, 'en', 'oferta', $request->query()));
         self::assertNull($cache->get($request, 'pl', 'kontakt', $request->query()));
         self::assertNull((new PublicHtmlCache($this->paths, true, 'release-b'))
@@ -99,7 +100,8 @@ final class PublicHtmlCacheTest extends TestCase
         $cache->put($request, 'pl', '', [], 'original', 123);
         $files = glob($this->project->path('storage/cache/html/*.cache'));
         self::assertIsArray($files);
-        file_put_contents($files[0], serialize([
+        $file = $files[0] ?? throw new \RuntimeException('Cache file was not created.');
+        file_put_contents($file, serialize([
             'html' => 'modified',
             'modifiedAt' => 123,
             'contentHash' => hash('sha256', 'original'),

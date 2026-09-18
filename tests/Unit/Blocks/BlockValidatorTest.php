@@ -80,13 +80,13 @@ final class BlockValidatorTest extends TestCase
         $items = ContentData::list($english['items'] ?? null, 'items');
         $firstItem = ContentData::map($items[0] ?? null, 'items.0');
 
-        self::assertSame('Services', $english['title']);
-        self::assertSame(4, $english['count']);
-        self::assertTrue($english['active']);
-        self::assertSame(['new', 'featured'], $english['tags']);
-        self::assertSame('#aabbcc', $english['color']);
-        self::assertSame('Photo', $image['alt']);
-        self::assertSame('First', $firstItem['label']);
+        self::assertSame('Services', $english['title'] ?? null);
+        self::assertSame(4, $english['count'] ?? null);
+        self::assertTrue($english['active'] ?? null);
+        self::assertSame(['new', 'featured'], $english['tags'] ?? null);
+        self::assertSame('#aabbcc', $english['color'] ?? null);
+        self::assertSame('Photo', $image['alt'] ?? null);
+        self::assertSame('First', $firstItem['label'] ?? null);
     }
 
     public function testUrlFieldAcceptsRelativePath(): void
@@ -109,7 +109,7 @@ final class BlockValidatorTest extends TestCase
             PageIdentity::fromString('offer'),
         );
 
-        self::assertSame('/en/documentation/getting-started', $normalized->values()['website']);
+        self::assertSame('/en/documentation/getting-started', $normalized->values()['website'] ?? null);
     }
 
     public function testItReportsMultipleValidationErrorsWithPaths(): void
@@ -177,8 +177,8 @@ final class BlockValidatorTest extends TestCase
         $items = ContentData::list($english['items'] ?? null, 'items');
         $firstItem = ContentData::map($items[0] ?? null, 'items.0');
 
-        self::assertSame('Oferta', $english['title']);
-        self::assertSame('Pierwsza', $firstItem['label']);
+        self::assertSame('Oferta', $english['title'] ?? null);
+        self::assertSame('Pierwsza', $firstItem['label'] ?? null);
     }
 
     private function writeDefinition(): void

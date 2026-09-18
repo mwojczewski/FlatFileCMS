@@ -22,8 +22,8 @@ final class OpenApiDocumentTest extends TestCase
         self::assertIsArray($info);
         self::assertIsArray($paths);
 
-        self::assertSame('3.1.0', $data['openapi']);
-        self::assertSame('FlatfileCMS Public API', $info['title']);
+        self::assertSame('3.1.0', $data['openapi'] ?? null);
+        self::assertSame('FlatfileCMS Public API', $info['title'] ?? null);
         self::assertSame([
             '/api/v1/health',
             '/api/v1/pages',

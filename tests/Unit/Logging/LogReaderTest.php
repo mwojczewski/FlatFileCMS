@@ -36,9 +36,10 @@ final class LogReaderTest extends TestCase
 
         self::assertSame(1, $result['total']);
         self::assertSame(1, $result['malformed']);
-        self::assertSame('ERROR', $result['entries'][0]['level']);
-        self::assertSame('07.09.2026, 10:16:00', $result['entries'][0]['date']);
-        self::assertSame(['code' => 5], $result['entries'][0]['context']);
+        self::assertSame('ERROR', $result['entries'][0]['level'] ?? null);
+        $entry = $result['entries'][0];
+        self::assertSame('07.09.2026, 10:16:00', $entry['date']);
+        self::assertSame(['code' => 5], $entry['context']);
     }
 
     public function testIgnoresUnrelatedFilesAndRejectsUnknownSelection(): void

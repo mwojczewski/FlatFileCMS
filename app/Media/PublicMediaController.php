@@ -77,7 +77,11 @@ final readonly class PublicMediaController
         }
         $filename = array_pop($segments);
         $fingerprint = array_pop($segments);
-        if ($filename === '' || preg_match('/^[a-f0-9]{16}$/D', $fingerprint) !== 1) {
+        if (
+            $filename === ''
+            || $fingerprint === null
+            || preg_match('/^[a-f0-9]{16}$/D', $fingerprint) !== 1
+        ) {
             throw new InvalidArgumentException('Media fingerprint is invalid.');
         }
 

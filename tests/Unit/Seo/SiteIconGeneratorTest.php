@@ -54,7 +54,7 @@ final class SiteIconGeneratorTest extends TestCase
             ],
         );
 
-        self::assertSame('/site.webmanifest', $paths['manifest']);
+        self::assertSame('/site.webmanifest', $paths['manifest'] ?? null);
         self::assertFileExists($this->project->path('public/favicon.ico'));
         self::assertFileExists($this->project->path('public/apple-touch-icon-precomposed.png'));
         self::assertFileExists($this->project->path('public/assets/icons/icon-512x512.png'));

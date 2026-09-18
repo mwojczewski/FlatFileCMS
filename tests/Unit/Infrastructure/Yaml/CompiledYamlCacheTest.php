@@ -45,7 +45,7 @@ final class CompiledYamlCacheTest extends TestCase
 
         self::assertNotNull($document);
         $site = ContentData::map($document->data()['site'] ?? null, 'site');
-        self::assertSame('Test', $site['name']);
+        self::assertSame('Test', $site['name'] ?? null);
     }
 
     public function testDifferentReleaseRejectsStaleCache(): void

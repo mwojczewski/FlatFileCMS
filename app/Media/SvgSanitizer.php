@@ -11,7 +11,14 @@ use DOMNode;
 final class SvgSanitizer
 {
     private const array BLOCKED_ELEMENTS = [
-        'audio', 'embed', 'foreignobject', 'iframe', 'object', 'script', 'style', 'video',
+        'audio',
+        'embed',
+        'foreignobject',
+        'iframe',
+        'object',
+        'script',
+        'style',
+        'video',
     ];
 
     public function sanitize(string $contents): string
@@ -22,6 +29,9 @@ final class SvgSanitizer
 
         $document = new DOMDocument();
         $previous = libxml_use_internal_errors(true);
+        if ($contents === '') {
+            throw new MediaException('Uploaded SVG is not a valid SVG document.');
+        }
         try {
             $loaded = $document->loadXML($contents, LIBXML_NONET | LIBXML_COMPACT | LIBXML_NOBLANKS);
         } finally {

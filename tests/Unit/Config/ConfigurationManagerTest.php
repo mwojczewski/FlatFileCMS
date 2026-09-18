@@ -50,9 +50,9 @@ YAML);
         $site = ContentData::map($data['site'] ?? null, 'site');
         $seo = ContentData::map($data['seo'] ?? null, 'seo');
 
-        self::assertSame('Example', $site['name']);
-        self::assertSame(['preserved' => true], $data['custom']);
-        self::assertSame(['pl' => 'Opis', 'en' => 'Description'], $seo['description']);
+        self::assertSame('Example', $site['name'] ?? null);
+        self::assertSame(['preserved' => true], $data['custom'] ?? null);
+        self::assertSame(['pl' => 'Opis', 'en' => 'Description'], $seo['description'] ?? null);
     }
 
     public function testItRejectsUnknownLayoutBeforeWriting(): void

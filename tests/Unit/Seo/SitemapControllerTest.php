@@ -59,7 +59,7 @@ final class SitemapControllerTest extends TestCase
         );
         $response = $controller->show(new Request('GET', '/sitemap.xml'));
 
-        self::assertSame('application/xml; charset=UTF-8', $response->headers()['Content-Type']);
+        self::assertSame('application/xml; charset=UTF-8', $response->headers()['Content-Type'] ?? null);
         self::assertStringContainsString('<loc>https://example.test/pl/</loc>', $response->body());
         self::assertStringContainsString('<loc>https://example.test/en/</loc>', $response->body());
         self::assertStringContainsString('xmlns:xhtml="http://www.w3.org/1999/xhtml"', $response->body());

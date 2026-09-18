@@ -160,12 +160,12 @@ final class MediaManagerTest extends TestCase
         $path = "offer/{$item->fingerprint()}/{$item->name()->value()}";
         $response = $controller->show(new Request('GET', "/media/{$path}", query: ['w' => '1', 'format' => 'webp'], attributes: ['path' => $path]));
         self::assertSame(200, $response->status());
-        self::assertSame('image/webp', $response->headers()['Content-Type']);
+        self::assertSame('image/webp', $response->headers()['Content-Type'] ?? null);
 
         $conditional = $controller->show(new Request(
             'GET',
             "/media/{$path}",
-            headers: ['if-none-match' => $response->headers()['ETag']],
+            headers: ['if-none-match' => $response->headers()['ETag'] ?? throw new RuntimeException('Expected ETag header to exist.')],
             query: ['w' => '1', 'format' => 'webp'],
             attributes: ['path' => $path],
         ));
@@ -180,7 +180,8 @@ final class MediaManagerTest extends TestCase
         ));
         self::assertSame(206, $range->status());
         self::assertSame(1, \strlen($range->body()));
-        self::assertStringStartsWith('bytes 0-0/', $range->headers()['Content-Range']);
+        self::assertStringStartsWith('bytes 0-0/', $range->headers()['Content-Range']
+            ?? throw new RuntimeException('Expected Content-Range header to exist.'));
     }
 
     public function testPublicControllerRejectsAnIncompleteMediaUrl(): void

@@ -102,7 +102,7 @@ final readonly class ConsoleApplication
                 if (!isset($arguments[$index + 1])) {
                     throw new InvalidArgumentException('The --first-name option requires a value.');
                 }
-                $firstName = $arguments[++$index];
+                $firstName = $arguments[++$index] ?? throw new InvalidArgumentException('Invalid index range.');
                 continue;
             }
             if (str_starts_with($argument, '--first-name=')) {
@@ -113,7 +113,7 @@ final readonly class ConsoleApplication
                 if (!isset($arguments[$index + 1])) {
                     throw new InvalidArgumentException('The --last-name option requires a value.');
                 }
-                $lastName = $arguments[++$index];
+                $lastName = $arguments[++$index] ?? throw new InvalidArgumentException('Invalid index range.');
                 continue;
             }
             if (str_starts_with($argument, '--last-name=')) {
@@ -201,8 +201,8 @@ final readonly class ConsoleApplication
         $options = $this->pruneOptions($arguments, ['assets' => 604800, 'cache' => 2592000]);
         $result = $this->cachePruner->prune(
             $options['dryRun'],
-            $options['ages']['assets'],
-            $options['ages']['cache'],
+            $options['ages']['assets'] ?? throw new InvalidArgumentException('Invalid assets age.'),
+            $options['ages']['cache'] ?? throw new InvalidArgumentException('Invalid cache age.'),
         );
         $prefix = $options['dryRun'] ? 'Cache prune dry run' : 'Cache pruned';
         $this->output(\sprintf("%s. %d file(s), %d byte(s).\n", $prefix, $result->files, $result->bytes));
@@ -232,7 +232,7 @@ final readonly class ConsoleApplication
     private function pruneRuntime(array $arguments): int
     {
         $options = $this->pruneOptions($arguments, ['sessions' => 86400]);
-        $result = $this->runtimePruner->prune($options['dryRun'], $options['ages']['sessions']);
+        $result = $this->runtimePruner->prune($options['dryRun'], $options['ages']['sessions'] ?? throw new InvalidArgumentException('Invalid sessions age.'));
         $prefix = $options['dryRun'] ? 'Runtime prune dry run' : 'Runtime pruned';
         $this->output(\sprintf("%s. %d file(s), %d byte(s).\n", $prefix, $result->files, $result->bytes));
 

@@ -34,7 +34,7 @@ final class InMemoryMailer implements Mailer
             throw new \RuntimeException('No email was sent.');
         }
 
-        return $this->messages[\count($this->messages) - 1];
+        return $this->messages[\count($this->messages) - 1] ?? throw new \RuntimeException('No email was sent.');
     }
 
     public function count(): int

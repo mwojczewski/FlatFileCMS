@@ -99,7 +99,7 @@ final readonly class SeoResolver
         $twitter = [...$this->map($global['twitter'] ?? []), ...$this->map($pageSeo['twitter'] ?? [])];
         $twitter['title'] ??= $fullTitle;
         $twitter['description'] ??= $description;
-        $twitter['image'] ??= $openGraph['image'] ?? null;
+        $twitter['image'] ??= $openGraph['image'];
 
         return [
             'title' => $fullTitle,

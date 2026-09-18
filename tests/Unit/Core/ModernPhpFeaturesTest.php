@@ -30,7 +30,7 @@ final class ModernPhpFeaturesTest extends TestCase
 
     public function testSensitiveParametersAreMarkedForRuntimeRedaction(): void
     {
-        $parameter = (new ReflectionMethod(PasswordHasher::class, 'hash'))->getParameters()[0];
+        $parameter = (new ReflectionMethod(PasswordHasher::class, 'hash'))->getParameters()[0] ?? throw new \RuntimeException('Expected parameter to be present in method signature');
 
         self::assertCount(1, $parameter->getAttributes(\SensitiveParameter::class));
     }

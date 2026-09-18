@@ -42,7 +42,7 @@ final class RedirectRepositoryTest extends TestCase
         self::assertCount(1, $written->rules());
         self::assertNotNull($response);
         self::assertSame(308, $response->status());
-        self::assertSame('/new', $response->headers()['Location']);
+        self::assertSame('/new', $response->headers()['Location'] ?? null);
     }
 
     public function testItRejectsRedirectCycles(): void

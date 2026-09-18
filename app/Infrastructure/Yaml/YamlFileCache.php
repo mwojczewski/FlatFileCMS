@@ -160,6 +160,7 @@ final readonly class YamlFileCache
             return null;
         }
 
+        // @phpstan-ignore argument.type
         $record = @unserialize($contents, ['allowed_classes' => false, 'max_depth' => 64]);
         $data = $this->recordData($record, $sourceRevision);
         if ($data === null) {

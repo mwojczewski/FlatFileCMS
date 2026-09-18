@@ -48,11 +48,11 @@ final class CollectionApiTest extends TestCase
         $attributes = ContentData::map($first['attributes'] ?? null, 'items.0.attributes');
 
         self::assertSame(200, $response->status());
-        self::assertSame('blog/third', $first['id']);
-        self::assertSame('blog/first', $second['id']);
-        self::assertSame('Newest excerpt', $attributes['excerpt']);
-        self::assertSame(2, $pagination['totalItems']);
-        self::assertSame(1, $pagination['totalPages']);
+        self::assertSame('blog/third', $first['id'] ?? null);
+        self::assertSame('blog/first', $second['id'] ?? null);
+        self::assertSame('Newest excerpt', $attributes['excerpt'] ?? null);
+        self::assertSame(2, $pagination['totalItems'] ?? null);
+        self::assertSame(1, $pagination['totalPages'] ?? null);
     }
 
     public function testAChildPageUsesItsCollectionLocalizedSlugAsAncestor(): void
@@ -66,7 +66,7 @@ final class CollectionApiTest extends TestCase
         $data = $this->decode($response);
 
         self::assertSame(200, $response->status());
-        self::assertSame('/pl/aktualnosci/najnowszy', $data['url']);
+        self::assertSame('/pl/aktualnosci/najnowszy', $data['url'] ?? null);
     }
 
     public function testItRejectsDisallowedFilterValues(): void
@@ -101,8 +101,8 @@ YAML);
         $data = $this->decode($response);
 
         self::assertSame(200, $response->status());
-        self::assertSame('Wpis third', $data['title']);
-        self::assertSame('/de/aktualnosci/najnowszy', $data['url']);
+        self::assertSame('Wpis third', $data['title'] ?? null);
+        self::assertSame('/de/aktualnosci/najnowszy', $data['url'] ?? null);
     }
 
     private function writeFixtures(): void
